@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cal St Francis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Spectral:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS ─────────────────────────────────── */
+:root {
+  --ink:        #1a1612;
+  --ink-2:      #211d18;
+  --ink-3:      #2e2820;
+  --rule:       #3d3528;
+  --rule-hi:    #5a4e38;
+  --vellum:     #e8dcc8;
+  --vellum-2:   #c8b898;
+  --vellum-3:   #9a8a6a;
+  --gold:       #c9a84c;
+  --gold-hi:    #e8c870;
+  --gold-bg:    rgba(201,168,76,.08);
+  --red:        #9a2820;
+  --red-hi:     #c03828;
+  --shadow:     0 2px 16px rgba(0,0,0,.45);
+  --shadow-sm:  0 1px 6px rgba(0,0,0,.35);
+}
+
+/* ── RESET ──────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--ink);
+  color: var(--vellum);
+  font-family: 'Spectral', Georgia, serif;
+  font-size: 1rem;
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--gold); text-decoration: none; transition: color .15s; }
+a:hover { color: var(--gold-hi); }
+
+.rule-h { border: none; border-top: 1px solid var(--rule); margin: 0; }
+
+/* ── LAYOUT ─────────────────────────────────── */
+.container { max-width: 860px; margin: 0 auto; padding: 0 1.75rem; }
+
+/* ── NAV ─────────────────────────────────────── */
+nav {
+  border-bottom: 1px solid var(--rule);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(26,22,18,.94);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 50px;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 1.75rem;
+}
+.nav-brand {
+  font-family: 'IM Fell English', serif;
+  font-size: 1.1rem;
+  color: var(--gold);
+  letter-spacing: .04em;
+}
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+}
+.nav-links a {
+  font-family: 'Spectral', serif;
+  font-size: .8rem;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--vellum-3);
+  transition: color .15s;
+}
+.nav-links a:hover { color: var(--gold); }
+
+/* ── HERO ────────────────────────────────────── */
+.hero {
+  padding: 5rem 0 4rem;
+  border-bottom: 1px solid var(--rule);
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '✛';
+  position: absolute;
+  right: -1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 22rem;
+  color: var(--ink-3);
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}
+.hero-eyebrow {
+  font-family: 'Spectral', serif;
+  font-size: .74rem;
+  font-weight: 600;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 1rem;
+}
+.hero h1 {
+  font-family: 'IM Fell English', serif;
+  font-size: 3.4rem;
+  font-weight: 400;
+  line-height: 1.12;
+  color: var(--gold);
+  margin-bottom: .3rem;
+  letter-spacing: .01em;
+}
+.hero-subtitle {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 1.15rem;
+  color: var(--vellum-2);
+  margin-bottom: 1.6rem;
+  letter-spacing: .02em;
+}
+.hero-desc {
+  font-size: .97rem;
+  color: var(--vellum-2);
+  line-height: 1.85;
+  max-width: 540px;
+  margin-bottom: 2rem;
+}
+.hero-desc em { font-style: italic; color: var(--vellum); }
+.hero-rule {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  margin-bottom: 1.8rem;
+  max-width: 540px;
+}
+.hero-rule-line { flex: 1; border-top: 1px solid var(--rule-hi); }
+.hero-rule-orn { font-size: .75rem; color: var(--gold); opacity: .6; letter-spacing: .1em; }
+.hero-actions { display: flex; gap: .75rem; flex-wrap: wrap; }
+
+/* ── BUTTONS ─────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .5rem 1.15rem;
+  font-family: 'Spectral', serif;
+  font-size: .86rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+  cursor: pointer;
+  transition: all .15s;
+  border: 1px solid transparent;
+  text-decoration: none !important;
+}
+.btn-gold {
+  background: var(--gold-bg);
+  color: var(--gold);
+  border-color: var(--rule-hi);
+}
+.btn-gold:hover { background: rgba(201,168,76,.16); border-color: var(--gold); color: var(--gold-hi); }
+.btn-ghost {
+  background: transparent;
+  color: var(--vellum-3);
+  border-color: var(--rule);
+}
+.btn-ghost:hover { background: var(--ink-3); color: var(--vellum); border-color: var(--rule-hi); }
+.btn-kofi {
+  background: rgba(154,40,32,.15);
+  color: #e07060;
+  border-color: rgba(154,40,32,.4);
+}
+.btn-kofi:hover { background: rgba(154,40,32,.25); color: #f08070; border-color: var(--red-hi); }
+
+/* ── SECTIONS ────────────────────────────────── */
+section { padding: 3.5rem 0; border-bottom: 1px solid var(--rule); }
+section:last-of-type { border-bottom: none; }
+
+.section-eyebrow {
+  font-family: 'Spectral', serif;
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: .45rem;
+}
+.section-title {
+  font-family: 'IM Fell English', serif;
+  font-size: 1.7rem;
+  font-weight: 400;
+  color: var(--gold);
+  line-height: 1.2;
+  margin-bottom: .5rem;
+}
+.section-intro {
+  color: var(--vellum-3);
+  font-size: .93rem;
+  line-height: 1.8;
+  max-width: 580px;
+  margin-bottom: 2rem;
+}
+
+/* ── GAME FEATURE ────────────────────────────── */
+.game-feature {
+  border: 1px solid var(--rule-hi);
+  background: #100e0b;
+  padding: 2rem 2rem 1.75rem;
+  margin-bottom: 1.2rem;
+  position: relative;
+  overflow: hidden;
+}
+.game-feature::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,.012) 2px, rgba(255,255,255,.012) 4px);
+  pointer-events: none;
+}
+.game-header { display: flex; align-items: flex-start; gap: 2rem; margin-bottom: 1.2rem; }
+.game-ascii {
+  font-family: 'Courier Prime', monospace;
+  font-size: .62rem;
+  color: #6a5a38;
+  white-space: pre;
+  line-height: 1.4;
+  flex-shrink: 0;
+  padding-top: .1rem;
+}
+.game-label {
+  font-family: 'Spectral', serif;
+  font-size: .68rem;
+  font-weight: 600;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: #6a5a38;
+  margin-bottom: .35rem;
+}
+.game-title {
+  font-family: 'IM Fell English', serif;
+  font-size: 1.6rem;
+  color: #f0e0a0;
+  line-height: 1.15;
+  margin-bottom: .5rem;
+}
+.game-desc {
+  font-size: .9rem;
+  color: #a89060;
+  line-height: 1.8;
+  max-width: 500px;
+  margin-bottom: 1.2rem;
+}
+.game-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid #3a3020;
+  padding-top: .9rem;
+}
+.game-status {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  font-family: 'Spectral', serif;
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #90c060;
+}
+.status-pip {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #90c060;
+  display: inline-block;
+  animation: pip 2.5s ease-in-out infinite;
+}
+@keyframes pip { 0%,100%{opacity:.5} 50%{opacity:1} }
+.game-link {
+  font-family: 'Spectral', serif;
+  font-size: .84rem;
+  font-weight: 600;
+  color: #c9a84c;
+  letter-spacing: .04em;
+}
+.game-link:hover { color: #e8c870; }
+
+/* ── PROJECT LIST ────────────────────────────── */
+.project-list { display: flex; flex-direction: column; gap: .75rem; }
+.project-card {
+  border: 1px solid var(--rule);
+  background: var(--ink-2);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+  transition: border-color .2s, background .2s;
+}
+.project-card:hover { border-color: var(--rule-hi); background: var(--ink-3); }
+.project-initial {
+  font-family: 'IM Fell English', serif;
+  font-size: 2.2rem;
+  color: var(--gold);
+  line-height: 1;
+  flex-shrink: 0;
+  width: 2.4rem;
+  text-align: center;
+  padding-top: .1rem;
+  opacity: .7;
+}
+.project-body { flex: 1; }
+.project-meta { display: flex; align-items: center; gap: .75rem; margin-bottom: .3rem; flex-wrap: wrap; }
+.project-name { font-family: 'IM Fell English', serif; font-size: 1.08rem; color: var(--vellum); }
+.project-type {
+  font-size: .68rem;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--vellum-3);
+  border: 1px solid var(--rule);
+  padding: .1rem .45rem;
+}
+.project-desc { font-size: .88rem; color: var(--vellum-3); line-height: 1.7; margin-bottom: .6rem; }
+.project-link { font-size: .8rem; font-weight: 600; letter-spacing: .04em; color: var(--gold); }
+.project-link:hover { color: var(--gold-hi); }
+.project-status-dev {
+  font-size: .68rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #8a7040;
+  border: 1px solid #3a3020;
+  padding: .1rem .45rem;
+  font-weight: 600;
+}
+
+/* ── ABOUT ───────────────────────────────────── */
+.about-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  border: 1px solid var(--rule);
+  background: var(--rule);
+}
+.about-cell { background: var(--ink-2); padding: 1.4rem 1.5rem; }
+.about-cell h3 {
+  font-family: 'IM Fell English', serif;
+  font-size: .95rem;
+  color: var(--gold);
+  margin-bottom: .7rem;
+  font-weight: 400;
+  letter-spacing: .02em;
+}
+.about-cell p, .about-cell li {
+  font-size: .87rem;
+  color: var(--vellum-3);
+  line-height: 1.75;
+}
+.about-cell ul { list-style: none; display: flex; flex-direction: column; gap: .2rem; }
+.about-cell li { padding-left: 1rem; position: relative; }
+.about-cell li::before { content: '·'; position: absolute; left: 0; color: var(--red); }
+
+/* ── SUPPORT ─────────────────────────────────── */
+.support-body {
+  border: 1px solid var(--rule);
+  background: var(--ink-2);
+  padding: 2rem 2.2rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+}
+.support-drop {
+  font-family: 'IM Fell English', serif;
+  font-size: 4.5rem;
+  color: var(--red);
+  line-height: .8;
+  flex-shrink: 0;
+  opacity: .7;
+  padding-top: .3rem;
+}
+.support-text p {
+  font-size: .93rem;
+  color: var(--vellum-3);
+  line-height: 1.85;
+  margin-bottom: 1.2rem;
+}
+
+/* ── FOOTER ──────────────────────────────────── */
+footer { padding: 2.5rem 0; text-align: center; }
+.footer-orn {
+  font-family: 'IM Fell English', serif;
+  font-size: 1.4rem;
+  color: var(--gold);
+  opacity: .35;
+  display: block;
+  margin-bottom: .75rem;
+  letter-spacing: .2em;
+}
+footer p { font-size: .8rem; color: var(--vellum-3); line-height: 1.9; }
+footer a { color: var(--vellum-3); }
+footer a:hover { color: var(--gold); }
+
+/* ── RESPONSIVE ──────────────────────────────── */
+@media (max-width: 640px) {
+  .hero h1 { font-size: 2.4rem; }
+  .hero::before { display: none; }
+  .game-ascii { display: none; }
+  .game-header { flex-direction: column; gap: .8rem; }
+  .about-body { grid-template-columns: 1fr; }
+  .support-body { flex-direction: column; gap: 1rem; }
+  .support-drop { font-size: 3rem; }
+  .nav-links { gap: 1.2rem; }
+}
+
+/* ── ANIMATIONS ──────────────────────────────── */
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.hero { animation: riseIn .6s ease both; }
+section { animation: riseIn .5s ease both; }
+section:nth-of-type(2) { animation-delay: .08s; }
+section:nth-of-type(3) { animation-delay: .14s; }
+section:nth-of-type(4) { animation-delay: .18s; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <span class="nav-brand">Cal St Francis</span>
+    <ul class="nav-links">
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#support">Support</a></li>
+    </ul>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="container">
+    <div class="hero-eyebrow">Minister · Theologian · Developer</div>
+    <h1>Cal St Francis</h1>
+    <p class="hero-subtitle">Candidate for Ordination, United Church of Canada</p>
+    <div class="hero-rule">
+      <div class="hero-rule-line"></div>
+      <span class="hero-rule-orn">✦ ✦ ✦</span>
+      <div class="hero-rule-line"></div>
+    </div>
+    <p class="hero-desc">
+      I make liturgical tools for ministers and worship leaders, write theology in the
+      traditions of <em>liberation and process</em>, and build the occasional strange little game.
+      Everything here is free. If it helps you, consider buying me a coffee.
+    </p>
+    <div class="hero-actions">
+      <a href="#projects" class="btn btn-gold">See My Work</a>
+      <a href="cv.html" class="btn btn-ghost">CV &amp; Résumé</a>
+      <a href="https://ko-fi.com/YOURHANDLE" target="_blank" rel="noopener" class="btn btn-kofi">☕ Ko-fi</a>
+    </div>
+  </div>
+</section>
+
+<section id="projects">
+  <div class="container">
+    <div class="section-eyebrow">Works</div>
+    <h2 class="section-title">Projects &amp; Games</h2>
+    <p class="section-intro">
+      Liturgical tools, LaTeX templates, and interactive fiction. All free; source on GitHub.
+    </p>
+
+    <div class="game-feature">
+      <div class="game-header">
+        <div class="game-ascii">╔══════════════════════════════════╗
+║  DRENTHE &amp; ASSOCIATES             ║
+║  Continuity. Clarity. Compliance. ║
+╚══════════════════════════════════╝
+  · · · · · · · · · · · · · · · · ·
+  [▓▓▓][▓▓▓][▓▓▓][▓▓▓][▓▓▓][▓▓▓]
+   clk   clk   clk   clk   clk</div>
+        <div>
+          <div class="game-label">Text Adventure · Browser · Free</div>
+          <div class="game-title">The Severed Hours</div>
+          <p class="game-desc">
+            A noir text adventure set inside the labyrinthine offices of Drenthe &amp; Associates —
+            a firm where Continuity, Clarity, and Compliance mask something far stranger.
+            Play as two investigators. Choices matter. Time frays.
+          </p>
+        </div>
+      </div>
+      <div class="game-footer">
+        <span class="game-status"><span class="status-pip"></span> Playable now — v1.3</span>
+        <a href="games/severed-hours.html" class="game-link">Play in browser →</a>
+      </div>
+    </div>
+
+    <div class="project-list">
+      <div class="project-card">
+        <div class="project-initial">L</div>
+        <div class="project-body">
+          <div class="project-meta">
+            <span class="project-name">Liturgy Planner</span>
+            <span class="project-type">LaTeX · UCC</span>
+            <span class="project-status-dev">In development</span>
+          </div>
+          <p class="project-desc">
+            A LaTeX-based worship planning system for United Church of Canada congregations.
+            Full service flows, lectionary integration, and print-ready orders of service.
+          </p>
+          <a href="https://github.com/YOURHANDLE/liturgy-planner" target="_blank" rel="noopener" class="project-link">View on GitHub →</a>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <div class="project-initial">τ</div>
+        <div class="project-body">
+          <div class="project-meta">
+            <span class="project-name">Liturgical LaTeX Templates</span>
+            <span class="project-type">LaTeX · Templates</span>
+            <span class="project-status-dev">In development</span>
+          </div>
+          <p class="project-desc">
+            Reusable templates for prayers, calls to worship, sermons, and full service booklets.
+            For ministers who want beautiful, print-ready documents without fighting their tools.
+          </p>
+          <a href="https://github.com/YOURHANDLE/liturgical-latex" target="_blank" rel="noopener" class="project-link">View on GitHub →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="container">
+    <div class="section-eyebrow">Biography</div>
+    <h2 class="section-title">Who I Am</h2>
+    <p class="section-intro">
+      Minister-in-formation at Atlantic School of Theology, Halifax, Nova Scotia.
+      My theology is shaped by liberation, process, and contemplative traditions.
+    </p>
+    <div class="about-body">
+      <div class="about-cell">
+        <h3>Ministry</h3>
+        <p>Student minister at Hope United Church, Halifax. I preach, lead worship,
+        and build liturgical tools for congregations. Grounded in a theology of liberation —
+        God's power as invitation, not coercion.</p>
+      </div>
+      <div class="about-cell">
+        <h3>Academic Formation</h3>
+        <ul>
+          <li>MDiv candidate, Atlantic School of Theology</li>
+          <li>Philosophy &amp; classical languages</li>
+          <li>Mathematics &amp; environmental studies</li>
+          <li>Biblical Hebrew &amp; Koine Greek</li>
+        </ul>
+      </div>
+      <div class="about-cell">
+        <h3>Theological Commitments</h3>
+        <ul>
+          <li>Liberation &amp; process theology</li>
+          <li>Borg/Crossan historical Jesus scholarship</li>
+          <li>Rinzai-influenced contemplative practice</li>
+          <li>Scripture as living encounter</li>
+        </ul>
+      </div>
+      <div class="about-cell">
+        <h3>Craft &amp; Method</h3>
+        <ul>
+          <li>LaTeX for liturgy &amp; academic writing</li>
+          <li>Illuminated manuscript &amp; calligraphy traditions</li>
+          <li>Free and open-source software throughout</li>
+          <li>Plain HTML — no engines, no frameworks</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="support">
+  <div class="container">
+    <div class="section-eyebrow">Support</div>
+    <h2 class="section-title">Buy Me a Coffee</h2>
+    <div class="support-body">
+      <div class="support-drop">☕</div>
+      <div class="support-text">
+        <p>
+          I'm a seminary student making ends meet while building free tools for the church.
+          Everything here — the games, the templates, the liturgical resources — is free
+          and will stay free. If something I've made has been useful to you, a small
+          donation goes a long way. No pressure, no paywalls.
+        </p>
+        <a href="https://ko-fi.com/YOURHANDLE" target="_blank" rel="noopener" class="btn btn-kofi">
+          ☕ Support on Ko-fi
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <span class="footer-orn">✦ · ✦ · ✦</span>
+    <p>
+      Cal St Francis · Halifax, Nova Scotia<br>
+      <a href="mailto:your@email.com">your@email.com</a> ·
+      <a href="https://github.com/YOURHANDLE" target="_blank" rel="noopener">GitHub</a> ·
+      <a href="cv.html">CV</a>
+    </p>
+    <p style="margin-top:.4rem; opacity:.6">All content freely given. Source on GitHub.</p>
+  </div>
+</footer>
+
+</body>
+</html>
