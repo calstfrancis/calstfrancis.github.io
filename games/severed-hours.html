@@ -733,6 +733,7 @@ const SCENES = {
   },
 
   stacy_cat: {
+    returnTo: `stacy_lobby`,
     location: `Your Office — Third Floor`,
     text: [
       `"The cat," you say.`,
@@ -747,10 +748,12 @@ const SCENES = {
       { text: `"What day is it?"`, effect: { reason: 1 }, next: `stacy_day` },
       { text: `Pick up the coffee.`, effect: { intuition: 1 }, next: `stacy_coffee` },
       { text: `"I don't remember coming in this morning."`, effect: { intuition: 1 }, next: `stacy_memory` },
+      { text: `Head to the lobby.`, next: `lobby` },
     ],
   },
 
   stacy_day: {
+    returnTo: `stacy_lobby`,
     location: `Your Office — Third Floor`,
     text: [
       `"What day is it?"`,
@@ -767,6 +770,7 @@ const SCENES = {
   },
 
   stacy_nine: {
+    returnTo: `stacy_lobby`,
     location: `Your Office — Third Floor`,
     text: [
       `"Who is the nine o'clock with?"`,
@@ -785,6 +789,7 @@ const SCENES = {
   },
 
   stacy_name: {
+    returnTo: `stacy_lobby`,
     location: `Your Office — Third Floor`,
     text: [
       `"Stacy."`,
@@ -803,6 +808,7 @@ const SCENES = {
   },
 
   stacy_coffee: {
+    returnTo: `stacy_lobby`,
     location: `Your Office — Third Floor`,
     text: [
       `You pick up the coffee.`,
@@ -889,6 +895,7 @@ const SCENES = {
   },
 
   stacy_clipboard: {
+    returnTo: `stacy_lobby`,
     location: `Your Office — Third Floor`,
     text: [
       `"May I see the list?"`,
@@ -1128,6 +1135,7 @@ const SCENES = {
     choices: [
       { text: `"What do you know about this place?"`, next: `craigslist_knows` },
       { text: `Check the directory.`, next: `lobby_directory` },
+      { text: `Go to the courtyard.`, next: `courtyard` },
     ],
   },
 
@@ -1408,6 +1416,9 @@ const SCENES = {
       { text: `Approach her.`, next: `meet_shaneel` },
       { text: `Look at more of the letters.`, effect: { reason: 1 }, next: `shaneel_letters` },
       { text: `Ask if anyone has received a reply.`, effect: { intuition: 1 }, next: `shaneel_replies` },
+      { text: `Return to the lobby.`, next: `lobby` },
+      { text: `Find the breakroom.`, next: `breakroom` },
+      { text: `Take the elevator to the second floor.`, next: `second_floor` },
     ],
   },
 
@@ -1557,6 +1568,8 @@ const SCENES = {
       { text: `[AWARENESS 5] Don't respond. Let the moment pass.`, next: `breakroom_continuous_refuse`,
         requireAwareness: 5, effect: { intuition: -1 },
         id: `breakroom_continuous_refuse`, permanent: true },
+      { text: `Return to the lobby.`, next: `lobby` },
+      { text: `Go to the courtyard.`, next: `courtyard` },
     ],
   },
 
@@ -1693,6 +1706,9 @@ const SCENES = {
       { text: `Sit on the bench a moment.`, effect: { composure: 1 }, next: `courtyard_bench` },
       { text: `Go through the gate to the garden.`, next: `garden` },
       { text: `Pet the calico.`, effect: { composure: 1 }, next: `courtyard_calico` },
+      { text: `Return to the lobby.`, next: `lobby` },
+      { text: `Find the breakroom.`, next: `breakroom` },
+      { text: `Visit the Correspondence Division.`, next: `correspondence` },
     ],
   },
 
@@ -1937,6 +1953,9 @@ const SCENES = {
       { text: `Go to Forecasting.`, next: `forecasting` },
       { text: `Go to Retention.`, next: `retention` },
       { text: `Check your Special Matters office.`, next: `special_matters` },
+      { text: `Return to the lobby.`, next: `lobby` },
+      { text: `Take the elevator to the third floor.`, next: `third_floor` },
+      { text: `Go to the garden.`, next: `garden` },
     ],
   },
 
@@ -2142,6 +2161,8 @@ const SCENES = {
         requireStat: { stat: `reason`, min: 3 },
         roll: { stat: `reason`, difficulty: 5, successNext: `philomena_system_success`, partialNext: `philomena_system_fail`, failNext: `philomena_system_fail` },
       },
+      { text: `Take the elevator to the second floor.`, next: `second_floor` },
+      { text: `Return to the lobby.`, next: `lobby` },
     ],
   },
 
@@ -2253,6 +2274,8 @@ const SCENES = {
       { text: `Open the letter.`, effect: { intuition: 1 }, next: `sm_letter` },
       { text: `Examine the map first.`, effect: { reason: 1 }, next: `sm_map` },
       { text: `Look through the files.`, effect: { reason: 1 }, next: `sm_files` },
+      { text: `Take the elevator to the second floor.`, next: `second_floor` },
+      { text: `Return to the lobby.`, next: `lobby` },
     ],
   },
 
@@ -2446,6 +2469,8 @@ const SCENES = {
       { text: `Look into the Board Room.`, next: `boardroom` },
       { text: `Try the Executive Suite.`, next: `exec_suite_locked` },
       { text: `Go to the Archive.`, next: `archive` },
+      { text: `Take the elevator to the second floor.`, next: `second_floor` },
+      { text: `Return to the lobby.`, next: `lobby` },
     ],
   },
 
@@ -2780,6 +2805,7 @@ const SCENES = {
     choices: [
       { text: `Try the Maintenance door first.`, next: `meet_til` },
       { text: `Go straight to the unlabelled door.`, next: `dept_nine_approach` },
+      { text: `Return to the lobby.`, next: `lobby` },
     ],
   },
 
