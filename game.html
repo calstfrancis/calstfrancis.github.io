@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Severed Hours — Cal St Francis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Spectral:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:      #1a1612;
+  --ink-2:    #211d18;
+  --rule:     #3d3528;
+  --rule-hi:  #5a4e38;
+  --vellum:   #e8dcc8;
+  --vellum-3: #9a8a6a;
+  --gold:     #c9a84c;
+  --gold-hi:  #e8c870;
+  --red:      #9a2820;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+
+body {
+  background: var(--ink);
+  color: var(--vellum);
+  font-family: 'Spectral', Georgia, serif;
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--gold); text-decoration: none; transition: color .15s; }
+a:hover { color: var(--gold-hi); }
+
+/* ── NAV ── */
+nav {
+  border-bottom: 1px solid var(--rule);
+  background: rgba(26,22,18,.97);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  flex-shrink: 0;
+  z-index: 10;
+}
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 50px;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 1.75rem;
+}
+.nav-brand {
+  font-family: 'IM Fell English', serif;
+  font-size: 1.1rem;
+  color: var(--gold);
+  letter-spacing: .04em;
+}
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+  align-items: center;
+}
+.nav-links a {
+  font-family: 'Spectral', serif;
+  font-size: .8rem;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--vellum-3);
+  transition: color .15s;
+}
+.nav-links a:hover { color: var(--gold); }
+.nav-back {
+  font-size: .78rem;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--vellum-3);
+  border: 1px solid var(--rule);
+  padding: .28rem .75rem;
+  transition: all .15s;
+  font-family: 'Spectral', serif;
+}
+.nav-back:hover { color: var(--gold); border-color: var(--rule-hi); }
+
+/* ── GAME LABEL BAR ── */
+.game-bar {
+  background: #100e0b;
+  border-bottom: 1px solid var(--rule-hi);
+  flex-shrink: 0;
+  padding: .45rem 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.game-bar-title {
+  font-family: 'IM Fell English', serif;
+  font-size: .95rem;
+  color: #f0e0a0;
+  letter-spacing: .04em;
+}
+.game-bar-meta {
+  font-family: 'Spectral', serif;
+  font-size: .7rem;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #6a5a38;
+}
+
+/* ── IFRAME ── */
+.game-frame {
+  flex: 1;
+  width: 100%;
+  border: none;
+  display: block;
+  background: #09080a;
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-brand">Cal St Francis</a>
+    <ul class="nav-links">
+      <li><a href="index.html#projects">Projects</a></li>
+      <li><a href="index.html#about">About</a></li>
+      <li><a href="index.html#support">Support</a></li>
+      <li><a href="index.html" class="nav-back">← Back to site</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="game-bar">
+  <span class="game-bar-title">The Severed Hours</span>
+  <span class="game-bar-meta">Text Adventure · v1.3</span>
+</div>
+
+<iframe
+  class="game-frame"
+  src="games/severed-hours.html"
+  title="The Severed Hours — a text adventure"
+  allowfullscreen
+></iframe>
+
+</body>
+</html>
