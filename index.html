@@ -413,16 +413,86 @@ footer p { font-size: .8rem; color: var(--vellum-3); line-height: 1.9; }
 footer a { color: var(--vellum-3); }
 footer a:hover { color: var(--gold); }
 
+/* ── HAMBURGER ───────────────────────────────── */
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 36px;
+  height: 36px;
+  background: none;
+  border: 1px solid var(--rule);
+  cursor: pointer;
+  padding: 8px 7px;
+  flex-shrink: 0;
+}
+.nav-toggle span {
+  display: block;
+  height: 1px;
+  background: var(--vellum-3);
+  transition: all .2s;
+}
+.nav-toggle.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.nav-toggle.open span:nth-child(2) { opacity: 0; }
+.nav-toggle.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
 /* ── RESPONSIVE ──────────────────────────────── */
 @media (max-width: 640px) {
-  .hero h1 { font-size: 2.4rem; }
+  /* Nav */
+  .nav-toggle { display: flex; }
+  .nav-links {
+    display: none;
+    position: fixed;
+    top: 50px;
+    left: 0; right: 0;
+    background: rgba(22,18,14,.99);
+    border-bottom: 1px solid var(--rule);
+    flex-direction: column;
+    gap: 0;
+    padding: .5rem 0;
+    z-index: 99;
+  }
+  .nav-links.open { display: flex; }
+  .nav-links li a {
+    display: block;
+    padding: .85rem 1.75rem;
+    font-size: .85rem;
+    letter-spacing: .1em;
+  }
+
+  /* Hero */
+  .hero { padding: 3rem 0 2.5rem; }
+  .hero h1 { font-size: 2.2rem; }
   .hero::before { display: none; }
+  .hero-desc { font-size: .93rem; }
+  .hero-actions { flex-direction: column; align-items: stretch; }
+  .btn { padding: .75rem 1.2rem; font-size: .9rem; justify-content: center; }
+
+  /* Sections */
+  section { padding: 2.5rem 0; }
+  .container { padding: 0 1.1rem; }
+
+  /* Game card */
+  .game-feature { padding: 1.4rem 1.2rem; }
   .game-ascii { display: none; }
   .game-header { flex-direction: column; gap: .8rem; }
+  .game-footer { flex-direction: column; align-items: flex-start; gap: .7rem; }
+  .game-link { font-size: .9rem; }
+
+  /* Project cards */
+  .project-card { padding: 1rem 1.1rem; gap: .9rem; }
+  .project-initial { font-size: 1.7rem; width: 2rem; }
+  .project-meta { flex-wrap: wrap; gap: .4rem; }
+  .project-type, .project-status-dev { font-size: .65rem; }
+
+  /* About grid */
   .about-body { grid-template-columns: 1fr; }
-  .support-body { flex-direction: column; gap: 1rem; }
-  .support-drop { font-size: 3rem; }
-  .nav-links { gap: 1.2rem; }
+  .about-cell { padding: 1.1rem 1.2rem; }
+
+  /* Support */
+  .support-body { flex-direction: column; gap: .8rem; padding: 1.4rem 1.2rem; }
+  .support-drop { font-size: 2.5rem; }
 }
 
 /* ── ANIMATIONS ──────────────────────────────── */
@@ -442,7 +512,10 @@ section:nth-of-type(4) { animation-delay: .18s; }
 <nav>
   <div class="nav-inner">
     <span class="nav-brand">Cal St Francis</span>
-    <ul class="nav-links">
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="navLinks">
       <li><a href="#projects">Projects</a></li>
       <li><a href="#about">About</a></li>
       <li><a href="#support">Support</a></li>
@@ -452,7 +525,7 @@ section:nth-of-type(4) { animation-delay: .18s; }
 
 <section class="hero">
   <div class="container">
-    <div class="hero-eyebrow">Minister · Student · Developer</div>
+    <div class="hero-eyebrow">Minister · Theologian · Developer</div>
     <h1>Cal St Francis</h1>
     <p class="hero-subtitle">Candidate for Ordination, United Church of Canada</p>
     <div class="hero-rule">
@@ -461,7 +534,7 @@ section:nth-of-type(4) { animation-delay: .18s; }
       <div class="hero-rule-line"></div>
     </div>
     <p class="hero-desc">
-      I make liturgical tools for ministers and worship leaders, study theology in the
+      I make liturgical tools for ministers and worship leaders, write theology in the
       traditions of <em>liberation and process</em>, and build the occasional strange little game.
       Everything here is free. If it helps you, consider buying me a coffee.
     </p>
@@ -502,7 +575,7 @@ section:nth-of-type(4) { animation-delay: .18s; }
       </div>
       <div class="game-footer">
         <span class="game-status"><span class="status-pip"></span> Playable now — v1.3</span>
-        <a href="game.html" class="game-link">Play in browser →</a>
+        <a href="games/severed-hours.html" class="game-link">Play in browser →</a>
       </div>
     </div>
 
@@ -517,11 +590,9 @@ section:nth-of-type(4) { animation-delay: .18s; }
           </div>
           <p class="project-desc">
             A LaTeX-based worship planning system for United Church of Canada congregations.
-            Build your service in an RCL-aware environment, with daily hymn suggestions and an option for saved snippets. 
-            Write everything in-program, and output to a printable manuscript, bulletin, and music plan. 
-            Currently only in Linux version and requires you manage your own texlive installation.
+            Full service flows, lectionary integration, and print-ready orders of service.
           </p>
-          <a href="https://github.com/calstfrancis/liturgy-planner" target="_blank" rel="noopener" class="project-link">View (NOT YET) on GitHub →</a>
+          <a href="https://github.com/YOURHANDLE/liturgy-planner" target="_blank" rel="noopener" class="project-link">View on GitHub →</a>
         </div>
       </div>
 
@@ -537,7 +608,7 @@ section:nth-of-type(4) { animation-delay: .18s; }
             Reusable templates for prayers, calls to worship, sermons, and full service booklets.
             For ministers who want beautiful, print-ready documents without fighting their tools.
           </p>
-          <a href="https://github.com/calstfrancis/liturgical-latex" target="_blank" rel="noopener" class="project-link">View (NOT YET) on GitHub →</a>
+          <a href="https://github.com/YOURHANDLE/liturgical-latex" target="_blank" rel="noopener" class="project-link">View on GitHub →</a>
         </div>
       </div>
     </div>
@@ -623,5 +694,20 @@ section:nth-of-type(4) { animation-delay: .18s; }
   </div>
 </footer>
 
+<script>
+const toggle = document.getElementById('navToggle');
+const links  = document.getElementById('navLinks');
+toggle.addEventListener('click', () => {
+  toggle.classList.toggle('open');
+  links.classList.toggle('open');
+});
+// Close menu when a link is tapped
+links.querySelectorAll('a').forEach(a => {
+  a.addEventListener('click', () => {
+    toggle.classList.remove('open');
+    links.classList.remove('open');
+  });
+});
+</script>
 </body>
 </html>
