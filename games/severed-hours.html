@@ -4791,6 +4791,20 @@ function renderChoices(scene) {
   const wrap = div(`choices`);
   scene.choices.forEach(choice => {
     const accessible = canAccess(choice, STATE.stats, STATE.charisms);
+
+    // Hide choices that fail a FLAG gate entirely (permanent, binary — no value in showing)
+    // Also hide maxAwareness/maxComposure failures (they've passed that window)
+    // Keep requireStat/requireCharism failures visible-but-greyed (shows aspiration)
+    const failsFlag = !accessible && (
+      (choice.requireFlag && !STATE.flags[choice.requireFlag]) ||
+      (choice.requireNoFlag && STATE.flags[choice.requireNoFlag]) ||
+      (choice.maxAwareness !== undefined && (STATE.awareness || 0) >= choice.maxAwareness) ||
+      (choice.maxComposure !== undefined && (STATE.stats.composure || 0) >= choice.maxComposure)
+    );
+    // Also hide permanently consumed choices (canAccess already returns false, but be explicit)
+    const consumed = choice.permanent && choice.id && STATE.permanentChoicesTaken.has(choice.id);
+    if (failsFlag || consumed) return; // skip entirely — don't render
+
     const hasRoll = !!choice.roll;
     let cls = `choice`;
     if (!accessible) cls += ` choice-locked`;
