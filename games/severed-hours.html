@@ -963,6 +963,8 @@ const SCENES = {
       `You turn the photograph over.`,
       `Seven people standing outside this building. Most smiling. One not looking at the camera. One looking at something above it with an expression of private knowledge.`,
       `You recognise Stacy. Younger, but unmistakably Stacy. Third from left.`,
+      `The man at the centre — the one with the particular quality of attention, the one the others are slightly oriented toward even in the photograph — has a name typed below in the kind of label that assumes it matters: ATHERTON DRENTHE.`,
+      `He does not look like a founder. He looks like someone who found something.`,
       `Dated on the back: Opening Day, 1931.`,
       `Stacy has not aged in sixteen years.`,
       `You put the photograph back face-down. Some things are better approached from the side.`,
@@ -1072,7 +1074,7 @@ const SCENES = {
     text: [
       `The lobby of Drenthe & Associates is exactly what a lobby should be and therefore immediately suspicious.`,
       `Brass fittings. A marble floor with a pattern your eye tries to follow and then gives up. A reception desk behind which Stacy Blaeght has already returned, as though she took a different route.`,
-      `A directory on the wall. An elevator. A door marked STAFF ONLY, always slightly ajar, emitting nothing, admitting no light.`,
+      `A directory on the wall. An elevator — its panel has more buttons than the building should have floors. A door marked STAFF ONLY, always slightly ajar, emitting nothing, admitting no light.`,
       `Seated in one of the lobby chairs: a man in his mid-thirties with slightly too many pens in his breast pocket, holding a motivational desk calendar and staring at it with the focused despair of someone who has only recently begun to understand what they're looking at.`,
       `He looks up. "Oh thank god," he says. "Another one."`,
     ],
@@ -2076,6 +2078,8 @@ const SCENES = {
       `"Nothing is on the other side. The Continuous doesn't have sides. It has depth. The Threshold is where the depth starts."`,
       `"The last person from Special Matters who went to the Threshold came back different. Not wrong. Different. Like they'd been refocused."`,
       `He pauses. "That was you. Four months ago. Whatever you found there is why you can't remember this morning."`,
+      `You ask: what if you go down to the stairs — and come back up without going all the way through?`,
+      `He looks at you steadily. "That would also be information," he says. "Knowing where you stop. Knowing what it costs to stop there. Some people need to reach the edge before they can go all the way through it."`,
     ],
     se: `learned_threshold_history`,
     choices: [
@@ -2543,6 +2547,10 @@ const SCENES = {
   archive: {
     location: `The Archive — Third Floor`,
     art: `archive`,
+    injectIf: [
+      { requireFlag: `question_intellectual`,
+        text: `On the wall near the entrance: a portrait, oil on board, labelled in small brass letters. ATHERTON DRENTHE. 1872–? The question mark is original to the plaque, not added later. He looks like a man who found something he didn't expect to find and then spent the rest of his life deciding what to do about it.` },
+    ],
     portrait: `portrait_eliza`,
     text: [
       `The Archive is floor-to-ceiling books. Not shelved neatly — accumulated. The smell is extraordinary: old paper, leather, something mineral, and at the back, behind the ladder, a door that opens onto the garden.`,
@@ -3955,9 +3963,11 @@ const SCENES = {
         lockedText: `Requires: Kenosis charism and Awareness 3.`,
       },
       {
-        text: `Make your recommendation. [None of the above are available to you — proceed anyway.]`,
+        // This choice only shows if all other endings are locked
+        // Handled specially in renderChoices via the _fallback marker
+        text: `Make your recommendation.`,
         next: `ending_unlocked`,
-        maxAwareness: 99,
+        _fallback: true,
       },
     ],
   },
@@ -4814,8 +4824,23 @@ function renderRollBox() {
 function renderChoices(scene) {
   if (STATE.rollResult) return renderRollBox();
 
+  // Pre-compute: is any real (non-fallback) ending accessible?
+  // Used to suppress the fallback ending when real options exist.
+  const hasAnyRealEnding = scene.choices && scene.choices.some(c =>
+    !c._fallback &&
+    !(c.requireFlag && !STATE.flags[c.requireFlag]) &&
+    !(c.requireNoFlag && STATE.flags[c.requireNoFlag]) &&
+    !(c.requireCharism && !(STATE.charisms || []).includes(c.requireCharism)) &&
+    !(c.requireAwareness && (STATE.awareness || 0) < c.requireAwareness) &&
+    !(c.permanent && c.id && STATE.permanentChoicesTaken.has(c.id)) &&
+    !c.lockedText  // lockedText means it's locked — doesn't count as accessible
+  );
+
   const wrap = div(`choices`);
   scene.choices.forEach(choice => {
+    // Fallback ending: hide if any real ending is accessible
+    if (choice._fallback && hasAnyRealEnding) return;
+
     const accessible = canAccess(choice, STATE.stats, STATE.charisms);
 
     // Hide choices that fail a FLAG gate entirely (permanent, binary — no value in showing)
