@@ -48,6 +48,16 @@ body { background: #09080a; color: #d0bc88; font-family: "Courier Prime", "Couri
 .loc { font-size: .7rem; letter-spacing: .15em; text-transform: uppercase; color: #9a8a58; border-bottom: 1px solid #3a3020; padding-bottom: .45rem; margin-bottom: 1.2rem; }
 .loc-aware { color: #8ab0c0; border-bottom-color: #2a4a5a; animation: pulse-loc 3s ease-in-out infinite; }
 @keyframes pulse-loc { 0%,100%{opacity:.8} 50%{opacity:1} }
+.notes-btn { position: fixed; bottom: 1.2rem; right: 1.2rem; background: #0a0900; border: 1px solid #3a3020; color: #9a8a58; font-family: "Courier Prime", monospace; font-size: .7rem; letter-spacing: .12em; padding: .45rem .8rem; cursor: pointer; z-index: 100; }
+.notes-btn:hover { border-color: #7a6a48; color: #d0b870; }
+.notes-panel { position: fixed; top: 0; right: 0; width: min(360px, 94vw); height: 100vh; background: #070600; border-left: 1px solid #2a2010; padding: 1.5rem; overflow-y: auto; z-index: 200; animation: slide-in-right .2s ease; }
+@keyframes slide-in-right { from { transform: translateX(100%); } to { transform: translateX(0); } }
+.notes-panel h3 { font-family: "Special Elite", serif; font-size: .9rem; color: #b0a070; letter-spacing: .15em; margin-bottom: 1rem; border-bottom: 1px solid #2a2010; padding-bottom: .5rem; }
+.notes-panel-close { float: right; background: none; border: none; color: #6a5a38; cursor: pointer; font-size: 1rem; line-height: 1; }
+.notes-panel-close:hover { color: #c0a860; }
+.notes-panel .nitem { font-size: .78rem; color: #9a8a58; font-style: italic; line-height: 1.75; margin-bottom: .2rem; padding-left: .6rem; border-left: 1px solid #2a2010; }
+.notes-panel-empty { font-size: .78rem; color: #4a3a28; font-style: italic; }
+.notes-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 150; }
 .sbar { display: flex; gap: .9rem; flex-wrap: wrap; margin-bottom: .7rem; padding-bottom: .7rem; border-bottom: 1px solid #2a2010; }
 .stat { font-size: .66rem; letter-spacing: .1em; text-transform: uppercase; color: #a89060; }
 .stat-val { color: #e8c860; }
@@ -1931,11 +1941,42 @@ const SCENES = {
       `Everything flows.`,
       `And below that, in a different hand: Yes, but toward what?`,
       `And below that, more recently, in handwriting you will come to recognise: That is the right question. Keep it.`,
+      `And below that, in handwriting you recognise completely because it is yours: The garden is always safe. The sundial reads the correct time. Freezer Beef is asleep.`,
+      `You wrote this. You don't know when.`,
+      `The words are true.`,
     ],
     se: `found_sundial`,
+    injectIf: [
+      { requireAwareness: 4,
+        text: `Haircut is on the bench. She has been on the bench. She looks at you with the particular quality of attention that has been consistent since your first morning — and then she does something she has not done before. She looks away first. Not in defeat. In completion. The assessment is done. She has what she came for.` },
+    ],
     choices: [
       { text: `Sit on the bench.`, next: `garden_sitting` },
+      { text: `[AWARENESS 4+] Ask Haircut what she found.`, next: `haircut_assessment_complete`,
+        requireAwareness: 4, id: `haircut_assessment_done`, permanent: true },
       { text: `Head inside. Second floor.`, next: `second_floor` },
+    ],
+  },
+
+  haircut_assessment_complete: {
+    returnTo: `garden`,
+    location: `The Garden`,
+    text: [
+      `You sit on the bench beside Haircut.`,
+      `She does not acknowledge the sitting. She is looking at the nameless plant.`,
+      `After a while — the sundial moves — she turns and looks at you directly. Not with assessment now. With something more specific.`,
+      `Recognition.`,
+      `You understand, in the way you understand things at this awareness level, that the assessment has been ongoing since October 14th. That Haircut has been tracking something in you — not your progress, not your stat line, not whether you succeed or fail. Something else.`,
+      `Whether you are, underneath everything, the person who belongs here.`,
+      `The assessment is complete.`,
+      `The answer is yes.`,
+      `Haircut returns to watching the plant. The matter is settled. You are, apparently, what this building requires you to be. Whatever that is.`,
+      `You sit in the garden for a while longer. The sundial reads the correct time. Everything flows.`,
+    ],
+    ses: [`haircut_assessment_done`],
+    effect: { composure: 1 },
+    choices: [
+      { text: `Go inside.`, next: `second_floor` },
     ],
   },
 
@@ -2121,6 +2162,10 @@ const SCENES = {
     ],
     awareness: 1,
     se: `brinch_continuous_reckoning`,
+    injectIf: [
+      { requireAwareness: 4,
+        text: `Brinch sets down his chalk carefully, like he is setting down something heavier. "There is something I have not told anyone," he says, "because it was not actionable. The Continuous has been patient for thirty years. Patient in the way something is patient when it has no choice but to wait." He pauses. "The board reads differently this week. The patience has a shape now. It is the shape of something that has been waiting long enough — and knows, without threatening, without demanding — that the waiting is almost done."` },
+    ],
   },
 
   forecasting_board: {
@@ -3065,7 +3110,73 @@ const SCENES = {
     ],
     se: `threshold_visited`,
     choices: [
-      { text: `Find Craigslist. Start with what he found.`, next: `craigslist_post_threshold` },
+      { text: `Take stock. You know what needs doing.`, next: `act_three_hub` },
+    ],
+  },
+
+  act_three_hub: {
+    location: `Special Matters — Second Floor`,
+    text: [
+      `November first. Three days until the Review.`,
+      `You sit in your Special Matters office with what you know and what you need.`,
+      `Three things before November fourth:`,
+      `Craigslist Butterantonio found something in his orientation packet. He needs to be briefed. He is the second — you understand this now. That thread goes first.`,
+      `Eliza has the notation. Without it, the second descent is shallower than it needs to be. That thread is the preparation.`,
+      `Philomena has your memories. Your name. You will need to be yourself for what comes next. That thread is the foundation.`,
+      `When all three are done, the Board will summon you. Then November third. Then the descent.`,
+    ],
+    injectIf: [
+      { requireFlag: `act3_craigslist_done`, maxFlag: `_never_`,
+        text: `` },
+    ],
+    choices: [
+      {
+        text: `Find Craigslist. Start with what he found.`,
+        next: `craigslist_post_threshold`,
+        requireNoFlag: `act3_craigslist_done`,
+      },
+      {
+        text: `Craigslist — done. ✓`,
+        next: `act_three_hub`,
+        requireFlag: `act3_craigslist_done`,
+        id: `act3_craigslist_done_stub`, permanent: true,
+        maxAwareness: 99,
+      },
+      {
+        text: `Go to the Archive. Learn the notation from Eliza.`,
+        next: `eliza_notation_thread`,
+        requireNoFlag: `act3_eliza_done`,
+      },
+      {
+        text: `Eliza / notation — done. ✓`,
+        next: `act_three_hub`,
+        requireFlag: `act3_eliza_done`,
+        id: `act3_eliza_done_stub`, permanent: true,
+        maxAwareness: 99,
+      },
+      {
+        text: `Go to Retention. Philomena has your memories.`,
+        next: `philomena_return`,
+        requireNoFlag: `act3_philomena_done`,
+      },
+      {
+        text: `Philomena / memories — done. ✓`,
+        next: `act_three_hub`,
+        requireFlag: `act3_philomena_done`,
+        id: `act3_philomena_done_stub`, permanent: true,
+        maxAwareness: 99,
+      },
+      {
+        text: `All three done — face the Board.`,
+        next: `board_summons`,
+        requireFlag: `act3_craigslist_done`,
+        requireFlag2: `act3_eliza_done`,
+        requireFlag3: `act3_philomena_done`,
+      },
+      {
+        text: `Go to the garden first. One last time.`,
+        next: `garden_pre_final`,
+      },
     ],
   },
 
@@ -3263,6 +3374,7 @@ const SCENES = {
       `She closes the notation sheet. "You have it. You're ready for November third."`,
     ],
     se: `learned_notation`,
+    flag: `act3_eliza_done`,
     choices: [
       { text: `Go to Philomena. Thread Three.`, next: `philomena_return` },
       { text: `Tell Craigslist what you learned.`, next: `craigslist_post_eliza` },
@@ -3279,6 +3391,7 @@ const SCENES = {
       `"The garden gave them to you," Eliza says. She sounds unsurprised. "It does that. The Continuous has been orienting toward this moment for weeks. It's not going to let the notation fail."`,
     ],
     se: `learned_notation`,
+    flag: `act3_eliza_done`,
     choices: [
       { text: `Go to Philomena. Thread Three.`, next: `philomena_return` },
       { text: `Tell Craigslist what you learned.`, next: `craigslist_post_eliza` },
@@ -3385,6 +3498,7 @@ const SCENES = {
       `You have followed your own instructions.`,
     ],
     ses: [`philomena_holding`],
+    flag: `act3_philomena_done`,
     choices: [
       { text: `Go find Craigslist. Tell him your name.`, next: `craigslist_name_scene` },
     ],
@@ -4120,6 +4234,11 @@ const SCENES = {
       `The sundial reads the correct time.`,
       `Freezer Beef is asleep.`,
       `Everything flows.`,
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+      `This run: one version of what the building holds.`,
+      `Other runs: different charisms, different choices, different truths.`,
+      `The Continuous has been patient for thirty years.`,
+      `It will be patient with another playthrough.`,
     ],
     choices: [
       { text: `Play again from the beginning.`, next: `__restart__` },
@@ -4298,11 +4417,14 @@ let STATE = {
   // actOneEnded: tracks when Act One letter was read (restores Reason)
   actOneEnded: false,
   rollResult: null,
+  lastRollEcho: null,  // { outcome, stat } — shown once in next scene
   rollChoice: null,
   saveMsg: ``,
   saveMsgTimer: null,
   selectedCharisms: [],
   confirmRestart: false,
+  notesPanelOpen: false,
+  introStep: 0,
   buildingRevised: false,
   mortificationSpent: false,
   retrySpent: false,
@@ -4439,6 +4561,7 @@ function applyChoice(choice) {
     STATE.awareness = 0;
     STATE.permanentChoicesTaken = new Set();
     STATE.mode = `attended`;
+    STATE.introStep = 0;
     STATE.tempPenalties = {};
     STATE.truths = {};
     STATE.actOneEnded = false;
@@ -4507,6 +4630,11 @@ function applyChoice(choice) {
   }
   if (choice.se) addNote(choice.se);
   if (choice.next) {
+    // If this choice came from a roll resolution, store echo for next scene
+    if (STATE._lastResolvedRoll) {
+      STATE.lastRollEcho = STATE._lastResolvedRoll;
+      STATE._lastResolvedRoll = null;
+    }
     applyScene(choice.next);
     STATE.sceneId = choice.next;
   }
@@ -4546,6 +4674,74 @@ function renderTitle() {
   );
 }
 
+function renderIntroScene() {
+  const steps = STATE.introStep || 0;
+
+  const scenes = [
+    {
+      text: [
+        `The office is exactly as you left it.`,
+        `You are not sure when you left it.`,
+        `On the desk: a coffee cup, still warm. A memo dated three weeks from now. Your personnel file, which is thicker than it should be for someone who does not remember working here.`,
+        `The window faces the interior courtyard. In the courtyard: a cat, sitting very still, watching the window with the focused attention of a professional.`,
+        `Something is wrong. Not dramatically wrong — the wrongness is subtle, the kind you feel before you can name it.`,
+        `The calendar on the wall reads October 14th.`,
+        `You have the distinct sense that it has read October 14th before.`,
+      ],
+      choice: `Look more carefully at the calendar.`,
+    },
+    {
+      text: [
+        `The calendar is a standard wall calendar. October. A photograph of a lighthouse above the grid of dates.`,
+        `October 14th is circled. In ink that looks fresh.`,
+        `Below the 14, in very small handwriting — your handwriting: also 14.`,
+        `Below that, smaller: 14.`,
+        `You circle the 14 yourself, without deciding to. The pen is already in your hand.`,
+        `This is the first thing you have done in this room that you understand completely.`,
+        `Something knocks at the door. Three beats, precise.`,
+      ],
+      choice: `Say: "Come in."`,
+    },
+    {
+      text: [
+        `The door opens.`,
+        `A woman with an expression of organised patience. "Good morning," she says. "I'm Stacy Blaeght. You've been expected."`,
+        `She sets a coffee cup on the desk. The coffee smells like a specific memory you cannot locate. The cup is warm. This is the second cup. You do not remember the first.`,
+        `"You don't remember your name," she says. It is not a question.`,
+        `"No."`,
+        `"That's alright," she says. "You will. The building keeps things."`,
+        `She goes to the door. Pauses. "The building keeps things," she repeats, "and gives them back when the time is right. It has been right before. It will be right again."`,
+        `She leaves.`,
+        `You are in Special Matters, fifth year, October 14th.`,
+        `You begin.`,
+      ],
+      choice: `Continue.`,
+      last: true,
+    },
+  ];
+
+  const current = scenes[Math.min(steps, scenes.length - 1)];
+  const wrap = div(`csel`);
+  wrap.style.maxWidth = `560px`;
+
+  current.text.forEach(line => {
+    const p2 = el(`p`, { className: `sp` }, line);
+    p2.style.marginBottom = `.9rem`;
+    wrap.appendChild(p2);
+  });
+
+  const nextBtn = btn(`btn-pri`, current.choice, () => {
+    if (current.last) {
+      STATE.screen = `csel`; _lastScreen = null; render();
+    } else {
+      STATE.introStep = steps + 1; _lastScreen = null; render();
+    }
+  });
+  nextBtn.style.marginTop = `1.5rem`;
+  wrap.appendChild(nextBtn);
+  return wrap;
+}
+
 function renderModeSelect() {
   const sel = STATE.mode || `attended`;
 
@@ -4577,8 +4773,8 @@ function renderModeSelect() {
     grid.appendChild(opt);
   });
 
-  const confirmBtn = btn(`btn-pri`, `continue with ${sel === `attended` ? `Attended` : `Witnessed`}`,
-    () => { STATE.screen = `csel`; _lastScreen = null; render(); }
+  const confirmBtn = btn(`btn-pri`, `continue`,
+    () => { STATE.screen = `intro`; _lastScreen = null; render(); }
   );
 
   return div(`msel`,
@@ -4738,6 +4934,7 @@ function renderRollBox() {
     if (r.outcome === `success`) next = c.roll.successNext;
     else if (r.outcome === `partial` && c.roll.partialNext) next = c.roll.partialNext;
     else next = c.roll.failNext;
+    STATE._lastResolvedRoll = { outcome: r.outcome, stat: c.roll.stat, total: r.total, diff: r.difficulty };
     applyChoice({ ...c, next });
   });
   continueBtn.style.marginTop = `.8rem`;
@@ -4848,6 +5045,8 @@ function renderChoices(scene) {
     // Keep requireStat/requireCharism failures visible-but-greyed (shows aspiration)
     const failsFlag = !accessible && (
       (choice.requireFlag && !STATE.flags[choice.requireFlag]) ||
+      (choice.requireFlag2 && !STATE.flags[choice.requireFlag2]) ||
+      (choice.requireFlag3 && !STATE.flags[choice.requireFlag3]) ||
       (choice.requireNoFlag && STATE.flags[choice.requireNoFlag]) ||
       (choice.maxAwareness !== undefined && (STATE.awareness || 0) >= choice.maxAwareness) ||
       (choice.maxComposure !== undefined && (STATE.stats.composure || 0) >= choice.maxComposure)
@@ -4939,6 +5138,7 @@ function renderChoices(scene) {
         `[UNMAKER] Force through (+2 awareness, irreversible)`,
         () => {
           STATE.unmakerUsedThisAct = true;
+          STATE.flags[`unmaker_forced_entry`] = true;
           STATE.awareness = Math.min((STATE.awareness || 0) + 2, 5);
           applyChoice({ ...choice, requireStat: null });
         }
@@ -4958,6 +5158,38 @@ function renderNotes() {
   STATE.notes.slice(-16).forEach(n => {
     wrap.appendChild(p(`nitem`, `— ${n}`));
   });
+  return wrap;
+}
+
+function renderNotesPanel() {
+  const overlay = el(`div`, { className: `notes-overlay`, onClick: () => {
+    STATE.notesPanelOpen = false;
+    _lastSceneId = null; render();
+  }});
+  const panel = el(`div`, { className: `notes-panel` });
+  panel.addEventListener(`click`, e => e.stopPropagation());
+
+  const closeBtn = el(`button`, { className: `notes-panel-close`,
+    onClick: () => { STATE.notesPanelOpen = false; _lastSceneId = null; render(); }
+  }, `✕`);
+  const heading = el(`h3`, {}, `field notes`);
+  heading.appendChild(closeBtn);
+  panel.appendChild(heading);
+
+  const notes = STATE.notes || [];
+  if (!notes.length) {
+    panel.appendChild(el(`p`, { className: `notes-panel-empty` }, `nothing recorded yet.`));
+  } else {
+    // Show in reverse order (most recent first)
+    [...notes].reverse().forEach(key => {
+      const label = NOTES[key] || key;
+      const item = el(`p`, { className: `nitem` }, label);
+      panel.appendChild(item);
+    });
+  }
+  const wrap = el(`div`, {});
+  wrap.appendChild(overlay);
+  wrap.appendChild(panel);
   return wrap;
 }
 
@@ -4991,9 +5223,46 @@ function renderScene() {
     game.appendChild(pre(ART[scene.portrait], `portrait`));
   }
 
+  // Run summary on final screen
+  if (STATE.sceneId === `final_screen`) {
+    const summaryItems = [];
+    if (STATE.charisms.length) summaryItems.push(`charisms: ${STATE.charisms.join(`, `)}`);
+    if (STATE.flags[`coffee_accepted`]) summaryItems.push(`you let the coffee come`);
+    if (STATE.flags[`coffee_refused`]) summaryItems.push(`you kept the glass in place`);
+    if (STATE.flags[`trusted_stacy`]) summaryItems.push(`Stacy knows you said her name`);
+    if (STATE.flags[`craigslist_ally_early`]) summaryItems.push(`Craigslist was a genuine second`);
+    if (STATE.flags[`dismissed_craigslist`]) summaryItems.push(`Craigslist was not asked early`);
+    if (STATE.flags[`retreated_threshold`]) summaryItems.push(`you went back before you went through`);
+    if (STATE.flags[`trusted_continuous`]) summaryItems.push(`you trusted the Continuous's version`);
+    if (STATE.flags[`haircut_assessment_done`]) summaryItems.push(`Haircut completed her assessment`);
+    if ((STATE.awareness || 0) >= 5) summaryItems.push(`awareness: maximum`);
+    else if ((STATE.awareness || 0) >= 3) summaryItems.push(`awareness: ${STATE.awareness}`);
+    if (summaryItems.length) {
+      const summary = el(`div`, { className: `run-summary` });
+      summary.appendChild(el(`p`, { className: `run-summary-title` }, `this run —`));
+      summaryItems.forEach(item => {
+        summary.appendChild(el(`p`, { className: `run-summary-item` }, item));
+      });
+      game.appendChild(summary);
+    }
+  }
+
   // Art
   if (scene.art && ART[scene.art]) {
     game.appendChild(pre(ART[scene.art], `art-block`));
+  }
+
+  // Roll echo — one line at top of scene, cleared after display
+  if (STATE.lastRollEcho) {
+    const echo = STATE.lastRollEcho;
+    const echoKey = `${echo.outcome}_${echo.stat}`;
+    const echoMessages = {'success_reason': 'Your Reason held. The pattern resolved cleanly.', 'success_intuition': 'The orientation was true. You found what you were facing.', 'success_composure': 'You held the depth. The notation did what it was made to do.', 'success_presence': 'You were present. The room received you.', 'partial_reason': 'Partial. Your Reason found the shape of it, not the whole.', 'partial_intuition': 'Partial. The contact was real but thin.', 'partial_composure': 'Partial. You held, but not cleanly. The depth was closer than expected.', 'partial_presence': 'Partial. Something landed. Not everything.', 'fail_reason': 'Your Reason slipped. The pattern refused.', 'fail_intuition': 'The orientation failed. You faced the wrong direction.', 'fail_composure': 'The notation slipped. The depth was more than you could hold.', 'fail_presence': 'The room did not receive you. Something closed.'};
+    const echoText = echoMessages[echoKey] || ``;
+    if (echoText) {
+      const echoEl = p(`sp roll-echo`, echoText);
+      game.appendChild(echoEl);
+    }
+    STATE.lastRollEcho = null;
   }
 
   // Text
@@ -5002,6 +5271,19 @@ function renderScene() {
     const cls = paraClass(line);
     stxt.appendChild(p(cls, line));
   });
+  // Void Gaze at Awareness 4+: sees things uninvited in any scene
+  if ((STATE.charisms || []).includes(`void_gaze`) && (STATE.awareness || 0) >= 4 && scene.voidGazeVision) {
+    stxt.appendChild(p(`sp inject-p void-vision`, scene.voidGazeVision));
+  }
+
+  // Unmaker aftermath: arrived by force — scene acknowledges it once
+  if (STATE.flags && STATE.flags[`unmaker_forced_entry`]) {
+    delete STATE.flags[`unmaker_forced_entry`];
+    stxt.appendChild(p(`sp inject-p unmaker-entry`,
+      `Something in this space registers that you arrived by force rather than passage. The Continuous noted the corrosion. Whatever you find here is real — but the door knows how you opened it.`
+    ));
+  }
+
   // Inject charism/flag/stat-gated paragraphs
   if (scene.injectIf) {
     scene.injectIf.forEach(inj => {
@@ -5156,8 +5438,22 @@ function render() {
     if (STATE.screen === `ded`)   wrap.appendChild(renderDedication());
     else if (STATE.screen === `title`) wrap.appendChild(renderTitle());
     else if (STATE.screen === `msel`)  wrap.appendChild(renderModeSelect());
+    else if (STATE.screen === `intro`) wrap.appendChild(renderIntroScene());
     else if (STATE.screen === `csel`)  wrap.appendChild(renderCharismSelect());
     else if (STATE.screen === `game`)  wrap.appendChild(renderScene());
+
+    // Notes button + panel — visible during game
+    if (STATE.screen === `game`) {
+      const notesBtn = el(`button`, {
+        className: `notes-btn`,
+        onClick: () => {
+          STATE.notesPanelOpen = !STATE.notesPanelOpen;
+          _lastSceneId = null; render();
+        }
+      }, `field notes`);
+      wrap.appendChild(notesBtn);
+      if (STATE.notesPanelOpen) wrap.appendChild(renderNotesPanel());
+    }
 
     root.appendChild(wrap);
   } else {
