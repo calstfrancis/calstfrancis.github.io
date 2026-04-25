@@ -654,6 +654,7 @@ const SCENES = {
       `You begin.`,
     ],
     choices: [
+      { text: `Return to the office.`, next: `opening_darkness` },
       { text: `Examine your desk.`, next: `office_desk` },
       { text: `Look out the window.`, next: `office_window` },
       { text: `Head to the lobby.`, next: `lobby` },
@@ -857,6 +858,7 @@ const SCENES = {
         text: `The first syllable of your name. Heard in someone else's voice. You have it. You will not lose it — it is in you now, not in the memory. That much came through.` },
     ],
     choices: [
+      { text: `Return to the office.`, next: `opening_darkness` },
       { text: `Examine your desk.`, next: `office_desk` },
       { text: `Head to the lobby.`, next: `lobby` },
     ],
@@ -878,6 +880,7 @@ const SCENES = {
   },
 
   stacy_memory: {
+    returnTo: `stacy_lobby`,
     location: `Your Office — Third Floor`,
     text: [
       `"I don't remember coming in this morning."`,
@@ -936,6 +939,7 @@ const SCENES = {
   },
 
   office_desk: {
+    returnTo: `opening_darkness`,
     location: `Your Office — Third Floor`,
     art: `personnel_file`,
     text: [
@@ -1049,7 +1053,7 @@ const SCENES = {
   },
 
   office_window: {
-    returnTo: `office_desk`,
+    returnTo: `opening_darkness`,
     location: `Your Office — Third Floor`,
     text: [
       `The window faces an interior courtyard. Two oaks and something you don't have a name for, flowering despite October, in a colour that is difficult to hold in mind directly.`,
@@ -1261,6 +1265,7 @@ const SCENES = {
   },
 
   lobby_directory: {
+    returnTo: `lobby`,
     location: `The Lobby — Ground Floor`,
     text: [
       `DRENTHE & ASSOCIATES — DIRECTORY`,
@@ -1770,6 +1775,8 @@ const SCENES = {
     ],
     choices: [
       { text: `Go through the gate to the garden.`, next: `garden` },
+      { text: `Return to the breakroom.`, next: `breakroom` },
+      { text: `Return to the lobby.`, next: `lobby` },
     ],
   },
 
@@ -1810,11 +1817,72 @@ const SCENES = {
         requireStat: { stat: `intuition`, min: 3 },
       },
       {
+        text: `[KENOSIS REQUIRED] Empty yourself toward it. Let it be fully present.`,
+        next: `garden_kenosis`,
+        requireCharism: `kenosis`,
+      },
+      {
         text: `[VOID GAZE REQUIRED] Look directly at the plant.`,
         next: `garden_plant_void`,
         requireCharism: `void_gaze`,
       },
       { text: `Look at the sundial.`, effect: { reason: 1 }, next: `garden_sundial` },
+
+      { text: `Go inside — return to the lobby.`, next: `lobby` },
+      { text: `Go to the courtyard.`, next: `courtyard` },
+      { text: `Take the elevator to the second floor.`, next: `second_floor` },    ],
+  },
+
+  garden_plant_void: {
+    returnTo: `garden`,
+    location: `The Garden`,
+    text: [
+      `You look directly at the plant.`,
+      `With the Void Gaze this is not a metaphor. You look at it the way the Void Gaze looks at things — without the protective layer of interpretation that usually sits between perception and meaning.`,
+      `What you see: the plant is not growing. It is arriving. Continuously. From somewhere else. The soil is not its origin — it is its point of entry.`,
+      `The Continuous, you understand, is not beneath the building. It is the medium through which things like this plant arrive. The building is one of the things that arrived that way. So, perhaps, are you.`,
+      `You look away before the Void Gaze can take you further. Some things yield to looking. Some things look back.`,
+    ],
+    awareness: 1,
+    se: `void_gaze_garden_plant`,
+    choices: [],
+  },
+
+  garden_kenosis: {
+    returnTo: `garden`,
+    location: `The Garden`,
+    text: [
+      `You empty yourself toward the plant.`,
+      `Not meditating on it. Not analyzing it. Making room. Kenosis in its oldest sense: the voluntary self-emptying that allows something else to occupy the space you vacate.`,
+      `The plant, in the space you've made, becomes — for a moment — fully present. Not more visible. More real. The difference between a painting of a fire and a fire.`,
+      `You are less noticed by the Continuous when you do this, which is the point of Kenosis. But the plant noticed. The garden noticed. Some things notice in a register that has nothing to do with awareness.`,
+      `You sit with this for a while. When you stand up, the garden is the same. You are slightly different.`,
+    ],
+    se: `kenosis_garden`,
+    effect: { intuition: 1 },
+    choices: [],
+  },
+
+  haircut_assessment_complete: {
+    returnTo: `garden`,
+    location: `The Garden`,
+    text: [
+      `You sit on the bench beside Haircut.`,
+      `She does not acknowledge the sitting. She is looking at the nameless plant.`,
+      `After a while — the sundial moves — she turns and looks at you directly. Not with assessment now. With something more specific.`,
+      `Recognition.`,
+      `You understand, in the way you understand things at this awareness level, that the assessment has been ongoing since October 14th. That Haircut has been tracking something in you — not your progress, not your stat line, not whether you succeed or fail. Something else.`,
+      `Whether you are, underneath everything, the person who belongs here.`,
+      `The assessment is complete.`,
+      `The answer is yes.`,
+      `Haircut returns to watching the plant. The matter is settled. You are, apparently, what this building requires you to be. Whatever that is.`,
+      `You sit in the garden for a while longer. The sundial reads the correct time. Everything flows.`,
+    ],
+    ses: [`haircut_assessment_done`],
+    healingComposure: true,
+    effect: { composure: 1 },
+    choices: [
+      { text: `Go inside.`, next: `second_floor` },
     ],
   },
 
@@ -1862,14 +1930,11 @@ const SCENES = {
       },
       { text: `Look at the sundial.`, next: `garden_sundial` },
       { text: `Head inside. Second floor.`, next: `second_floor` },
+      { text: `Return to the lobby.`, next: `lobby` },
+      { text: `Return to the courtyard.`, next: `courtyard` },
     ],
   },
-
-  garden_kenosis: {
-    location: `The Garden`,
-    art: `continuous_contact`,
-    text: [
-      `You do not reach toward it. You make room.`,
+ward it. You make room.`,
       `This is the discipline: not grasping, not asking, not even waiting — just the space where you would have been if you hadn't stepped back.`,
       `What happens next is not communication. It is more like: orientation. The compass needle doesn't speak to the pole. It simply turns.`,
       `You turn.`,
@@ -1902,14 +1967,11 @@ const SCENES = {
       { text: `Sit on the bench.`, next: `garden_sitting` },
       { text: `Look at the sundial.`, next: `garden_sundial` },
       { text: `Head inside.`, next: `second_floor` },
+      { text: `Return to the lobby.`, next: `lobby` },
+      { text: `Return to the courtyard.`, next: `courtyard` },
     ],
   },
 
-  garden_plant_void: {
-    returnTo: `garden`,
-    location: `The Garden`,
-    art: `continuous_contact`,
-    text: [
       `You look directly at the plant. The Void Gaze doesn't flinch from destabilising truths and this, you understand, is one.`,
       `You see: a plant, yes. Flowering in a specific colour that you will not be able to describe later, but which you can see now, fully, without your vision sliding away.`,
       `And below the plant, through the plant, through the soil, through whatever the garden is resting on: depth.`,
@@ -1951,14 +2013,11 @@ const SCENES = {
       { text: `[AWARENESS 4+] Ask Haircut what she found.`, next: `haircut_assessment_complete`,
         requireAwareness: 4, id: `haircut_assessment_done`, permanent: true },
       { text: `Head inside. Second floor.`, next: `second_floor` },
+      { text: `Return to the lobby.`, next: `lobby` },
+      { text: `Return to the courtyard.`, next: `courtyard` },
     ],
   },
-
-  haircut_assessment_complete: {
-    returnTo: `garden`,
-    location: `The Garden`,
-    text: [
-      `You sit on the bench beside Haircut.`,
+e bench beside Haircut.`,
       `She does not acknowledge the sitting. She is looking at the nameless plant.`,
       `After a while — the sundial moves — she turns and looks at you directly. Not with assessment now. With something more specific.`,
       `Recognition.`,
