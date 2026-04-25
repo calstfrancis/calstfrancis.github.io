@@ -50,6 +50,7 @@ body { background: #09080a; color: #d0bc88; font-family: "Courier Prime", "Couri
 @keyframes pulse-loc { 0%,100%{opacity:.8} 50%{opacity:1} }
 .notes-btn { position: fixed; bottom: 1.2rem; right: 1.2rem; background: #0a0900; border: 1px solid #3a3020; color: #9a8a58; font-family: "Courier Prime", monospace; font-size: .7rem; letter-spacing: .12em; padding: .45rem .8rem; cursor: pointer; z-index: 100; }
 .notes-btn:hover { border-color: #7a6a48; color: #d0b870; }
+@media (max-width: 480px) { .notes-btn { bottom: 3.5rem; } }
 .notes-panel { position: fixed; top: 0; right: 0; width: min(360px, 94vw); height: 100vh; background: #070600; border-left: 1px solid #2a2010; padding: 1.5rem; overflow-y: auto; z-index: 200; animation: slide-in-right .2s ease; }
 @keyframes slide-in-right { from { transform: translateX(100%); } to { transform: translateX(0); } }
 .notes-panel h3 { font-family: "Special Elite", serif; font-size: .9rem; color: #b0a070; letter-spacing: .15em; margin-bottom: 1rem; border-bottom: 1px solid #2a2010; padding-bottom: .5rem; }
@@ -646,22 +647,16 @@ const SCENES = {
   // ══ OPENING ══════════════════════════════════════════════════
 
   opening_darkness: {
-    id: `opening_darkness`,
+    location: `Your Office — Third Floor`,
     text: [
-      `You are aware before you are awake.`,
-      `Something is continuous. You are not sure if it is you.`,
-      `There is a ceiling. Institutional. The tiles have a pattern you feel you have counted before. Light from a fixture that hums in a frequency that is almost a word.`,
-      `You are sitting in a chair. The chair is in an office. The office, you will discover, is yours.`,
-      `On the desk: a coffee cup. Steam rising. Nobody brought it. Or somebody brought it and you have already forgotten.`,
-      `On the wall: a calendar. October. The date shows fourteen. Below the date, in very small print that you have to lean forward to read: also fourteen. Below that, smaller still: fourteen.`,
-      `You do not remember your name. This feels recent, which is its own kind of wrong.`,
-      `A knock at the door. Three beats, precise.`,
+      `She leaves.`,
+      `You are in Special Matters, fifth year, October 14th.`,
+      `You begin.`,
     ],
     choices: [
-      { text: `"Come in." Voice steady, like you do this every day.`, effect: { composure: 1, presence: 1 }, next: `eleanor_a` },
-      { text: `Say nothing. Wait. See what happens.`, effect: { intuition: 1 }, next: `eleanor_b` },
-      { text: `Check the room first. Desk, window, door. Get your bearings.`, effect: { reason: 1 }, next: `eleanor_c`, se: `room_scan` },
-      { text: `Try to remember your name before whoever it is comes through that door.`, effect: { intuition: 1 }, next: `eleanor_d`, se: `haircut_appears` },
+      { text: `Examine your desk.`, next: `office_desk` },
+      { text: `Look out the window.`, next: `office_window` },
+      { text: `Head to the lobby.`, next: `lobby` },
     ],
   },
 
@@ -853,7 +848,7 @@ const SCENES = {
       `You let it come.`,
       `Not a room this time — a specific quality of December light on a specific floor. A name being called across it. Two syllables. The second syllable is still behind glass. The first is yours.`,
       `You are sitting at your desk again. The coffee is finished. Stacy Blaeght has left the doorway. On the surface of your desk, in a ring left by the cup, the ink of the nearest memo has run slightly. It now reads — in the damaged portion — something different from what it read before. You cannot fully make it out.`,
-      `Your Reason is working at a slight angle to itself. This will pass. Or it won't.`,
+      `Your Reason is working at a slight angle to itself. The stats bar shows it — a small ▼1 beside Reason. This is temporary. It will restore when you find what you were already looking for.`,
     ],
     // penalty applied by applyScene's tempPenaltyOnEnter — reason -1 temp
     tempPenaltyOnEnter: { reason: 1 },
@@ -1839,6 +1834,7 @@ const SCENES = {
     awareness: 1,
     choices: [
       { text: `Look at the nameless plant.`, next: `garden_plant` },
+      { text: `Look at the sundial.`, next: `garden_sundial` },
       { text: `Go inside.`, next: `second_floor` },
     ],
   },
@@ -1941,9 +1937,9 @@ const SCENES = {
       `Everything flows.`,
       `And below that, in a different hand: Yes, but toward what?`,
       `And below that, more recently, in handwriting you will come to recognise: That is the right question. Keep it.`,
-      `And below that, in handwriting you recognise completely because it is yours: The garden is always safe. The sundial reads the correct time. Freezer Beef is asleep.`,
+      `And below that, in handwriting you recognise completely because it is yours: The garden is always safe. The sundial reads the correct time.`,
       `You wrote this. You don't know when.`,
-      `The words are true.`,
+      `The words are true. You don't know yet how you know this.`,
     ],
     se: `found_sundial`,
     injectIf: [
@@ -3126,8 +3122,12 @@ const SCENES = {
       `When all three are done, the Board will summon you. Then November third. Then the descent.`,
     ],
     injectIf: [
-      { requireFlag: `act3_craigslist_done`, maxFlag: `_never_`,
-        text: `` },
+      { requireFlag: `act3_craigslist_done`,
+        text: `✓ Craigslist knows what he found. He is ready to be the second.` },
+      { requireFlag: `act3_eliza_done`,
+        text: `✓ The notation is in you. Eliza said: better than April.` },
+      { requireFlag: `act3_philomena_done`,
+        text: `✓ Philomena has given back what she held. You have your name.` },
     ],
     choices: [
       {
@@ -3135,37 +3135,19 @@ const SCENES = {
         next: `craigslist_post_threshold`,
         requireNoFlag: `act3_craigslist_done`,
       },
-      {
-        text: `Craigslist — done. ✓`,
-        next: `act_three_hub`,
-        requireFlag: `act3_craigslist_done`,
-        id: `act3_craigslist_done_stub`, permanent: true,
-        maxAwareness: 99,
-      },
+      // Craigslist thread completion shown via injectIf below
       {
         text: `Go to the Archive. Learn the notation from Eliza.`,
         next: `eliza_notation_thread`,
         requireNoFlag: `act3_eliza_done`,
       },
-      {
-        text: `Eliza / notation — done. ✓`,
-        next: `act_three_hub`,
-        requireFlag: `act3_eliza_done`,
-        id: `act3_eliza_done_stub`, permanent: true,
-        maxAwareness: 99,
-      },
+      // Eliza thread completion shown via injectIf below
       {
         text: `Go to Retention. Philomena has your memories.`,
         next: `philomena_return`,
         requireNoFlag: `act3_philomena_done`,
       },
-      {
-        text: `Philomena / memories — done. ✓`,
-        next: `act_three_hub`,
-        requireFlag: `act3_philomena_done`,
-        id: `act3_philomena_done_stub`, permanent: true,
-        maxAwareness: 99,
-      },
+      // Philomena thread completion shown via injectIf below
       {
         text: `All three done — face the Board.`,
         next: `board_summons`,
@@ -3241,6 +3223,7 @@ const SCENES = {
       `He closes the notebook. "Two things you need before November fourth. The notation — Eliza has it. And your memories — Philomena has them. You choose the order. I'll be here."`,
     ],
     ses: [`craigslist_bond`],
+    flag: `act3_craigslist_done`,
     choices: [
       {
         text: `Go to Eliza first. The notation shapes what you bring down.`,
@@ -3861,9 +3844,10 @@ const SCENES = {
       `"Craigslist," you say.`,
       `"Yeah."`,
       `"Thank you."`,
-      `He nods. He goes. You sit with the notation until the light changes.`,
-      `Then you go down.`,
+      `He nods. He goes.`,
+      `You sit with the notation until the light changes. You take stock of what you're carrying into the dark.`,
     ],
+    statSummary: true,
     choices: [
       { text: `Go to the basement. Go down.`, next: `final_descent` },
     ],
@@ -4270,6 +4254,8 @@ function canAccess(choice, stats, charisms) {
   if (choice.requireStat && effectiveStat(choice.requireStat.stat) < choice.requireStat.min) return false;
   if (choice.requireCharism && !charisms.includes(choice.requireCharism)) return false;
   if (choice.requireFlag && !STATE.flags[choice.requireFlag]) return false;
+  if (choice.requireFlag2 && !STATE.flags[choice.requireFlag2]) return false;
+  if (choice.requireFlag3 && !STATE.flags[choice.requireFlag3]) return false;
   if (choice.requireNoFlag && STATE.flags[choice.requireNoFlag]) return false;
   if (choice.requireAwareness && (STATE.awareness || 0) < choice.requireAwareness) return false;
   // maxAwareness: choice vanishes if awareness gets too high (can't pretend anymore)
@@ -4392,7 +4378,7 @@ function hr(cls) { const e = document.createElement(`hr`); e.className = cls; re
 // ═══════════════════════════════════════════════
 
 const INIT_STATS = { reason: 1, intuition: 1, composure: 1, presence: 1 };
-const SAVE_KEY = `severed_hours_v10`;
+const SAVE_KEY = `severed_hours_v11`;
 
 // FLAGS: permanent binary decisions that close/open paths and change NPC behaviour
 // flags is a plain object: { flag_name: true }
@@ -4425,6 +4411,7 @@ let STATE = {
   confirmRestart: false,
   notesPanelOpen: false,
   introStep: 0,
+  introRollResult: null,
   buildingRevised: false,
   mortificationSpent: false,
   retrySpent: false,
@@ -4459,7 +4446,7 @@ function saveGame() {
   } catch(e) {}
 }
 
-const GAME_VERSION = 10; // v1.0 // increment when scenes are removed or renamed
+const GAME_VERSION = 11; // v1.0 // increment when scenes are removed or renamed
 
 function loadGame() {
   try {
@@ -4562,6 +4549,8 @@ function applyChoice(choice) {
     STATE.permanentChoicesTaken = new Set();
     STATE.mode = `attended`;
     STATE.introStep = 0;
+    STATE.introRollResult = null;
+    STATE.notesPanelOpen = false;
     STATE.tempPenalties = {};
     STATE.truths = {};
     STATE.actOneEnded = false;
@@ -4698,8 +4687,14 @@ function renderIntroScene() {
         `Below that, smaller: 14.`,
         `You circle the 14 yourself, without deciding to. The pen is already in your hand.`,
         `This is the first thing you have done in this room that you understand completely.`,
+        `Below your circle, your hand writes something else before you can stop it.`,
         `Something knocks at the door. Three beats, precise.`,
+        `You steady yourself.`,
       ],
+      roll: { stat: `composure`, difficulty: 3, label: `composure check — staying steady` },
+      rollSuccess: `The knock is just a knock. You say: "Come in."`,
+      rollPartial: `Your hand is shaking slightly. You say: "Come in." Your voice is steadier than your hand.`,
+      rollFail: `Something in you tilts. You say: "Come in." The words feel borrowed.`,
       choice: `Say: "Come in."`,
     },
     {
@@ -4724,19 +4719,57 @@ function renderIntroScene() {
   const wrap = div(`csel`);
   wrap.style.maxWidth = `560px`;
 
+  // Show roll result text if pending
+  const introRollResult = STATE.introRollResult || null;
+  if (introRollResult && current.roll) {
+    const resultText = introRollResult === `success` ? current.rollSuccess
+      : introRollResult === `partial` ? current.rollPartial
+      : current.rollFail;
+    const rp = el(`p`, { className: `sp roll-echo` }, resultText);
+    rp.style.marginBottom = `1rem`;
+    wrap.appendChild(rp);
+  }
+
   current.text.forEach(line => {
     const p2 = el(`p`, { className: `sp` }, line);
     p2.style.marginBottom = `.9rem`;
     wrap.appendChild(p2);
   });
 
-  const nextBtn = btn(`btn-pri`, current.choice, () => {
-    if (current.last) {
-      STATE.screen = `csel`; _lastScreen = null; render();
-    } else {
-      STATE.introStep = steps + 1; _lastScreen = null; render();
-    }
-  });
+  // Show roll box if this scene has a roll and no result yet
+  if (current.roll && !introRollResult) {
+    const rollBox = div(`roll-box`);
+    rollBox.appendChild(p(`roll-label`, current.roll.label.toUpperCase()));
+    rollBox.appendChild(p(`roll-math`, `2d6 + ${current.roll.stat} vs. difficulty ${current.roll.difficulty}`));
+    rollBox.style.marginTop = `1rem`;
+    wrap.appendChild(rollBox);
+
+    const rollBtn = btn(`btn-pri`, `roll`, () => {
+      const d1 = Math.floor(Math.random() * 6) + 1;
+      const d2 = Math.floor(Math.random() * 6) + 1;
+      const statVal = STATE.stats[current.roll.stat] || 1;
+      const total = d1 + d2 + statVal;
+      const outcome = total >= current.roll.difficulty ? `success`
+        : total >= current.roll.difficulty - 2 ? `partial` : `fail`;
+      STATE.introRollResult = outcome;
+      _lastScreen = null; render();
+    });
+    rollBtn.style.marginTop = `.8rem`;
+    wrap.appendChild(rollBtn);
+    return wrap;
+  }
+
+  // Continue button (after roll resolved, or no roll)
+  const nextBtn = btn(`btn-pri`,
+    introRollResult ? `continue` : current.choice,
+    () => {
+      STATE.introRollResult = null;
+      if (current.last) {
+        STATE.screen = `csel`; _lastScreen = null; render();
+      } else {
+        STATE.introStep = steps + 1; _lastScreen = null; render();
+      }
+    });
   nextBtn.style.marginTop = `1.5rem`;
   wrap.appendChild(nextBtn);
   return wrap;
@@ -5181,8 +5214,7 @@ function renderNotesPanel() {
     panel.appendChild(el(`p`, { className: `notes-panel-empty` }, `nothing recorded yet.`));
   } else {
     // Show in reverse order (most recent first)
-    [...notes].reverse().forEach(key => {
-      const label = NOTES[key] || key;
+    [...notes].reverse().forEach(label => {
       const item = el(`p`, { className: `nitem` }, label);
       panel.appendChild(item);
     });
@@ -5237,19 +5269,35 @@ function renderScene() {
     if (STATE.flags[`haircut_assessment_done`]) summaryItems.push(`Haircut completed her assessment`);
     if ((STATE.awareness || 0) >= 5) summaryItems.push(`awareness: maximum`);
     else if ((STATE.awareness || 0) >= 3) summaryItems.push(`awareness: ${STATE.awareness}`);
-    if (summaryItems.length) {
-      const summary = el(`div`, { className: `run-summary` });
-      summary.appendChild(el(`p`, { className: `run-summary-title` }, `this run —`));
-      summaryItems.forEach(item => {
-        summary.appendChild(el(`p`, { className: `run-summary-item` }, item));
-      });
-      game.appendChild(summary);
-    }
+    if (!summaryItems.length) summaryItems.push(`a quiet run`);
+    const summary = el(`div`, { className: `run-summary` });
+    summary.appendChild(el(`p`, { className: `run-summary-title` }, `this run —`));
+    summaryItems.forEach(item => {
+      summary.appendChild(el(`p`, { className: `run-summary-item` }, item));
+    });
+    game.appendChild(summary);
   }
 
   // Art
   if (scene.art && ART[scene.art]) {
     game.appendChild(pre(ART[scene.art], `art-block`));
+  }
+
+  // Stat summary for pre-descent scene
+  if (scene.statSummary) {
+    const comp = effectiveStat(`composure`);
+    const intu = effectiveStat(`intuition`);
+    const reas = effectiveStat(`reason`);
+    const pres = effectiveStat(`presence`);
+    const aw = STATE.awareness || 0;
+    const ch = STATE.charisms || [];
+    const charismNote = ch.includes(`void_gaze`) ? `Void Gaze: threshold rolls use higher of two throws.`
+      : ch.includes(`kenosis`) ? `Kenosis: awareness gains reduced. Emptiness is a kind of readiness.`
+      : ch.includes(`mortification`) ? `Mortification: you can spend Composure to push through.`
+      : ``;
+    const subNote = intu > comp ? ` Intuition (${intu}) will substitute for Composure on Threshold rolls.` : ``;
+    const txt = `Composure: ${comp}. Intuition: ${intu}. Reason: ${reas}. Presence: ${pres}. Awareness: ${aw}.${subNote}${charismNote ? ` ` + charismNote : ``}`;
+    game.appendChild(p(`sp inject-p stat-summary-p`, txt));
   }
 
   // Roll echo — one line at top of scene, cleared after display
@@ -5271,8 +5319,11 @@ function renderScene() {
     const cls = paraClass(line);
     stxt.appendChild(p(cls, line));
   });
-  // Void Gaze at Awareness 4+: sees things uninvited in any scene
-  if ((STATE.charisms || []).includes(`void_gaze`) && (STATE.awareness || 0) >= 4 && scene.voidGazeVision) {
+  // Void Gaze at Awareness 4+: sees things uninvited in any scene — once per scene
+  const voidGazeKey = `_vgv_${STATE.sceneId}`;
+  if ((STATE.charisms || []).includes(`void_gaze`) && (STATE.awareness || 0) >= 4
+      && scene.voidGazeVision && !STATE.seen.has(voidGazeKey)) {
+    STATE.seen.add(voidGazeKey);
     stxt.appendChild(p(`sp inject-p void-vision`, scene.voidGazeVision));
   }
 
@@ -5407,7 +5458,7 @@ function render() {
   const screenChanged = STATE.screen !== _lastScreen;
   const sceneChanged  = STATE.sceneId !== _lastSceneId;
   // Also force redraw when charism selection changes
-  const selStr = STATE.selectedCharisms.join(`,`) + `|` + (STATE.mode || `attended`);
+  const selStr = STATE.selectedCharisms.join(`,`) + `|` + (STATE.mode || `attended`) + `|` + (STATE.introStep || 0) + `|` + (STATE.introRollResult || ``);
   const selChanged = selStr !== (_lastCharismSel || ``);
   if (selChanged) _lastCharismSel = selStr;
   // Force redraw when visitedLeaf changes (so hub dims visited choices)
