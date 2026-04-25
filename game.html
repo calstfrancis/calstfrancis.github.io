@@ -76,18 +76,54 @@ nav {
   transition: color .15s;
 }
 .nav-links a:hover { color: var(--gold); }
-.nav-back {
-  font-size: .78rem;
-  font-weight: 600;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  color: var(--vellum-3);
+
+/* ── HAMBURGER ICON ── */
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 36px;
+  height: 36px;
+  background: none;
   border: 1px solid var(--rule);
-  padding: .28rem .75rem;
-  transition: all .15s;
-  font-family: 'Spectral', serif;
+  cursor: pointer;
+  padding: 8px 7px;
+  flex-shrink: 0;
 }
-.nav-back:hover { color: var(--gold); border-color: var(--rule-hi); }
+.nav-toggle span {
+  display: block;
+  height: 1px;
+  background: var(--vellum-3);
+  transition: all .2s;
+}
+.nav-toggle.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.nav-toggle.open span:nth-child(2) { opacity: 0; }
+.nav-toggle.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+/* ── RESPONSIVE MOBILE NAV ── */
+@media (max-width: 640px) {
+  .nav-toggle { display: flex; }
+  .nav-links {
+    display: none;
+    position: fixed;
+    top: 50px;
+    left: 0; right: 0;
+    background: rgba(26,22,18,.99);
+    border-bottom: 1px solid var(--rule);
+    flex-direction: column;
+    gap: 0;
+    padding: .5rem 0;
+    z-index: 99;
+  }
+  .nav-links.open { display: flex; }
+  .nav-links li a {
+    display: block;
+    padding: .85rem 1.75rem;
+    font-size: .85rem;
+    letter-spacing: .1em;
+  }
+}
 
 /* ── GAME LABEL BAR ── */
 .game-bar {
@@ -133,9 +169,9 @@ nav {
       <span></span><span></span><span></span>
     </button>
     <ul class="nav-links" id="navLinks">
-      <li><a href="#projects">Projects</a></li>
-      <li><a href="#about">About</a></li>
-      <li><a href="#support">Support</a></li>
+      <li><a href="index.html#projects">Projects</a></li>
+      <li><a href="index.html#about">About</a></li>
+      <li><a href="index.html#support">Support</a></li>
     </ul>
   </div>
 </nav>
@@ -151,6 +187,22 @@ nav {
   title="The Severed Hours — a text adventure"
   allowfullscreen
 ></iframe>
+<script>
+const toggle = document.getElementById('navToggle');
+const links  = document.getElementById('navLinks');
 
+toggle.addEventListener('click', () => {
+  toggle.classList.toggle('open');
+  links.classList.toggle('open');
+});
+
+// Close menu when a link is tapped
+links.querySelectorAll('a').forEach(a => {
+  a.addEventListener('click', () => {
+    toggle.classList.remove('open');
+    links.classList.remove('open');
+  });
+});
+</script>
 </body>
 </html>
