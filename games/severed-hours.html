@@ -4412,6 +4412,7 @@ let STATE = {
   notesPanelOpen: false,
   introStep: 0,
   introRollResult: null,
+  introRollDice: null,
   buildingRevised: false,
   mortificationSpent: false,
   retrySpent: false,
@@ -4722,6 +4723,19 @@ function renderIntroScene() {
   // Show roll result text if pending
   const introRollResult = STATE.introRollResult || null;
   if (introRollResult && current.roll) {
+    const dice = STATE.introRollDice || {};
+    const outcomeBand = introRollResult === `success` ? `SUCCESS`
+      : introRollResult === `partial` ? `PARTIAL` : `FAILURE`;
+    const outcomeCls = introRollResult === `success` ? `roll-success`
+      : introRollResult === `partial` ? `roll-partial` : `roll-fail`;
+    const rbox = div(`roll-box${introRollResult === `fail` ? ` roll-box-fail` : introRollResult === `partial` ? ` roll-box-partial` : ``}`);
+    rbox.appendChild(p(`roll-label`, `COMPOSURE CHECK`));
+    if (dice.d1 !== undefined) {
+      const statVal = dice.total - dice.d1 - dice.d2;
+      rbox.appendChild(p(`roll-math`, `[${dice.d1}]+[${dice.d2}] = ${dice.d1+dice.d2} + ${statVal} (composure) = ${dice.total} vs. difficulty ${current.roll.difficulty}`));
+    }
+    rbox.appendChild(p(`roll-result ${outcomeCls}`, `░░░░░░░░░░ ${outcomeBand}`));
+    wrap.appendChild(rbox);
     const resultText = introRollResult === `success` ? current.rollSuccess
       : introRollResult === `partial` ? current.rollPartial
       : current.rollFail;
@@ -4752,6 +4766,7 @@ function renderIntroScene() {
       const outcome = total >= current.roll.difficulty ? `success`
         : total >= current.roll.difficulty - 2 ? `partial` : `fail`;
       STATE.introRollResult = outcome;
+      STATE.introRollDice = { d1, d2, total, outcome };
       _lastScreen = null; render();
     });
     rollBtn.style.marginTop = `.8rem`;
@@ -5408,6 +5423,7 @@ function renderRestartBar() {
     const yes = el(`button`, {
       className: `btn confirm-yes`,
       onClick: () => {
+        // Full state reset — mirrors the __restart__ handler in applyChoice
         STATE.screen = `ded`;
         STATE.sceneId = `opening_darkness`;
         STATE.stats = { ...INIT_STATS };
@@ -5415,13 +5431,35 @@ function renderRestartBar() {
         STATE.notes = [];
         STATE.seen = new Set();
         STATE.visitedLeaf = new Set();
+        STATE.flags = {};
+        STATE.awareness = 0;
+        STATE.permanentChoicesTaken = new Set();
+        STATE.tempPenalties = {};
+        STATE.truths = {};
+        STATE.actOneEnded = false;
+        STATE.mode = `attended`;
+        STATE.introStep = 0;
+        STATE.introRollResult = null;
+        STATE.notesPanelOpen = false;
+        STATE.buildingRevised = false;
+        STATE.mortificationSpent = false;
+        STATE.retrySpent = false;
+        STATE.discernmentRetrySpent = false;
+        STATE.poaAbsorbedThisScene = false;
+        STATE.unmakerUsedThisAct = false;
         STATE.rollResult = null;
         STATE.rollChoice = null;
+        STATE.lastRollEcho = null;
+        STATE._lastResolvedRoll = null;
         STATE.confirmRestart = false;
         STATE.selectedCharisms = [];
         try { localStorage.removeItem(SAVE_KEY); } catch(e) {}
         _lastScreen = null;
         _lastSceneId = null;
+        _lastCharismSel = null;
+        _lastLeafSize = 0;
+        _lastRollKey = `none`;
+        _lastAwareness = `0`;
         render();
       }
     }, `yes, restart`);
