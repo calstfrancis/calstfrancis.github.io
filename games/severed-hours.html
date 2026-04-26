@@ -69,6 +69,8 @@ body { background: #09080a; color: #d0bc88; font-family: "Courier Prime", "Couri
 .status-panel { position: fixed; top: 0; left: 0; width: min(360px, 94vw); height: 100vh;
   background: #070600; border-right: 1px solid #1a2a1a; padding: 1.5rem; overflow-y: auto; z-index: 200;
   animation: slide-in-left .2s ease; }
+.status-panel.unraveling { animation: unravel-blur 3s ease-in-out infinite; opacity: 0.7; }
+@keyframes unravel-blur { 0%,100%{opacity:0.7;filter:blur(0)} 50%{opacity:0.5;filter:blur(0.8px)} }
 @keyframes slide-in-left { from { transform: translateX(-100%); } to { transform: translateX(0); } }
 .status-panel h3 { font-family: "Special Elite", serif; font-size: .9rem; color: #8ab070;
   letter-spacing: .15em; margin-bottom: 1rem; border-bottom: 1px solid #1a2a1a; padding-bottom: .5rem; }
@@ -198,6 +200,7 @@ const NOTES = {
   found_threshold_memo:       `The Threshold Review: November 4th`,
   found_own_file:             `You are in Special Matters`,
   found_stink_patrol_1:       `STINK PATROL — FIELD DIVISION (coffee mug)`,
+  found_stink_patrol_equipment: `Stink Patrol field kit. The compass oscillates. TYPE 3 — CONTINUOUS EXPOSURE.`,
   found_stink_patrol_2:       `Stink Patrol debrief rescheduled — see previous memo`,
   found_stink_patrol_3:       `STINK PATROL — EQUIPMENT STORAGE (locked)`,
   met_craigslist:                    `Craigslist Butterantonio — orientation, week three`,
@@ -1029,7 +1032,7 @@ const SCENES = {
       {
         text: `She is part of whatever is below. Not employee — participant. The Continuous keeps its own.`,
         setTruth: { key: `stacy_nature`, value: `stacy_continuous` },
-        flag: `reconciled_stacy_photo`,
+        flag: [`reconciled_stacy_photo`, `reconciled_stacy_continuous`],
         awareness: 1,
         next: `office_desk`,
       },
@@ -1074,8 +1077,10 @@ const SCENES = {
     tempPenaltyOnEnter: { reason: 1 },
     art: `personnel_file`,
     injectIf: [
-      { requireFlag: `reconciled_stacy_photo`, requireNoFlag: `trusted_continuous`,
-        text: `Under TENURE: the field reads "continuous." Not continuous employment — just the word, as a category.` },
+      { requireFlag: `reconciled_stacy_photo`, requireNoFlag: `reconciled_stacy_continuous`,
+        text: `Under TENURE: the field reads "continuous." Not continuous employment — the word alone, as category. Under DATES: several entries have been corrected. The corrections go back further than five years.` },
+      { requireFlag: `reconciled_stacy_continuous`,
+        text: `Under TENURE: no date recorded. The field for administrative dates is blank — not erased, simply never applicable. Under SUPERVISOR: the letters stop rearranging when you accept that you cannot read the name because it is not a name.` },
     ],
     text: [
       `The file opens. You read quickly, steadily.`,
@@ -1826,6 +1831,13 @@ const SCENES = {
       { text: `Go through the gate to the garden.`, next: `garden` },
       { text: `Sit on the bench a little longer.`, next: `courtyard_bench` },
       { text: `Head inside.`, next: `lobby` },
+      {
+        text: `Stay longer. Let the world narrow to this. (Grounding: +1 Composure, −1 Awareness)`,
+        effect: { composure: 1 },
+        awarenessLoss: 1,
+        healingComposure: true,
+        id: `freezer_beef_grounding`, permanent: true,
+      },
     ],
   },
 
@@ -2961,7 +2973,27 @@ const SCENES = {
       { text: `"What do you know about the unlabelled door?"`, next: `til_door` },
       { text: `"What do you know about the Threshold?"`, next: `til_threshold` },
       { text: `"Have you ever been through it?"`, effect: { presence: 1 }, next: `til_been_through` },
+      { text: `Look around the maintenance area.`, next: `equipment_storage` },
     ],
+  },
+
+  equipment_storage: {
+    returnTo: `meet_til`,
+    location: `Basement — Maintenance Storage`,
+    text: [
+      `Shelves of institutional supply: replacement tiles, pipe fittings, cleaning products in industrial quantities.`,
+      `One shelf is labelled STINK PATROL — FIELD KIT. Three items: a device like a modified compass, a notebook of dense grid-paper annotations, and a small canister labelled NEUTRALISER (TYPE 3 — CONTINUOUS EXPOSURE).`,
+      `The compass needle does not point north. It oscillates between two positions with the patience of something tracking something slow.`,
+      `Til Okafor has been annotating coordinates for a long time. They correspond to rooms in this building.`,
+    ],
+    se: `found_stink_patrol_equipment`,
+    injectIf: [
+      { requireCharism: `void_gaze`,
+        text: `The Void Gaze reads the canister label more completely. Under "CONTINUOUS EXPOSURE," in smaller print: exposure to Continuous-adjacent atmospheric conditions. Type 3: ozone, old paper, mineral depth. Stink Patrol was not cleaning odours. It was mapping Seam-leaks — places where the Continuous breathes through the building's surfaces.` },
+      { requireCharism: `void_gaze`,
+        text: `The compass needle traces the boundary of something directly below. The Threshold is wider than the door suggests.` },
+    ],
+    choices: [],
   },
 
   til_door: {
@@ -3661,6 +3693,8 @@ const SCENES = {
     location: `The Board Room — Third Floor`,
     art: `boardroom`,
     injectIf: [
+      { requireFlag: `solidarity_high`,
+        text: `You are not presenting alone. Shaneel has been corresponding with something for twenty years. Craigslist has been noticing since his first week. The Correspondence workers are still at their desks. You are not the protagonist here — you are the orientation point. The Board can sense the difference.` },
       { requireAwareness: 4,
         text: `Something shifts in the room as you settle. Not your entrance — you. Three Board members feel it: you have been to the Threshold and back and the Continuous has been oriented toward you for days, and that orientation is detectable here. Three of them look up from their papers before you speak.` },
     ],
@@ -3700,6 +3734,12 @@ const SCENES = {
   board_shaky: {
     location: `The Board Room — Third Floor`,
     art: `boardroom`,
+    injectIf: [
+      { requireFlag: `descent_failed_roll`,
+        text: `The Board chair looks at you a moment longer than she should. "You look," she says carefully, "like someone who has been somewhere." The descent is visible on you. This is not the disadvantage you might expect — it is a specific kind of credential.` },
+      { requireFlag: `solidarity_high`,
+        text: `Something in the room registers that you are not entirely alone in your uncertainty. This is unusual. The Board adjusts slightly.` },
+    ],
     text: [
       `You enter. Twelve faces turn. Something in your entry reads to the room as uncertainty — not weakness, but the honest uncertainty of someone carrying something large.`,
       `The Board chair's eyes narrow slightly. "Special Matters. Your findings?"`,
@@ -4085,6 +4125,7 @@ const SCENES = {
   },
 
   descent_stage_3_minimum: {
+    flag: `descent_failed_roll`,
     location: `The Threshold — Third Stage`,
     art: `continuous_contact`,
     text: [
@@ -4122,6 +4163,10 @@ const SCENES = {
   the_review: {
     location: `The Board Room — Third Floor`,
     art: `boardroom`,
+    injectIf: [
+      { requireFlag: `solidarity_high`,
+        text: `You are aware, as you enter the Board Room, that you are not alone. Shaneel has been writing toward this. Craigslist has been noticing toward this. The Correspondence workers are still at their desks. You are the voice, not the origin. The recommendation is already being made — in every act of attention that brought anyone here.` },
+    ],
     text: [
       `November fourth.`,
       `The Board Room. The long table. Fourteen chairs — twelve for the Board, one for you, one for Craigslist.`,
@@ -4616,6 +4661,7 @@ function saveGame() {
       tempPenalties: STATE.tempPenalties || {},
       truths: STATE.truths || {},
       actOneEnded: STATE.actOneEnded || false,
+      solidarity: STATE.solidarity || 0,
     }));
     const saveLabels2 = (STATE.awareness || 0) >= 5 ? [`held`, `witnessed`, `retained`, `recorded`] : [`saved`];
     STATE.saveMsg = saveLabels2[Math.floor(Math.random() * saveLabels2.length)];
@@ -4657,6 +4703,8 @@ function loadGame() {
       STATE.tempPenalties = s.tempPenalties || {};
       STATE.truths = s.truths || {};
       STATE.actOneEnded = s.actOneEnded || false;
+      STATE.solidarity = s.solidarity || 0;
+      if (STATE.solidarity >= 4) STATE.flags[`solidarity_high`] = true;
     }
   } catch(e) {
     localStorage.removeItem(SAVE_KEY);
@@ -4689,6 +4737,7 @@ function applyScene(id) {
     const solidarityFlags = new Set([`craigslist_ally_early`, `trusted_stacy`,
       `act3_craigslist_done`, `act3_philomena_done`, `craigslist_bond`]);
     flags.forEach(f => { if (solidarityFlags.has(f)) STATE.solidarity = Math.min((STATE.solidarity||0)+1, 5); });
+    if ((STATE.solidarity||0) >= 4) STATE.flags[`solidarity_high`] = true;
   }
   if (s.overwriteNote) {
     const idx = STATE.notes.indexOf(s.overwriteNote.old);
@@ -4777,6 +4826,10 @@ function applyChoice(choice) {
   // Raise awareness
   if (choice.awareness) {
     STATE.awareness = Math.min((STATE.awareness || 0) + choice.awareness, 5);
+  }
+  if (choice.awarenessLoss) {
+    STATE.awareness = Math.max((STATE.awareness || 0) - choice.awarenessLoss, 0);
+    STATE.pendingToast = `grounded — awareness recedes`;
   }
   // Mark permanent choice consumed
   if (choice.permanent && choice.id) {
@@ -5434,7 +5487,8 @@ function renderStatusPanel() {
   const overlay = el(`div`, { className: `notes-overlay`,
     onClick: () => { STATE.statusPanelOpen = false; _lastSceneId = null; render(); }
   });
-  const panel = el(`div`, { className: `status-panel` });
+  const isUnraveling = STATE.mode === `witnessed` && (STATE.stats.composure || 1) <= 1;
+  const panel = el(`div`, { className: `status-panel${isUnraveling ? ` unraveling` : ``}` });
   panel.addEventListener(`click`, e => e.stopPropagation());
 
   const closeBtn = el(`button`, { className: `status-panel-close`,
@@ -5888,8 +5942,25 @@ function render() {
     // leaving the rest of the DOM (and its animation state) untouched.
     const ind = document.querySelector(`.save-indicator`);
     if (ind) {
-      ind.textContent = STATE.saveMsg || `·`;
-      ind.className = `save-indicator` + (STATE.saveMsg ? `` : ` save-hidden`);
+      if ((STATE.awareness || 0) >= 5 && !STATE.saveMsg) {
+        if (!window._saveInterval) {
+          const cycleLabels = [`·`, `held`, `witnessed`, `reconciled`, `·`, `retained`];
+          let _ci = 0;
+          window._saveInterval = setInterval(() => {
+            const el = document.querySelector(`.save-indicator`);
+            if (!el || (STATE.awareness || 0) < 5 || STATE.saveMsg) {
+              clearInterval(window._saveInterval); window._saveInterval = null; return;
+            }
+            _ci = (_ci + 1) % cycleLabels.length;
+            el.textContent = cycleLabels[_ci];
+            el.className = `save-indicator`;
+          }, 1800);
+        }
+      } else {
+        if (window._saveInterval) { clearInterval(window._saveInterval); window._saveInterval = null; }
+        ind.textContent = STATE.saveMsg || `·`;
+        ind.className = `save-indicator` + (STATE.saveMsg ? `` : ` save-hidden`);
+      }
     }
   }
 }
