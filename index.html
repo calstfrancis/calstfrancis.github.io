@@ -383,6 +383,7 @@ footer a:hover{color:var(--coral)}
   .support-bota{width:50px}
 }
 
+[data-theme="light"] .hero h1 { color: #0a0402; }
 @keyframes riseIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
 .hero{animation:riseIn .6s ease both}
 section{animation:riseIn .5s ease both}
@@ -436,7 +437,7 @@ section:nth-of-type(4){animation-delay:.2s}
   </div>
 
   <!-- botanical vine strip across bottom of hero, full bleed -->
-  <svg class="hero-vine" viewBox="0 0 900 70" preserveAspectRatio="none" aria-hidden="true" style="height:70px;display:block;margin-top:2.5rem">
+  <svg class="hero-vine" viewBox="0 0 900 70" preserveAspectRatio="xMidYMid slice" aria-hidden="true" style="height:70px;display:block;margin-top:2.5rem;overflow:hidden">
     <!-- main vine -->
     <path d="M -10,45 C 80,20 160,55 220,35 C 280,15 340,55 450,38 C 560,20 620,58 680,35 C 740,12 820,52 910,38"
       stroke="#5a6428" stroke-width="2.5" fill="none" stroke-linecap="round"/>
@@ -470,7 +471,7 @@ section:nth-of-type(4){animation-delay:.2s}
 
     <!-- game card with botanical top border -->
     <div class="game-feature">
-      <svg class="game-bota-top" viewBox="0 0 800 38" style="height:38px;display:block" preserveAspectRatio="none" aria-hidden="true">
+      <svg class="game-bota-top" viewBox="0 0 800 38" style="height:38px;display:block;overflow:hidden" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
         <rect width="800" height="38" fill="#0e0b09"/>
         <path d="M -5,22 C 60,8 130,30 200,18 C 270,6 340,28 400,18 C 460,8 530,30 600,18 C 670,6 740,28 805,18"
           stroke="#5a6428" stroke-width="2" fill="none" stroke-linecap="round"/>
@@ -650,7 +651,7 @@ section:nth-of-type(4){animation-delay:.2s}
 <footer>
   <div class="container">
     <!-- botanical footer vine -->
-    <svg class="footer-vine" viewBox="0 0 500 50" style="height:50px" aria-hidden="true">
+    <svg class="footer-vine" viewBox="0 0 500 50" style="height:50px;overflow:hidden" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
       <path d="M 0,30 C 60,12 120,40 180,25 C 240,10 310,42 370,25 C 430,8 480,35 500,28"
         stroke="#5a6428" stroke-width="2" fill="none" stroke-linecap="round"/>
       <g transform="translate(180,22) scale(.38)"><use href="#sf"/></g>
