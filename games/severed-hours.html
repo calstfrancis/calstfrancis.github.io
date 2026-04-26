@@ -99,6 +99,9 @@ body { background: #09080a; color: #d0bc88; font-family: "Courier Prime", "Couri
 .ctag-dark { border-color: #6a2a4a; color: #c06090; }
 .portrait { font-family: "Courier Prime", monospace; font-size: .66rem; color: #c0aa70; white-space: pre; line-height: 1.35; margin: 1rem 0; display: inline-block; }
 .art-block { font-family: "Courier Prime", monospace; font-size: .68rem; color: #c0aa70; white-space: pre; line-height: 1.4; margin: 1rem 0; overflow-x: auto; }
+.glitch-4 { filter: skewX(1.5deg); animation: glitch-flicker 4s ease-in-out infinite; }
+.glitch-5 { filter: skewX(3deg) blur(0.4px); letter-spacing: .03em; animation: glitch-flicker 2s ease-in-out infinite; }
+@keyframes glitch-flicker { 0%,100%{opacity:1} 45%{opacity:.93;filter:skewX(2deg)} 46%{opacity:1;filter:skewX(0.8deg)} }
 .stxt { margin-bottom: 1.2rem; }
 .sp { font-size: .95rem; line-height: 1.92; color: #d4c08a; margin-bottom: .95rem; }
 .sp-memo { font-size: .85rem; color: #a89060; border-left: 2px solid #3a3020; padding-left: .9rem; margin-left: .4rem; line-height: 1.7; }
@@ -244,6 +247,12 @@ const NOTES = {
   learned_notation_partial:   `You have most of the notation. Enough.`,
   board_faced:                `The Board has heard the account.`,
   board_committed:            `The Board committed to accepting the answer.`,
+  haircut_assessment_done: `Haircut completed her assessment. The answer was yes.`,
+  kenosis_garden: `You emptied yourself toward the plant. Something noticed.`,
+  learned_notation_deep: `The notation is in you at depth. The descent will be different.`,
+  met_eliza_distant: `Eliza Moneyfreme, the Archivist. She already knows more than she said.`,
+  saw_garden_first_time: `The garden exists. It is walled. Something is planted over.`,
+  void_gaze_garden_plant: `The Void Gaze looked directly at the plant. It looked back.`,
 };
 
 // ── ASCII ART LIBRARY ─────────────────────────────────────────
@@ -1010,7 +1019,28 @@ const SCENES = {
       `You put the photograph back face-down. Some things are better approached from the side.`,
     ],
     se: `found_photograph`,
-    choices: [],
+    choices: [
+      {
+        text: `Time works differently in this building. She arrived in 1931 and the building has kept her.`,
+        setTruth: { key: `stacy_nature`, value: `institutional_time` },
+        flag: `reconciled_stacy_photo`,
+        next: `office_desk`,
+      },
+      {
+        text: `She is part of whatever is below. Not employee — participant. The Continuous keeps its own.`,
+        setTruth: { key: `stacy_nature`, value: `stacy_continuous` },
+        flag: `reconciled_stacy_photo`,
+        awareness: 1,
+        next: `office_desk`,
+      },
+      {
+        text: `File it. You don't have enough yet to reconcile this.`,
+        setTruth: { key: `stacy_nature`, value: `deferred` },
+        flag: `reconciled_stacy_photo`,
+        tempPenaltyOnEnter: { reason: 1 },
+        next: `office_desk`,
+      },
+    ],
   },
 
   office_memo: {
@@ -1043,6 +1073,10 @@ const SCENES = {
     // Reading this file costs Reason temporarily - restored when Act One letter read
     tempPenaltyOnEnter: { reason: 1 },
     art: `personnel_file`,
+    injectIf: [
+      { requireFlag: `reconciled_stacy_photo`, requireNoFlag: `trusted_continuous`,
+        text: `Under TENURE: the field reads "continuous." Not continuous employment — just the word, as a category.` },
+    ],
     text: [
       `The file opens. You read quickly, steadily.`,
       `Employment start: five years ago. Department: SPECIAL MATTERS. Supervisor: the field is filled in, but the ink does something strange — the letters rearrange themselves mildly each time you try to focus directly on the name.`,
@@ -4357,6 +4391,7 @@ function rollCheck(statValue, difficulty, opts) {
     STATE.stats.composure = Math.max((STATE.stats.composure || 1) - 1, 1);
     charismNote = `mortification +2 (−1 composure)`;
     STATE.mortificationSpent = false; // reset
+    STATE.flags[`mortification_grace`] = true; // next Presence roll gets advantage
   }
   if (opts.statKey === `presence` && ch.includes(`consolation`)) {
     charismBonus += 1; charismNote = (charismNote ? charismNote + ` / ` : ``) + `consolation +1`;
@@ -4377,9 +4412,41 @@ function rollCheck(statValue, difficulty, opts) {
     const alt = alt1 + alt2;
     if (alt > roll) { roll = alt; charismNote = `void gaze (took higher roll)`; }
   }
+  // Mortification Grace: next Presence roll uses advantage (roll twice, take higher)
+  if (opts.statKey === `presence` && STATE.flags && STATE.flags[`mortification_grace`]) {
+    delete STATE.flags[`mortification_grace`]; // consumed on use
+    const gc1 = Math.floor(Math.random() * 6) + 1;
+    const gc2 = Math.floor(Math.random() * 6) + 1;
+    const graceRoll = gc1 + gc2;
+    if (graceRoll > roll) { roll = graceRoll; charismNote = (charismNote?charismNote+` / `:``)+`grace (took higher roll)`; }
+  }
+
+  // Solidarity bonus on corporate/Board rolls — collective orientation
+  if (opts.corporate && (STATE.solidarity || 0) >= 3) {
+    charismBonus += 1;
+    charismNote = (charismNote?charismNote+` / `:``)+`solidarity +1`;
+  }
+
   // Mortification spend: player can burn 1 Composure for +2 (handled at choice level)
 
-  const effectiveDiff = Math.max(difficulty - awareMod, 3);
+  let effectiveDiff = Math.max(difficulty - awareMod, 3);
+
+  // Seam truth modifier: reconciliation choices alter interaction difficulty
+  if (opts.npcKey && STATE.truths) {
+    const npcTruth = STATE.truths[`${opts.npcKey}_nature`] || STATE.truths[opts.npcKey];
+    // Stacy: institutional_time → easier, stacy_continuous → harder
+    if (opts.npcKey === `stacy`) {
+      if (npcTruth === `institutional_time`) effectiveDiff = Math.max(effectiveDiff - 1, 3);
+      else if (npcTruth === `stacy_continuous`) effectiveDiff = Math.min(effectiveDiff + 1, 9);
+    }
+    // sm_contradiction truths affect Continuous contact rolls
+    if (opts.npcKey === `continuous`) {
+      const namingTruth = STATE.truths.naming_origin;
+      if (namingTruth === `continuous`) effectiveDiff = Math.max(effectiveDiff - 1, 3);
+      else if (namingTruth === `file`) effectiveDiff = Math.min(effectiveDiff + 1, 9);
+    }
+  }
+
   const total = roll + statValue + charismBonus;
 
   // Three bands: full success, partial (diff-2 to diff-1), failure
@@ -4475,6 +4542,7 @@ function resetState() {
   STATE.poaAbsorbedThisScene = false;
   STATE.unmakerUsedThisAct = false;
   STATE.mode = `attended`;
+  STATE.solidarity = 0;
   try { localStorage.removeItem(SAVE_KEY); } catch(e) {}
   _lastScreen = null;
   _lastSceneId = null;
@@ -4527,6 +4595,7 @@ let STATE = {
   poaAbsorbedThisScene: false,
   unmakerUsedThisAct: false,
   mode: `attended`,
+  solidarity: 0,  // hidden — increases when player acts collectively
 };
 
 function saveGame() {
@@ -4548,7 +4617,8 @@ function saveGame() {
       truths: STATE.truths || {},
       actOneEnded: STATE.actOneEnded || false,
     }));
-    STATE.saveMsg = `saved`;
+    const saveLabels2 = (STATE.awareness || 0) >= 5 ? [`held`, `witnessed`, `retained`, `recorded`] : [`saved`];
+    STATE.saveMsg = saveLabels2[Math.floor(Math.random() * saveLabels2.length)];
     if (STATE.saveMsgTimer) clearTimeout(STATE.saveMsgTimer);
     STATE.saveMsgTimer = setTimeout(() => { STATE.saveMsg = ``; render(); }, 1800);
   } catch(e) {}
@@ -4613,8 +4683,12 @@ function applyScene(id) {
     STATE.awareness = Math.min((STATE.awareness || 0) + s.awareness, 5);
   }
   if (s.flag) {
-    if (typeof s.flag === `string`) STATE.flags[s.flag] = true;
-    else s.flag.forEach(f => { STATE.flags[f] = true; });
+    const flags = typeof s.flag === `string` ? [s.flag] : s.flag;
+    flags.forEach(f => { STATE.flags[f] = true; });
+    // Solidarity: collective actions build it
+    const solidarityFlags = new Set([`craigslist_ally_early`, `trusted_stacy`,
+      `act3_craigslist_done`, `act3_philomena_done`, `craigslist_bond`]);
+    flags.forEach(f => { if (solidarityFlags.has(f)) STATE.solidarity = Math.min((STATE.solidarity||0)+1, 5); });
   }
   if (s.overwriteNote) {
     const idx = STATE.notes.indexOf(s.overwriteNote.old);
@@ -5183,20 +5257,20 @@ function renderChoices(scene) {
 
   // Pre-compute: is any real (non-fallback) ending accessible?
   // Used to suppress the fallback ending when real options exist.
+  // Use canAccess directly — it handles all gate types correctly.
+  // A real ending is accessible if it's not the fallback and canAccess returns true.
   const hasAnyRealEnding = scene.choices && scene.choices.some(c =>
-    !c._fallback &&
-    !(c.requireFlag && !STATE.flags[c.requireFlag]) &&
-    !(c.requireNoFlag && STATE.flags[c.requireNoFlag]) &&
-    !(c.requireCharism && !(STATE.charisms || []).includes(c.requireCharism)) &&
-    !(c.requireAwareness && (STATE.awareness || 0) < c.requireAwareness) &&
-    !(c.permanent && c.id && STATE.permanentChoicesTaken.has(c.id)) &&
-    !c.lockedText  // lockedText means it's locked — doesn't count as accessible
+    !c._fallback && canAccess(c, STATE.stats, STATE.charisms)
   );
 
   const wrap = div(`choices`);
   scene.choices.forEach(choice => {
     // Fallback ending: hide if any real ending is accessible
     if (choice._fallback && hasAnyRealEnding) return;
+
+
+    const accessible = canAccess(choice, STATE.stats, STATE.charisms);
+    const hasRoll = !!choice.roll;
 
     // Awareness ≥ 4: silently remove one non-essential accessible choice per hub
     // On opening_darkness: fires every visit (persistent disorientation on return)
@@ -5210,8 +5284,6 @@ function renderChoices(scene) {
       if (!aw4IsOpeningHub) STATE.seen.add(`_aw4_removed_${STATE.sceneId}`);
       return; // silently removed
     }
-
-    const accessible = canAccess(choice, STATE.stats, STATE.charisms);
 
     // Hide choices that fail a FLAG gate entirely (permanent, binary — no value in showing)
     // Also hide maxAwareness/maxComposure failures (they've passed that window)
@@ -5228,7 +5300,6 @@ function renderChoices(scene) {
     const consumed = choice.permanent && choice.id && STATE.permanentChoicesTaken.has(choice.id);
     if (failsFlag || consumed) return; // skip entirely — don't render
 
-    const hasRoll = !!choice.roll;
     let cls = `choice`;
     if (!accessible && choice.requireCharism) {
       // Charism gates show their type via colour
@@ -5499,7 +5570,9 @@ function renderScene() {
     const locText = awareness5
       ? `the continuous — present`
       : scene.location;
-    const locEl = p(`loc${awareness5 ? ` loc-aware` : ``}`, locText);
+    const aw3 = STATE.awareness || 0;
+    const locGlitch = aw3 >= 5 ? ` glitch-5` : aw3 >= 4 ? ` glitch-4` : ``;
+    const locEl = p(`loc${(aw3 >= 3 || awareness5) ? ` loc-aware` : ``}${locGlitch}`, locText);
     game.appendChild(locEl);
   }
 
@@ -5508,7 +5581,9 @@ function renderScene() {
 
   // Portrait
   if (scene.portrait && ART[scene.portrait]) {
-    game.appendChild(pre(ART[scene.portrait], `portrait`));
+    const aw = STATE.awareness || 0;
+    const glitchCls = aw >= 5 ? `portrait glitch-5` : aw >= 4 ? `portrait glitch-4` : `portrait`;
+    game.appendChild(pre(ART[scene.portrait], glitchCls));
   }
 
   // Run summary on final screen
@@ -5534,9 +5609,15 @@ function renderScene() {
     game.appendChild(summary);
   }
 
-  // Art
+  // Art — glitch at high awareness for reality-adjacent locations
   if (scene.art && ART[scene.art]) {
-    game.appendChild(pre(ART[scene.art], `art-block`));
+    const aw2 = STATE.awareness || 0;
+    const glitchable = new Set([`lobby`,`garden`,`threshold_art`,`continuous_contact`,
+      `basement`,`dept_nine`,`sundial_inscription`,`archive`]);
+    let artCls = `art-block`;
+    if (glitchable.has(scene.art) && aw2 >= 5) artCls += ` glitch-5`;
+    else if (glitchable.has(scene.art) && aw2 >= 4) artCls += ` glitch-4`;
+    game.appendChild(pre(ART[scene.art], artCls));
   }
 
   // Stat summary for pre-descent scene
@@ -5726,7 +5807,7 @@ function render() {
   const leafChanged = leafSize !== (_lastLeafSize || 0);
   if (leafChanged) _lastLeafSize = leafSize;
   // Force redraw when roll result appears or clears
-  const rollKey = STATE.rollResult ? `${STATE.rollResult.die}-${STATE.rollResult.total}` : `none`;
+  const rollKey = STATE.rollResult ? `${STATE.rollResult.d1}-${STATE.rollResult.d2}-${STATE.rollResult.total}` : `none`;
   const rollChanged = rollKey !== (_lastRollKey || `none`);
   if (rollChanged) _lastRollKey = rollKey;
   // Track awareness changes (affects stats bar)
@@ -5738,10 +5819,14 @@ function render() {
   if (screenChanged || sceneChanged || selChanged || leafChanged || rollChanged || awareChanged) {
     _lastScreen  = STATE.screen;
     _lastSceneId = STATE.sceneId;
-    STATE.mortificationSpent = false; // reset each scene
-    STATE.retrySpent = false;
-    STATE.discernmentRetrySpent = false;
-    STATE.poaAbsorbedThisScene = false;
+    // Per-scene ability flags ONLY reset when the scene itself changes
+    // (not on roll results, awareness ticks, or other mid-scene state changes)
+    if (sceneChanged) {
+      STATE.mortificationSpent = false;
+      STATE.retrySpent = false;
+      STATE.discernmentRetrySpent = false;
+      STATE.poaAbsorbedThisScene = false;
+    }
 
     root.innerHTML = ``;
     const wrap = div(`wrap`);
