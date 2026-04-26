@@ -994,7 +994,7 @@ const SCENES = {
     ],
     ses: [`found_stink_patrol_1`, `found_own_file`],
     choices: [
-      { text: `Turn over the photograph.`, effect: { intuition: 1 }, next: `office_photo` },
+      { text: `Turn over the photograph.`, effect: { intuition: 1 }, next: `office_photo`, permanent: true, id: `examined_photo` },
       { text: `Read the memo dated three weeks from now.`, effect: { reason: 1 }, next: `office_memo` },
       {
         text: `Try to open the personnel file.`,
@@ -1027,6 +1027,7 @@ const SCENES = {
         text: `Time works differently in this building. She arrived in 1931 and the building has kept her.`,
         setTruth: { key: `stacy_nature`, value: `institutional_time` },
         flag: `reconciled_stacy_photo`,
+        permanent: true, id: `stacy_photo_reconciled`,
         next: `office_desk`,
       },
       {
@@ -1034,13 +1035,14 @@ const SCENES = {
         setTruth: { key: `stacy_nature`, value: `stacy_continuous` },
         flag: [`reconciled_stacy_photo`, `reconciled_stacy_continuous`],
         awareness: 1,
+        permanent: true, id: `stacy_photo_reconciled`,
         next: `office_desk`,
       },
       {
         text: `File it. You don't have enough yet to reconcile this.`,
         setTruth: { key: `stacy_nature`, value: `deferred` },
         flag: `reconciled_stacy_photo`,
-        tempPenaltyOnEnter: { reason: 1 },
+        permanent: true, id: `stacy_photo_reconciled`,
         next: `office_desk`,
       },
     ],
@@ -1081,6 +1083,8 @@ const SCENES = {
         text: `Under TENURE: the field reads "continuous." Not continuous employment — the word alone, as category. Under DATES: several entries have been corrected. The corrections go back further than five years.` },
       { requireFlag: `reconciled_stacy_continuous`,
         text: `Under TENURE: no date recorded. The field for administrative dates is blank — not erased, simply never applicable. Under SUPERVISOR: the letters stop rearranging when you accept that you cannot read the name because it is not a name.` },
+      { requireFlag: `trusted_continuous`,
+        text: `The dates in this file do not read as dates. Employment start: NOW. Review scheduled: NOW. Last performance evaluation: NOW. The Continuous does not use the calendar. The institutional record, viewed through its truth, is a series of presents stacked on top of each other.` },
     ],
     text: [
       `The file opens. You read quickly, steadily.`,
@@ -4217,6 +4221,10 @@ const SCENES = {
 
   ending_dissolution: {
     location: `The Board Room — Third Floor`,
+    injectIf: [
+      { requireFlag: `solidarity_high`,
+        text: `You say "we" without deciding to. The Board chair notices. "We," she repeats. Something in the room shifts — twelve people recalibrating to a word that is not the word they expected from the person in your seat.` },
+    ],
     text: [
       `"Dissolution," you say. "The corporation ends. The building is returned to the site. The people who need to stay, stay — but as themselves, not as Drenthe & Associates employees. Without the apparatus. Without the compliance framework. Without applied continuity management."`,
       `"And the work?" the Board chair asks.`,
@@ -4596,7 +4604,7 @@ function resetState() {
   _lastRollKey = `none`;
   _lastAwareness = `0`;
 }
-const SAVE_KEY = `severed_hours_v11`;
+const SAVE_KEY = `severed_hours_v12`;
 
 // FLAGS: permanent binary decisions that close/open paths and change NPC behaviour
 // flags is a plain object: { flag_name: true }
@@ -4670,7 +4678,7 @@ function saveGame() {
   } catch(e) {}
 }
 
-const GAME_VERSION = 11; // v1.0 // increment when scenes are removed or renamed
+const GAME_VERSION = 12; // v1.0 // increment when scenes are removed or renamed
 
 function loadGame() {
   try {
@@ -4725,6 +4733,18 @@ function applyScene(id) {
   const s = SCENES[id];
   if (!s) return;
   STATE.poaAbsorbedThisScene = false; // reset per scene
+
+  // Act 3 safety net: if player reached completion scenes via alternate routes,
+  // ensure flags are set. Prevents hub lockout from edge-case routing.
+  if (id === `act_three_hub`) {
+    if (STATE.seen.has(`craigslist_bond`) || STATE.seen.has(`craigslist_briefing`))
+      STATE.flags[`act3_craigslist_done`] = true;
+    if (STATE.seen.has(`learned_notation`) || STATE.seen.has(`learned_notation_deep`))
+      STATE.flags[`act3_eliza_done`] = true;
+    if (STATE.seen.has(`philomena_holding`) || STATE.seen.has(`name_returned`))
+      STATE.flags[`act3_philomena_done`] = true;
+    if ((STATE.solidarity || 0) >= 4) STATE.flags[`solidarity_high`] = true;
+  }
   if (s.se) addNote(s.se);
   if (s.ses) s.ses.forEach(addNote);
   if (s.awareness) {
