@@ -6,562 +6,400 @@
 <title>Cal St Francis</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Spectral:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+<svg width="0" height="0" style="position:absolute;pointer-events:none" aria-hidden="true">
+<defs>
+  <!-- sunflower centred at 0,0 -->
+  <g id="sf">
+    <g fill="#e06030">
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(0)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(25.7)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(51.4)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(77.1)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(102.8)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(128.5)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(154.2)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(180)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(205.7)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(231.4)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(257.1)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(282.8)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(308.5)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(334.2)"/>
+    </g>
+    <circle r="16" fill="#5a2c10"/>
+    <circle r="11" fill="#3e1a08"/>
+    <circle r="2.2" cx="0"  cy="-5.5" fill="#6a3818" opacity=".7"/>
+    <circle r="2.2" cx="5"  cy="2"    fill="#6a3818" opacity=".7"/>
+    <circle r="2.2" cx="-5" cy="2"    fill="#6a3818" opacity=".7"/>
+    <circle r="2.2" cx="2"  cy="-10"  fill="#6a3818" opacity=".5"/>
+    <circle r="2.2" cx="-2" cy="-10"  fill="#6a3818" opacity=".5"/>
+    <circle r="2.2" cx="8"  cy="-5"   fill="#6a3818" opacity=".5"/>
+    <circle r="2.2" cx="-8" cy="-5"   fill="#6a3818" opacity=".5"/>
+  </g>
+  <!-- broad leaf -->
+  <path id="lf-b" d="M0,0 C12,-10 22,-8 26,-2 C30,6 24,20 10,24 C-4,28 -16,18 -14,8 C-12,0 -6,-2 0,0Z" fill="#7a8840"/>
+  <!-- narrow leaf -->
+  <path id="lf-n" d="M0,0 C6,-6 8,-20 0,-32 C-8,-20 -6,-6 0,0Z" fill="#7a8840"/>
+  <!-- veined leaf -->
+  <g id="lf-v">
+    <path d="M0,0 C10,-8 18,-6 20,2 C18,12 8,18 0,16 C-8,18 -18,12 -20,2 C-18,-6 -10,-8 0,0Z" fill="#7a8840"/>
+    <path d="M0,0 L0,16" stroke="#5a6428" stroke-width="1" fill="none"/>
+    <path d="M0,6 L6,10" stroke="#5a6428" stroke-width=".7" fill="none"/>
+    <path d="M0,6 L-6,10" stroke="#5a6428" stroke-width=".7" fill="none"/>
+  </g>
+</defs>
+</svg>
+
 <style>
-/* ── TOKENS (DEFAULT DARK THEME) ─────────────────────────────────── */
 :root {
-  --ink:        #1a1612;
-  --ink-2:      #211d18;
-  --ink-3:      #2e2820;
-  --rule:       #3d3528;
-  --rule-hi:    #5a4e38;
-  --vellum:     #e8dcc8;
-  --vellum-2:   #c8b898;
-  --vellum-3:   #9a8a6a;
-  --gold:       #c9a84c;
-  --gold-hi:    #e8c870;
-  --gold-bg:    rgba(201,168,76,.08);
-  --red:        #9a2820;
-  --red-hi:     #c03828;
-  --shadow:     0 2px 16px rgba(0,0,0,.45);
-  --shadow-sm:  0 1px 6px rgba(0,0,0,.35);
-  --status-color: #90c060;
+  --bg:        #6a1710;
+  --bg-2:      #7c1e14;
+  --bg-3:      #8e2218;
+  --nav-bg:    rgba(28,6,4,.97);
+  --border:    #4a0e0b;
+  --border-hi: #8a2a1a;
+  --text:      #f2e4c4;
+  --text-2:    #d8c4a0;
+  --text-3:    #b89c72;
+  --coral:     #e06030;
+  --coral-hi:  #f07848;
+  --cpale:     rgba(224,96,48,.12);
+  --olive:     #7a8840;
+  --olive-hi:  #96aa52;
+  --opale:     rgba(122,136,64,.15);
+  --black:     #100c08;
+  --ok:        #96aa52;
 }
-
-/* ── LIGHT ADWAITA THEME ─────────────────────────────────── */
 [data-theme="light"] {
-  --ink:        #f6f5f4;
-  --ink-2:      #ffffff;
-  --ink-3:      #e9e8e7;
-  --rule:       #dadce0;
-  --rule-hi:    #c0c2c5;
-  --vellum:     #202124;
-  --vellum-2:   #3c4043;
-  --vellum-3:   #5f6368;
-  --gold:       #1a73e8;
-  --gold-hi:    #4285f4;
-  --gold-bg:    rgba(26,115,232,.08);
-  --red:        #c5221f;
-  --red-hi:     #d93025;
-  --shadow:     0 2px 12px rgba(0,0,0,.08);
-  --shadow-sm:  0 1px 4px rgba(0,0,0,.05);
-  --status-color: #2e7d32;
+  --bg:        #f0e4c8;
+  --bg-2:      #fdf6e8;
+  --bg-3:      #e4d4b0;
+  --nav-bg:    rgba(34,10,4,.96);
+  --border:    #c8b890;
+  --border-hi: #a89060;
+  --text:      #28120c;
+  --text-2:    #4a2e18;
+  --text-3:    #7a5a38;
+  --coral:     #b83818;
+  --coral-hi:  #d04825;
+  --cpale:     rgba(184,56,24,.1);
+  --olive:     #4a6018;
+  --olive-hi:  #5a7820;
+  --opale:     rgba(74,96,24,.12);
+  --black:     #faf4e4;
+  --ok:        #4a6018;
 }
 
-/* ── RESET ──────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Spectral',Georgia,serif;
+  font-size:1rem;
+  line-height:1.75;
+  -webkit-font-smoothing:antialiased;
+  transition:background .25s,color .25s;
+}
+a{color:var(--coral);text-decoration:none;transition:color .15s}
+a:hover{color:var(--coral-hi)}
+.container{max-width:860px;margin:0 auto;padding:0 1.75rem}
 
-body {
-  background: var(--ink);
-  color: var(--vellum);
-  font-family: 'Spectral', Georgia, serif;
-  font-size: 1rem;
-  line-height: 1.75;
-  -webkit-font-smoothing: antialiased;
-  transition: background 0.2s ease, color 0.2s ease;
+/* ── NAV ── */
+nav{
+  background:var(--nav-bg);
+  border-bottom:2px solid var(--border);
+  position:sticky;top:0;z-index:100;
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
 }
+.nav-inner{
+  display:flex;align-items:center;justify-content:space-between;
+  height:52px;max-width:860px;margin:0 auto;padding:0 1.75rem;
+}
+.nav-brand{
+  font-family:'IM Fell English',serif;
+  font-size:1.05rem;color:var(--coral);letter-spacing:.03em;
+  display:flex;align-items:center;gap:.45rem;
+}
+.nav-brand svg{width:20px;height:20px;overflow:visible;flex-shrink:0}
+.nav-links{display:flex;align-items:center;gap:1.8rem;list-style:none}
+.nav-links a{
+  font-family:'Spectral',serif;font-size:.78rem;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--text-3);transition:color .15s;
+}
+.nav-links a:hover{color:var(--coral)}
+.theme-toggle{
+  background:none;border:1px solid var(--border-hi);padding:.22rem .65rem;
+  font-family:'Spectral',serif;font-size:.72rem;font-weight:600;
+  letter-spacing:.06em;color:var(--text-3);cursor:pointer;transition:all .15s;
+  display:inline-flex;align-items:center;gap:5px;
+}
+.theme-toggle:hover{border-color:var(--coral);color:var(--coral)}
+.nav-toggle{
+  display:none;flex-direction:column;justify-content:center;gap:5px;
+  width:36px;height:36px;background:none;border:1px solid var(--border-hi);
+  cursor:pointer;padding:8px 7px;
+}
+.nav-toggle span{display:block;height:1px;background:var(--text-3);transition:all .2s}
+.nav-toggle.open span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+.nav-toggle.open span:nth-child(2){opacity:0}
+.nav-toggle.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
 
-a { color: var(--gold); text-decoration: none; transition: color .15s; }
-a:hover { color: var(--gold-hi); }
+/* ── HERO ── */
+.hero{border-bottom:2px solid var(--border);position:relative;overflow:hidden;padding:4.5rem 0 0}
+/* large watermark flower behind text */
+.hero-wm{
+  position:absolute;right:-40px;top:-30px;
+  opacity:.09;pointer-events:none;
+}
+.hero-eyebrow{
+  font-family:'Spectral',serif;font-size:.72rem;font-weight:600;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--olive);margin-bottom:.9rem;
+}
+.hero h1{
+  font-family:'IM Fell English',serif;font-size:3.2rem;font-weight:400;
+  line-height:1.1;color:var(--text);margin-bottom:.3rem;
+}
+.hero-subtitle{
+  font-family:'IM Fell English',serif;font-style:italic;
+  font-size:1.1rem;color:var(--text-2);margin-bottom:1.6rem;
+}
+.hero-desc{
+  font-size:.96rem;color:var(--text-2);line-height:1.85;
+  max-width:520px;margin-bottom:1.8rem;
+}
+.hero-desc em{font-style:italic;color:var(--text)}
+.hero-actions{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:0}
 
-.rule-h { border: none; border-top: 1px solid var(--rule); margin: 0; }
-
-/* ── LAYOUT ─────────────────────────────────── */
-.container { max-width: 860px; margin: 0 auto; padding: 0 1.75rem; }
-
-/* ── NAV ─────────────────────────────────────── */
-nav {
-  border-bottom: 1px solid var(--rule);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: rgba(26,22,18,.94);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  transition: background 0.2s ease;
-}
-[data-theme="light"] nav {
-  background: rgba(246,245,244,.96);
-}
-.nav-inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 50px;
-  max-width: 860px;
-  margin: 0 auto;
-  padding: 0 1.75rem;
-}
-.nav-brand {
-  font-family: 'IM Fell English', serif;
-  font-size: 1.1rem;
-  color: var(--gold);
-  letter-spacing: .04em;
-}
-.nav-links {
-  display: flex;
-  gap: 2rem;
-  list-style: none;
-}
-.nav-links a {
-  font-family: 'Spectral', serif;
-  font-size: .8rem;
-  font-weight: 600;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  color: var(--vellum-3);
-  transition: color .15s;
-}
-.nav-links a:hover { color: var(--gold); }
-
-/* Theme toggle button */
-.theme-toggle {
-  background: none;
-  border: 1px solid var(--rule);
-  border-radius: 24px;
-  padding: 4px 12px;
-  font-size: 0.8rem;
-  font-family: 'Spectral', serif;
-  font-weight: 600;
-  color: var(--vellum-2);
-  cursor: pointer;
-  transition: all 0.2s;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  letter-spacing: 0.04em;
-}
-.theme-toggle:hover {
-  border-color: var(--gold);
-  color: var(--gold);
-  background: var(--gold-bg);
-}
-.theme-toggle span {
-  font-size: 1rem;
+/* botanical strip along bottom of hero — full width vine with flowers */
+.hero-vine{
+  display:block;width:100%;margin-top:2.5rem;
+  overflow:visible;
 }
 
-/* ── HERO ────────────────────────────────────── */
-.hero {
-  padding: 5rem 0 4rem;
-  border-bottom: 1px solid var(--rule);
-  position: relative;
-  overflow: hidden;
-  transition: border-color 0.2s;
-}
-.hero::before {
-  content: '✛';
-  position: absolute;
-  right: -1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 22rem;
-  color: var(--ink-3);
-  line-height: 1;
-  pointer-events: none;
-  user-select: none;
-}
-.hero-eyebrow {
-  font-family: 'Spectral', serif;
-  font-size: .74rem;
-  font-weight: 600;
-  letter-spacing: .18em;
-  text-transform: uppercase;
-  color: var(--red);
-  margin-bottom: 1rem;
-}
-.hero h1 {
-  font-family: 'IM Fell English', serif;
-  font-size: 3.4rem;
-  font-weight: 400;
-  line-height: 1.12;
-  color: var(--gold);
-  margin-bottom: .3rem;
-  letter-spacing: .01em;
-}
-.hero-subtitle {
-  font-family: 'IM Fell English', serif;
-  font-style: italic;
-  font-size: 1.15rem;
-  color: var(--vellum-2);
-  margin-bottom: 1.6rem;
-  letter-spacing: .02em;
-}
-.hero-desc {
-  font-size: .97rem;
-  color: var(--vellum-2);
-  line-height: 1.85;
-  max-width: 540px;
-  margin-bottom: 2rem;
-}
-.hero-desc em { font-style: italic; color: var(--vellum); }
-.hero-rule {
-  display: flex;
-  align-items: center;
-  gap: .75rem;
-  margin-bottom: 1.8rem;
-  max-width: 540px;
-}
-.hero-rule-line { flex: 1; border-top: 1px solid var(--rule-hi); }
-.hero-rule-orn { font-size: .75rem; color: var(--gold); opacity: .6; letter-spacing: .1em; }
-.hero-actions { display: flex; gap: .75rem; flex-wrap: wrap; }
-
-/* ── BUTTONS ─────────────────────────────────── */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: .4rem;
-  padding: .5rem 1.15rem;
-  font-family: 'Spectral', serif;
-  font-size: .86rem;
-  font-weight: 600;
-  letter-spacing: .04em;
-  cursor: pointer;
-  transition: all .15s;
-  border: 1px solid transparent;
-  text-decoration: none !important;
-}
-.btn-gold {
-  background: var(--gold-bg);
-  color: var(--gold);
-  border-color: var(--rule-hi);
-}
-.btn-gold:hover { background: rgba(201,168,76,.16); border-color: var(--gold); color: var(--gold-hi); }
-[data-theme="light"] .btn-gold:hover { background: rgba(26,115,232,.12); }
-.btn-ghost {
-  background: transparent;
-  color: var(--vellum-3);
-  border-color: var(--rule);
-}
-.btn-ghost:hover { background: var(--ink-3); color: var(--vellum); border-color: var(--rule-hi); }
-.btn-kofi {
-  background: rgba(154,40,32,.15);
-  color: #e07060;
-  border-color: rgba(154,40,32,.4);
-}
-.btn-kofi:hover { background: rgba(154,40,32,.25); color: #f08070; border-color: var(--red-hi); }
-[data-theme="light"] .btn-kofi {
-  background: rgba(197,34,31,.08);
-  color: #c5221f;
-}
-[data-theme="light"] .btn-kofi:hover { background: rgba(197,34,31,.15); }
-
-/* ── SECTIONS ────────────────────────────────── */
-section { padding: 3.5rem 0; border-bottom: 1px solid var(--rule); transition: border-color 0.2s; }
-section:last-of-type { border-bottom: none; }
-
-.section-eyebrow {
-  font-family: 'Spectral', serif;
-  font-size: .72rem;
-  font-weight: 600;
-  letter-spacing: .18em;
-  text-transform: uppercase;
-  color: var(--red);
-  margin-bottom: .45rem;
-}
-.section-title {
-  font-family: 'IM Fell English', serif;
-  font-size: 1.7rem;
-  font-weight: 400;
-  color: var(--gold);
-  line-height: 1.2;
-  margin-bottom: .5rem;
-}
-.section-intro {
-  color: var(--vellum-3);
-  font-size: .93rem;
-  line-height: 1.8;
-  max-width: 580px;
-  margin-bottom: 2rem;
+/* ── BOTANICAL DIVIDER between sections ── */
+.bota-div{
+  display:block;width:100%;overflow:visible;
+  margin:-1px 0;/* sits on the section border */
 }
 
-/* ── GAME FEATURE ────────────────────────────── */
-.game-feature {
-  border: 1px solid var(--rule-hi);
-  background: var(--ink-2);
-  padding: 2rem 2rem 1.75rem;
-  margin-bottom: 1.2rem;
-  position: relative;
-  overflow: hidden;
-  transition: background 0.2s, border-color 0.2s;
+/* ── BUTTONS ── */
+.btn{
+  display:inline-flex;align-items:center;gap:.4rem;
+  padding:.52rem 1.15rem;
+  font-family:'Spectral',serif;font-size:.84rem;font-weight:600;
+  letter-spacing:.04em;cursor:pointer;transition:all .15s;
+  border:1px solid transparent;text-decoration:none!important;
 }
-.game-feature::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,.012) 2px, rgba(255,255,255,.012) 4px);
-  pointer-events: none;
-}
-.game-header { display: flex; align-items: flex-start; gap: 2rem; margin-bottom: 1.2rem; }
-.game-ascii {
-  font-family: 'Courier Prime', monospace;
-  font-size: .62rem;
-  color: var(--vellum-3);
-  white-space: pre;
-  line-height: 1.4;
-  flex-shrink: 0;
-  padding-top: .1rem;
-}
-.game-label {
-  font-family: 'Spectral', serif;
-  font-size: .68rem;
-  font-weight: 600;
-  letter-spacing: .16em;
-  text-transform: uppercase;
-  color: var(--vellum-3);
-  margin-bottom: .35rem;
-}
-.game-title {
-  font-family: 'IM Fell English', serif;
-  font-size: 1.6rem;
-  color: var(--gold);
-  line-height: 1.15;
-  margin-bottom: .5rem;
-}
-.game-desc {
-  font-size: .9rem;
-  color: var(--vellum-2);
-  line-height: 1.8;
-  max-width: 500px;
-  margin-bottom: 1.2rem;
-}
-.game-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-top: 1px solid var(--rule);
-  padding-top: .9rem;
-}
-.game-status {
-  display: inline-flex;
-  align-items: center;
-  gap: .4rem;
-  font-family: 'Spectral', serif;
-  font-size: .72rem;
-  font-weight: 600;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  color: var(--status-color);
-}
-.status-pip {
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: var(--status-color);
-  display: inline-block;
-  animation: pip 2.5s ease-in-out infinite;
-}
-@keyframes pip { 0%,100%{opacity:.5} 50%{opacity:1} }
-.game-link {
-  font-family: 'Spectral', serif;
-  font-size: .84rem;
-  font-weight: 600;
-  color: var(--gold);
-  letter-spacing: .04em;
-}
-.game-link:hover { color: var(--gold-hi); }
+.btn-coral{background:var(--cpale);color:var(--coral);border-color:var(--coral)}
+.btn-coral:hover{background:rgba(224,96,48,.22);color:var(--coral-hi);border-color:var(--coral-hi)}
+.btn-ghost{background:transparent;color:var(--text-3);border-color:var(--border-hi)}
+.btn-ghost:hover{background:var(--opale);color:var(--text);border-color:var(--olive)}
+.btn-kofi{background:rgba(0,0,0,.2);color:var(--coral);border-color:var(--border-hi)}
+.btn-kofi:hover{background:var(--cpale);border-color:var(--coral)}
+[data-theme="light"] .btn-kofi{background:var(--cpale)}
 
-/* ── PROJECT LIST ────────────────────────────── */
-.project-list { display: flex; flex-direction: column; gap: .75rem; }
-.project-card {
-  border: 1px solid var(--rule);
-  background: var(--ink-2);
-  padding: 1.25rem 1.5rem;
-  display: flex;
-  align-items: flex-start;
-  gap: 1.25rem;
-  transition: border-color .2s, background .2s;
+/* ── SECTIONS ── */
+section{padding:3.5rem 0;border-bottom:2px solid var(--border)}
+section:last-of-type{border-bottom:none}
+
+/* section title with inline flower */
+.section-title-row{display:flex;align-items:center;gap:.7rem;margin-bottom:.35rem}
+.section-title-row svg{width:32px;height:32px;overflow:visible;flex-shrink:0}
+.section-eyebrow{
+  font-family:'Spectral',serif;font-size:.7rem;font-weight:600;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--olive);margin-bottom:.3rem;
 }
-.project-card:hover { border-color: var(--rule-hi); background: var(--ink-3); }
-.project-initial {
-  font-family: 'IM Fell English', serif;
-  font-size: 2.2rem;
-  color: var(--gold);
-  line-height: 1;
-  flex-shrink: 0;
-  width: 2.4rem;
-  text-align: center;
-  padding-top: .1rem;
-  opacity: .7;
+.section-title{
+  font-family:'IM Fell English',serif;font-size:1.7rem;font-weight:400;
+  color:var(--text);line-height:1.2;
 }
-.project-body { flex: 1; }
-.project-meta { display: flex; align-items: center; gap: .75rem; margin-bottom: .3rem; flex-wrap: wrap; }
-.project-name { font-family: 'IM Fell English', serif; font-size: 1.08rem; color: var(--vellum); }
-.project-type {
-  font-size: .68rem;
-  font-weight: 600;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  color: var(--vellum-3);
-  border: 1px solid var(--rule);
-  padding: .1rem .45rem;
-}
-.project-desc { font-size: .88rem; color: var(--vellum-3); line-height: 1.7; margin-bottom: .6rem; }
-.project-link { font-size: .8rem; font-weight: 600; letter-spacing: .04em; color: var(--gold); }
-.project-link:hover { color: var(--gold-hi); }
-.project-status-dev {
-  font-size: .68rem;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  color: var(--vellum-3);
-  border: 1px solid var(--rule);
-  padding: .1rem .45rem;
-  font-weight: 600;
+.section-intro{
+  color:var(--text-3);font-size:.93rem;line-height:1.8;
+  max-width:580px;margin-top:.5rem;margin-bottom:1.8rem;
 }
 
-/* ── ABOUT ───────────────────────────────────── */
-.about-body {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1px;
-  border: 1px solid var(--rule);
-  background: var(--rule);
+/* ── GAME FEATURE ── */
+.game-feature{
+  border:2px solid var(--border);background:var(--black);
+  margin-bottom:1.2rem;position:relative;overflow:hidden;
 }
-.about-cell { background: var(--ink-2); padding: 1.4rem 1.5rem; transition: background 0.2s; }
-.about-cell h3 {
-  font-family: 'IM Fell English', serif;
-  font-size: .95rem;
-  color: var(--gold);
-  margin-bottom: .7rem;
-  font-weight: 400;
-  letter-spacing: .02em;
+[data-theme="light"] .game-feature{border-color:var(--border-hi)}
+.game-feature::after{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,.012) 2px,rgba(255,255,255,.012) 4px);
 }
-.about-cell p, .about-cell li {
-  font-size: .87rem;
-  color: var(--vellum-3);
-  line-height: 1.75;
+/* botanical top-border on game card */
+.game-bota-top{display:block;width:100%;overflow:visible}
+.game-body{padding:1.5rem 2rem 1.75rem;position:relative;z-index:1}
+.game-header{display:flex;align-items:flex-start;gap:2rem;margin-bottom:1.2rem}
+.game-ascii{
+  font-family:'Courier Prime',monospace;font-size:.62rem;color:#6a5a38;
+  white-space:pre;line-height:1.4;flex-shrink:0;
 }
-.about-cell ul { list-style: none; display: flex; flex-direction: column; gap: .2rem; }
-.about-cell li { padding-left: 1rem; position: relative; }
-.about-cell li::before { content: '·'; position: absolute; left: 0; color: var(--red); }
+.game-label{
+  font-family:'Spectral',serif;font-size:.68rem;font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;color:#6a5a38;margin-bottom:.35rem;
+}
+.game-title{font-family:'IM Fell English',serif;font-size:1.6rem;color:#f0e0a0;line-height:1.15;margin-bottom:.5rem}
+.game-desc{font-size:.9rem;color:#a89060;line-height:1.8;max-width:500px;margin-bottom:1.2rem}
+.game-footer{
+  display:flex;align-items:center;justify-content:space-between;
+  border-top:1px solid #3a3020;padding-top:.9rem;
+}
+.game-status{
+  display:inline-flex;align-items:center;gap:.4rem;
+  font-family:'Spectral',serif;font-size:.72rem;font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--ok);
+}
+.status-pip{width:6px;height:6px;border-radius:50%;background:var(--ok);display:inline-block;animation:pip 2.5s ease-in-out infinite}
+@keyframes pip{0%,100%{opacity:.5}50%{opacity:1}}
+.game-link{font-family:'Spectral',serif;font-size:.84rem;font-weight:600;letter-spacing:.04em;color:#c9a84c}
+.game-link:hover{color:#e8c870}
 
-/* ── SUPPORT ─────────────────────────────────── */
-.support-body {
-  border: 1px solid var(--rule);
-  background: var(--ink-2);
-  padding: 2rem 2.2rem;
-  display: flex;
-  align-items: flex-start;
-  gap: 2rem;
-  transition: background 0.2s;
+/* ── PROJECT LIST ── */
+.project-list{display:flex;flex-direction:column;gap:.75rem}
+.project-card{
+  border:1px solid var(--border-hi);background:rgba(0,0,0,.18);
+  display:flex;align-items:flex-start;gap:1.25rem;
+  transition:border-color .2s,background .2s;position:relative;overflow:hidden;
 }
-.support-drop {
-  font-family: 'IM Fell English', serif;
-  font-size: 4.5rem;
-  color: var(--red);
-  line-height: .8;
-  flex-shrink: 0;
-  opacity: .7;
-  padding-top: .3rem;
+[data-theme="light"] .project-card{background:var(--bg-2)}
+.project-card:hover{border-color:var(--coral);background:var(--cpale)}
+/* flower growing out of right edge of project card */
+.project-card-flower{
+  position:absolute;right:-18px;top:50%;transform:translateY(-50%);
+  opacity:.12;pointer-events:none;
 }
-.support-text p {
-  font-size: .93rem;
-  color: var(--vellum-3);
-  line-height: 1.85;
-  margin-bottom: 1.2rem;
+.project-body-wrap{padding:1.25rem 1.5rem;flex:1;display:flex;align-items:flex-start;gap:1.25rem}
+.project-initial{
+  font-family:'IM Fell English',serif;font-size:2.2rem;color:var(--coral);
+  line-height:1;flex-shrink:0;width:2.4rem;text-align:center;padding-top:.1rem;opacity:.7;
+}
+.project-body{flex:1}
+.project-meta{display:flex;align-items:center;gap:.65rem;margin-bottom:.3rem;flex-wrap:wrap}
+.project-name{font-family:'IM Fell English',serif;font-size:1.08rem;color:var(--text)}
+.project-type{
+  font-family:'Spectral',serif;font-size:.64rem;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--olive);border:1px solid var(--olive);padding:.1rem .45rem;
+}
+.project-desc{font-size:.88rem;color:var(--text-3);line-height:1.7;margin-bottom:.6rem}
+.project-link{font-family:'Spectral',serif;font-size:.8rem;font-weight:600;letter-spacing:.04em;color:var(--coral)}
+.project-link:hover{color:var(--coral-hi)}
+.project-status-dev{
+  font-family:'Spectral',serif;font-size:.64rem;font-weight:600;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--text-3);border:1px solid var(--border-hi);padding:.1rem .45rem;
 }
 
-/* ── FOOTER ──────────────────────────────────── */
-footer { padding: 2.5rem 0; text-align: center; }
-.footer-orn {
-  font-family: 'IM Fell English', serif;
-  font-size: 1.4rem;
-  color: var(--gold);
-  opacity: .35;
-  display: block;
-  margin-bottom: .75rem;
-  letter-spacing: .2em;
+/* ── ABOUT ── */
+.about-body{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:1px;border:1px solid var(--border-hi);background:var(--border-hi);
 }
-footer p { font-size: .8rem; color: var(--vellum-3); line-height: 1.9; }
-footer a { color: var(--vellum-3); }
-footer a:hover { color: var(--gold); }
+.about-cell{
+  background:var(--bg-2);padding:1.4rem 1.5rem;
+  transition:background .25s;position:relative;overflow:hidden;
+}
+.about-cell-flower{
+  position:absolute;bottom:-14px;right:-14px;
+  opacity:.08;pointer-events:none;
+}
+.about-cell h3{
+  font-family:'IM Fell English',serif;font-size:.98rem;font-weight:400;
+  color:var(--coral);margin-bottom:.7rem;letter-spacing:.02em;
+  display:flex;align-items:center;gap:.45rem;
+}
+.about-cell h3 svg{width:18px;height:18px;overflow:visible;flex-shrink:0;opacity:.75}
+.about-cell p,.about-cell li{font-size:.87rem;color:var(--text-3);line-height:1.75;position:relative;z-index:1}
+.about-cell ul{list-style:none;display:flex;flex-direction:column;gap:.2rem}
+.about-cell li{padding-left:1.1rem;position:relative}
+.about-cell li::before{content:'❧';position:absolute;left:0;color:var(--olive);font-size:.72rem;line-height:1.85}
 
-/* ── HAMBURGER ───────────────────────────────── */
-.nav-toggle {
-  display: none;
-  flex-direction: column;
-  justify-content: center;
-  gap: 5px;
-  width: 36px;
-  height: 36px;
-  background: none;
-  border: 1px solid var(--rule);
-  cursor: pointer;
-  padding: 8px 7px;
-  flex-shrink: 0;
+/* ── SUPPORT ── */
+.support-body{
+  border:1px solid var(--border-hi);background:var(--bg-2);
+  padding:2rem 2.2rem;display:flex;align-items:flex-start;gap:1.8rem;
+  transition:background .25s;position:relative;overflow:hidden;
 }
-.nav-toggle span {
-  display: block;
-  height: 1px;
-  background: var(--vellum-3);
-  transition: all .2s;
+.support-bota{flex-shrink:0;width:72px;align-self:stretch;display:flex;align-items:center}
+.support-bota svg{width:72px;overflow:visible}
+.support-text p{
+  font-size:.93rem;color:var(--text-3);line-height:1.85;margin-bottom:1.2rem;
+  position:relative;z-index:1;
 }
-.nav-toggle.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
-.nav-toggle.open span:nth-child(2) { opacity: 0; }
-.nav-toggle.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
 
-/* ── RESPONSIVE ──────────────────────────────── */
-@media (max-width: 640px) {
-  .nav-toggle { display: flex; }
-  .nav-links {
-    display: none;
-    position: fixed;
-    top: 50px;
-    left: 0; right: 0;
-    background: rgba(22,18,14,.99);
-    flex-direction: column;
-    gap: 0;
-    padding: .5rem 0;
-    z-index: 99;
+/* ── FOOTER ── */
+footer{padding:2.5rem 0;text-align:center}
+.footer-vine{display:block;width:100%;max-width:500px;margin:0 auto 1rem;overflow:visible}
+footer p{
+  font-family:'Spectral',serif;font-size:.78rem;
+  color:var(--text-3);line-height:1.9;
+}
+footer a{color:var(--text-3)}
+footer a:hover{color:var(--coral)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:680px){
+  .nav-toggle{display:flex}
+  .nav-links{
+    display:none;position:fixed;top:52px;left:0;right:0;
+    background:rgba(20,4,2,.99);border-bottom:2px solid var(--border);
+    flex-direction:column;gap:0;padding:.5rem 0;z-index:99;
   }
-  [data-theme="light"] .nav-links {
-    background: rgba(246,245,244,.99);
+  [data-theme="light"] .nav-links{background:rgba(240,228,200,.99)}
+  .nav-links.open{display:flex}
+  .nav-links li a,.nav-links li button{
+    display:block;padding:.85rem 1.75rem;font-size:.82rem;
+    letter-spacing:.1em;width:100%;text-align:left;
   }
-  .nav-links.open { display: flex; }
-  .nav-links li a {
-    display: block;
-    padding: .85rem 1.75rem;
-    font-size: .85rem;
-    letter-spacing: .1em;
-  }
-  .hero { padding: 3rem 0 2.5rem; }
-  .hero h1 { font-size: 2.2rem; }
-  .hero::before { display: none; }
-  .hero-desc { font-size: .93rem; }
-  .hero-actions { flex-direction: column; align-items: stretch; }
-  .btn { padding: .75rem 1.2rem; font-size: .9rem; justify-content: center; }
-  section { padding: 2.5rem 0; }
-  .container { padding: 0 1.1rem; }
-  .game-feature { padding: 1.4rem 1.2rem; }
-  .game-ascii { display: none; }
-  .game-header { flex-direction: column; gap: .8rem; }
-  .game-footer { flex-direction: column; align-items: flex-start; gap: .7rem; }
-  .game-link { font-size: .9rem; }
-  .project-card { padding: 1rem 1.1rem; gap: .9rem; }
-  .project-initial { font-size: 1.7rem; width: 2rem; }
-  .project-meta { flex-wrap: wrap; gap: .4rem; }
-  .project-type, .project-status-dev { font-size: .65rem; }
-  .about-body { grid-template-columns: 1fr; }
-  .about-cell { padding: 1.1rem 1.2rem; }
-  .support-body { flex-direction: column; gap: .8rem; padding: 1.4rem 1.2rem; }
-  .support-drop { font-size: 2.5rem; }
+  .theme-toggle{border:none;padding:.85rem 1.75rem;width:100%;justify-content:flex-start}
+
+  .hero{padding:3rem 0 0}
+  .hero h1{font-size:2.2rem}
+  .hero-wm{display:none}
+  .hero-actions{flex-direction:column;align-items:stretch}
+  .btn{justify-content:center;padding:.75rem 1.2rem}
+
+  section{padding:2.5rem 0}
+  .container{padding:0 1.1rem}
+
+  .game-body{padding:1.2rem 1.1rem 1.4rem}
+  .game-ascii{display:none}
+  .game-header{flex-direction:column;gap:.8rem}
+  .game-footer{flex-direction:column;align-items:flex-start;gap:.7rem}
+  .game-bota-top{display:none}
+
+  .project-card-flower{display:none}
+  .project-body-wrap{padding:1rem 1.1rem;gap:.9rem}
+  .project-initial{font-size:1.7rem;width:2rem}
+  .project-meta{gap:.4rem}
+
+  .about-body{grid-template-columns:1fr}
+  .about-cell{padding:1.1rem 1.2rem}
+
+  .support-body{flex-direction:column;gap:.8rem;padding:1.4rem 1.2rem}
+  .support-bota{width:50px}
 }
 
-/* ── ANIMATIONS ──────────────────────────────── */
-@keyframes riseIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.hero { animation: riseIn .6s ease both; }
-section { animation: riseIn .5s ease both; }
-section:nth-of-type(2) { animation-delay: .08s; }
-section:nth-of-type(3) { animation-delay: .14s; }
-section:nth-of-type(4) { animation-delay: .18s; }
+@keyframes riseIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.hero{animation:riseIn .6s ease both}
+section{animation:riseIn .5s ease both}
+section:nth-of-type(2){animation-delay:.08s}
+section:nth-of-type(3){animation-delay:.14s}
+section:nth-of-type(4){animation-delay:.2s}
 </style>
 </head>
 <body>
 
+<!-- NAV -->
 <nav>
   <div class="nav-inner">
-    <span class="nav-brand">Cal St Francis</span>
+    <span class="nav-brand">
+      <svg viewBox="-55 -55 110 110" aria-hidden="true"><use href="#sf"/></svg>
+      Cal St Francis
+    </span>
     <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
       <span></span><span></span><span></span>
     </button>
@@ -574,115 +412,195 @@ section:nth-of-type(4) { animation-delay: .18s; }
   </div>
 </nav>
 
+<!-- HERO -->
 <section class="hero">
-  <div class="container">
+  <div class="container" style="position:relative">
+
+    <!-- large watermark flower behind text -->
+    <svg class="hero-wm" width="340" height="340" viewBox="-55 -55 110 110" aria-hidden="true">
+      <use href="#sf"/>
+    </svg>
+
     <div class="hero-eyebrow">Minister · Theologian · Developer</div>
     <h1>Cal St Francis</h1>
     <p class="hero-subtitle">Candidate for Ordination, United Church of Canada</p>
-    <div class="hero-rule">
-      <div class="hero-rule-line"></div>
-      <span class="hero-rule-orn">✦ ✦ ✦</span>
-      <div class="hero-rule-line"></div>
-    </div>
     <p class="hero-desc">
       I make liturgical tools for ministers and worship leaders, favour theology in the
       traditions of <em>liberation and process</em>, and build the occasional strange little game.
       Everything here is free. If it helps you, consider buying me a coffee.
     </p>
     <div class="hero-actions">
-      <a href="#projects" class="btn btn-gold">See My Work</a>
+      <a href="#projects" class="btn btn-coral">See My Work</a>
       <a href="https://ko-fi.com/calstfrancis" target="_blank" rel="noopener" class="btn btn-kofi">☕ Ko-fi</a>
     </div>
   </div>
+
+  <!-- botanical vine strip across bottom of hero, full bleed -->
+  <svg class="hero-vine" viewBox="0 0 900 70" preserveAspectRatio="none" aria-hidden="true" style="height:70px;display:block;margin-top:2.5rem">
+    <!-- main vine -->
+    <path d="M -10,45 C 80,20 160,55 220,35 C 280,15 340,55 450,38 C 560,20 620,58 680,35 C 740,12 820,52 910,38"
+      stroke="#5a6428" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <!-- sunflower 1 -->
+    <g transform="translate(220,30) scale(.42)"><use href="#sf"/></g>
+    <!-- sunflower 2 centre -->
+    <g transform="translate(450,33) scale(.52)"><use href="#sf"/></g>
+    <!-- sunflower 3 -->
+    <g transform="translate(680,30) scale(.42)"><use href="#sf"/></g>
+    <!-- leaves scattered on vine -->
+    <g transform="translate(120,38) rotate(-30) scale(.55)"><use href="#lf-v"/></g>
+    <g transform="translate(340,42) rotate(20) scale(.5)"><use href="#lf-b"/></g>
+    <g transform="translate(560,36) rotate(-20) scale(.48)"><use href="#lf-v"/></g>
+    <g transform="translate(780,40) rotate(25) scale(.5)"><use href="#lf-b"/></g>
+    <g transform="translate(60,40) rotate(10) scale(.4)"><use href="#lf-n"/></g>
+    <g transform="translate(840,38) rotate(-15) scale(.4)"><use href="#lf-n"/></g>
+  </svg>
 </section>
 
+<!-- PROJECTS -->
 <section id="projects">
   <div class="container">
     <div class="section-eyebrow">Works</div>
-    <h2 class="section-title">Projects &amp; Games</h2>
+    <div class="section-title-row">
+      <h2 class="section-title">Projects &amp; Games</h2>
+      <svg viewBox="-55 -55 110 110" aria-hidden="true"><use href="#sf"/></svg>
+    </div>
     <p class="section-intro">
       Liturgical tools, LaTeX templates, and interactive fiction. All free; source on GitHub.
     </p>
 
+    <!-- game card with botanical top border -->
     <div class="game-feature">
-      <div class="game-header">
-        <div class="game-ascii">╔══════════════════════════════════╗
+      <svg class="game-bota-top" viewBox="0 0 800 38" style="height:38px;display:block" preserveAspectRatio="none" aria-hidden="true">
+        <rect width="800" height="38" fill="#0e0b09"/>
+        <path d="M -5,22 C 60,8 130,30 200,18 C 270,6 340,28 400,18 C 460,8 530,30 600,18 C 670,6 740,28 805,18"
+          stroke="#5a6428" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <g transform="translate(200,15) scale(.32)"><use href="#sf"/></g>
+        <g transform="translate(400,15) scale(.38)"><use href="#sf"/></g>
+        <g transform="translate(600,15) scale(.32)"><use href="#sf"/></g>
+        <g transform="translate(100,20) rotate(-15) scale(.38)"><use href="#lf-v"/></g>
+        <g transform="translate(300,18) rotate(20) scale(.35)"><use href="#lf-b"/></g>
+        <g transform="translate(500,20) rotate(-20) scale(.36)"><use href="#lf-v"/></g>
+        <g transform="translate(700,18) rotate(15) scale(.35)"><use href="#lf-b"/></g>
+      </svg>
+
+      <div class="game-body">
+        <div class="game-header">
+          <div class="game-ascii">╔══════════════════════════════════╗
 ║  DRENTHE &amp; ASSOCIATES             ║
 ║  Continuity. Clarity. Compliance. ║
 ╚══════════════════════════════════╝
   · · · · · · · · · · · · · · · · ·
   [▓▓▓][▓▓▓][▓▓▓][▓▓▓][▓▓▓][▓▓▓]
    clk   clk   clk   clk   clk</div>
-        <div>
-          <div class="game-label">Text Adventure · Browser · Free</div>
-          <div class="game-title">The Severed Hours</div>
-          <p class="game-desc">
-            A noir text adventure set inside the labyrinthine offices of Drenthe &amp; Associates —
-            a firm where Continuity, Clarity, and Compliance mask something far stranger.
-            Play as two investigators. Choices matter. Time frays.
-          </p>
+          <div>
+            <div class="game-label">Text Adventure · Browser · Free</div>
+            <div class="game-title">The Severed Hours</div>
+            <p class="game-desc">
+              A noir text adventure set inside the labyrinthine offices of Drenthe &amp; Associates —
+              a firm where Continuity, Clarity, and Compliance mask something far stranger.
+              Play as two investigators. Choices matter. Time frays.
+            </p>
+          </div>
         </div>
-      </div>
-      <div class="game-footer">
-        <span class="game-status"><span class="status-pip"></span> Playable now — v1.19</span>
-        <a href="game.html" class="game-link">Play in browser →</a>
+        <div class="game-footer">
+          <span class="game-status"><span class="status-pip"></span> Playable now — v1.19</span>
+          <a href="game.html" class="game-link">Play in browser →</a>
+        </div>
       </div>
     </div>
 
     <div class="project-list">
       <div class="project-card">
-        <div class="project-initial">L</div>
-        <div class="project-body">
-          <div class="project-meta">
-            <span class="project-name">Rubric - Liturgy Planner</span>
-            <span class="project-type">LaTeX · UCC</span>
-            <span class="project-status-dev">In development</span>
+        <!-- flower growing from right edge -->
+        <svg class="project-card-flower" width="80" height="80" viewBox="-55 -55 110 110" aria-hidden="true">
+          <use href="#sf"/>
+        </svg>
+        <div class="project-body-wrap">
+          <div class="project-initial">R</div>
+          <div class="project-body">
+            <div class="project-meta">
+              <span class="project-name">Rubric — Liturgy Planner</span>
+              <span class="project-type">LaTeX · UCC</span>
+              <span class="project-status-dev">In development</span>
+            </div>
+            <p class="project-desc">
+              A LaTeX-based worship planning system for United Church of Canada congregations.
+              Full service flows, lectionary integration, and print-ready orders of service.
+            </p>
+            <a href="https://github.com/calstfrancis/rubric" target="_blank" rel="noopener" class="project-link">View on GitHub →</a>
           </div>
-          <p class="project-desc">
-            A LaTeX-based worship planning system for United Church of Canada congregations.
-            Full service flows, lectionary integration, and print-ready orders of service.
-          </p>
-          <a href="https://github.com/calstfrancis/rubric" target="_blank" rel="noopener" class="project-link">View on GitHub →</a>
         </div>
       </div>
     </div>
   </div>
 </section>
 
+<!-- ABOUT -->
 <section id="about">
   <div class="container">
     <div class="section-eyebrow">Biography</div>
-    <h2 class="section-title">Who I Am</h2>
+    <div class="section-title-row">
+      <h2 class="section-title">Who I Am</h2>
+      <svg viewBox="-55 -55 110 110" aria-hidden="true"><use href="#sf"/></svg>
+    </div>
     <p class="section-intro">
       Minister-in-formation at Atlantic School of Theology, Halifax, Nova Scotia.
       My theology is shaped by liberation, process, and contemplative traditions.
     </p>
     <div class="about-body">
+
       <div class="about-cell">
-        <h3>Ministry</h3>
+        <svg class="about-cell-flower" width="90" height="90" viewBox="-55 -55 110 110" aria-hidden="true"><use href="#sf"/></svg>
+        <h3>
+          <svg viewBox="-55 -55 110 110" aria-hidden="true"><use href="#sf"/></svg>
+          Ministry
+        </h3>
         <p>Student minister at Hope United Church, Halifax. I preach, lead worship,
         and build liturgical tools for congregations. Grounded in a theology of liberation —
         God's power as invitation, not coercion.</p>
       </div>
+
       <div class="about-cell">
-        <h3>Academic Formation</h3>
+        <svg class="about-cell-flower" width="70" height="70" viewBox="-22 -22 44 44" aria-hidden="true">
+          <g transform="scale(.9)"><use href="#lf-v"/></g>
+        </svg>
+        <h3>
+          <svg viewBox="-22 -22 44 44" aria-hidden="true" style="width:18px;height:18px;overflow:visible">
+            <use href="#lf-v"/>
+          </svg>
+          Academic Formation
+        </h3>
         <ul>
           <li>MDiv candidate, Atlantic School of Theology</li>
-          <li>Philosophy &amp; classical languages - University of Guelph</li>
-          <li>Mathematics &amp; economics - University of Guelph</li>
-          <li>Masters of Environmental Studies - York University</li>
+          <li>Philosophy &amp; classical languages — University of Guelph</li>
+          <li>Mathematics &amp; economics — University of Guelph</li>
+          <li>Masters of Environmental Studies — York University</li>
         </ul>
       </div>
+
       <div class="about-cell">
-        <h3>Theological Commitments</h3>
+        <svg class="about-cell-flower" width="70" height="70" viewBox="-22 -22 44 44" aria-hidden="true">
+          <g transform="scale(.9)"><use href="#lf-v"/></g>
+        </svg>
+        <h3>
+          <svg viewBox="-22 -22 44 44" aria-hidden="true" style="width:18px;height:18px;overflow:visible">
+            <use href="#lf-v"/>
+          </svg>
+          Theological Commitments
+        </h3>
         <ul>
           <li>Liberation &amp; process theology</li>
           <li>Rinzai-influenced contemplative practice</li>
           <li>Scripture as living encounter</li>
         </ul>
       </div>
+
       <div class="about-cell">
-        <h3>Craft &amp; Method</h3>
+        <svg class="about-cell-flower" width="90" height="90" viewBox="-55 -55 110 110" aria-hidden="true"><use href="#sf"/></svg>
+        <h3>
+          <svg viewBox="-55 -55 110 110" aria-hidden="true"><use href="#sf"/></svg>
+          Craft &amp; Method
+        </h3>
         <ul>
           <li>LaTeX for liturgy &amp; academic writing</li>
           <li>Illuminated manuscript &amp; calligraphy traditions</li>
@@ -690,16 +608,29 @@ section:nth-of-type(4) { animation-delay: .18s; }
           <li>Plain HTML — no engines, no frameworks</li>
         </ul>
       </div>
+
     </div>
   </div>
 </section>
 
+<!-- SUPPORT -->
 <section id="support">
   <div class="container">
     <div class="section-eyebrow">Support</div>
-    <h2 class="section-title">Buy Me a Coffee</h2>
+    <div class="section-title-row">
+      <h2 class="section-title">Buy Me a Coffee</h2>
+      <svg viewBox="-55 -55 110 110" aria-hidden="true"><use href="#sf"/></svg>
+    </div>
     <div class="support-body">
-      <div class="support-drop">☕</div>
+      <!-- botanical spray instead of emoji -->
+      <div class="support-bota">
+        <svg viewBox="0 0 72 130" aria-hidden="true">
+          <line x1="36" y1="130" x2="36" y2="58" stroke="#5a6428" stroke-width="3" stroke-linecap="round"/>
+          <g transform="translate(36,95) translate(-24,0) rotate(-38) scale(.8)"><use href="#lf-b"/></g>
+          <g transform="translate(36,78) translate(12,0) rotate(32) scale(.72)"><use href="#lf-b"/></g>
+          <g transform="translate(36,55) scale(.68)"><use href="#sf"/></g>
+        </svg>
+      </div>
       <div class="support-text">
         <p>
           I'm a seminary student making ends meet while building free tools for the church.
@@ -715,15 +646,25 @@ section:nth-of-type(4) { animation-delay: .18s; }
   </div>
 </section>
 
+<!-- FOOTER -->
 <footer>
   <div class="container">
-    <span class="footer-orn">✦ · ✦ · ✦</span>
+    <!-- botanical footer vine -->
+    <svg class="footer-vine" viewBox="0 0 500 50" style="height:50px" aria-hidden="true">
+      <path d="M 0,30 C 60,12 120,40 180,25 C 240,10 310,42 370,25 C 430,8 480,35 500,28"
+        stroke="#5a6428" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <g transform="translate(180,22) scale(.38)"><use href="#sf"/></g>
+      <g transform="translate(370,22) scale(.38)"><use href="#sf"/></g>
+      <g transform="translate(90,28) rotate(-20) scale(.42)"><use href="#lf-v"/></g>
+      <g transform="translate(275,28) rotate(18) scale(.38)"><use href="#lf-b"/></g>
+      <g transform="translate(450,26) rotate(-15) scale(.38)"><use href="#lf-v"/></g>
+    </svg>
     <p>
       Cal St Francis · Halifax, Nova Scotia<br>
       <a href="mailto:calstfrancis@disroot.org">calstfrancis@disroot.org</a> ·
       <a href="https://github.com/calstfrancis" target="_blank" rel="noopener">GitHub</a>
     </p>
-    <p style="margin-top:.4rem; opacity:.6">All content freely given. Source on GitHub.</p>
+    <p style="margin-top:.4rem;opacity:.45">All content freely given. Source on GitHub.</p>
   </div>
 </footer>
 
@@ -734,32 +675,23 @@ toggle.addEventListener('click', () => {
   toggle.classList.toggle('open');
   links.classList.toggle('open');
 });
-links.querySelectorAll('a:not(.theme-toggle)').forEach(a => {
+links.querySelectorAll('a').forEach(a => {
   a.addEventListener('click', () => {
     toggle.classList.remove('open');
     links.classList.remove('open');
   });
 });
 
-// Theme switcher logic
 const themeBtn = document.getElementById('themeToggle');
-const setTheme = (theme) => {
-  document.documentElement.setAttribute('data-theme', theme);
-  localStorage.setItem('theme', theme);
-  const isDark = theme === 'dark';
-  themeBtn.innerHTML = isDark ? '<span>🌙</span> Dark' : '<span>☀️</span> Light';
+const setTheme = t => {
+  document.documentElement.setAttribute('data-theme', t);
+  localStorage.setItem('theme', t);
+  themeBtn.innerHTML = t === 'dark' ? '<span>🌙</span> Dark' : '<span>☀️</span> Light';
 };
-const savedTheme = localStorage.getItem('theme');
-const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-if (savedTheme) {
-  setTheme(savedTheme);
-} else {
-  setTheme(prefersDark ? 'dark' : 'light');
-}
+const saved = localStorage.getItem('theme');
+setTheme(saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
 themeBtn.addEventListener('click', () => {
-  const current = document.documentElement.getAttribute('data-theme');
-  const newTheme = current === 'dark' ? 'light' : 'dark';
-  setTheme(newTheme);
+  setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
 });
 </script>
 </body>
