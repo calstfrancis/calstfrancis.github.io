@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Spectral:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <style>
-/* ── TOKENS ─────────────────────────────────── */
+/* ── TOKENS (DEFAULT DARK THEME) ─────────────────────────────────── */
 :root {
   --ink:        #1a1612;
   --ink-2:      #211d18;
@@ -24,6 +24,27 @@
   --red-hi:     #c03828;
   --shadow:     0 2px 16px rgba(0,0,0,.45);
   --shadow-sm:  0 1px 6px rgba(0,0,0,.35);
+  --status-color: #90c060;
+}
+
+/* ── LIGHT ADWAITA THEME ─────────────────────────────────── */
+[data-theme="light"] {
+  --ink:        #f6f5f4;
+  --ink-2:      #ffffff;
+  --ink-3:      #e9e8e7;
+  --rule:       #dadce0;
+  --rule-hi:    #c0c2c5;
+  --vellum:     #202124;
+  --vellum-2:   #3c4043;
+  --vellum-3:   #5f6368;
+  --gold:       #1a73e8;
+  --gold-hi:    #4285f4;
+  --gold-bg:    rgba(26,115,232,.08);
+  --red:        #c5221f;
+  --red-hi:     #d93025;
+  --shadow:     0 2px 12px rgba(0,0,0,.08);
+  --shadow-sm:  0 1px 4px rgba(0,0,0,.05);
+  --status-color: #2e7d32;
 }
 
 /* ── RESET ──────────────────────────────────── */
@@ -37,6 +58,7 @@ body {
   font-size: 1rem;
   line-height: 1.75;
   -webkit-font-smoothing: antialiased;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 a { color: var(--gold); text-decoration: none; transition: color .15s; }
@@ -56,6 +78,10 @@ nav {
   background: rgba(26,22,18,.94);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  transition: background 0.2s ease;
+}
+[data-theme="light"] nav {
+  background: rgba(246,245,244,.96);
 }
 .nav-inner {
   display: flex;
@@ -88,12 +114,39 @@ nav {
 }
 .nav-links a:hover { color: var(--gold); }
 
+/* Theme toggle button */
+.theme-toggle {
+  background: none;
+  border: 1px solid var(--rule);
+  border-radius: 24px;
+  padding: 4px 12px;
+  font-size: 0.8rem;
+  font-family: 'Spectral', serif;
+  font-weight: 600;
+  color: var(--vellum-2);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  letter-spacing: 0.04em;
+}
+.theme-toggle:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: var(--gold-bg);
+}
+.theme-toggle span {
+  font-size: 1rem;
+}
+
 /* ── HERO ────────────────────────────────────── */
 .hero {
   padding: 5rem 0 4rem;
   border-bottom: 1px solid var(--rule);
   position: relative;
   overflow: hidden;
+  transition: border-color 0.2s;
 }
 .hero::before {
   content: '✛';
@@ -173,6 +226,7 @@ nav {
   border-color: var(--rule-hi);
 }
 .btn-gold:hover { background: rgba(201,168,76,.16); border-color: var(--gold); color: var(--gold-hi); }
+[data-theme="light"] .btn-gold:hover { background: rgba(26,115,232,.12); }
 .btn-ghost {
   background: transparent;
   color: var(--vellum-3);
@@ -185,9 +239,14 @@ nav {
   border-color: rgba(154,40,32,.4);
 }
 .btn-kofi:hover { background: rgba(154,40,32,.25); color: #f08070; border-color: var(--red-hi); }
+[data-theme="light"] .btn-kofi {
+  background: rgba(197,34,31,.08);
+  color: #c5221f;
+}
+[data-theme="light"] .btn-kofi:hover { background: rgba(197,34,31,.15); }
 
 /* ── SECTIONS ────────────────────────────────── */
-section { padding: 3.5rem 0; border-bottom: 1px solid var(--rule); }
+section { padding: 3.5rem 0; border-bottom: 1px solid var(--rule); transition: border-color 0.2s; }
 section:last-of-type { border-bottom: none; }
 
 .section-eyebrow {
@@ -218,11 +277,12 @@ section:last-of-type { border-bottom: none; }
 /* ── GAME FEATURE ────────────────────────────── */
 .game-feature {
   border: 1px solid var(--rule-hi);
-  background: #100e0b;
+  background: var(--ink-2);
   padding: 2rem 2rem 1.75rem;
   margin-bottom: 1.2rem;
   position: relative;
   overflow: hidden;
+  transition: background 0.2s, border-color 0.2s;
 }
 .game-feature::after {
   content: '';
@@ -235,7 +295,7 @@ section:last-of-type { border-bottom: none; }
 .game-ascii {
   font-family: 'Courier Prime', monospace;
   font-size: .62rem;
-  color: #6a5a38;
+  color: var(--vellum-3);
   white-space: pre;
   line-height: 1.4;
   flex-shrink: 0;
@@ -247,19 +307,19 @@ section:last-of-type { border-bottom: none; }
   font-weight: 600;
   letter-spacing: .16em;
   text-transform: uppercase;
-  color: #6a5a38;
+  color: var(--vellum-3);
   margin-bottom: .35rem;
 }
 .game-title {
   font-family: 'IM Fell English', serif;
   font-size: 1.6rem;
-  color: #f0e0a0;
+  color: var(--gold);
   line-height: 1.15;
   margin-bottom: .5rem;
 }
 .game-desc {
   font-size: .9rem;
-  color: #a89060;
+  color: var(--vellum-2);
   line-height: 1.8;
   max-width: 500px;
   margin-bottom: 1.2rem;
@@ -268,7 +328,7 @@ section:last-of-type { border-bottom: none; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-top: 1px solid #3a3020;
+  border-top: 1px solid var(--rule);
   padding-top: .9rem;
 }
 .game-status {
@@ -280,12 +340,12 @@ section:last-of-type { border-bottom: none; }
   font-weight: 600;
   letter-spacing: .08em;
   text-transform: uppercase;
-  color: #90c060;
+  color: var(--status-color);
 }
 .status-pip {
   width: 6px; height: 6px;
   border-radius: 50%;
-  background: #90c060;
+  background: var(--status-color);
   display: inline-block;
   animation: pip 2.5s ease-in-out infinite;
 }
@@ -294,10 +354,10 @@ section:last-of-type { border-bottom: none; }
   font-family: 'Spectral', serif;
   font-size: .84rem;
   font-weight: 600;
-  color: #c9a84c;
+  color: var(--gold);
   letter-spacing: .04em;
 }
-.game-link:hover { color: #e8c870; }
+.game-link:hover { color: var(--gold-hi); }
 
 /* ── PROJECT LIST ────────────────────────────── */
 .project-list { display: flex; flex-direction: column; gap: .75rem; }
@@ -341,8 +401,8 @@ section:last-of-type { border-bottom: none; }
   font-size: .68rem;
   letter-spacing: .08em;
   text-transform: uppercase;
-  color: #8a7040;
-  border: 1px solid #3a3020;
+  color: var(--vellum-3);
+  border: 1px solid var(--rule);
   padding: .1rem .45rem;
   font-weight: 600;
 }
@@ -355,7 +415,7 @@ section:last-of-type { border-bottom: none; }
   border: 1px solid var(--rule);
   background: var(--rule);
 }
-.about-cell { background: var(--ink-2); padding: 1.4rem 1.5rem; }
+.about-cell { background: var(--ink-2); padding: 1.4rem 1.5rem; transition: background 0.2s; }
 .about-cell h3 {
   font-family: 'IM Fell English', serif;
   font-size: .95rem;
@@ -381,6 +441,7 @@ section:last-of-type { border-bottom: none; }
   display: flex;
   align-items: flex-start;
   gap: 2rem;
+  transition: background 0.2s;
 }
 .support-drop {
   font-family: 'IM Fell English', serif;
@@ -439,7 +500,6 @@ footer a:hover { color: var(--gold); }
 
 /* ── RESPONSIVE ──────────────────────────────── */
 @media (max-width: 640px) {
-  /* Nav */
   .nav-toggle { display: flex; }
   .nav-links {
     display: none;
@@ -447,11 +507,13 @@ footer a:hover { color: var(--gold); }
     top: 50px;
     left: 0; right: 0;
     background: rgba(22,18,14,.99);
-    border-bottom: 1px solid var(--rule);
     flex-direction: column;
     gap: 0;
     padding: .5rem 0;
     z-index: 99;
+  }
+  [data-theme="light"] .nav-links {
+    background: rgba(246,245,244,.99);
   }
   .nav-links.open { display: flex; }
   .nav-links li a {
@@ -460,37 +522,25 @@ footer a:hover { color: var(--gold); }
     font-size: .85rem;
     letter-spacing: .1em;
   }
-
-  /* Hero */
   .hero { padding: 3rem 0 2.5rem; }
   .hero h1 { font-size: 2.2rem; }
   .hero::before { display: none; }
   .hero-desc { font-size: .93rem; }
   .hero-actions { flex-direction: column; align-items: stretch; }
   .btn { padding: .75rem 1.2rem; font-size: .9rem; justify-content: center; }
-
-  /* Sections */
   section { padding: 2.5rem 0; }
   .container { padding: 0 1.1rem; }
-
-  /* Game card */
   .game-feature { padding: 1.4rem 1.2rem; }
   .game-ascii { display: none; }
   .game-header { flex-direction: column; gap: .8rem; }
   .game-footer { flex-direction: column; align-items: flex-start; gap: .7rem; }
   .game-link { font-size: .9rem; }
-
-  /* Project cards */
   .project-card { padding: 1rem 1.1rem; gap: .9rem; }
   .project-initial { font-size: 1.7rem; width: 2rem; }
   .project-meta { flex-wrap: wrap; gap: .4rem; }
   .project-type, .project-status-dev { font-size: .65rem; }
-
-  /* About grid */
   .about-body { grid-template-columns: 1fr; }
   .about-cell { padding: 1.1rem 1.2rem; }
-
-  /* Support */
   .support-body { flex-direction: column; gap: .8rem; padding: 1.4rem 1.2rem; }
   .support-drop { font-size: 2.5rem; }
 }
@@ -519,6 +569,7 @@ section:nth-of-type(4) { animation-delay: .18s; }
       <li><a href="#projects">Projects</a></li>
       <li><a href="#about">About</a></li>
       <li><a href="#support">Support</a></li>
+      <li><button class="theme-toggle" id="themeToggle"><span>🌙</span> Dark</button></li>
     </ul>
   </div>
 </nav>
@@ -540,7 +591,6 @@ section:nth-of-type(4) { animation-delay: .18s; }
     </p>
     <div class="hero-actions">
       <a href="#projects" class="btn btn-gold">See My Work</a>
-<!--      <a href="cv.html" class="btn btn-ghost">CV &amp; Résumé</a> -->
       <a href="https://ko-fi.com/calstfrancis" target="_blank" rel="noopener" class="btn btn-kofi">☕ Ko-fi</a>
     </div>
   </div>
@@ -574,7 +624,7 @@ section:nth-of-type(4) { animation-delay: .18s; }
         </div>
       </div>
       <div class="game-footer">
-        <span class="game-status"><span class="status-pip"></span> Playable now — v1.13</span>
+        <span class="game-status"><span class="status-pip"></span> Playable now — v1.15</span>
         <a href="game.html" class="game-link">Play in browser →</a>
       </div>
     </div>
@@ -595,23 +645,7 @@ section:nth-of-type(4) { animation-delay: .18s; }
           <a href="https://github.com/calstfrancis/rubric" target="_blank" rel="noopener" class="project-link">View on GitHub →</a>
         </div>
       </div>
-
-<!--      <div class="project-card">
-        <div class="project-initial">τ</div>
-        <div class="project-body">
-          <div class="project-meta">
-            <span class="project-name">Liturgical LaTeX Templates</span>
-            <span class="project-type">LaTeX · Templates</span>
-            <span class="project-status-dev">In development</span>
-          </div>
-          <p class="project-desc">
-            Reusable templates for prayers, calls to worship, sermons, and full service booklets.
-            For ministers who want beautiful, print-ready documents without fighting their tools.
-          </p>
-          <a href="https://github.com/YOURHANDLE/liturgical-latex" target="_blank" rel="noopener" class="project-link">View on GitHub →</a>
-        </div>
-      </div>
-    </div> -->
+    </div>
   </div>
 </section>
 
@@ -687,8 +721,7 @@ section:nth-of-type(4) { animation-delay: .18s; }
     <p>
       Cal St Francis · Halifax, Nova Scotia<br>
       <a href="mailto:calstfrancis@disroot.org">calstfrancis@disroot.org</a> ·
-      <a href="https://github.com/calstfrancis" target="_blank" rel="noopener">GitHub</a> ·
-   <!--   <a href="cv.html">CV</a> -->
+      <a href="https://github.com/calstfrancis" target="_blank" rel="noopener">GitHub</a>
     </p>
     <p style="margin-top:.4rem; opacity:.6">All content freely given. Source on GitHub.</p>
   </div>
@@ -701,12 +734,32 @@ toggle.addEventListener('click', () => {
   toggle.classList.toggle('open');
   links.classList.toggle('open');
 });
-// Close menu when a link is tapped
-links.querySelectorAll('a').forEach(a => {
+links.querySelectorAll('a:not(.theme-toggle)').forEach(a => {
   a.addEventListener('click', () => {
     toggle.classList.remove('open');
     links.classList.remove('open');
   });
+});
+
+// Theme switcher logic
+const themeBtn = document.getElementById('themeToggle');
+const setTheme = (theme) => {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('theme', theme);
+  const isDark = theme === 'dark';
+  themeBtn.innerHTML = isDark ? '<span>🌙</span> Dark' : '<span>☀️</span> Light';
+};
+const savedTheme = localStorage.getItem('theme');
+const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+if (savedTheme) {
+  setTheme(savedTheme);
+} else {
+  setTheme(prefersDark ? 'dark' : 'light');
+}
+themeBtn.addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme');
+  const newTheme = current === 'dark' ? 'light' : 'dark';
+  setTheme(newTheme);
 });
 </script>
 </body>

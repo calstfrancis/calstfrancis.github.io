@@ -17,6 +17,20 @@
   --gold:     #c9a84c;
   --gold-hi:  #e8c870;
   --red:      #9a2820;
+  --status-color: #90c060;
+}
+
+[data-theme="light"] {
+  --ink:      #f6f5f4;
+  --ink-2:    #ffffff;
+  --rule:     #dadce0;
+  --rule-hi:  #c0c2c5;
+  --vellum:   #202124;
+  --vellum-3: #5f6368;
+  --gold:     #1a73e8;
+  --gold-hi:  #4285f4;
+  --red:      #c5221f;
+  --status-color: #2e7d32;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -29,6 +43,7 @@ body {
   display: flex;
   flex-direction: column;
   -webkit-font-smoothing: antialiased;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 a { color: var(--gold); text-decoration: none; transition: color .15s; }
@@ -44,6 +59,10 @@ nav {
   position: sticky;
   top: 0;
   z-index: 100;
+  transition: background 0.2s;
+}
+[data-theme="light"] nav {
+  background: rgba(246,245,244,.97);
 }
 .nav-inner {
   display: flex;
@@ -76,6 +95,32 @@ nav {
   transition: color .15s;
 }
 .nav-links a:hover { color: var(--gold); }
+
+/* Theme toggle button */
+.theme-toggle {
+  background: none;
+  border: 1px solid var(--rule);
+  border-radius: 24px;
+  padding: 4px 12px;
+  font-size: 0.8rem;
+  font-family: 'Spectral', serif;
+  font-weight: 600;
+  color: var(--vellum-3);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  letter-spacing: 0.04em;
+}
+.theme-toggle:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: var(--gold-bg, rgba(201,168,76,.08));
+}
+.theme-toggle span {
+  font-size: 1rem;
+}
 
 /* ── HAMBURGER ICON ── */
 .nav-toggle {
@@ -116,28 +161,41 @@ nav {
     padding: .5rem 0;
     z-index: 99;
   }
+  [data-theme="light"] .nav-links {
+    background: rgba(246,245,244,.99);
+  }
   .nav-links.open { display: flex; }
-  .nav-links li a {
+  .nav-links li a, .nav-links li button {
     display: block;
     padding: .85rem 1.75rem;
     font-size: .85rem;
     letter-spacing: .1em;
+    width: 100%;
+    text-align: left;
+  }
+  .theme-toggle {
+    border: none;
+    border-radius: 0;
+    padding: .85rem 1.75rem;
+    width: 100%;
+    justify-content: flex-start;
   }
 }
 /* ── GAME LABEL BAR ── */
 .game-bar {
-  background: #100e0b;
+  background: var(--ink-2);
   border-bottom: 1px solid var(--rule-hi);
   flex-shrink: 0;
   padding: .45rem 1.75rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  transition: background 0.2s, border-color 0.2s;
 }
 .game-bar-title {
   font-family: 'IM Fell English', serif;
   font-size: .95rem;
-  color: #f0e0a0;
+  color: var(--gold);
   letter-spacing: .04em;
 }
 .game-bar-meta {
@@ -146,7 +204,7 @@ nav {
   font-weight: 600;
   letter-spacing: .12em;
   text-transform: uppercase;
-  color: #6a5a38;
+  color: var(--vellum-3);
 }
 
 /* ── IFRAME ── */
@@ -156,6 +214,10 @@ nav {
   border: none;
   display: block;
   background: #09080a;
+  transition: background 0.2s;
+}
+[data-theme="light"] .game-frame {
+  background: #e9e8e7;
 }
 </style>
 </head>
@@ -171,13 +233,14 @@ nav {
       <li><a href="index.html#projects">Projects</a></li>
       <li><a href="index.html#about">About</a></li>
       <li><a href="index.html#support">Support</a></li>
+      <li><button class="theme-toggle" id="themeToggle"><span>🌙</span> Dark</button></li>
     </ul>
   </div>
 </nav>
 
 <div class="game-bar">
   <span class="game-bar-title">The Severed Hours</span>
-  <span class="game-bar-meta">Text Adventure · v1.3</span>
+  <span class="game-bar-meta">Text Adventure · v1.15</span>
 </div>
 
 <iframe
@@ -186,6 +249,7 @@ nav {
   title="The Severed Hours — a text adventure"
   allowfullscreen
 ></iframe>
+
 <script>
 const toggle = document.getElementById('navToggle');
 const links  = document.getElementById('navLinks');
@@ -195,14 +259,35 @@ toggle.addEventListener('click', () => {
   links.classList.toggle('open');
 });
 
-// Close menu when a link is tapped
+// Close menu when a link is tapped (except theme toggle)
 links.querySelectorAll('a').forEach(a => {
   a.addEventListener('click', () => {
     toggle.classList.remove('open');
     links.classList.remove('open');
   });
 });
+
+// Theme switcher logic
+const themeBtn = document.getElementById('themeToggle');
+const setTheme = (theme) => {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('theme', theme);
+  const isDark = theme === 'dark';
+  themeBtn.innerHTML = isDark ? '<span>🌙</span> Dark' : '<span>☀️</span> Light';
+};
+const savedTheme = localStorage.getItem('theme');
+const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+if (savedTheme) {
+  setTheme(savedTheme);
+} else {
+  setTheme(prefersDark ? 'dark' : 'light');
+}
+themeBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  const current = document.documentElement.getAttribute('data-theme');
+  const newTheme = current === 'dark' ? 'light' : 'dark';
+  setTheme(newTheme);
+});
 </script>
 </body>
 </html>
-

@@ -48,9 +48,37 @@ body { background: #09080a; color: #d0bc88; font-family: "Courier Prime", "Couri
 .loc { font-size: .7rem; letter-spacing: .15em; text-transform: uppercase; color: #9a8a58; border-bottom: 1px solid #3a3020; padding-bottom: .45rem; margin-bottom: 1.2rem; }
 .loc-aware { color: #8ab0c0; border-bottom-color: #2a4a5a; animation: pulse-loc 3s ease-in-out infinite; }
 @keyframes pulse-loc { 0%,100%{opacity:.8} 50%{opacity:1} }
+.note-toast { position: fixed; bottom: 4.5rem; right: 1.2rem; background: #0a0900;
+  border: 1px solid #4a3a18; color: #c0a060; font-family: "Courier Prime", monospace;
+  font-size: .72rem; padding: .4rem .8rem; z-index: 300; pointer-events: none;
+  animation: toast-in .3s ease, toast-out .4s ease 2.6s forwards; }
+@keyframes toast-in { from { opacity:0; transform:translateY(.5rem); } to { opacity:1; transform:translateY(0); } }
+@keyframes toast-out { to { opacity:0; transform:translateY(-.5rem); } }
+.stat-flash { animation: stat-pop .5s ease; }
+@keyframes stat-pop { 0%{background:#2a3a1a} 100%{background:transparent} }
+.choice-permanent { border-color: #8a5a28 !important; }
+.choice-permanent::before { content: '⬥ '; font-size: .7rem; color: #8a5a28; }
+.choice-cost-tag { font-size: .68rem; color: #6a5a30; letter-spacing: .03em; }
 .notes-btn { position: fixed; bottom: 1.2rem; right: 1.2rem; background: #0a0900; border: 1px solid #3a3020; color: #9a8a58; font-family: "Courier Prime", monospace; font-size: .7rem; letter-spacing: .12em; padding: .45rem .8rem; cursor: pointer; z-index: 100; }
 .notes-btn:hover { border-color: #7a6a48; color: #d0b870; }
 @media (max-width: 480px) { .notes-btn { bottom: 3.5rem; } }
+.status-btn { position: fixed; bottom: 1.2rem; left: 1.2rem; background: #0a0900;
+  border: 1px solid #2a3a2a; color: #7a9a68; font-family: "Courier Prime", monospace;
+  font-size: .7rem; letter-spacing: .12em; padding: .45rem .8rem; cursor: pointer; z-index: 100; }
+.status-btn:hover { border-color: #4a6a3a; color: #a0c088; }
+.status-panel { position: fixed; top: 0; left: 0; width: min(360px, 94vw); height: 100vh;
+  background: #070600; border-right: 1px solid #1a2a1a; padding: 1.5rem; overflow-y: auto; z-index: 200;
+  animation: slide-in-left .2s ease; }
+@keyframes slide-in-left { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+.status-panel h3 { font-family: "Special Elite", serif; font-size: .9rem; color: #8ab070;
+  letter-spacing: .15em; margin-bottom: 1rem; border-bottom: 1px solid #1a2a1a; padding-bottom: .5rem; }
+.status-panel-close { float: right; background: none; border: none; color: #4a6a38; cursor: pointer; font-size: 1rem; }
+.status-panel-close:hover { color: #80b060; }
+.stat-row { display: flex; justify-content: space-between; font-size: .8rem; color: #9a9a78;
+  margin-bottom: .4rem; padding: .2rem 0; border-bottom: 1px solid #111200; }
+.stat-row .slabel { color: #7a8a58; }
+.stat-row .sval { color: #c0c088; font-weight: bold; }
+.charism-row { font-size: .75rem; color: #7a8a68; font-style: italic; margin: .3rem 0; }
 .notes-panel { position: fixed; top: 0; right: 0; width: min(360px, 94vw); height: 100vh; background: #070600; border-left: 1px solid #2a2010; padding: 1.5rem; overflow-y: auto; z-index: 200; animation: slide-in-right .2s ease; }
 @keyframes slide-in-right { from { transform: translateX(100%); } to { transform: translateX(0); } }
 .notes-panel h3 { font-family: "Special Elite", serif; font-size: .9rem; color: #b0a070; letter-spacing: .15em; margin-bottom: 1rem; border-bottom: 1px solid #2a2010; padding-bottom: .5rem; }
@@ -58,6 +86,8 @@ body { background: #09080a; color: #d0bc88; font-family: "Courier Prime", "Couri
 .notes-panel-close:hover { color: #c0a860; }
 .notes-panel .nitem { font-size: .78rem; color: #9a8a58; font-style: italic; line-height: 1.75; margin-bottom: .2rem; padding-left: .6rem; border-left: 1px solid #2a2010; }
 .notes-panel-empty { font-size: .78rem; color: #4a3a28; font-style: italic; }
+.nitem-ending { color: #a0c070; border-left-color: #4a6a28; }
+.nitem-ending::after { content: ' ◎'; font-size: .65rem; color: #6a9a48; }
 .notes-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 150; }
 .sbar { display: flex; gap: .9rem; flex-wrap: wrap; margin-bottom: .7rem; padding-bottom: .7rem; border-bottom: 1px solid #2a2010; }
 .stat { font-size: .66rem; letter-spacing: .1em; text-transform: uppercase; color: #a89060; }
@@ -197,6 +227,8 @@ const NOTES = {
   met_philomena:              `Philomena Cunk — Head of Retention`,
   mortification_used:         `You absorbed what the coffee carried. It cost you.`,
   brinch_continuous_reckoning: `The Continuous has been adjusting its reckoning since you woke up.`,
+  brinch_personal_forecast: `Brinch told you what he forecast for you. You paid to know it.`,
+  brinch_personal_forecast: `Brinch told you what he forecast for you. You paid to know it.`,
   craigslist_notes_seen: `Craigslist Butterantonio has been noticing things for three weeks. You asked.`,
   board_disruption_happened: `The orientation arrived in the Board Room. They saw it happen to you.`,
   void_gaze_direct: `You looked at the edge directly. The Void Gaze held. Your composure paid for it.`,
@@ -654,7 +686,6 @@ const SCENES = {
       `You begin.`,
     ],
     choices: [
-      { text: `Return to the office.`, next: `opening_darkness` },
       { text: `Examine your desk.`, next: `office_desk` },
       { text: `Look out the window.`, next: `office_window` },
       { text: `Head to the lobby.`, next: `lobby` },
@@ -1890,6 +1921,7 @@ const SCENES = {
     returnTo: `garden`,
     location: `The Garden`,
     art: `continuous_contact`,
+    overwriteNote: { old: `The garden is always safe`, new: `The garden is always safe — the Continuous confirms this. Safety is not the same as neutrality.` },
     text: [
       `You are sitting. You did not choose to sit.`,
       `The bench received you the way a familiar chair receives a person who has been away for a long time — with a particular exactness, the shaped absence fitting the shape of what's present.`,
@@ -2048,7 +2080,9 @@ const SCENES = {
     ],
     choices: [
       { text: `"What can you tell me about November fourth?"`, effect: { reason: 1 }, next: `brinch_november` },
-      { text: `"What do you forecast for me specifically?"`, effect: { intuition: 1 }, next: `brinch_you`,
+      { text: `"What do you forecast for me specifically?"`,
+        effect: { intuition: 1 }, cost: { composure: 1 }, next: `brinch_you`,
+        permanent: true, id: `brinch_personal_forecast`,
         maxAwareness: 3 },
       { text: `"What do you forecast for me?" [He won't answer directly at this awareness level.]`,
         next: `brinch_you_high_awareness`,
@@ -2142,13 +2176,17 @@ const SCENES = {
     returnTo: `forecasting`,
     location: `Forecasting — Second Floor`,
     text: [
-      `Brinch looks at you for a long time. "You find what you were looking for. Whether you're glad you found it — that depends on choices you haven't made yet."`,
+      `Brinch looks at you for a long time.`,
+      `Then he tells you.`,
+      `Not what you expected. Specific. Accurate. The kind of accurate that stays — not because it's frightening, but because it's true, and truth at this resolution has a weight that doesn't redistribute.`,
+      `"You find what you were looking for. Whether you're glad you found it — that depends on choices you haven't made yet."`,
       `"What choices?"`,
       `"I can't tell you that. If I tell you, you'll choose toward the forecast instead of toward what's true."`,
       `He turns back to the board. "What I can tell you: the garden helps. The archive helps. Shaneel is worth speaking to."`,
       `"And the cats," he adds. "Obviously."`,
       `"Haircut has better forecasting than I do," he says, with neither irony nor resentment. "I've accepted this."`,
     ],
+    ses: [`brinch_personal_forecast`],
     choices: [
       { text: `Go check your office.`, next: `special_matters` },
       { text: `Go to Retention.`, next: `retention` },
@@ -2174,6 +2212,10 @@ const SCENES = {
       { requireAwareness: 4,
         text: `Brinch sets down his chalk carefully, like he is setting down something heavier. "There is something I have not told anyone," he says, "because it was not actionable. The Continuous has been patient for thirty years. Patient in the way something is patient when it has no choice but to wait." He pauses. "The board reads differently this week. The patience has a shape now. It is the shape of something that has been waiting long enough — and knows, without threatening, without demanding — that the waiting is almost done."` },
     ],
+    collisionIf: { awareness: 4, maxComposure: 1,
+      text: `Brinch stops talking mid-sentence. He looks at you — not at your face, at something behind your face. "You should sit down," he says, very carefully. "You are at the edge of something and you are very tired and those two things together are — " he pauses. "Sit down," he says. "That's not a suggestion."`,
+      effect: { composure: 1 }, // the building steadies you
+    },
   },
 
   forecasting_board: {
@@ -2277,6 +2319,7 @@ const SCENES = {
   },
 
   philomena_system: {
+    returnTo: `retention`,
     location: `Retention — Second Floor`,
     text: [
       `You examine the filing system. The labels are not alphabetical, not chronological. You look for the underlying logic.`,
@@ -2450,6 +2493,7 @@ const SCENES = {
       `You fold the letter. You put it in your pocket, with the other letter.`,
       `Two letters from people who knew you when you didn't.`,
       `You stand up. The building waits.`,
+      `This is still navigable. You can go anywhere. That won't always be true.`,
     ],
     choices: [
       { text: `Continue exploring — return to the lobby.`, next: `lobby` },
@@ -3237,6 +3281,7 @@ const SCENES = {
     ses: [`craigslist_bond`],
     flag: `act3_craigslist_done`,
     choices: [
+      { text: `Return to your office. See what remains.`, next: `act_three_hub` },
       {
         text: `Go to Eliza first. The notation shapes what you bring down.`,
         next: `eliza_notation_thread`,
@@ -3347,12 +3392,14 @@ const SCENES = {
     ],
     ses: [`learned_notation`, `learned_notation_deep`],
     choices: [
+      { text: `Return to your office.`, next: `act_three_hub` },
       { text: `Go to Philomena. Thread Three.`, next: `philomena_return` },
       { text: `Go back to Craigslist. He needs to understand what you learned.`, next: `craigslist_post_eliza` },
     ],
   },
 
   notation_roll: {
+    returnTo: `archive`,
     location: `The Archive — Third Floor`,
     text: [ `You study the notation.` ],
     roll: { stat: `intuition`, difficulty: 4, successNext: `notation_full`, partialNext: `notation_partial`, failNext: `notation_partial` },
@@ -3371,6 +3418,7 @@ const SCENES = {
     se: `learned_notation`,
     flag: `act3_eliza_done`,
     choices: [
+      { text: `Return to your office.`, next: `act_three_hub` },
       { text: `Go to Philomena. Thread Three.`, next: `philomena_return` },
       { text: `Tell Craigslist what you learned.`, next: `craigslist_post_eliza` },
     ],
@@ -3495,6 +3543,7 @@ const SCENES = {
     ses: [`philomena_holding`],
     flag: `act3_philomena_done`,
     choices: [
+      { text: `Return to your office.`, next: `act_three_hub` },
       { text: `Go find Craigslist. Tell him your name.`, next: `craigslist_name_scene` },
     ],
   },
@@ -3685,6 +3734,7 @@ const SCENES = {
   },
 
   board_collision: {
+    returnTo: `act_three_hub`,
     location: `The Board Room — Third Floor`,
     text: [ `The orientation arrives in the Board Room. You feel it — and fight to keep your composure.` ],
     roll: { stat: `composure`, difficulty: 5, successNext: `board_strong_recovered`, partialNext: `board_shaky`, failNext: `board_disrupted`, social: true },
@@ -3755,6 +3805,7 @@ const SCENES = {
   },
 
   board_bureaucratic: {
+    returnTo: `act_three_hub`,
     location: `The Board Room — Third Floor`,
     text: [ `You frame the account in administrative language.` ],
     roll: { stat: `reason`, difficulty: 5, successNext: `board_bureaucratic_success`, partialNext: `board_account`, failNext: `board_account` },
@@ -3784,6 +3835,7 @@ const SCENES = {
   },
 
   board_commitment_roll: {
+    returnTo: `act_three_hub`,
     location: `The Board Room — Third Floor`,
     text: [ `You ask for their commitment.` ],
     roll: { stat: `presence`, difficulty: 5, successNext: `board_committed_yes`, partialNext: `board_committed_partial`, failNext: `board_committed_partial` },
@@ -4388,6 +4440,49 @@ function hr(cls) { const e = document.createElement(`hr`); e.className = cls; re
 // ═══════════════════════════════════════════════
 
 const INIT_STATS = { reason: 1, intuition: 1, composure: 1, presence: 1 };
+
+function resetState() {
+  // Single source of truth for all state resets — called by both restart paths
+  STATE.screen = `ded`;
+  STATE.sceneId = `opening_darkness`;
+  STATE.stats = { ...INIT_STATS };
+  STATE.charisms = [];
+  STATE.notes = [];
+  STATE.seen = new Set();
+  STATE.visitedLeaf = new Set();
+  STATE.flags = {};
+  STATE.awareness = 0;
+  STATE.permanentChoicesTaken = new Set();
+  STATE.tempPenalties = {};
+  STATE.truths = {};
+  STATE.actOneEnded = false;
+  STATE.rollResult = null;
+  STATE.lastRollEcho = null;
+  STATE._lastResolvedRoll = null;
+  STATE.rollChoice = null;
+  STATE.selectedCharisms = [];
+  STATE.confirmRestart = false;
+  STATE.notesPanelOpen = false;
+  STATE.statusPanelOpen = false;
+  STATE.pendingToast = null;
+  STATE.introStep = 0;
+  STATE.introRollResult = null;
+  STATE.introRollDice = null;
+  STATE.buildingRevised = false;
+  STATE.mortificationSpent = false;
+  STATE.retrySpent = false;
+  STATE.discernmentRetrySpent = false;
+  STATE.poaAbsorbedThisScene = false;
+  STATE.unmakerUsedThisAct = false;
+  STATE.mode = `attended`;
+  try { localStorage.removeItem(SAVE_KEY); } catch(e) {}
+  _lastScreen = null;
+  _lastSceneId = null;
+  _lastCharismSel = null;
+  _lastLeafSize = 0;
+  _lastRollKey = `none`;
+  _lastAwareness = `0`;
+}
 const SAVE_KEY = `severed_hours_v11`;
 
 // FLAGS: permanent binary decisions that close/open paths and change NPC behaviour
@@ -4420,6 +4515,8 @@ let STATE = {
   selectedCharisms: [],
   confirmRestart: false,
   notesPanelOpen: false,
+  statusPanelOpen: false,
+  pendingToast: null,
   introStep: 0,
   introRollResult: null,
   introRollDice: null,
@@ -4500,12 +4597,16 @@ function addNote(key) {
   if (!key || STATE.seen.has(key)) return;
   STATE.seen.add(key);
   const label = NOTES[key];
-  if (label) STATE.notes.push(label);
+  if (label) {
+    STATE.notes.push(label);
+    STATE.pendingToast = label; // triggers toast notification
+  }
 }
 
 function applyScene(id) {
   const s = SCENES[id];
   if (!s) return;
+  STATE.poaAbsorbedThisScene = false; // reset per scene
   if (s.se) addNote(s.se);
   if (s.ses) s.ses.forEach(addNote);
   if (s.awareness) {
@@ -4518,6 +4619,7 @@ function applyScene(id) {
   if (s.overwriteNote) {
     const idx = STATE.notes.indexOf(s.overwriteNote.old);
     if (idx >= 0) STATE.notes[idx] = s.overwriteNote.new;
+    else addNote(s.overwriteNote.new); // note not found — add fresh
   }
   if (s.restorePenalties) {
     STATE.tempPenalties = {};
@@ -4548,26 +4650,7 @@ function applyScene(id) {
 
 function applyChoice(choice) {
   if (choice.next === `__restart__`) {
-    STATE.screen = `ded`;
-    STATE.sceneId = `opening_darkness`;
-    STATE.stats = { ...INIT_STATS };
-    STATE.charisms = [];
-    STATE.notes = [];
-    STATE.seen = new Set();
-    STATE.visitedLeaf = new Set();
-    STATE.flags = {};
-    STATE.awareness = 0;
-    STATE.permanentChoicesTaken = new Set();
-    STATE.mode = `attended`;
-    STATE.introStep = 0;
-    STATE.introRollResult = null;
-    STATE.notesPanelOpen = false;
-    STATE.tempPenalties = {};
-    STATE.truths = {};
-    STATE.actOneEnded = false;
-    STATE.buildingRevised = false;
-    STATE.rollResult = null;
-    STATE.rollChoice = null;
+    resetState();
     render();
     return;
   }
@@ -4575,10 +4658,11 @@ function applyChoice(choice) {
     Object.entries(choice.effect).forEach(([k, v]) => {
       // In witnessed mode, composure healing choices don't restore the stat
       if (k === `composure` && v > 0 && choice.healingComposure && STATE.mode === `witnessed`) return;
-      // Presence of Absence: silently absorb the first stat LOSS per scene
+      // Presence of Absence: absorb first stat loss — show a subtle toast hint
       if (v < 0 && (STATE.charisms || []).includes(`presence_of_absence`) && !STATE.poaAbsorbedThisScene) {
         STATE.poaAbsorbedThisScene = true;
-        return; // absorbed — cost prevented, player doesn't know why
+        STATE.pendingToast = `—`;  // minimal signal: something didn't happen
+        return; // absorbed
       }
       STATE.stats[k] = Math.min((STATE.stats[k] || 0) + v, 6);
     });
@@ -4589,6 +4673,7 @@ function applyChoice(choice) {
       // Presence of Absence absorbs first stat loss per scene
       if ((STATE.charisms || []).includes(`presence_of_absence`) && !STATE.poaAbsorbedThisScene) {
         STATE.poaAbsorbedThisScene = true;
+        STATE.pendingToast = `—`;
         return;
       }
       STATE.stats[k] = Math.max((STATE.stats[k] || 1) - v, 1);
@@ -4629,6 +4714,19 @@ function applyChoice(choice) {
     if (idx >= 0) STATE.notes[idx] = choice.overwriteNote.new;
   }
   if (choice.se) addNote(choice.se);
+  // Witnessed mode: toast notification of what this choice cost/changed
+  if (STATE.mode === `witnessed`) {
+    const toastParts = [];
+    if (choice.awareness && choice.awareness > 0) toastParts.push(`+${choice.awareness} awareness`);
+    if (choice.effect) Object.entries(choice.effect).forEach(([k,v]) => {
+      if (v > 0 && choice.healingComposure) return;
+      if (v !== 0) toastParts.push(`${v>0?'+':''}${v} ${k}`);
+    });
+    if (choice.cost) Object.entries(choice.cost).forEach(([k,v]) => toastParts.push(`−${v} ${k}`));
+    if (choice.permanent && choice.id) toastParts.push(`permanent`);
+    if (toastParts.length) STATE.pendingToast = toastParts.join(' · ');
+  }
+
   if (choice.next) {
     // If this choice came from a roll resolution, store echo for next scene
     if (STATE._lastResolvedRoll) {
@@ -5079,6 +5177,10 @@ function renderRollBox() {
 function renderChoices(scene) {
   if (STATE.rollResult) return renderRollBox();
 
+  // Awareness ≥ 4: one choice is quietly unavailable (the building has opinions)
+  const awarenessRemoval = (STATE.awareness || 0) >= 4;
+  let awarenessRemovedOne = STATE.seen.has(`_aw4_removed_${STATE.sceneId}`);
+
   // Pre-compute: is any real (non-fallback) ending accessible?
   // Used to suppress the fallback ending when real options exist.
   const hasAnyRealEnding = scene.choices && scene.choices.some(c =>
@@ -5095,6 +5197,19 @@ function renderChoices(scene) {
   scene.choices.forEach(choice => {
     // Fallback ending: hide if any real ending is accessible
     if (choice._fallback && hasAnyRealEnding) return;
+
+    // Awareness ≥ 4: silently remove one non-essential accessible choice per hub
+    // On opening_darkness: fires every visit (persistent disorientation on return)
+    // Elsewhere: fires once per run (seen-gated)
+    var aw4IsOpeningHub = STATE.sceneId === `opening_darkness`;
+    if (awarenessRemoval && (!awarenessRemovedOne || aw4IsOpeningHub) && accessible && !hasRoll
+        && !choice._fallback && !choice.permanent && !choice.requireFlag
+        && !choice.requireCharism && !choice.lockedText && scene.choices.indexOf(choice) > 0
+        && scene.choices.indexOf(choice) < scene.choices.length - 1) {
+      awarenessRemovedOne = true;
+      if (!aw4IsOpeningHub) STATE.seen.add(`_aw4_removed_${STATE.sceneId}`);
+      return; // silently removed
+    }
 
     const accessible = canAccess(choice, STATE.stats, STATE.charisms);
 
@@ -5115,8 +5230,13 @@ function renderChoices(scene) {
 
     const hasRoll = !!choice.roll;
     let cls = `choice`;
-    if (!accessible) cls += ` choice-locked`;
-    else if (hasRoll) cls += ` choice-rolled`;
+    if (!accessible && choice.requireCharism) {
+      // Charism gates show their type via colour
+      const cDef = CHARISM_DEFS[choice.requireCharism];
+      cls += cDef && cDef.type === `dark` ? ` choice-locked choice-charism-dark` : ` choice-locked choice-charism-light`;
+    } else if (!accessible) cls += ` choice-locked`;
+    if (accessible && hasRoll) cls += ` choice-rolled`;
+    if (accessible && choice.permanent && choice.id && !STATE.permanentChoicesTaken.has(choice.id)) cls += ` choice-permanent`;
 
     // Grey out already-visited leaf choices on hub scenes
     const alreadyVisited = (STATE.visitedLeaf || new Set()).has(choice.next);
@@ -5128,6 +5248,23 @@ function renderChoices(scene) {
     const unmakerBypassAvail = hasUnmaker && !STATE.unmakerUsedThisAct
       && choice.requireStat && !accessible && !choice.requireFlag && !choice.requireCharism;
     // Permanent consumed choices are hidden entirely (filtered in canAccess)
+
+    // Cost preview tag — Attended mode only
+    // Witnessed mode gets a post-choice toast instead (see applyChoice)
+    if (accessible && !hasRoll && STATE.mode !== `witnessed`) {
+      const costParts = [];
+      if (choice.awareness && choice.awareness > 0) costParts.push(`+${choice.awareness} awareness`);
+      if (choice.effect) Object.entries(choice.effect).forEach(([k,v]) => {
+        if (v > 0 && choice.healingComposure) return;
+        if (v !== 0) costParts.push(`${v>0?'+':''}${v} ${k}`);
+      });
+      if (choice.cost) Object.entries(choice.cost).forEach(([k,v]) => costParts.push(`−${v} ${k}`));
+      if (choice.permanent && choice.id && !STATE.permanentChoicesTaken.has(choice.id)) costParts.push(`permanent`);
+      if (costParts.length) choice._costTag = costParts.join(' · ');
+      else delete choice._costTag;
+    } else {
+      delete choice._costTag;
+    }
 
     const b = el(`button`, {
       className: cls,
@@ -5158,6 +5295,9 @@ function renderChoices(scene) {
     if (!accessible && choice.lockedText) {
       const lockMsg = el(`span`, { className: `locked-ending-text` }, choice.lockedText);
       b.appendChild(lockMsg);
+    }
+    if (choice._costTag) {
+      b.appendChild(el(`span`, { className: `choice-cost-tag` }, ` ◈ ${choice._costTag}`));
     }
     if (hasRoll && accessible) {
       const stat = choice.roll.stat;
@@ -5219,6 +5359,88 @@ function renderNotes() {
   return wrap;
 }
 
+function renderStatusPanel() {
+  const overlay = el(`div`, { className: `notes-overlay`,
+    onClick: () => { STATE.statusPanelOpen = false; _lastSceneId = null; render(); }
+  });
+  const panel = el(`div`, { className: `status-panel` });
+  panel.addEventListener(`click`, e => e.stopPropagation());
+
+  const closeBtn = el(`button`, { className: `status-panel-close`,
+    onClick: () => { STATE.statusPanelOpen = false; _lastSceneId = null; render(); }
+  }, `✕`);
+  const heading = el(`h3`, {}, `current status`);
+  heading.appendChild(closeBtn);
+  panel.appendChild(heading);
+
+  // Stats
+  const stats = [`composure`, `reason`, `intuition`, `presence`];
+  stats.forEach(s => {
+    const base = STATE.stats[s] || 1;
+    const eff = effectiveStat(s);
+    const penalty = base - eff;
+    const row = el(`div`, { className: `stat-row` });
+    row.appendChild(el(`span`, { className: `slabel` }, s));
+    const valStr = penalty > 0 ? `${eff} (${base}−${penalty} temp)` : `${eff}`;
+    row.appendChild(el(`span`, { className: `sval` }, valStr));
+    panel.appendChild(row);
+  });
+
+  // Awareness
+  const awRow = el(`div`, { className: `stat-row` });
+  awRow.appendChild(el(`span`, { className: `slabel` }, `awareness`));
+  awRow.appendChild(el(`span`, { className: `sval` }, `${STATE.awareness || 0} / 5`));
+  panel.appendChild(awRow);
+
+  // Mode
+  const modeRow = el(`div`, { className: `stat-row` });
+  modeRow.appendChild(el(`span`, { className: `slabel` }, `mode`));
+  modeRow.appendChild(el(`span`, { className: `sval` }, STATE.mode || `attended`));
+  panel.appendChild(modeRow);
+
+  // Charisms
+  if (STATE.charisms && STATE.charisms.length) {
+    const ch = el(`p`, { className: `run-summary-title` });
+    ch.textContent = `charisms —`;
+    ch.style.marginTop = `.8rem`;
+    panel.appendChild(ch);
+
+    const CHARISM_NOTES = {
+      discernment: `reroll any failed check once per scene (costs 1 awareness)`,
+      consolation: `+1 to presence rolls`,
+      tongues: `+2 to document/reason checks`,
+      presence_of_absence: `absorbs first stat loss per scene silently`,
+      kenosis: `awareness gains reduced; Continuous clearer`,
+      mortification: `spend 1 Composure for +2 reroll once per scene`,
+      void_gaze: `threshold rolls use higher of two dice at Awareness 3+`,
+      unmaker: `bypass one requireStat gate per act (+2 awareness)`,
+    };
+    STATE.charisms.forEach(c => {
+      const def = CHARISM_DEFS[c];
+      if (!def) return;
+      const row = el(`div`, { className: `charism-row` });
+      row.innerHTML = `<strong>${def.name}:</strong> ${CHARISM_NOTES[c] || def.desc}`;
+      panel.appendChild(row);
+    });
+  }
+
+  // Active penalties
+  if (STATE.tempPenalties && Object.keys(STATE.tempPenalties).length) {
+    const pen = el(`p`, { className: `run-summary-title` });
+    pen.textContent = `temporary penalties —`;
+    pen.style.marginTop = `.8rem`;
+    panel.appendChild(pen);
+    Object.entries(STATE.tempPenalties).forEach(([k, v]) => {
+      panel.appendChild(el(`div`, { className: `charism-row` }, `${k}: −${v}`));
+    });
+  }
+
+  const wrap = el(`div`, {});
+  wrap.appendChild(overlay);
+  wrap.appendChild(panel);
+  return wrap;
+}
+
 function renderNotesPanel() {
   const overlay = el(`div`, { className: `notes-overlay`, onClick: () => {
     STATE.notesPanelOpen = false;
@@ -5239,8 +5461,17 @@ function renderNotesPanel() {
     panel.appendChild(el(`p`, { className: `notes-panel-empty` }, `nothing recorded yet.`));
   } else {
     // Show in reverse order (most recent first)
+    // Reverse map: label → NOTES key (for prerequisite highlighting)
+    const labelToKey = {};
+    Object.entries(NOTES).forEach(([k, v]) => { labelToKey[v] = k; });
+    const PREREQ_KEYS = new Set([`read_own_letter`, `craigslist_ally_early`,
+      `retreated_threshold`, `kenosis_garden`, `haircut_assessment_done`]);
+
     [...notes].reverse().forEach(label => {
-      const item = el(`p`, { className: `nitem` }, label);
+      const key = labelToKey[label];
+      const isPrereq = key && PREREQ_KEYS.has(key);
+      const cls = isPrereq ? `nitem nitem-ending` : `nitem`;
+      const item = el(`p`, { className: cls }, label);
       panel.appendChild(item);
     });
   }
@@ -5344,6 +5575,22 @@ function renderScene() {
     const cls = paraClass(line);
     stxt.appendChild(p(cls, line));
   });
+  // Collision event: high awareness + low composure = the building intervenes
+  if (scene.collisionIf) {
+    const ci = scene.collisionIf;
+    if ((STATE.awareness||0) >= ci.awareness && (STATE.stats.composure||1) <= (ci.maxComposure||1)) {
+      const collKey = `_col_${STATE.sceneId}`;
+      if (!STATE.seen.has(collKey)) {
+        STATE.seen.add(collKey);
+        const colEl = p(`sp inject-p collision-inject`, ci.text);
+        stxt.appendChild(colEl);
+        if (ci.effect) Object.entries(ci.effect).forEach(([k,v]) => {
+          STATE.stats[k] = Math.min((STATE.stats[k]||1) + v, 6);
+        });
+      }
+    }
+  }
+
   // Void Gaze at Awareness 4+: sees things uninvited in any scene — once per scene
   const voidGazeKey = `_vgv_${STATE.sceneId}`;
   if ((STATE.charisms || []).includes(`void_gaze`) && (STATE.awareness || 0) >= 4
@@ -5407,8 +5654,8 @@ function renderScene() {
   }
 
   // Notes
-  const notes = renderNotes();
-  if (notes) game.appendChild(notes);
+ // const notes = renderNotes();
+ // if (notes) game.appendChild(notes);
 
   // Restart bar — always visible during game
   game.appendChild(renderRestartBar());
@@ -5434,42 +5681,7 @@ function renderRestartBar() {
       className: `btn confirm-yes`,
       onClick: () => {
         // Full state reset — mirrors the __restart__ handler in applyChoice
-        STATE.screen = `ded`;
-        STATE.sceneId = `opening_darkness`;
-        STATE.stats = { ...INIT_STATS };
-        STATE.charisms = [];
-        STATE.notes = [];
-        STATE.seen = new Set();
-        STATE.visitedLeaf = new Set();
-        STATE.flags = {};
-        STATE.awareness = 0;
-        STATE.permanentChoicesTaken = new Set();
-        STATE.tempPenalties = {};
-        STATE.truths = {};
-        STATE.actOneEnded = false;
-        STATE.mode = `attended`;
-        STATE.introStep = 0;
-        STATE.introRollResult = null;
-        STATE.notesPanelOpen = false;
-        STATE.buildingRevised = false;
-        STATE.mortificationSpent = false;
-        STATE.retrySpent = false;
-        STATE.discernmentRetrySpent = false;
-        STATE.poaAbsorbedThisScene = false;
-        STATE.unmakerUsedThisAct = false;
-        STATE.rollResult = null;
-        STATE.rollChoice = null;
-        STATE.lastRollEcho = null;
-        STATE._lastResolvedRoll = null;
-        STATE.confirmRestart = false;
-        STATE.selectedCharisms = [];
-        try { localStorage.removeItem(SAVE_KEY); } catch(e) {}
-        _lastScreen = null;
-        _lastSceneId = null;
-        _lastCharismSel = null;
-        _lastLeafSize = 0;
-        _lastRollKey = `none`;
-        _lastAwareness = `0`;
+        resetState();
         render();
       }
     }, `yes, restart`);
@@ -5541,20 +5753,51 @@ function render() {
     else if (STATE.screen === `csel`)  wrap.appendChild(renderCharismSelect());
     else if (STATE.screen === `game`)  wrap.appendChild(renderScene());
 
-    // Notes button + panel — visible during game
+    // Toast notification (note discovered or Witnessed stat change)
+    if (STATE.screen === `game` && STATE.pendingToast) {
+      const toast = el(`div`, { className: `note-toast` }, STATE.pendingToast);
+      wrap.appendChild(toast);
+      // Auto-clear after animation completes (3s)
+      const toastVal = STATE.pendingToast;
+      setTimeout(() => {
+        if (STATE.pendingToast === toastVal) {
+          STATE.pendingToast = null;
+          // No re-render needed — toast just fades via CSS
+        }
+      }, 3000);
+    }
+
+    // Notes + Status buttons — visible during game
     if (STATE.screen === `game`) {
       const notesBtn = el(`button`, {
         className: `notes-btn`,
         onClick: () => {
           STATE.notesPanelOpen = !STATE.notesPanelOpen;
+          STATE.statusPanelOpen = false;
           _lastSceneId = null; render();
         }
       }, `field notes`);
       wrap.appendChild(notesBtn);
       if (STATE.notesPanelOpen) wrap.appendChild(renderNotesPanel());
+
+      const statusBtn = el(`button`, {
+        className: `status-btn`,
+        onClick: () => {
+          STATE.statusPanelOpen = !STATE.statusPanelOpen;
+          STATE.notesPanelOpen = false;
+          _lastSceneId = null; render();
+        }
+      }, `status`);
+      wrap.appendChild(statusBtn);
+      if (STATE.statusPanelOpen) wrap.appendChild(renderStatusPanel());
     }
 
     root.appendChild(wrap);
+  } else if (STATE.pendingToast) {
+    // Toast pending — need a full render to show it even if scene hasn't changed
+    _lastSceneId = null;
+    render();
+    return;
   } else {
     // Scene hasn't changed — just patch the save indicator in-place,
     // leaving the rest of the DOM (and its animation state) untouched.
