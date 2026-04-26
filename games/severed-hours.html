@@ -256,6 +256,7 @@ const NOTES = {
   met_eliza_distant: `Eliza Moneyfreme, the Archivist. She already knows more than she said.`,
   saw_garden_first_time: `The garden exists. It is walled. Something is planted over.`,
   void_gaze_garden_plant: `The Void Gaze looked directly at the plant. It looked back.`,
+  post_descent_grounded: `After the descent: you sat with both cats until the depth was quieter.`,
 };
 
 // ── ASCII ART LIBRARY ─────────────────────────────────────────
@@ -1116,6 +1117,7 @@ const SCENES = {
   office_file_fail: {
     returnTo: `office_desk`,
     location: `Your Office — Third Floor`,
+    flag: `file_failed`,
     text: [
       `You open the file. The first page is clear — your start date, your department — and then your eyes move to the supervisor field and something shifts.`,
       `Not the letters rearranging. Something simpler and worse: you stop being able to want to read it. A gentle, thorough disinterest settles over you like a hand placed on your shoulder. You close the file.`,
@@ -1911,7 +1913,14 @@ const SCENES = {
 
       { text: `Go inside — return to the lobby.`, next: `lobby` },
       { text: `Go to the courtyard.`, next: `courtyard` },
-      { text: `Take the elevator to the second floor.`, next: `second_floor` },    ],
+      { text: `Take the elevator to the second floor.`, next: `second_floor` },
+      {
+        text: `Sit with both cats until the depth is quieter. (−1 Awareness, +1 Composure)`,
+        next: `garden_post_descent_grounding`,
+        requireFlag: `threshold_visited`,
+        permanent: true, id: `post_descent_grounding`,
+      },
+    ],
   },
 
   garden_plant_void: {
@@ -1967,6 +1976,21 @@ const SCENES = {
     ],
   },
 
+  garden_post_descent_grounding: {
+    returnTo: `garden`,
+    location: `The Garden`,
+    text: [
+      `You sit down. Both cats are present — Haircut on the bench, Freezer Beef in the patch of sage. Neither acknowledges your return from the depth.`,
+      `This is correct. The garden does not ask where you have been. It has always been safe. The depth is below. The garden is not the depth. The difference is measurable in the quality of the light.`,
+      `You breathe. The awareness recedes — not gone, but quieter. The Continuous is still there. It is always still there. But it is not louder than the October afternoon.`,
+      `Haircut looks at you once and looks away. Freezer Beef does not look at you at all. This is grounding.`,
+    ],
+    se: `post_descent_grounded`,
+    awarenessLoss: 1,
+    healingComposure: true,
+    effect: { composure: 1 },
+    choices: [],
+  },
   garden_forced_sitting: {
     returnTo: `garden`,
     location: `The Garden`,
@@ -2499,7 +2523,7 @@ const SCENES = {
         awareness: 1,
         effect: { intuition: 1 } },
     ],
-    se: `contradiction_found`,
+    ses: [`contradiction_found`, `files_may_differ`],
   },
 
   sm_letter: {
@@ -2808,6 +2832,10 @@ const SCENES = {
   eliza_reading: {
     returnTo: `archive`,
     location: `The Archive — Third Floor`,
+    injectIf: [
+      { requireFlag: `file_failed`,
+        text: `Eliza Moneyfreme looks at you for a moment before speaking. "You tried to read your file," she says. Not a question. "They don't open for everyone. The building decides." She pauses. "It decided something about you. I don't know what yet."` },
+    ],
     text: [
       `"What are you reading?"`,
       `She holds it up. The cover is blank. The pages, when she lets you glimpse them, are dense with handwriting in several different hands, as though many people have written in the same book over many years.`,
@@ -4737,18 +4765,18 @@ function applyScene(id) {
   // Act 3 safety net: if player reached completion scenes via alternate routes,
   // ensure flags are set. Prevents hub lockout from edge-case routing.
   if (id === `act_three_hub`) {
-    if (STATE.seen.has(`craigslist_bond`) || STATE.seen.has(`craigslist_briefing`))
-      STATE.flags[`act3_craigslist_done`] = true;
-    if (STATE.seen.has(`learned_notation`) || STATE.seen.has(`learned_notation_deep`))
-      STATE.flags[`act3_eliza_done`] = true;
-    if (STATE.seen.has(`philomena_holding`) || STATE.seen.has(`name_returned`))
-      STATE.flags[`act3_philomena_done`] = true;
+    if (STATE.seen.has(`craigslist_bond`)) STATE.flags[`act3_craigslist_done`] = true;
+    if (STATE.seen.has(`learned_notation`)) STATE.flags[`act3_eliza_done`] = true;
+    if (STATE.seen.has(`philomena_holding`)) STATE.flags[`act3_philomena_done`] = true;
     if ((STATE.solidarity || 0) >= 4) STATE.flags[`solidarity_high`] = true;
   }
   if (s.se) addNote(s.se);
   if (s.ses) s.ses.forEach(addNote);
   if (s.awareness) {
     STATE.awareness = Math.min((STATE.awareness || 0) + s.awareness, 5);
+  }
+  if (s.awarenessLoss) {
+    STATE.awareness = Math.max((STATE.awareness || 0) - s.awarenessLoss, 0);
   }
   if (s.flag) {
     const flags = typeof s.flag === `string` ? [s.flag] : s.flag;
@@ -4792,6 +4820,17 @@ function applyScene(id) {
 }
 
 function applyChoice(choice) {
+  // Awareness override: at Awareness 5, one unmistakable misdirection — fires once.
+  // Player chooses "Head to the lobby" from the office; arrives in the garden instead.
+  if ((STATE.awareness || 0) >= 5
+      && choice.next === `lobby`
+      && STATE.sceneId === `opening_darkness`
+      && !STATE.seen.has(`_aw5_override_fired`)) {
+    STATE.seen.add(`_aw5_override_fired`);
+    STATE.pendingToast = `you intended the lobby`;
+    choice = { ...choice, next: `garden` };
+  }
+
   if (choice.next === `__restart__`) {
     resetState();
     render();
@@ -4837,6 +4876,16 @@ function applyChoice(choice) {
   // Set truth
   if (choice.setTruth) {
     STATE.truths[choice.setTruth.key] = choice.setTruth.value;
+    // New perspectives hint: nudge player to revisit key locations
+    const perspectiveHints = {
+      naming_origin: `Your understanding of your name's origin is set. Some earlier documents may read differently now.`,
+      stacy_nature: `Your understanding of Stacy is set. The personnel file may respond.`,
+    };
+    const hint = perspectiveHints[choice.setTruth.key];
+    if (hint) {
+      STATE.pendingToast = hint;
+      addNote(`files_may_differ`); // persistent journal entry
+    }
   }
   // Set flags permanently
   if (choice.flag) {
