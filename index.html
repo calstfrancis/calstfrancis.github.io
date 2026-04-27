@@ -110,6 +110,56 @@
   --game-footer-border: #d0c0a0;
 }
 
+/* SPASIBO custom theme – dark mode (default) */
+.game-feature.spasibo {
+  background: #0a121c;
+  border-color: #2a4a5a;
+}
+.game-feature.spasibo .game-ascii {
+  color: #5a7a8a;
+}
+.game-feature.spasibo .game-label,
+.game-feature.spasibo .game-title {
+  color: #c0d8e8;
+}
+.game-feature.spasibo .game-desc {
+  color: #a0b8c8;
+}
+.game-feature.spasibo .game-link {
+  color: #7aa8c0;
+}
+.game-feature.spasibo .game-link:hover {
+  color: #a0d0e8;
+}
+.game-feature.spasibo .game-footer {
+  border-top-color: #2a4a5a;
+}
+
+/* SPASIBO – light mode overrides */
+[data-theme="light"] .game-feature.spasibo {
+  background: #d8e4ec;        /* pale fog / ice reflection */
+  border-color: #8ab0c0;
+}
+[data-theme="light"] .game-feature.spasibo .game-ascii {
+  color: #4a6a7a;
+}
+[data-theme="light"] .game-feature.spasibo .game-label,
+[data-theme="light"] .game-feature.spasibo .game-title {
+  color: #1a3a48;
+}
+[data-theme="light"] .game-feature.spasibo .game-desc {
+  color: #2c5060;
+}
+[data-theme="light"] .game-feature.spasibo .game-link {
+  color: #a06030;             /* coral accent for warmth in light mode */
+}
+[data-theme="light"] .game-feature.spasibo .game-link:hover {
+  color: #c07848;
+}
+[data-theme="light"] .game-feature.spasibo .game-footer {
+  border-top-color: #a0b8c8;
+}
+
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{
@@ -168,7 +218,6 @@ nav{
 
 /* ── HERO ── */
 .hero{border-bottom:2px solid var(--border);position:relative;overflow:hidden;padding:4.5rem 0 0}
-/* large watermark flower behind text */
 .hero-wm{
   position:absolute;right:-40px;top:-30px;
   opacity:.09;pointer-events:none;
@@ -191,20 +240,11 @@ nav{
 }
 .hero-desc em{font-style:italic;color:var(--text)}
 .hero-actions{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:0}
-
-/* botanical strip along bottom of hero — full width vine with flowers */
 .hero-vine{
   display:block;width:100%;margin-top:2.5rem;
   overflow:visible;
 }
 
-/* ── BOTANICAL DIVIDER between sections ── */
-.bota-div{
-  display:block;width:100%;overflow:visible;
-  margin:-1px 0;/* sits on the section border */
-}
-
-/* ── BUTTONS ── */
 .btn{
   display:inline-flex;align-items:center;gap:.4rem;
   padding:.52rem 1.15rem;
@@ -220,11 +260,8 @@ nav{
 .btn-kofi:hover{background:var(--cpale);border-color:var(--coral)}
 [data-theme="light"] .btn-kofi{background:var(--cpale)}
 
-/* ── SECTIONS ── */
 section{padding:3.5rem 0;border-bottom:2px solid var(--border)}
 section:last-of-type{border-bottom:none}
-
-/* section title with inline flower */
 .section-title-row{display:flex;align-items:center;gap:.7rem;margin-bottom:.35rem}
 .section-title-row svg{width:32px;height:32px;overflow:visible;flex-shrink:0}
 .section-eyebrow{
@@ -240,7 +277,6 @@ section:last-of-type{border-bottom:none}
   max-width:580px;margin-top:.5rem;margin-bottom:1.8rem;
 }
 
-/* ── GAME FEATURE (shared) ── */
 .game-feature{
   border:2px solid var(--border);background:var(--black);
   margin-bottom:1.2rem;position:relative;overflow:hidden;
@@ -250,7 +286,6 @@ section:last-of-type{border-bottom:none}
   content:'';position:absolute;inset:0;pointer-events:none;
   background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,.012) 2px,rgba(255,255,255,.012) 4px);
 }
-/* botanical top-border on game card */
 .game-bota-top{display:block;width:100%;overflow:visible}
 .game-body{padding:1.5rem 2rem 1.75rem;position:relative;z-index:1}
 .game-header{display:flex;align-items:flex-start;gap:2rem;margin-bottom:1.2rem}
@@ -308,7 +343,6 @@ section:last-of-type{border-bottom:none}
 }
 .game-link:hover{color:var(--game-link-hover)}
 
-/* ── PROJECT LIST ── */
 .project-list{display:flex;flex-direction:column;gap:.75rem}
 .project-card{
   border:1px solid var(--border-hi);background:rgba(0,0,0,.18);
@@ -317,7 +351,6 @@ section:last-of-type{border-bottom:none}
 }
 [data-theme="light"] .project-card{background:var(--bg-2)}
 .project-card:hover{border-color:var(--coral);background:var(--cpale)}
-/* flower growing out of right edge of project card */
 .project-card-flower{
   position:absolute;right:-18px;top:50%;transform:translateY(-50%);
   opacity:.12;pointer-events:none;
@@ -342,7 +375,6 @@ section:last-of-type{border-bottom:none}
   text-transform:uppercase;color:var(--text-3);border:1px solid var(--border-hi);padding:.1rem .45rem;
 }
 
-/* ── ABOUT ── */
 .about-body{
   display:grid;grid-template-columns:1fr 1fr;
   gap:1px;border:1px solid var(--border-hi);background:var(--border-hi);
@@ -366,7 +398,6 @@ section:last-of-type{border-bottom:none}
 .about-cell li{padding-left:1.1rem;position:relative}
 .about-cell li::before{content:'❧';position:absolute;left:0;color:var(--olive);font-size:.72rem;line-height:1.85}
 
-/* ── SUPPORT ── */
 .support-body{
   border:1px solid var(--border-hi);background:var(--bg-2);
   padding:2rem 2.2rem;display:flex;align-items:flex-start;gap:1.8rem;
@@ -379,7 +410,6 @@ section:last-of-type{border-bottom:none}
   position:relative;z-index:1;
 }
 
-/* ── FOOTER ── */
 footer{padding:2.5rem 0;text-align:center}
 .footer-vine{display:block;width:100%;max-width:500px;margin:0 auto 1rem;overflow:visible}
 footer p{
@@ -389,7 +419,6 @@ footer p{
 footer a{color:var(--text-3)}
 footer a:hover{color:var(--coral)}
 
-/* ── RESPONSIVE ── */
 @media(max-width:680px){
   .nav-toggle{display:flex}
   .nav-links{
@@ -443,7 +472,6 @@ section:nth-of-type(4){animation-delay:.2s}
 </head>
 <body>
 
-<!-- NAV -->
 <nav>
   <div class="nav-inner">
     <span class="nav-brand">
@@ -482,7 +510,6 @@ section:nth-of-type(4){animation-delay:.2s}
       <a href="https://ko-fi.com/calstfrancis" target="_blank" rel="noopener" class="btn btn-kofi">☕ Ko-fi</a>
     </div>
   </div>
-
   <svg class="hero-vine" viewBox="0 0 900 70" preserveAspectRatio="xMidYMid slice" aria-hidden="true" style="height:70px;display:block;margin-top:2.5rem;overflow:hidden">
     <path d="M -10,45 C 80,20 160,55 220,35 C 280,15 340,55 450,38 C 560,20 620,58 680,35 C 740,12 820,52 910,38"
       stroke="#5a6428" stroke-width="2.5" fill="none" stroke-linecap="round"/>
@@ -524,7 +551,6 @@ section:nth-of-type(4){animation-delay:.2s}
         <g transform="translate(500,20) rotate(-20) scale(.36)"><use href="#lf-v"/></g>
         <g transform="translate(700,18) rotate(15) scale(.35)"><use href="#lf-b"/></g>
       </svg>
-
       <div class="game-body">
         <div class="game-header">
           <div class="game-ascii">╔══════════════════════════════════╗
@@ -551,12 +577,12 @@ section:nth-of-type(4){animation-delay:.2s}
       </div>
     </div>
 
-    <!-- NEW: СПАСИБО game card -->
-    <div class="game-feature">
+    <!-- СПАСИБО game card – fully themed for dark and light modes -->
+    <div class="game-feature spasibo">
       <svg class="game-bota-top" viewBox="0 0 800 38" style="height:38px;display:block;overflow:hidden" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-        <rect width="800" height="38" fill="#0e0b09"/>
+        <rect width="800" height="38" fill="#0a121c"/>
         <path d="M -5,22 C 60,8 130,30 200,18 C 270,6 340,28 400,18 C 460,8 530,30 600,18 C 670,6 740,28 805,18"
-          stroke="#5a6428" stroke-width="2" fill="none" stroke-linecap="round"/>
+          stroke="#3a6a7a" stroke-width="2" fill="none" stroke-linecap="round"/>
         <g transform="translate(200,15) scale(.32)"><use href="#sf"/></g>
         <g transform="translate(400,15) scale(.38)"><use href="#sf"/></g>
         <g transform="translate(600,15) scale(.32)"><use href="#sf"/></g>
@@ -565,10 +591,8 @@ section:nth-of-type(4){animation-delay:.2s}
         <g transform="translate(500,20) rotate(-20) scale(.36)"><use href="#lf-v"/></g>
         <g transform="translate(700,18) rotate(15) scale(.35)"><use href="#lf-b"/></g>
       </svg>
-
       <div class="game-body">
         <div class="game-header">
-          <!-- ascii tribute: porthole + ship outline -->
           <div class="game-ascii">      .-.
     (   )
      '-'
@@ -596,7 +620,6 @@ section:nth-of-type(4){animation-delay:.2s}
       </div>
     </div>
 
-    <!-- Other project (Rubric) -->
     <div class="project-list">
       <div class="project-card">
         <svg class="project-card-flower" width="80" height="80" viewBox="-55 -55 110 110" aria-hidden="true">
@@ -622,7 +645,7 @@ section:nth-of-type(4){animation-delay:.2s}
   </div>
 </section>
 
-<!-- ABOUT (unchanged) -->
+<!-- ABOUT -->
 <section id="about">
   <div class="container">
     <div class="section-eyebrow">Biography</div>
@@ -635,28 +658,18 @@ section:nth-of-type(4){animation-delay:.2s}
       My theology is shaped by liberation, process, and contemplative traditions.
     </p>
     <div class="about-body">
-
       <div class="about-cell">
         <svg class="about-cell-flower" width="90" height="90" viewBox="-55 -55 110 110" aria-hidden="true"><use href="#sf"/></svg>
-        <h3>
-          <svg viewBox="-55 -55 110 110" aria-hidden="true"><use href="#sf"/></svg>
-          Ministry
-        </h3>
+        <h3><svg viewBox="-55 -55 110 110" aria-hidden="true"><use href="#sf"/></svg> Ministry</h3>
         <p>Student minister at Hope United Church, Halifax. I preach, lead worship,
         and build liturgical tools for congregations. Grounded in a theology of liberation —
         God's power as invitation, not coercion.</p>
       </div>
-
       <div class="about-cell">
         <svg class="about-cell-flower" width="70" height="70" viewBox="-22 -22 44 44" aria-hidden="true">
           <g transform="scale(.9)"><use href="#lf-v"/></g>
         </svg>
-        <h3>
-          <svg viewBox="-22 -22 44 44" aria-hidden="true" style="width:18px;height:18px;overflow:visible">
-            <use href="#lf-v"/>
-          </svg>
-          Academic Formation
-        </h3>
+        <h3><svg viewBox="-22 -22 44 44" aria-hidden="true" style="width:18px;height:18px;overflow:visible"><use href="#lf-v"/></svg> Academic Formation</h3>
         <ul>
           <li>MDiv candidate, Atlantic School of Theology</li>
           <li>Philosophy &amp; classical languages — University of Guelph</li>
@@ -664,30 +677,20 @@ section:nth-of-type(4){animation-delay:.2s}
           <li>Masters of Environmental Studies — York University</li>
         </ul>
       </div>
-
       <div class="about-cell">
         <svg class="about-cell-flower" width="70" height="70" viewBox="-22 -22 44 44" aria-hidden="true">
           <g transform="scale(.9)"><use href="#lf-v"/></g>
         </svg>
-        <h3>
-          <svg viewBox="-22 -22 44 44" aria-hidden="true" style="width:18px;height:18px;overflow:visible">
-            <use href="#lf-v"/>
-          </svg>
-          Theological Commitments
-        </h3>
+        <h3><svg viewBox="-22 -22 44 44" aria-hidden="true" style="width:18px;height:18px;overflow:visible"><use href="#lf-v"/></svg> Theological Commitments</h3>
         <ul>
           <li>Liberation &amp; process theology</li>
           <li>Rinzai-influenced contemplative practice</li>
           <li>Scripture as living encounter</li>
         </ul>
       </div>
-
       <div class="about-cell">
         <svg class="about-cell-flower" width="90" height="90" viewBox="-55 -55 110 110" aria-hidden="true"><use href="#sf"/></svg>
-        <h3>
-          <svg viewBox="-55 -55 110 110" aria-hidden="true"><use href="#sf"/></svg>
-          Craft &amp; Method
-        </h3>
+        <h3><svg viewBox="-55 -55 110 110" aria-hidden="true"><use href="#sf"/></svg> Craft &amp; Method</h3>
         <ul>
           <li>LaTeX for liturgy &amp; academic writing</li>
           <li>Illuminated manuscript &amp; calligraphy traditions</li>
@@ -695,12 +698,11 @@ section:nth-of-type(4){animation-delay:.2s}
           <li>Plain HTML — no engines, no frameworks</li>
         </ul>
       </div>
-
     </div>
   </div>
 </section>
 
-<!-- SUPPORT (unchanged) -->
+<!-- SUPPORT -->
 <section id="support">
   <div class="container">
     <div class="section-eyebrow">Support</div>
@@ -724,15 +726,12 @@ section:nth-of-type(4){animation-delay:.2s}
           and will stay free. If something I've made has been useful to you, a small
           donation goes a long way. No pressure, no paywalls.
         </p>
-        <a href="https://ko-fi.com/calstfrancis" target="_blank" rel="noopener" class="btn btn-kofi">
-          ☕ Support on Ko-fi
-        </a>
+        <a href="https://ko-fi.com/calstfrancis" target="_blank" rel="noopener" class="btn btn-kofi">☕ Support on Ko-fi</a>
       </div>
     </div>
   </div>
 </section>
 
-<!-- FOOTER -->
 <footer>
   <div class="container">
     <svg class="footer-vine" viewBox="0 0 500 50" style="height:50px;overflow:hidden" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
