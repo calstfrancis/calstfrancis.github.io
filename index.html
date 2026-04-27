@@ -70,7 +70,17 @@
   --opale:     rgba(122,136,64,.15);
   --black:     #100c08;
   --ok:        #96aa52;
+
+  /* Game card text colors (dark mode defaults) */
+  --game-title: #f0e0a0;
+  --game-desc:  #a89060;
+  --game-ascii: #6a5a38;
+  --game-label: #6a5a38;
+  --game-link:  #c9a84c;
+  --game-link-hover: #e8c870;
+  --game-footer-border: #3a3020;
 }
+
 [data-theme="light"] {
   --bg:        #f0e4c8;
   --bg-2:      #fdf6e8;
@@ -89,6 +99,15 @@
   --opale:     rgba(74,96,24,.12);
   --black:     #faf4e4;
   --ok:        #4a6018;
+
+  /* Light mode overrides for game card text */
+  --game-title: #3a2c1c;
+  --game-desc:  #4a3a28;
+  --game-ascii: #5a4a30;
+  --game-label: #5a4a30;
+  --game-link:  #a05030;
+  --game-link-hover: #c06038;
+  --game-footer-border: #d0c0a0;
 }
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -221,7 +240,7 @@ section:last-of-type{border-bottom:none}
   max-width:580px;margin-top:.5rem;margin-bottom:1.8rem;
 }
 
-/* ── GAME FEATURE ── */
+/* ── GAME FEATURE (shared) ── */
 .game-feature{
   border:2px solid var(--border);background:var(--black);
   margin-bottom:1.2rem;position:relative;overflow:hidden;
@@ -236,18 +255,42 @@ section:last-of-type{border-bottom:none}
 .game-body{padding:1.5rem 2rem 1.75rem;position:relative;z-index:1}
 .game-header{display:flex;align-items:flex-start;gap:2rem;margin-bottom:1.2rem}
 .game-ascii{
-  font-family:'Courier Prime',monospace;font-size:.62rem;color:#6a5a38;
-  white-space:pre;line-height:1.4;flex-shrink:0;
+  font-family:'Courier Prime',monospace;
+  font-size:.62rem;
+  color:var(--game-ascii);
+  white-space:pre;
+  line-height:1.4;
+  flex-shrink:0;
 }
 .game-label{
-  font-family:'Spectral',serif;font-size:.68rem;font-weight:600;
-  letter-spacing:.14em;text-transform:uppercase;color:#6a5a38;margin-bottom:.35rem;
+  font-family:'Spectral',serif;
+  font-size:.68rem;
+  font-weight:600;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--game-label);
+  margin-bottom:.35rem;
 }
-.game-title{font-family:'IM Fell English',serif;font-size:1.6rem;color:#f0e0a0;line-height:1.15;margin-bottom:.5rem}
-.game-desc{font-size:.9rem;color:#a89060;line-height:1.8;max-width:500px;margin-bottom:1.2rem}
+.game-title{
+  font-family:'IM Fell English',serif;
+  font-size:1.6rem;
+  color:var(--game-title);
+  line-height:1.15;
+  margin-bottom:.5rem;
+}
+.game-desc{
+  font-size:.9rem;
+  color:var(--game-desc);
+  line-height:1.8;
+  max-width:500px;
+  margin-bottom:1.2rem;
+}
 .game-footer{
-  display:flex;align-items:center;justify-content:space-between;
-  border-top:1px solid #3a3020;padding-top:.9rem;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  border-top:1px solid var(--game-footer-border);
+  padding-top:.9rem;
 }
 .game-status{
   display:inline-flex;align-items:center;gap:.4rem;
@@ -256,8 +299,14 @@ section:last-of-type{border-bottom:none}
 }
 .status-pip{width:6px;height:6px;border-radius:50%;background:var(--ok);display:inline-block;animation:pip 2.5s ease-in-out infinite}
 @keyframes pip{0%,100%{opacity:.5}50%{opacity:1}}
-.game-link{font-family:'Spectral',serif;font-size:.84rem;font-weight:600;letter-spacing:.04em;color:#c9a84c}
-.game-link:hover{color:#e8c870}
+.game-link{
+  font-family:'Spectral',serif;
+  font-size:.84rem;
+  font-weight:600;
+  letter-spacing:.04em;
+  color:var(--game-link);
+}
+.game-link:hover{color:var(--game-link-hover)}
 
 /* ── PROJECT LIST ── */
 .project-list{display:flex;flex-direction:column;gap:.75rem}
@@ -416,20 +465,17 @@ section:nth-of-type(4){animation-delay:.2s}
 <!-- HERO -->
 <section class="hero">
   <div class="container" style="position:relative">
-
-    <!-- large watermark flower behind text -->
     <svg class="hero-wm" width="340" height="340" viewBox="-55 -55 110 110" aria-hidden="true">
       <use href="#sf"/>
     </svg>
-
-    <div class="hero-eyebrow">Minister · Theologian · Developer</div>
+    <div class="hero-eyebrow">Student Minister · Amateur Developer</div>
     <h1>Cal St Francis</h1>
     <p class="hero-subtitle">Candidate for Ordination, United Church of Canada</p>
     <p class="hero-desc">
-    	 I make some little very specialized tools for ministers and worship leaders, favour theology in the 
-	   traditions of <em>liberation and process</em>, and build weird little games as a hobby. 
-	   Everything here is free. 
-	   If it helps you, consider buying me a coffee.
+       I make some little very specialized tools for ministers and worship leaders, favour theology in the 
+       traditions of <em>liberation and process</em>, and build weird little games as a hobby. 
+       Everything here is free. 
+       If it helps you, consider buying me a coffee.
     </p>
     <div class="hero-actions">
       <a href="#projects" class="btn btn-coral">See My Work</a>
@@ -437,18 +483,12 @@ section:nth-of-type(4){animation-delay:.2s}
     </div>
   </div>
 
-  <!-- botanical vine strip across bottom of hero, full bleed -->
   <svg class="hero-vine" viewBox="0 0 900 70" preserveAspectRatio="xMidYMid slice" aria-hidden="true" style="height:70px;display:block;margin-top:2.5rem;overflow:hidden">
-    <!-- main vine -->
     <path d="M -10,45 C 80,20 160,55 220,35 C 280,15 340,55 450,38 C 560,20 620,58 680,35 C 740,12 820,52 910,38"
       stroke="#5a6428" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-    <!-- sunflower 1 -->
     <g transform="translate(220,30) scale(.42)"><use href="#sf"/></g>
-    <!-- sunflower 2 centre -->
     <g transform="translate(450,33) scale(.52)"><use href="#sf"/></g>
-    <!-- sunflower 3 -->
     <g transform="translate(680,30) scale(.42)"><use href="#sf"/></g>
-    <!-- leaves scattered on vine -->
     <g transform="translate(120,38) rotate(-30) scale(.55)"><use href="#lf-v"/></g>
     <g transform="translate(340,42) rotate(20) scale(.5)"><use href="#lf-b"/></g>
     <g transform="translate(560,36) rotate(-20) scale(.48)"><use href="#lf-v"/></g>
@@ -470,7 +510,7 @@ section:nth-of-type(4){animation-delay:.2s}
       Liturgical tools, LaTeX templates, and interactive fiction. All free; source on GitHub.
     </p>
 
-    <!-- game card with botanical top border -->
+    <!-- Severed Hours game card -->
     <div class="game-feature">
       <svg class="game-bota-top" viewBox="0 0 800 38" style="height:38px;display:block;overflow:hidden" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
         <rect width="800" height="38" fill="#0e0b09"/>
@@ -511,9 +551,54 @@ section:nth-of-type(4){animation-delay:.2s}
       </div>
     </div>
 
+    <!-- NEW: СПАСИБО game card -->
+    <div class="game-feature">
+      <svg class="game-bota-top" viewBox="0 0 800 38" style="height:38px;display:block;overflow:hidden" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <rect width="800" height="38" fill="#0e0b09"/>
+        <path d="M -5,22 C 60,8 130,30 200,18 C 270,6 340,28 400,18 C 460,8 530,30 600,18 C 670,6 740,28 805,18"
+          stroke="#5a6428" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <g transform="translate(200,15) scale(.32)"><use href="#sf"/></g>
+        <g transform="translate(400,15) scale(.38)"><use href="#sf"/></g>
+        <g transform="translate(600,15) scale(.32)"><use href="#sf"/></g>
+        <g transform="translate(100,20) rotate(-15) scale(.38)"><use href="#lf-v"/></g>
+        <g transform="translate(300,18) rotate(20) scale(.35)"><use href="#lf-b"/></g>
+        <g transform="translate(500,20) rotate(-20) scale(.36)"><use href="#lf-v"/></g>
+        <g transform="translate(700,18) rotate(15) scale(.35)"><use href="#lf-b"/></g>
+      </svg>
+
+      <div class="game-body">
+        <div class="game-header">
+          <!-- ascii tribute: porthole + ship outline -->
+          <div class="game-ascii">      .-.
+    (   )
+     '-'
+   ___|___
+  |  NORTH |
+  | ATLANTIC|
+  |  ···    |
+   ～～～～～～～
+   [ˢᴾᴬˢᴵᴮᴼ]</div>
+          <div>
+            <div class="game-label">Literary IF · Chaplaincy noir · Browser</div>
+            <div class="game-title">СПАСИБО <span style="font-size:0.9rem; letter-spacing:0;">(Spasibo)</span></div>
+            <p class="game-desc">
+              You are the ship’s chaplain on a North Atlantic crossing. The light is the wrong kind, 
+              a cat watches from the railing, and a passenger named Pavel speaks of a woman who 
+              “isn’t wrong about you.” Build your cover, choose your charisms, and navigate a 
+              waking dream of theology, memory, and the grey sea. Multiple crossings, persistent echoes.
+            </p>
+          </div>
+        </div>
+        <div class="game-footer">
+          <span class="game-status"><span class="status-pip"></span> Playable demo — v0.3 · Waking content added</span>
+          <a href="spasibo.html" class="game-link">Cross the Atlantic →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Other project (Rubric) -->
     <div class="project-list">
       <div class="project-card">
-        <!-- flower growing from right edge -->
         <svg class="project-card-flower" width="80" height="80" viewBox="-55 -55 110 110" aria-hidden="true">
           <use href="#sf"/>
         </svg>
@@ -537,7 +622,7 @@ section:nth-of-type(4){animation-delay:.2s}
   </div>
 </section>
 
-<!-- ABOUT -->
+<!-- ABOUT (unchanged) -->
 <section id="about">
   <div class="container">
     <div class="section-eyebrow">Biography</div>
@@ -615,7 +700,7 @@ section:nth-of-type(4){animation-delay:.2s}
   </div>
 </section>
 
-<!-- SUPPORT -->
+<!-- SUPPORT (unchanged) -->
 <section id="support">
   <div class="container">
     <div class="section-eyebrow">Support</div>
@@ -624,7 +709,6 @@ section:nth-of-type(4){animation-delay:.2s}
       <svg viewBox="-55 -55 110 110" aria-hidden="true"><use href="#sf"/></svg>
     </div>
     <div class="support-body">
-      <!-- botanical spray instead of emoji -->
       <div class="support-bota">
         <svg viewBox="0 0 72 130" aria-hidden="true">
           <line x1="36" y1="130" x2="36" y2="58" stroke="#5a6428" stroke-width="3" stroke-linecap="round"/>
@@ -651,7 +735,6 @@ section:nth-of-type(4){animation-delay:.2s}
 <!-- FOOTER -->
 <footer>
   <div class="container">
-    <!-- botanical footer vine -->
     <svg class="footer-vine" viewBox="0 0 500 50" style="height:50px;overflow:hidden" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
       <path d="M 0,30 C 60,12 120,40 180,25 C 240,10 310,42 370,25 C 430,8 480,35 500,28"
         stroke="#5a6428" stroke-width="2" fill="none" stroke-linecap="round"/>

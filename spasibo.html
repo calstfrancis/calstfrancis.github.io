@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Spasibo — Cal St Francis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Spectral:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+
+<svg width="0" height="0" style="position:absolute;pointer-events:none" aria-hidden="true">
+<defs>
+  <g id="sf">
+    <g fill="#e06030">
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(0)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(25.7)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(51.4)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(77.1)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(102.8)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(128.5)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(154.2)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(180)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(205.7)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(231.4)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(257.1)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(282.8)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(308.5)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(334.2)"/>
+    </g>
+    <circle r="16" fill="#5a2c10"/>
+    <circle r="11" fill="#3e1a08"/>
+    <circle r="2.2" cx="0"  cy="-5.5" fill="#6a3818" opacity=".7"/>
+    <circle r="2.2" cx="5"  cy="2"    fill="#6a3818" opacity=".7"/>
+    <circle r="2.2" cx="-5" cy="2"    fill="#6a3818" opacity=".7"/>
+    <circle r="2.2" cx="2"  cy="-10"  fill="#6a3818" opacity=".5"/>
+    <circle r="2.2" cx="-2" cy="-10"  fill="#6a3818" opacity=".5"/>
+    <circle r="2.2" cx="8"  cy="-5"   fill="#6a3818" opacity=".5"/>
+    <circle r="2.2" cx="-8" cy="-5"   fill="#6a3818" opacity=".5"/>
+  </g>
+  <path id="lf-b" d="M0,0 C12,-10 22,-8 26,-2 C30,6 24,20 10,24 C-4,28 -16,18 -14,8 C-12,0 -6,-2 0,0Z" fill="#7a8840"/>
+  <path id="lf-n" d="M0,0 C6,-6 8,-20 0,-32 C-8,-20 -6,-6 0,0Z" fill="#7a8840"/>
+  <g id="lf-v">
+    <path d="M0,0 C10,-8 18,-6 20,2 C18,12 8,18 0,16 C-8,18 -18,12 -20,2 C-18,-6 -10,-8 0,0Z" fill="#7a8840"/>
+    <path d="M0,0 L0,16" stroke="#5a6428" stroke-width="1" fill="none"/>
+    <path d="M0,6 L6,10" stroke="#5a6428" stroke-width=".7" fill="none"/>
+    <path d="M0,6 L-6,10" stroke="#5a6428" stroke-width=".7" fill="none"/>
+  </g>
+</defs>
+</svg>
+
+<style>
+:root {
+  --bg:        #6a1710;
+  --bg-2:      #7c1e14;
+  --nav-bg:    rgba(28,6,4,.97);
+  --border:    #4a0e0b;
+  --border-hi: #8a2a1a;
+  --text:      #f2e4c4;
+  --text-2:    #d8c4a0;
+  --text-3:    #b89c72;
+  --coral:     #e06030;
+  --coral-hi:  #f07848;
+  --olive:     #7a8840;
+}
+[data-theme="light"] {
+  --bg:        #f0e4c8;
+  --bg-2:      #fdf6e8;
+  --nav-bg:    rgba(34,10,4,.96);
+  --border:    #c8b890;
+  --border-hi: #a89060;
+  --text:      #28120c;
+  --text-2:    #4a2e18;
+  --text-3:    #7a5a38;
+  --coral:     #b83818;
+  --coral-hi:  #d04825;
+  --olive:     #4a6018;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:'Spectral',Georgia,serif;
+  display:flex;flex-direction:column;
+  -webkit-font-smoothing:antialiased;
+  transition:background .25s,color .25s;
+}
+a{color:var(--coral);text-decoration:none;transition:color .15s}
+a:hover{color:var(--coral-hi)}
+
+/* ── NAV ── */
+nav{
+  background:var(--nav-bg);
+  border-bottom:2px solid var(--border);
+  position:sticky;top:0;z-index:100;
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  flex-shrink:0;transition:background .25s;
+}
+.nav-inner{
+  display:flex;align-items:center;justify-content:space-between;
+  height:52px;max-width:860px;margin:0 auto;padding:0 1.75rem;
+}
+.nav-brand{
+  font-family:'IM Fell English',serif;font-size:1.05rem;
+  color:var(--coral);letter-spacing:.03em;
+  display:flex;align-items:center;gap:.45rem;text-decoration:none;
+}
+.nav-brand svg{width:20px;height:20px;overflow:visible;flex-shrink:0}
+.nav-links{display:flex;align-items:center;gap:1.6rem;list-style:none}
+.nav-links a{
+  font-family:'Spectral',serif;font-size:.78rem;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--text-3);transition:color .15s;
+}
+.nav-links a:hover{color:var(--coral)}
+.nav-back{
+  border:1px solid var(--border-hi);padding:.26rem .75rem;transition:all .15s;
+}
+.nav-back:hover{border-color:var(--coral) !important}
+.theme-toggle{
+  background:none;border:1px solid var(--border-hi);padding:.22rem .65rem;
+  font-family:'Spectral',serif;font-size:.72rem;font-weight:600;
+  letter-spacing:.06em;color:var(--text-3);cursor:pointer;transition:all .15s;
+  display:inline-flex;align-items:center;gap:5px;
+}
+.theme-toggle:hover{border-color:var(--coral);color:var(--coral)}
+
+.nav-toggle{
+  display:none;flex-direction:column;justify-content:center;gap:5px;
+  width:36px;height:36px;background:none;border:1px solid var(--border-hi);
+  cursor:pointer;padding:8px 7px;
+}
+.nav-toggle span{display:block;height:1px;background:var(--text-3);transition:all .2s}
+.nav-toggle.open span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+.nav-toggle.open span:nth-child(2){opacity:0}
+.nav-toggle.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+
+/* ── GAME BAR ── */
+.game-bar{
+  background:var(--bg-2);
+  border-bottom:2px solid var(--border);
+  flex-shrink:0;overflow:hidden;
+  transition:background .25s,border-color .25s;
+}
+.game-bar-vine{
+  display:block;width:100%;height:44px;overflow:hidden;
+}
+.game-bar-info{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.3rem 1.75rem .5rem;
+}
+.game-bar-title{
+  font-family:'IM Fell English',serif;font-style:italic;
+  font-size:.98rem;color:var(--coral);letter-spacing:.03em;
+}
+.game-bar-meta{
+  font-family:'Spectral',serif;font-size:.68rem;font-weight:600;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--text-3);
+}
+
+/* ── IFRAME ── */
+.game-frame{flex:1;width:100%;border:none;display:block;background:#09080a}
+[data-theme="light"] .game-frame{background:#e9e8e7}
+
+/* ── RESPONSIVE ── */
+@media(max-width:640px){
+  .nav-toggle{display:flex}
+  .nav-links{
+    display:none;position:fixed;top:52px;left:0;right:0;
+    background:rgba(20,4,2,.99);border-bottom:2px solid var(--border);
+    flex-direction:column;gap:0;padding:.5rem 0;z-index:99;
+  }
+  [data-theme="light"] .nav-links{background:rgba(240,228,200,.99)}
+  .nav-links.open{display:flex}
+  .nav-links li a,.nav-links li button{
+    display:block;padding:.85rem 1.75rem;font-size:.82rem;
+    letter-spacing:.1em;width:100%;text-align:left;
+  }
+  .nav-back{border:none;padding:.85rem 1.75rem}
+  .theme-toggle{border:none;padding:.85rem 1.75rem;width:100%;justify-content:flex-start}
+  .game-bar-vine{height:30px}
+  .game-bar-info{padding:.25rem 1.1rem .4rem}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-brand">
+      <svg viewBox="-55 -55 110 110" aria-hidden="true"><use href="#sf"/></svg>
+      Cal St Francis
+    </a>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html#projects">Projects</a></li>
+      <li><a href="index.html#about">About</a></li>
+      <li><a href="index.html#support">Support</a></li>
+      <li><a href="index.html" class="nav-back">← Back to site</a></li>
+      <li><button class="theme-toggle" id="themeToggle"><span>🌙</span> Dark</button></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="game-bar">
+  <svg class="game-bar-vine" viewBox="0 0 900 44" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <rect width="900" height="44" fill="#7c1e14"/>
+    <path d="M -10,28 C 80,10 160,36 250,22 C 340,8 420,36 500,22 C 580,8 660,36 750,22 C 840,8 890,30 910,24"
+      stroke="#5a6428" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <g transform="translate(250,20) scale(.33)"><use href="#sf"/></g>
+    <g transform="translate(500,20) scale(.38)"><use href="#sf"/></g>
+    <g transform="translate(750,20) scale(.33)"><use href="#sf"/></g>
+    <g transform="translate(130,24) rotate(-18) scale(.32)"><use href="#lf-v"/></g>
+    <g transform="translate(375,26) rotate(15) scale(.3)"><use href="#lf-b"/></g>
+    <g transform="translate(625,24) rotate(-15) scale(.3)"><use href="#lf-v"/></g>
+    <g transform="translate(860,24) rotate(12) scale(.28)"><use href="#lf-b"/></g>
+    <g transform="translate(50,26) rotate(8) scale(.26)"><use href="#lf-n"/></g>
+  </svg>
+  <div class="game-bar-info">
+    <span class="game-bar-title">СПАСИБО </span>
+    <span class="game-bar-meta">Text Adventure · 0.3</span>
+  </div>
+</div>
+
+<iframe
+  class="game-frame"
+  src="games/spasibo.html"
+  title="СПАСИБО - Thank You"
+  allowfullscreen
+></iframe>
+
+<script>
+const toggle = document.getElementById('navToggle');
+const links  = document.getElementById('navLinks');
+toggle.addEventListener('click', () => {
+  toggle.classList.toggle('open');
+  links.classList.toggle('open');
+});
+links.querySelectorAll('a').forEach(a => {
+  a.addEventListener('click', () => {
+    toggle.classList.remove('open');
+    links.classList.remove('open');
+  });
+});
+
+const themeBtn = document.getElementById('themeToggle');
+const setTheme = t => {
+  document.documentElement.setAttribute('data-theme', t);
+  localStorage.setItem('theme', t);
+  themeBtn.innerHTML = t === 'dark' ? '<span>🌙</span> Dark' : '<span>☀️</span> Light';
+};
+const saved = localStorage.getItem('theme');
+setTheme(saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+themeBtn.addEventListener('click', () => {
+  setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+});
+</script>
+</body>
+</html>
