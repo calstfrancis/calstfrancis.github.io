@@ -6,14 +6,14 @@
 // ── ATMOSPHERE (canvas, functions) ──────────────────────────
 const canvas = document.getElementById('atmos'), ctx = canvas.getContext('2d');
 let mood='neutral',targetMood='neutral',moodLerp=1,fogParts=[],rainDrops=[],T=0;
-let atmosMods = { fogMult:1.0, lampWarm:0, lampFlicker:true };
+let atmosMods = { fogMult:1.0, lampWarm:0, lampFlicker:true, soboWarm:false };
 function resize(){canvas.width=innerWidth;canvas.height=innerHeight;initRain();}
 resize();addEventListener('resize',resize);
 function initFog(){fogParts=[];for(let i=0;i<22;i++)fogParts.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:80+Math.random()*140,vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.08,ph:Math.random()*Math.PI*2,base:.025+Math.random()*.05});}initFog();
 function initRain(){const p=porthole();rainDrops=[];for(let i=0;i<24;i++)rainDrops.push({x:p.x+(Math.random()-.5)*p.r*2,y:p.y+(Math.random()-.5)*p.r*2,len:5+Math.random()*9,spd:1.2+Math.random()*2});}
 function porthole(){const r=Math.min(canvas.width,canvas.height)*.085;return{x:canvas.width-r-28,y:r+28,r};}
 const MOOD={neutral:[130,170,190,6,8,12],tense:[140,90,70,10,6,4],uncanny:[60,130,170,4,8,14],revelation:[200,190,140,12,14,10]};
-function setMood(m){if(!m||m===targetMood)return;targetMood=m;moodLerp=0;}
+function setMood(m){if(!m||m===targetMood)return;targetMood=m;moodLerp=0;_updateAudioMood();}
 function lerpN(a,b,t){return a+(b-a)*t;}
 
 // ── GLOBAL STATE (extended) ─────────────────────────────────
@@ -34,6 +34,7 @@ let G = {
   time: { day: 1, hour: 8, maxDays: 3 },
   reputation: {},
   quests: {},
+  crossingLog:[],
   // roll state (kept in memory only, not saved)
   pendingRoll:null,
   rollResult:null
@@ -44,6 +45,7 @@ function refreshAtmosMods(){
   atmosMods.fogMult = s.includes('gnoti_seauton') ? 0.55 : 1.0;
   atmosMods.lampWarm = s.includes('magnificat') ? 0.08 : 0;
   atmosMods.lampFlicker = !s.includes('null_set');
+  atmosMods.soboWarm = s.includes('sobornost');
 }
 
 // ── DRAW FUNCTIONS (unchanged) ──────────────────────────────
@@ -87,7 +89,7 @@ function drawPorthole(){
   const sc=mood==='uncanny'?'#060e18':mood==='revelation'?'#202810':'#0e1820';
   const sg=ctx.createLinearGradient(x,y-r,x,y+r);sg.addColorStop(0,sc);sg.addColorStop(1,'#182430');
   ctx.fillStyle=sg;ctx.fillRect(x-r,y-r,r*2,r*2);
-  const soboWarm = G && G.soundings && G.soundings.settled.includes('sobornost');
+  const soboWarm = atmosMods.soboWarm;
   ctx.strokeStyle=`rgba(${soboWarm?80:60},${soboWarm?110:100},${soboWarm?120:130},${mood==='uncanny'?0.5:0.25})`;ctx.lineWidth=.8;
   for(let i=0;i<6;i++){const wy=y+r*.2+i*r*.12+Math.sin(T*.6+i*1.2)*2;ctx.beginPath();ctx.moveTo(x-r,wy);ctx.quadraticCurveTo(x,wy+Math.sin(T+i)*3,x+r,wy);ctx.stroke();}
   if(mood!=='uncanny'&&mood!=='revelation'){
@@ -107,7 +109,7 @@ function saveGame(){
       stats:G.stats,charisms:G.charisms,soundings:G.soundings,
       cover:G.cover,coverIntegrity:G.coverIntegrity,notes:G.notes,
       flags:[...G.flags],scene:G.scene,mode:G.mode,
-      lastReaction:G.lastReaction,tutorialDone:G.tutorialDone,
+      lastReaction:G.lastReaction,tutorialDone:G.tutorialDone,crossingLog:G.crossingLog||[],
       // new fields
       inventory:G.inventory, time:G.time, reputation:G.reputation, quests:G.quests
     }));
@@ -123,7 +125,7 @@ function loadGame(){
     G.cover=s.cover||G.cover;G.coverIntegrity=s.coverIntegrity!==undefined?s.coverIntegrity:3;
     G.notes=s.notes||[];G.flags=new Set(s.flags||[]);G.scene=s.scene||'chapel_waking';
     G.mode=s.mode||'attended';G.lastReaction=s.lastReaction||null;
-    G.tutorialDone=s.tutorialDone||false;
+    G.tutorialDone=s.tutorialDone||false;G.crossingLog=s.crossingLog||[];
     // load new fields (safe defaults)
     G.inventory = s.inventory || [];
     G.time = s.time || { day:1, hour:8, maxDays:3 };
@@ -239,6 +241,45 @@ function performRoll(statKey, difficulty, options={}) {
   };
 }
 
+
+// ── AUDIO SYSTEM ─────────────────────────────────────────────
+let _actx=null,_gainNode=null,_audioOn=false;
+function _initAudio(){
+  if(_actx)return;
+  try{
+    _actx=new(window.AudioContext||window.webkitAudioContext)();
+    const master=_actx.createGain();master.gain.value=0;master.connect(_actx.destination);_gainNode=master;
+    // Three oscillators for engine hum
+    [50,101,149].forEach((freq,i)=>{
+      const o=_actx.createOscillator(),g=_actx.createGain();
+      o.frequency.value=freq;o.type='sawtooth';g.gain.value=[0.5,0.25,0.15][i];
+      o.connect(g);g.connect(master);o.start();
+    });
+    // Low-pass filtered noise layer
+    const buf=_actx.createBuffer(1,_actx.sampleRate,_actx.sampleRate);
+    const d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1);
+    const ns=_actx.createBufferSource();ns.buffer=buf;ns.loop=true;
+    const flt=_actx.createBiquadFilter();flt.type='lowpass';flt.frequency.value=90;
+    const ng=_actx.createGain();ng.gain.value=0.03;
+    ns.connect(flt);flt.connect(ng);ng.connect(master);ns.start();
+  }catch(e){console.warn('Audio:',e);}
+}
+function _audioMoodGain(){
+  return mood==='tense'?0.055:mood==='revelation'?0.015:mood==='uncanny'?0.008:0.035;
+}
+function toggleAudio(){
+  _initAudio();
+  if(!_actx)return;
+  if(_actx.state==='suspended')_actx.resume();
+  _audioOn=!_audioOn;
+  if(_gainNode)_gainNode.gain.setTargetAtTime(_audioOn?_audioMoodGain():0,_actx.currentTime,1.2);
+  const btn=document.getElementById('audio-btn');
+  if(btn){btn.textContent=_audioOn?'♪ on':'♪ off';btn.style.color=_audioOn?'var(--amber)':'var(--dim)';}
+}
+function _updateAudioMood(){
+  if(_audioOn&&_gainNode&&_actx)_gainNode.gain.setTargetAtTime(_audioMoodGain(),_actx.currentTime,2.5);
+}
+
 // ── UTILITIES (unchanged but with new helpers) ───────────────
 function noteLabel(k){const n=NOTES[k];if(!n)return k;return typeof n==='function'?n():n;}
 function hasFlag(f){return G.flags.has(f);}
@@ -269,10 +310,13 @@ function rollCover(difficulty){
   return'failure';
 }
 function degradeCover(amount){
+  const prev=G.coverIntegrity;
   G.coverIntegrity=Math.max(0,G.coverIntegrity-amount);
-  if(G.coverIntegrity<=0&&!hasFlag('cover_blown')){ setFlag('cover_compromised'); showToast('Your cover is compromised.','note');}
-  else if(G.coverIntegrity===1){ showToast('Your cover is thin.','note');}
-  else if(G.coverIntegrity===2){ showToast('Your cover has been questioned.','note');}
+  // Toast on threshold crossings only
+  if(G.coverIntegrity<=0&&prev>0){ setFlag('cover_blown'); setFlag('cover_compromised'); showToast('Cover blown. Merky will confront you.','note'); }
+  else if(G.coverIntegrity<=1&&prev>1){ showToast('Cover is thin — one more slip breaks it.','note'); }
+  else if(G.coverIntegrity<=2&&prev>2){ showToast('Cover questioned — Kenosis harder to access.','note'); }
+  else if(G.coverIntegrity<=3&&prev>3){ showToast('Cover is strained.','note'); }
 }
 
 // ── SOUNDINGS (unchanged) ───────────────────────────────────
@@ -419,11 +463,11 @@ function renderGame(root){
   Object.entries(G.stats).forEach(([k,v])=>{ const d=document.createElement('div'); d.className='stat'; d.innerHTML=k+' <span class="stat-val">'+v+'</span>'+(STAT_TIPS[k]?'<span class="stat-tip">'+STAT_TIPS[k]+'</span>':''); sb.appendChild(d); });
   hdr.appendChild(sb);
   const tags=[];
-  G.charisms.forEach(id=>{const c=findCharism(id);if(c)tags.push('<span class="ctag">'+c.name+'</span>');});
+  G.charisms.forEach(id=>{const c=findCharism(id);if(c)tags.push(`<span class="ctag" title="${c.desc}">${c.name}</span>`);});
   const cc=Object.values(G.cover).filter(Boolean).length; if(cc>0)tags.push('<span class="cover-tag">cover '+cc+'/5</span>');
   if(G.coverIntegrity<3){ const ci=G.coverIntegrity===0?'blown':G.coverIntegrity===1?'thin':'questioned'; tags.push(`<span class="cover-tag" style="border-color:var(--rust);color:var(--rust)">cover ${ci}</span>`); }
   const tc=G.soundings.taken.length+G.soundings.settled.length, ta=G.soundings.available.length;
-  if(tc>0||ta>0)tags.push('<span class="breviary-tag">⚓ '+tc+'/'+MAX_SOUNDINGS+(ta?' +'+ta:'')+'</span>');
+  if(tc>0||ta>0)tags.push(`<span class="breviary-tag" title="${tc} taken or settled. ${ta} waiting. Open Breviary to manage.">⚓ ${tc}/${MAX_SOUNDINGS}${ta?' +'+ta:''}</span>`);
   if(tags.length){ const cb=document.createElement('div'); cb.className='cbar'; cb.innerHTML=tags.join(''); hdr.appendChild(cb); }
   wrap.appendChild(hdr);
   const body=document.createElement('div'); body.className='game-body';
@@ -493,10 +537,25 @@ function renderGame(root){
   if(G.confirmRestart){ const msg=document.createElement('span'); msg.className='confirm-msg'; msg.textContent='End this crossing?'; rb2.appendChild(msg); const yes=document.createElement('button'); yes.className='btn confirm-yes'; yes.textContent='Yes — return to shore'; yes.onclick=doRestart; rb2.appendChild(yes); const no=document.createElement('button'); no.className='btn confirm-no'; no.textContent='No — continue'; no.onclick=()=>{G.confirmRestart=false;render();}; rb2.appendChild(no); }
   else{ const rbt=document.createElement('button'); rbt.className='btn restart-btn'; rbt.textContent='abandon crossing'; rbt.onclick=()=>{G.confirmRestart=true;render();}; rb2.appendChild(rbt); }
   body.appendChild(rb2); wrap.appendChild(body); root.appendChild(wrap);
+  // Audio toggle
+  const ab=document.createElement('button');ab.id='audio-btn';
+  ab.style.cssText='position:fixed;top:.55rem;right:.8rem;background:none;border:none;font-family:\'Courier Prime\',monospace;font-size:.7rem;color:var(--dim);cursor:pointer;z-index:200;letter-spacing:.08em;padding:.2rem .4rem;';
+  ab.textContent=_audioOn?'♪ on':'♪ off';ab.onclick=toggleAudio;root.appendChild(ab);
   const gb=document.createElement('button'); gb.style.cssText='position:fixed;bottom:3.4rem;right:1.2rem;background:rgba(10,14,20,0.85);border:1px solid var(--border);font-family:\'Courier Prime\',monospace;font-size:.62rem;letter-spacing:.08em;padding:.3rem .55rem;cursor:pointer;color:var(--dim);z-index:100;'; gb.textContent='glossary'; gb.onclick=()=>openPanel('glossary'); root.appendChild(gb);
-  const nb=document.createElement('button'); nb.className='notes-btn'; nb.textContent='observations'; nb.onclick=()=>openPanel('notes'); root.appendChild(nb);
-  const sb2=document.createElement('button'); sb2.className='status-btn'; sb2.textContent='status'; sb2.onclick=()=>openPanel('status'); root.appendChild(sb2);
-  const bb=document.createElement('button'); bb.className='breviary-btn'+(G.soundings.available.length?' has-available':''); bb.textContent='breviary'; bb.onclick=()=>openPanel('breviary'); root.appendChild(bb);
+  // Bottom nav — hamburger on mobile, row on desktop
+  const bnav=document.createElement('div');bnav.id='bottom-nav';
+  bnav.style.cssText='position:fixed;bottom:0;left:0;width:100%;z-index:100;display:flex;justify-content:center;gap:0;background:rgba(6,8,12,0.96);border-top:1px solid var(--border);';
+  [
+    {label:'observations',fn:()=>openPanel('notes'),cls:''},
+    {label:'status',fn:()=>openPanel('status'),cls:''},
+    {label:'breviary'+(G.soundings.available.length?' ⚑':''),fn:()=>openPanel('breviary'),cls:G.soundings.available.length?' has-available':''},
+    {label:'glossary',fn:()=>openPanel('glossary'),cls:''},
+  ].forEach(({label,fn,cls})=>{
+    const b=document.createElement('button');
+    b.style.cssText='flex:1;background:none;border:none;border-right:1px solid var(--border);font-family:\'Courier Prime\',monospace;font-size:.66rem;letter-spacing:.07em;padding:.55rem .3rem;cursor:pointer;color:var(--dim);';
+    b.className=cls;b.textContent=label;b.onclick=fn;bnav.appendChild(b);
+  });
+  root.appendChild(bnav);
   if(G.panelOpen==='notes')renderNotesPanel(root);
   if(G.panelOpen==='status')renderStatusPanel(root);
   if(G.panelOpen==='breviary')renderBreviaryPanel(root);
@@ -538,6 +597,15 @@ function renderRollBox(root) {
 
 // ── APPLY CHOICE (extended) ─────────────────────────────────
 function applyChoice(ch){
+  // Crossing log: record meaningful decisions
+  if(ch.cover_set||ch.set_note||ch.thought||(ch.requires_charism&&!ch.cover_set)){
+    if(!G.crossingLog)G.crossingLog=[];
+    const label=ch.cover_set?'Cover: '+ch.cover_set.value.replace(/_/g,' '):
+                ch.thought?'Sounding offered: '+(ch.thought||'').replace(/_/g,' '):
+                ch.set_note&&NOTES[ch.set_note]?noteLabel(ch.set_note).slice(0,52):
+                ch.text.replace(/\[.*?\]/g,'').trim().slice(0,52);
+    G.crossingLog.unshift(label);if(G.crossingLog.length>8)G.crossingLog.pop();
+  }
   applyEffect(ch.effect);
   if(ch.set_flag)setFlag(ch.set_flag); if(ch.set_flag2)setFlag(ch.set_flag2);
   if(ch.set_note)addNote(ch.set_note); if(ch.cover_set)setCover(ch.cover_set.key,ch.cover_set.value);
@@ -575,7 +643,7 @@ function newPlay(){
   G.cover={posting:null,background:null,denomination:null,connection:null,left:null};
   G.coverIntegrity=3;
   G.notes=[]; G.flags=new Set(); G.scene='chapel_waking';
-  G.lastReaction=null; G.phase='charism'; G.panelOpen=null; G.confirmRestart=false;
+  G.lastReaction=null; G.crossingLog=[]; G.phase='charism'; G.panelOpen=null; G.confirmRestart=false;
   G.inventory=[]; G.time={day:1,hour:8,maxDays:3}; G.reputation={}; G.quests={};
   refreshAtmosMods(); render();
 }
@@ -617,11 +685,26 @@ function renderStatusPanel(root){
   if(!G.charisms.length){ const d=document.createElement('div'); d.className='panel-empty'; d.textContent='None.'; p.appendChild(d); }
   else G.charisms.forEach(id=>{ const c=findCharism(id); if(!c)return; const d=document.createElement('div'); d.className='panel-item'; d.innerHTML='<strong style="color:var(--cold)">'+c.name+'</strong><br>'+c.desc; p.appendChild(d); });
   addSec('Cover');
-  const intLabelMap={3:'Intact',2:'Questioned',1:'Thin',0:'Blown'};
-  const intColMap={3:'var(--amber)',2:'var(--amber-dim)',1:'var(--rust)',0:'var(--rust)'};
-  addRow('Integrity',intLabelMap[G.coverIntegrity]||G.coverIntegrity,intColMap[G.coverIntegrity]);
+  const intDesc={
+    5:'Full — all charisms available',
+    4:'Good — no restrictions',
+    3:'Intact — cover holding',
+    2:'Questioned — Kenosis harder',
+    1:'Thin — one slip breaks it',
+    0:'Blown — Merky knows'
+  };
+  const intCol=G.coverIntegrity<=1?'var(--rust)':G.coverIntegrity<=2?'var(--amber-dim)':'var(--amber)';
+  addRow('Cover integrity',intDesc[G.coverIntegrity]||G.coverIntegrity,intCol);
   Object.entries(G.cover).forEach(([k,v])=>{ const val=v?(coverLabels[v]||v.replace(/_/g,' ')):'—'; addRow(cl[k]||k,val,v?'var(--amber)':'var(--dim)'); });
   addSec('Crossing'); addRow('number',G.playCount+1);
+  if(G.crossingLog&&G.crossingLog.length){
+    addSec('Recent Decisions');
+    G.crossingLog.slice(0,5).forEach(entry=>{
+      const d=document.createElement('div');d.className='panel-item';
+      d.style.cssText='font-size:.76rem;padding-left:.5rem;border-left:2px solid var(--border-mid);margin-bottom:.3rem;';
+      d.textContent='◦ '+entry;p.appendChild(d);
+    });
+  }
   root.appendChild(mkOverlay(()=>openPanel('status'))); root.appendChild(p);
 }
 function renderBreviaryPanel(root){

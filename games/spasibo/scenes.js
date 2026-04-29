@@ -4,7 +4,16 @@
 // ═══════════════════════════════════════════════════════════
 
 function iconWord() {
+  // crossing 1: icon  crossing 2-3: ikon  crossing 4+: Икон
   return G.playCount >= 4 ? '\u0418\u043a\u043e\u043d' : G.playCount >= 2 ? 'ikon' : 'icon';
+}
+function harbourWord() {
+  // The harbour where all this happens. Gets more specific across crossings.
+  return G.playCount >= 4 ? 'Ленинград' : G.playCount >= 2 ? 'the Eastern port' : 'port';
+}
+function shipWord() {
+  // The ship's name surfaces gradually
+  return G.playCount >= 3 ? 'the Sobornost' : G.playCount >= 1 ? 'this ship' : 'the ship';
 }
 
 function objectDescription() {
@@ -100,6 +109,12 @@ const NOTES = {
   found_documents:         "Heritage Transfer Services. Your authentication role. A handwritten note: Confirm only. Do not investigate further.",
   crew_pastoral_intel:     "A crew member mentioned Pavel has been asking about the container. Not to anyone official.",
   had_sincere_moment:      "You told someone something true. The cover is slightly less complete. This is not a problem.",
+  act2_nav_hint:           "Eider mentioned a crewman with burned hands — try the engine room. Sinhola is in Cabin 2. The container release mechanism is somewhere in cargo.",
+  merky_cover_held:        "Your cover held. Merky accepted the explanation.",
+  merky_watching:          "Merky is watching you. They did not accept the explanation.",
+  merky_suspicious:        "Merky knows something is wrong. The cover has been questioned.",
+  merky_respects_you:      "Merky respects the discipline. They did not press.",
+  merky_trusts_partial:    "You told Merky something true. They noticed the difference.",
 };
 function noteLabel(k) { const n = NOTES[k]; if (!n) return k; return typeof n === 'function' ? n() : n; }
 
@@ -224,7 +239,10 @@ function theChoiceText(G) {
     "Pavel is somewhere behind you. You hear him not speaking.",
     "The port is close. You have perhaps six hours.",
   ];
-  if (G.playCount >= 1) lines.push("Last crossing, you knew what you were supposed to do. This crossing is different.");
+  if (G.playCount >= 1) {
+    lines.push("Last crossing, you knew what you were supposed to do. This crossing is different.");
+    if(G.flags.has('had_witness_ending'))lines.push("The previous crossing: you witnessed. You did not act. The weight of that is still here.");
+  }
   if (G.playCount >= 2) lines.push("You have stood here before. The weight is familiar now. The weight is the point.");
   lines.push("Three things you could do.");
   return lines;
@@ -252,7 +270,7 @@ function endingInterceptText(G) {
 
 function epilogueInterceptText(G) {
   const L = ["\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500", "What followed.",""];
-  L.push("Pavel was not on the next crossing. He was not on the one after that. She would know where he went. She is not answering, on this particular crossing, in the particular way she answered him.");
+  if(G.playCount>=1)L.push("Pavel was not on the crossing that followed. He was not on the one after that. She would know where he went. She is not answering, on this particular crossing, in the particular way she answered him.");
   if (G.flags.has('met_butterantonio')) L.push("Butterantonio filed a report. It went to people who read reports. Those people filed their own reports. The matter was considered legally settled. Butterantonio considers it differently. You know this because he was on the ship after this one, with a different briefcase. He did not acknowledge you. That was the acknowledgement.");
   if (G.flags.has('met_vance')) L.push("Vance Landstorm stayed on the ship. He has been on this ship since before you were ordained, and he will be on it after. The next time Haircut sat near him, she did not press her side against his leg.");
   if (G.flags.has('merky_warned_cargo')) L.push("Merky Crabbit said nothing to you on the way out. On the next crossing, they were first mate on a different ship. The company moves people around.");

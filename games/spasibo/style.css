@@ -274,3 +274,41 @@ body { background: var(--bg); color: var(--text); min-height: 100vh; overflow-x:
   padding-left: .6rem; border-left: 1px dashed var(--border-mid);
   line-height: 1.8;
 }
+
+/* ── BOTTOM NAV (replaces separate buttons) ──────────────── */
+#bottom-nav button {
+  flex: 1;
+  background: none;
+  border: none;
+  border-right: 1px solid var(--border);
+  font-family: 'Courier Prime', monospace;
+  font-size: .66rem;
+  letter-spacing: .07em;
+  padding: .6rem .3rem;
+  cursor: pointer;
+  color: var(--dim);
+  min-height: 2.8rem;  /* touch target */
+  transition: color .15s, background .15s;
+}
+#bottom-nav button:last-child { border-right: none; }
+#bottom-nav button:hover, #bottom-nav button:active {
+  color: var(--amber);
+  background: rgba(176,128,48,0.08);
+}
+#bottom-nav button.has-available { color: var(--thought); animation: pulse-thought 2s ease-in-out infinite; }
+
+/* Hide old individual panel buttons if bottom-nav present */
+.notes-btn, .status-btn, .breviary-btn { display: none; }
+
+/* ── STAT BAR — CSS grid on narrow screens ───────────────── */
+@media (max-width: 480px) {
+  .sbar { display: grid; grid-template-columns: repeat(2, 1fr); gap: .35rem .8rem; }
+  .sp { font-size: 1.02rem; }
+  .choice { font-size: .95rem; padding: .82rem 1rem; min-height: 3rem; }
+  #bottom-nav button { font-size: .62rem; padding: .55rem .2rem; }
+  .side-panel { width: 100vw !important; }
+}
+
+/* ── AUDIO BUTTON ───────────────────────────────────────────── */
+#audio-btn { transition: color .2s; }
+#audio-btn:hover { color: var(--amber); }
