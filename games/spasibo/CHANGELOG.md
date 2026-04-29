@@ -1,6 +1,79 @@
 # СПАСИБО — Changelog
 
-## v1.0 (current) — Multi-file architecture
+## v1.2 — Five gameplay suggestions implemented
+
+**Suggestion 1 — Breviary ghost slots** (engine.js, style.css):
+- `G.soundings.released` array added; persisted to save, reset on new crossing
+- `releaseSounding()` now records the released sounding ID before removing it
+- Breviary panel renders a new "Released — given up" section below Settled
+- Each ghost card shows the sounding name (struck through), the original fragment, and the taking text at reduced opacity, with a hatched background pattern and a note: "this contemplation was set down. It cannot be taken again."
+- The ghost slot communicates the loss without being punitive — the text is still readable, still haunting. The `◌` glyph replaces `●`.
+- `.sounding-ghost` CSS class with `::after` diagonal hatch overlay and `.sounding-ghost-name/frag/body` sub-classes.
+
+**Suggestion 2 — Cover denomination test scene** (scenes-act2.js, scenes-act1.js):
+- New scene `merky_denomination_test`: triggered from `mess_approach` when `act2_unlocked` is set and the scene hasn't been visited; once-only
+- Merky requests a memorial service from a crew member whose father has died — the denomination matters to him. He will know if it's wrong.
+- Four choices depending on situation: succeed with Cover charism (`denomination_test_passed`), partially succeed with a slight error (`cover_questioned_denom`), pass apophatically with Doubt 2+ (Via Negativa applied, Merky doesn't press), or admit you don't know (`denomination_test_failed`) — which closes the cover but opens a sincere moment
+- Four outcome scenes: `merky_denomination_held`, `merky_denomination_partial`, `merky_denomination_apophatic`, `merky_denomination_fail`
+- The cover story is now inhabited rather than asserted — you must speak in its voice, not just claim it
+
+**Suggestion 3 — Haircut zero-choice observation scene** (scenes-act1.js):
+- New scene `haircut_observation` accessible from `main_deck` hub after `saw_haircut` is set; once-only, hidden after visit
+- No choices. The player simply arrives, is present for a few beats, and leaves.
+- Scene text: she is doing something complex with her attention. You do not speak. Something in you quiets. Not resolved — quieted.
+- The structural complement to the Witness ending: presence-without-action as its own complete thing
+- Uses `haircut` ART block
+
+**Suggestion 4 — non_erat_dominus branching** (scenes.js):
+- Scene text converted from static string array to `nonEratDominusText(G)` dynamic function
+- If `via_negativa` is in `G.soundings.settled`: additional paragraph about the Via Negativa as preparation for this kind of witness — the apophatic theology has been practised, and now it has found its moment
+- If `kenosis_thought` is in `G.soundings.settled`: additional paragraph about kenosis as the theology of the empty hand — refusing to sign was a self-emptying, and Pavel's "hardest of the three" gets its theological name
+- Registered in SCENES patch block at bottom of scenes.js
+
+**Suggestion 5 — Consequential cargo container roll** (scenes-act2.js):
+- `cargo_container` scene now offers a new choice: "Try the lock without knowing the mechanism" — visible only when `knows_release` flag is absent
+- Roll: Vigilance vs. difficulty 10 (hard — you're working blind)
+  - **Success**: container opens normally → `cargo_container_open`
+  - **Partial**: noise carries, Merky hears → `cargo_container_noise` — a tense 2-minute window; the player must choose between going up to meet Merky (cover questioned) or staying to brazen it out (composure check)
+  - **Fail**: caught in the act → `cargo_container_caught` — cover immediately compromised, forced into `merky_confrontation` earlier than intended, cover blown if that roll also fails
+- This is the first roll in the game where failure permanently changes the crossing trajectory. The player knows the stakes before they roll.
+
+---
+
+## v1.1 — Witness path, audio depth, gold-leaf visual
+
+**New scene — `non_erat_dominus`** (scenes-act3.js):
+- Forced interstitial after the Witness ending, before `epilogue_witness`
+- Location: The Ship's Chapel — After / mood: uncanny
+- Text: the Elijah passage (1 Kings 19) as reflection on chosen inaction — "Non erat in terremotu Dominus." Still small voice theology. No branch, no choices except continuing.
+- Rewired `ending_witness` to route → `non_erat_dominus` → `epilogue_witness`
+
+**Bug fix — duplicate Glossary button** (engine.js):
+- Floating `glossary` button (fixed position, bottom-right) removed
+- Glossary now accessible only via bottom navigation bar (was appearing twice: fixed overlay + bottom nav)
+
+**Audio enrichment** (engine.js):
+- Oscillators stored as `_oscNodes` array for runtime retuning
+- Per-mood oscillator frequency shift: neutral 50/101/149 Hz → tense detunes down, uncanny drops further, revelation rises to clean harmonic series (55/110/165)
+- Low-pass filter (`_filterNode`) retuned per mood: tense 60 Hz (oppressive), uncanny 200 Hz (hollow), revelation 420 Hz (open)
+- Convolution reverb added (`_makeReverb`): impulse-response generated in-browser; wet level modulates per mood (tense 8%, revelation 45%)
+- **Revelation mood**: strikes a sine bell partial at 880 Hz, 4-second exponential decay, on each mood transition
+- **Uncanny mood**: injects a dissonant 333 Hz sine whisper, 5-second fade
+- `_applyMoodToAudio()` called on `toggleAudio()` and `_updateAudioMood()` — audio and atmosphere now fully synchronised
+
+**Visual — Halo / Gold Leaf effect** (engine.js, style.css):
+- New CSS class `.stxt-halo` with `halo-shimmer` keyframe animation: warm box-shadow pulse, subtle brightness lift, gold-tinted left-edge strip (`::before` pseudo-element using linear-gradient)
+- Applied to `.stxt` container when: `scene.mood === 'revelation'` OR any Waking charism (Anamnesis, Kenosis, Tathāgatagarbha, Apophasis) is active in `G.charisms`
+- Designed as Transfiguration metaphor: the gold of the Ikon beginning to show through the rust of the Atlantic crossing
+- Text paragraphs inside `.stxt-halo` receive a faint `text-shadow` warm glow
+
+**Epilogue enrichment — Freezer Beef** (scenes.js):
+- `epilogueWitnessText()` now includes a closing note on Freezer Beef (calico, small, cargo hold), present and asleep throughout the arbitration process
+- Text: "Some presences are complete without witness." — mirrors and inverts the Witness ending's moral logic
+
+---
+
+## v1.0 (previous) — Multi-file architecture
 **Architecture change**: Game split into 4 files for maintainability and engine reuse.
 - `index.html` — shell, loads files in order: scenes.js → engine.js
 - `style.css` — all visual styling, complete (was missing ~40% of referenced classes in v0.x)

@@ -139,6 +139,38 @@ body { background: var(--bg); color: var(--text); min-height: 100vh; overflow-x:
 /* ── SCENE CONTENT ────────────────────────────────────────────── */
 .art-block { font-family: 'Courier Prime', monospace; font-size: .68rem; color: var(--amber-dim); white-space: pre; line-height: 1.4; margin: 1rem 0; overflow-x: auto; }
 .stxt { margin-bottom: 1.2rem; }
+
+/* ── HALO / GOLD LEAF — Revelation mood or Waking charism active ──────── */
+@keyframes halo-shimmer {
+  0%   { box-shadow: 0 0 0px rgba(210,185,100,0); filter: brightness(1); }
+  40%  { box-shadow: 0 0 28px 4px rgba(210,185,100,0.13), inset 0 0 18px rgba(200,170,60,0.07); filter: brightness(1.04); }
+  100% { box-shadow: 0 0 0px rgba(210,185,100,0); filter: brightness(1); }
+}
+@keyframes halo-edge-pulse {
+  0%,100% { opacity: 0; }
+  50%      { opacity: 1; }
+}
+.stxt-halo {
+  position: relative;
+  border-radius: 2px;
+  animation: halo-shimmer 6s ease-in-out infinite;
+  transition: box-shadow 1.8s ease;
+}
+/* Gold-leaf border strip that pulses on the left edge */
+.stxt-halo::before {
+  content: '';
+  position: absolute;
+  left: -6px; top: 8%; height: 84%;
+  width: 2px;
+  background: linear-gradient(to bottom, transparent, rgba(212,183,90,0.55) 35%, rgba(200,160,50,0.75) 55%, rgba(212,183,90,0.55) 75%, transparent);
+  border-radius: 2px;
+  animation: halo-edge-pulse 5s ease-in-out infinite;
+  pointer-events: none;
+}
+/* Subtle warm tint on the text paragraphs themselves */
+.stxt-halo .sp {
+  text-shadow: 0 0 18px rgba(200,170,60,0.12);
+}
 .sp { font-size: 1.0rem; line-height: 2.0; color: var(--text); margin-bottom: .9rem; }
 .sp-cold { color: var(--cold); }
 .sp-dim  { color: var(--dim); font-style: italic; }
@@ -244,6 +276,27 @@ body { background: var(--bg); color: var(--text); min-height: 100vh; overflow-x:
 .sounding-btn-suspend:hover { border-color: var(--border-bright); color: var(--text); }
 .sounding-settled { border-color: var(--cold-dim); animation: sounding-settle .5s ease; }
 .sounding-settled .sounding-name { color: var(--cold); }
+
+/* ── GHOST SLOT — released soundings ────────────────────────── */
+.sounding-ghost {
+  border-color: var(--border);
+  background: rgba(10,8,16,0.35);
+  opacity: 0.55;
+  position: relative;
+}
+.sounding-ghost::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent, transparent 6px,
+    rgba(60,50,80,0.08) 6px, rgba(60,50,80,0.08) 7px
+  );
+  pointer-events: none;
+}
+.sounding-ghost-name { color: var(--dim); text-decoration: line-through; text-decoration-color: rgba(100,80,130,0.4); letter-spacing: .05em; }
+.sounding-ghost-frag { color: var(--dim); font-style: italic; opacity: 0.6; }
+.sounding-ghost-body { color: var(--dim); opacity: 0.5; }
 
 /* ── TOASTS ──────────────────────────────────────────────────── */
 .note-toast {

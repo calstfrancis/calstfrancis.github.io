@@ -300,7 +300,8 @@ function epilogueWitnessText(G) {
   if (G.flags.has('met_butterantonio')) L.push("Butterantonio's filing entered the official record during the hold. Once in the record, it cannot be taken out. The dispersed community's claim is formally acknowledged. This is not the same as justice. It is one of the materials from which justice is eventually made.");
   if (G.flags.has('met_sinhola')) L.push("Sinhola Shinola stayed at the port for three weeks, present for the formal acknowledgement of the provenance document. They translated it into four languages for four different legal systems. They later said it was the most important translation they had done.");
   if (G.flags.has('met_vance')) L.push("Vance Landstorm described the crossing, once, to someone he trusted. He said: the chaplain did nothing. He said it the way you say something you have been turning over for a long time and have finally understood. The chaplain did nothing. That was the thing they did.");
-  L.push("\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500", "\u0421\u043f\u0430\u0441\u0438\u0431\u043e.");
+  L.push("Freezer Beef was asleep in the cargo hold when the container was held. She remained asleep through the entire filing process. She was asleep when the first arbitration notice arrived. She is, as far as anyone can tell, still asleep. Some presences are complete without witness.");
+  L.push("───────────────────────────────────────", "Спасибо.");
   return L;
 }
 
@@ -331,6 +332,28 @@ function cargoContainerOpenText(G) {
   return base;
 }
 
+function nonEratDominusText(G) {
+  const settled = G.soundings ? G.soundings.settled : [];
+  const hasApophasis = settled.includes('via_negativa');
+  const hasKenosis = settled.includes('kenosis_thought');
+  const L = [
+    "Non erat in terremotu Dominus.",
+    "The Lord was not in the earthquake.",
+    "You sit in the chapel. You do not pray, exactly. You remain. That is a kind of prayer.",
+    "There is no wind that tears mountains. No fire. No earthquake. Just the ship moving. The Atlantic, grey and indifferent and completely itself.",
+    "Still small voice. Still. Small. This is what you chose: to not be the mechanism. To let the thing pass through the world without your hand accelerating it.",
+    "The difficulty with bearing witness is that it requires you to stay awake for all of it.",
+    "You stay awake for all of it."
+  ];
+  if (hasApophasis) {
+    L.push("You have been practising this. The Via Negativa: not God in the fire, not God in the earthquake, not God in the great and strong wind. What remains after the subtraction — that smaller thing, that still small thing — you have been learning how to stand near it without reaching for it. It is the only honest posture you have found.");
+  }
+  if (hasKenosis) {
+    L.push("To empty yourself so that something else can fill you. That is what kenosis asks. And this was a kind of kenosis: the emptying of the hand that would have signed. The space you made by refusing to fill it. Pavel called it the hardest of the three. He did not say which kind of hard. You think he meant the kind that does not feel like enough.");
+  }
+  return L;
+}
+
 // ── SCENES (assembled from act files) ────────────────────────
 const SCENES = { ...SCENES_ACT1, ...SCENES_ACT2, ...SCENES_ACT3 };
 
@@ -344,3 +367,4 @@ SCENES['epilogue_intercept'].text   = epilogueInterceptText;
 SCENES['epilogue_facilitate'].text  = epilogueFacilitateText;
 SCENES['epilogue_witness'].text     = epilogueWitnessText;
 SCENES['cargo_container_open'].text = cargoContainerOpenText;
+SCENES['non_erat_dominus'].text     = nonEratDominusText;
