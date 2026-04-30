@@ -1,6 +1,7 @@
 // ═══════════════════════════════════════════════════════════
-// SOBORNOST ENGINE v1.0 – Core Mechanics
-// Zero game content. Registries for charisms, soundings, notes, art, glossary, statTips.
+// SOBORNOST ENGINE v1.6 – Core Mechanics
+// Linguistic toggling, memory distortion, environmental bleed,
+// Kenotic UI dimming, ghost choice variable
 // ═══════════════════════════════════════════════════════════
 
 // ── ATMOSPHERE (canvas, functions) ──────────────────────────
@@ -94,7 +95,17 @@ let G = {
   quests: {},
   crossingLog:[],
   pendingRoll:null,
-  rollResult:null
+  rollResult:null,
+  awareness: 0,
+  _poaAbsorbedThisScene: false,
+  _mortificationSpent: false,
+  beliefs: new Set(),
+  knowledge: new Set(),
+  consequenceQueue: [],
+  npcStance: {},
+  eventQueue: [],
+  pastLifeFlags: new Set(),          // NEW: persist across resets (NG+)
+  _kenosisProgress: 0               // NEW: 0..8, used for UI dimming
 };
 
 // ── REGISTRIES (game data is injected here) ─────────────────
@@ -108,7 +119,15 @@ const _registries = {
   iconWordFn: () => 'icon',
   harbourWordFn: () => 'port',
   shipWordFn: () => 'the ship',
-  objectDescriptionFn: () => 'an object'
+  objectDescriptionFn: () => 'an object',
+  rollModifiers: [],
+  availableModes: ['attended','open','witnessed'],
+  scenePools: {},
+  rituals: {},
+  // NEW for v1.6
+  translations: {},                // { slavonic_text: translated_text }
+  postEventShifts: [],             // [{ triggerFlag, patterns: [{ from, to }] }]
+  pastLifeLines: {}                // sceneId -> [{ pattern, replacement, index? }]
 };
 
 function registerCharisms(sleepingList, wakingList) {
@@ -124,6 +143,34 @@ function setIconWordFunction(fn) { _registries.iconWordFn = fn; }
 function setHarbourWordFunction(fn) { _registries.harbourWordFn = fn; }
 function setShipWordFunction(fn) { _registries.shipWordFn = fn; }
 function setObjectDescriptionFunction(fn) { _registries.objectDescriptionFn = fn; }
+function registerRollModifier(statKey, condition, bonusCallback) {
+  _registries.rollModifiers.push({ statKey, condition, bonusCallback });
+}
+function setAvailableModes(modeArray) {
+  _registries.availableModes = modeArray;
+}
+function registerScenePool(poolId, entries) {
+  _registries.scenePools[poolId] = entries;
+}
+function addToScenePool(poolId, entry) {
+  if (!_registries.scenePools[poolId]) _registries.scenePools[poolId] = [];
+  _registries.scenePools[poolId].push(entry);
+}
+function registerRitual(ritual) {
+  _registries.rituals[ritual.id] = ritual;
+}
+
+// ========== v1.6 New Registries ==========
+function registerTranslation(original, translated) {
+  _registries.translations[original] = translated;
+}
+function registerPostEventShift(triggerFlag, patterns) {
+  _registries.postEventShifts.push({ triggerFlag, patterns });
+}
+function registerPastLifeLine(sceneId, pattern, replacement, index) {
+  if (!_registries.pastLifeLines[sceneId]) _registries.pastLifeLines[sceneId] = [];
+  _registries.pastLifeLines[sceneId].push({ pattern, replacement, index });
+}
 
 function allCharisms() {
   return [..._registries.charisms.sleeping, ..._registries.charisms.waking];
@@ -139,7 +186,7 @@ function harbourWord() { return _registries.harbourWordFn(); }
 function shipWord() { return _registries.shipWordFn(); }
 function objectDescription() { return _registries.objectDescriptionFn(); }
 
-// ── PERSISTENCE ─────────────────────────────────────────────
+// ── PERSISTENCE (extended for pastLifeFlags, kenosisProgress) ──
 const SAVE_KEY='spasibo_save',PLAY_KEY='spasibo_plays',FLAGS_KEY='spasibo_past_flags',ENDINGS_KEY='spasibo_endings';
 
 function saveGame(){
@@ -149,7 +196,11 @@ function saveGame(){
       cover:G.cover,coverIntegrity:G.coverIntegrity,notes:G.notes,
       flags:[...G.flags],scene:G.scene,mode:G.mode,
       lastReaction:G.lastReaction,tutorialDone:G.tutorialDone,crossingLog:G.crossingLog||[],
-      inventory:G.inventory, time:G.time, reputation:G.reputation, quests:G.quests
+      inventory:G.inventory, time:G.time, reputation:G.reputation, quests:G.quests,
+      awareness:G.awareness,
+      beliefs:[...G.beliefs], knowledge:[...G.knowledge], consequenceQueue:G.consequenceQueue,
+      npcStance:G.npcStance, eventQueue:G.eventQueue,
+      pastLifeFlags:[...G.pastLifeFlags], _kenosisProgress:G._kenosisProgress
     }));
     const el=document.querySelector('.save-indicator');
     if(el){el.style.display='block';el.style.animation='none';void el.offsetWidth;el.style.animation='save-flash 2.2s ease forwards';setTimeout(()=>{if(el)el.style.display='none';},2300);}
@@ -169,6 +220,14 @@ function loadGame(){
     G.time = s.time || { day:1, hour:8, maxDays:3 };
     G.reputation = s.reputation || {};
     G.quests = s.quests || {};
+    G.awareness = s.awareness !== undefined ? s.awareness : 0;
+    G.beliefs = new Set(s.beliefs || []);
+    G.knowledge = new Set(s.knowledge || []);
+    G.consequenceQueue = s.consequenceQueue || [];
+    G.npcStance = s.npcStance || {};
+    G.eventQueue = s.eventQueue || [];
+    G.pastLifeFlags = new Set(s.pastLifeFlags || []);
+    G._kenosisProgress = s._kenosisProgress || 0;
     G.phase='game';refreshAtmosMods();return true;
   }catch(e){console.warn('Load:',e);return false;}
 }
@@ -183,42 +242,279 @@ function commitPlay(){
   }catch(e){}
 }
 
-// ── NEW FEATURE FUNCTIONS (Inventory, Time, Reputation, Quests) ──
-function hasItem(id) { return G.inventory.includes(id); }
-function addItem(id) { if(!hasItem(id)) G.inventory.push(id); }
-function removeItem(id) { G.inventory = G.inventory.filter(i=>i!==id); }
-function advanceTime(hours) {
-  G.time.hour += hours;
-  while(G.time.hour >= 24) { G.time.hour -= 24; G.time.day++; }
-  if(G.time.day > G.time.maxDays) { /* optional end-of-crossing trigger */ }
+// ── KENOSIS PROGRESS TRACKING (for UI dimming) ──────────────
+function updateKenosisProgress() {
+  const settled = G.soundings.settled;
+  if (settled.includes('kenosis_thought')) {
+    // Find the sounding entry
+    const entry = G.soundings.taken.find(t => t.id === 'kenosis_thought');
+    if (entry) G._kenosisProgress = entry.progress;
+    else G._kenosisProgress = 8; // already settled
+  } else {
+    G._kenosisProgress = 0;
+  }
 }
-function modReputation(id, delta) {
-  if(!G.reputation[id]) G.reputation[id]=0;
-  G.reputation[id] += delta;
+function getKenosisOpacity() {
+  if (!G.soundings.settled.includes('kenosis_thought') && !G.soundings.taken.some(t=>t.id==='kenosis_thought')) return 1;
+  const progress = Math.min(G._kenosisProgress, 8);
+  const target = Math.max(0.4, 1 - (progress / 8));
+  return target;
 }
-function getReputation(id) { return G.reputation[id] || 0; }
-function setReputation(id, val) { G.reputation[id] = val; }
-function setQuestState(id, state) { G.quests[id] = state; }
-function getQuestState(id) { return G.quests[id] || 'inactive'; }
-function isQuestActive(id) { return getQuestState(id)==='active'; }
-function isQuestCompleted(id) { return getQuestState(id)==='completed'; }
+// Called after each tickSoundings or after taking a sounding
+function onKenosisChange() {
+  updateKenosisProgress();
+  // No need to re-render immediately; will apply on next render
+}
 
-// ── ADVANCED ROLL SYSTEM (extended) ─────────────────────────
+// ── TEXT PRE‑PROCESSOR CHAIN (linguistic, bleed, past life) ──
+function applyLinguisticToggle(text) {
+  if (!text) return text;
+  const hasTranslationFlag = G.flags.has('met_sinhola');
+  return text.replace(/\[\[slavonic:([^\]]+)\]\]/g, (match, slavonic) => {
+    if (hasTranslationFlag && _registries.translations[slavonic]) {
+      return _registries.translations[slavonic];
+    }
+    return '[unintelligible]';
+  });
+}
+function applyPostEventShifts(text) {
+  let result = text;
+  for (const shift of _registries.postEventShifts) {
+    if (G.flags.has(shift.triggerFlag)) {
+      for (const { from, to } of shift.patterns) {
+        result = result.replace(new RegExp(from, 'g'), to);
+      }
+    }
+  }
+  return result;
+}
+function applyPastLifeLines(textArray, sceneId) {
+  if (G.playCount === 0) return textArray; // first playthrough, no anamnesis
+  if (!G.charisms.includes('anamnesis')) return textArray;
+  const lines = _registries.pastLifeLines[sceneId];
+  if (!lines) return textArray;
+  const result = [...textArray];
+  for (const line of lines) {
+    const idx = line.index !== undefined ? line.index : result.length;
+    result.splice(idx, 0, line.replacement);
+  }
+  return result;
+}
+
+// ── CONDITION EVALUATOR (extended for past flag) ────────────
+function evaluateCondition(cond) {
+  if (!cond) return true;
+  if (Array.isArray(cond)) return cond.every(c => evaluateCondition(c));
+  switch (cond.type) {
+    case 'flag': return hasFlag(cond.id) === (cond.state !== false);
+    case 'stat': return (G.stats[cond.name]||0) >= (cond.min||0);
+    case 'charism': return G.charisms.includes(cond.id);
+    case 'item': return hasItem(cond.id);
+    case 'playcount': return G.playCount >= (cond.min||0);
+    case 'awareness': return (G.awareness||0) >= (cond.min||0);
+    case 'belief': return believes(cond.id);
+    case 'knowledge': return knows(cond.id);
+    case 'stance': return getStance(cond.npc, cond.key) >= (cond.min||0);
+    case 'past_flag': return G.pastLifeFlags.has(cond.id);
+    case 'or': return cond.conditions.some(c => evaluateCondition(c));
+    case 'and': return cond.conditions.every(c => evaluateCondition(c));
+    case 'not': return !evaluateCondition(cond.condition);
+    default: return true;
+  }
+}
+
+// ── UNIFIED CHOICE LOCK CHECK (includes past_flag) ──────────
+function isChoiceLocked(ch) {
+  if (ch.condition) return !evaluateCondition(ch.condition);
+  if (ch.requires_past_flag && !G.pastLifeFlags.has(ch.requires_past_flag)) return true;
+  // ... existing old fields (unchanged)
+  if (ch.requires_flag && !hasFlag(ch.requires_flag)) return true;
+  if (ch.requires_stat){ const[s,m]=ch.requires_stat; if((G.stats[s]||0)<m) return true; }
+  if (ch.requires_charism && !hasCharism(ch.requires_charism)) return true;
+  if (ch.requires_playcount!==undefined && G.playCount<ch.requires_playcount) return true;
+  if (ch.requires_charism==='kenosis' && G.coverIntegrity>=8) return true;
+  if (ch.requires_item && !hasItem(ch.requires_item)) return true;
+  if (ch.requires_time_from){ const[h]=ch.requires_time_from.split(':'); if(G.time.hour < h) return true; }
+  if (ch.requires_time_until){ const[h]=ch.requires_time_until.split(':'); if(G.time.hour > h) return true; }
+  if (ch.requires_day_lt && G.time.day >= ch.requires_day_lt) return true;
+  if (ch.requires_reputation_min){ for(const[id,min] of Object.entries(ch.requires_reputation_min)) if(getReputation(id)<min) return true; }
+  if (ch.requires_reputation_max){ for(const[id,max] of Object.entries(ch.requires_reputation_max)) if(getReputation(id)>max) return true; }
+  if (ch.requires_quest_state){ for(const[id,state] of Object.entries(ch.requires_quest_state)) if(getQuestState(id)!==state) return true; }
+  if (ch.requires_belief && !believes(ch.requires_belief)) return true;
+  if (ch.requires_knowledge && !knows(ch.requires_knowledge)) return true;
+  return false;
+}
+
+// ── SCENE TEXT RESOLUTION (with new pre‑processors) ─────────
+function getSceneText(scene) {
+  if (scene.variants && Array.isArray(scene.variants)) {
+    for (const v of scene.variants) {
+      if (v.when && evaluateCondition(v.when)) return resolveTextBlock(v.text);
+    }
+  }
+  return resolveTextBlock(scene.text);
+}
+function resolveTextBlock(textBlock) {
+  if (typeof textBlock === 'function') textBlock = textBlock(G);
+  if (typeof textBlock === 'object' && !Array.isArray(textBlock)) {
+    const awarenessLevel = G.awareness || 0;
+    let bestKey = 0;
+    for (const key in textBlock) {
+      const k = parseInt(key);
+      if (!isNaN(k) && k <= awarenessLevel && k >= bestKey) bestKey = k;
+    }
+    textBlock = textBlock[bestKey] || textBlock[0] || [];
+  }
+  let arr = Array.isArray(textBlock) ? [...textBlock] : [textBlock];
+  // Apply post‑processing chain (linguistic, environmental bleed)
+  arr = arr.map(line => applyLinguisticToggle(line));
+  arr = arr.map(line => applyPostEventShifts(line));
+  return arr;
+}
+function injectMicroLines(textArray, scene) {
+  if (!scene.microLines || !Array.isArray(scene.microLines)) return textArray;
+  const lines = [...textArray];
+  for (const ml of scene.microLines) {
+    if (ml.when && !evaluateCondition(ml.when)) continue;
+    const idx = ml.index !== undefined ? ml.index : lines.length;
+    lines.splice(idx, 0, ml.line);
+  }
+  return lines;
+}
+
+// ── EXISTING FEATURES (scene pools, event queue, etc.) ──────
+function navigateToPool(poolId) {
+  const pool = _registries.scenePools[poolId];
+  if (!pool || pool.length === 0) { console.warn(`Scene pool "${poolId}" empty or missing.`); return; }
+  const available = pool.filter(entry => !entry.condition || evaluateCondition(entry.condition));
+  if (available.length === 0) { console.warn(`No scenes available in pool "${poolId}" after condition filtering.`); return; }
+  let totalWeight = 0;
+  for (const entry of available) totalWeight += entry.weight || 1;
+  let random = Math.random() * totalWeight;
+  for (const entry of available) {
+    const w = entry.weight || 1;
+    if (random < w) { navigate(entry.sceneId); return; }
+    random -= w;
+  }
+  navigate(available[0].sceneId);
+}
+function scheduleEvent(event) { G.eventQueue.push(event); saveGame(); }
+function processEventQueue() {
+  let processed = false;
+  for (let i = 0; i < G.eventQueue.length; i++) {
+    const ev = G.eventQueue[i];
+    const { triggerTime, sceneId, conditions, once = true } = ev;
+    if (G.time.day === triggerTime.day && G.time.hour === triggerTime.hour) {
+      if (conditions && !evaluateCondition(conditions)) continue;
+      if (sceneId) { G.scene = sceneId; processed = true; }
+      if (once) { G.eventQueue.splice(i,1); i--; }
+    }
+  }
+  if (processed) render();
+}
+function getStance(npcId, key) {
+  if (!G.npcStance[npcId]) G.npcStance[npcId] = { trust:0, suspicion:0, solidarity:0 };
+  return G.npcStance[npcId][key] || 0;
+}
+function setStance(npcId, key, value) {
+  if (!G.npcStance[npcId]) G.npcStance[npcId] = { trust:0, suspicion:0, solidarity:0 };
+  G.npcStance[npcId][key] = value;
+}
+function modStance(npcId, key, delta) {
+  const cur = getStance(npcId, key);
+  setStance(npcId, key, cur + delta);
+  if (delta !== 0) showToast(`${npcId}: ${key} ${delta>0?'+'+delta:delta}`, 'note');
+}
+let _activeRitual = null;
+function startRitual(ritualId, startingScene, nextScene) {
+  const ritual = _registries.rituals[ritualId];
+  if (!ritual) { console.warn(`Ritual "${ritualId}" not found.`); return false; }
+  _activeRitual = { id: ritualId, phaseIndex: 0, startingScene, nextScene };
+  render(); return true;
+}
+function ritualNextPhase() {
+  if (!_activeRitual) return;
+  const ritual = _registries.rituals[_activeRitual.id];
+  _activeRitual.phaseIndex++;
+  if (_activeRitual.phaseIndex >= ritual.phases.length) {
+    const next = _activeRitual.nextScene || _activeRitual.startingScene;
+    _activeRitual = null;
+    navigate(next);
+  } else render();
+}
+function getCurrentRitualPhase() {
+  if (!_activeRitual) return null;
+  const ritual = _registries.rituals[_activeRitual.id];
+  return ritual.phases[_activeRitual.phaseIndex];
+}
+function isRitualActive() { return _activeRitual !== null; }
+function renderRitual(root) {
+  const phase = getCurrentRitualPhase();
+  if (!phase) { _activeRitual = null; render(); return; }
+  const wrap = document.createElement('div'); wrap.className='game';
+  const hdr = document.createElement('div'); hdr.className='game-header';
+  const lb = document.createElement('div'); lb.className='location-bar'; lb.textContent=`${_activeRitual.id} — ${phase.title||'Phase '+( _activeRitual.phaseIndex+1)}`;
+  hdr.appendChild(lb); wrap.appendChild(hdr);
+  const body = document.createElement('div'); body.className='game-body';
+  if (phase.text) {
+    let raw = Array.isArray(phase.text) ? phase.text : [phase.text];
+    raw = raw.map(line => applyLinguisticToggle(line));
+    raw = raw.map(line => applyPostEventShifts(line));
+    raw.forEach(line => { const p = document.createElement('p'); p.className='sp'; p.innerHTML=processText(line); body.appendChild(p); });
+  }
+  const cd = document.createElement('div'); cd.className='choices';
+  if (phase.choices) {
+    phase.choices.forEach(ch => {
+      const btn = document.createElement('button'); btn.className='choice';
+      btn.textContent = processText(ch.text);
+      btn.onclick = () => {
+        if (ch.effect) applyEffect(ch.effect);
+        if (ch.set_flag) setFlag(ch.set_flag);
+        ritualNextPhase();
+      };
+      cd.appendChild(btn);
+    });
+  } else {
+    const cont = document.createElement('button'); cont.className='choice'; cont.textContent='Continue';
+    cont.onclick = () => ritualNextPhase(); cd.appendChild(cont);
+  }
+  body.appendChild(cd); wrap.appendChild(body); root.appendChild(wrap);
+}
+
+// ── EPISTEMIC HELPERS ───────────────────────────────────────
+function learn(flag) { G.knowledge.add(flag); G.beliefs.add(flag); }
+function comeToBelieve(flag) { if (!G.knowledge.has(flag)) G.beliefs.add(flag); }
+function contradict(flag) { G.beliefs.delete(flag); }
+function knows(flag) { return G.knowledge.has(flag); }
+function believes(flag) { return G.beliefs.has(flag); }
+function pushConsequence(consequence) { G.consequenceQueue.push(consequence); }
+function processConsequenceQueue() {
+  let processed = false;
+  for (let i = 0; i < G.consequenceQueue.length; i++) {
+    const c = G.consequenceQueue[i];
+    if (c.condition && !c.condition()) continue;
+    if (c.flagsToSet) c.flagsToSet.forEach(f => setFlag(f));
+    if (c.sceneToRun) { G.scene = c.sceneToRun; processed = true; }
+    G.consequenceQueue.splice(i,1); i--;
+  }
+  if (processed) render();
+}
+
+// ── ADVANCED ROLL SYSTEM (unchanged) ────────────────────────
 function performRoll(statKey, difficulty, options={}) {
   const baseStat = G.stats[statKey] || 1;
-  const ch = G.charisms || [];
   let charismBonus = 0;
   let charismNote = '';
-
-  // existing charism bonuses
-  if (statKey === 'presence' && ch.includes('consolation')) { charismBonus += 1; charismNote += 'consolation +1 '; }
-  if (statKey === 'reason' && options.docCheck && ch.includes('tongues')) { charismBonus += 2; charismNote += 'tongues +2 '; }
-  if (options.corporate && ch.includes('unmaker')) { charismBonus += 1; G.awareness = Math.min((G.awareness||0)+1,5); charismNote += 'unmaker +1 (awareness↑) '; }
-
+  let voidGazeUsed = false;
+  for (const mod of _registries.rollModifiers) {
+    if (mod.condition(statKey, options, G)) {
+      const bonus = mod.bonusCallback(statKey, options, G);
+      if (bonus !== 0) { charismBonus += bonus; charismNote += `${mod.statKey}+${bonus} `; }
+    }
+  }
   let awareMod = options.awarenessBonus ? Math.floor((G.awareness||0)/2) : 0;
   let effectiveDiff = Math.max(difficulty - awareMod, 3);
   const tempBonus = options.tempBonus || 0;
-
   let d1,d2,rollSum;
   if (options.advantage) {
     const r1a=Math.floor(Math.random()*6)+1, r1b=Math.floor(Math.random()*6)+1;
@@ -229,54 +525,38 @@ function performRoll(statKey, difficulty, options={}) {
   } else {
     d1=Math.floor(Math.random()*6)+1; d2=Math.floor(Math.random()*6)+1; rollSum=d1+d2;
   }
-
   let total = rollSum + baseStat + charismBonus + tempBonus;
-
   let opposedResult = null;
+  let outcome = 'failure';
+  if (options.threshold && G.charisms.includes('void_gaze') && (G.awareness||0)>=3 && !options.advantage && !options.opposed) {
+    const d1b = Math.floor(Math.random()*6)+1; const d2b = Math.floor(Math.random()*6)+1;
+    const altTotal = d1b + d2b + baseStat + charismBonus;
+    if (altTotal > total) { total = altTotal; charismNote += 'void gaze '; voidGazeUsed = true; }
+  }
   if (options.opposed) {
     const oppStat = options.opposed.stat;
     const oppRoll = Math.floor(Math.random()*6)+1 + Math.floor(Math.random()*6)+1;
     const oppBonus = G.stats[oppStat] || 0;
     const oppTotal = oppRoll + oppBonus;
     opposedResult = { stat: oppStat, roll: oppRoll, bonus: oppBonus, total: oppTotal };
-    if(total >= oppTotal) { outcome = 'success'; } else { outcome = 'failure'; }
-  }
-
-  let outcome = 'failure';
-  if (!options.opposed) {
+    if(total >= oppTotal) outcome = 'success';
+    else outcome = 'failure';
+  } else {
     if (total >= effectiveDiff) outcome = 'success';
     else if (total >= effectiveDiff - 2) outcome = 'partial';
+    else outcome = 'failure';
   }
-
-  if (!options.opposed && outcome === 'partial' && options.social && ch.includes('discernment')) {
-    outcome = 'success';
-    charismNote += 'discernment ';
-  }
-
   let crit = false;
   if (options.critical && !options.opposed) {
     if (rollSum === 12) { crit = 'success'; outcome = 'success'; charismNote += 'CRIT! '; }
     else if (rollSum === 2) { crit = 'failure'; outcome = 'failure'; charismNote += 'FUMBLE! '; }
   }
-
-  if (options.threshold && ch.includes('void_gaze') && (G.awareness||0)>=3 && !options.advantage && !options.opposed) {
-    const d1b = Math.floor(Math.random()*6)+1; const d2b = Math.floor(Math.random()*6)+1;
-    const altTotal = d1b + d2b + baseStat + charismBonus;
-    if (altTotal > total) { total = altTotal; charismNote += 'void gaze '; }
-  }
-
-  return {
-    outcome, total, roll:rollSum, d1,d2,
-    statValue:baseStat, charismBonus, charismNote:charismNote.trim(),
-    difficulty:effectiveDiff, rawDifficulty:difficulty, awareMod,
-    crit, opposed:opposedResult, tempBonus
-  };
+  return { outcome, total, roll:rollSum, d1,d2, statValue:baseStat, charismBonus, charismNote:charismNote.trim(), difficulty:effectiveDiff, rawDifficulty:difficulty, awareMod, crit, opposed:opposedResult, tempBonus, voidGazeUsed };
 }
 
-// ── AUDIO SYSTEM ─────────────────────────────────────────────
+// ── AUDIO SYSTEM (unchanged) ────────────────────────────────
 let _actx=null,_gainNode=null,_audioOn=false;
 let _oscNodes=[],_filterNode=null,_reverbGain=null;
-
 function _makeReverb(ctx, duration=1.8, decay=2.2) {
   const len = ctx.sampleRate * duration;
   const buf = ctx.createBuffer(2, len, ctx.sampleRate);
@@ -286,24 +566,20 @@ function _makeReverb(ctx, duration=1.8, decay=2.2) {
   }
   const conv = ctx.createConvolver(); conv.buffer = buf; return conv;
 }
-
 function _initAudio(){
   if(_actx)return;
   try{
     _actx=new(window.AudioContext||window.webkitAudioContext)();
     const master=_actx.createGain();master.gain.value=0;master.connect(_actx.destination);_gainNode=master;
-
     const reverb = _makeReverb(_actx);
     _reverbGain = _actx.createGain(); _reverbGain.gain.value = 0.18;
     reverb.connect(_reverbGain); _reverbGain.connect(master);
-
     _oscNodes = [50,101,149].map((freq,i)=>{
       const o=_actx.createOscillator(),g=_actx.createGain();
       o.frequency.value=freq;o.type='sawtooth';g.gain.value=[0.5,0.25,0.15][i];
       o.connect(g);g.connect(master);o.connect(reverb);o.start();
       return o;
     });
-
     const buf=_actx.createBuffer(1,_actx.sampleRate,_actx.sampleRate);
     const d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1);
     const ns=_actx.createBufferSource();ns.buffer=buf;ns.loop=true;
@@ -312,25 +588,15 @@ function _initAudio(){
     ns.connect(_filterNode);_filterNode.connect(ng);ng.connect(master);ns.start();
   }catch(e){console.warn('Audio:',e);}
 }
-
-function _audioMoodGain(){
-  return mood==='tense'?0.055:mood==='revelation'?0.015:mood==='uncanny'?0.008:0.035;
-}
-
+function _audioMoodGain(){ return mood==='tense'?0.055:mood==='revelation'?0.015:mood==='uncanny'?0.008:0.035; }
 function _applyMoodToAudio(m){
   if(!_actx||!_audioOn)return;
   const t=_actx.currentTime;
-  const configs={
-    neutral:  { freqs:[50,101,149], filter:90,  reverbWet:0.18 },
-    tense:    { freqs:[48,98,146],  filter:60,  reverbWet:0.08 },
-    uncanny:  { freqs:[44,88,132],  filter:200, reverbWet:0.35 },
-    revelation:{ freqs:[55,110,165], filter:420, reverbWet:0.45 },
-  };
+  const configs={ neutral:{ freqs:[50,101,149], filter:90, reverbWet:0.18 }, tense:{ freqs:[48,98,146], filter:60, reverbWet:0.08 }, uncanny:{ freqs:[44,88,132], filter:200, reverbWet:0.35 }, revelation:{ freqs:[55,110,165], filter:420, reverbWet:0.45 } };
   const cfg = configs[m] || configs.neutral;
   _oscNodes.forEach((o,i)=>{ if(o) o.frequency.setTargetAtTime(cfg.freqs[i], t, 2.5); });
   if(_filterNode) _filterNode.frequency.setTargetAtTime(cfg.filter, t, 2.5);
   if(_reverbGain) _reverbGain.gain.setTargetAtTime(cfg.reverbWet, t, 2.5);
-
   if(m==='revelation'){
     try{
       const bell=_actx.createOscillator(); const bellG=_actx.createGain();
@@ -348,7 +614,6 @@ function _applyMoodToAudio(m){
     }catch(e){}
   }
 }
-
 function toggleAudio(){
   _initAudio();
   if(!_actx)return;
@@ -366,7 +631,7 @@ function _updateAudioMood(){
   }
 }
 
-// ── UTILITIES (with registry integration) ───────────────────
+// ── UTILITIES (applyEffect, etc.) ───────────────────────────
 function hasFlag(f){return G.flags.has(f);}
 function setFlag(f){if(f)G.flags.add(f);}
 function addNote(key){
@@ -374,7 +639,20 @@ function addNote(key){
   G.notes.push(key);
   const l=noteLabel(key);showToast(l.length>52?l.slice(0,52)+'…':l,'note');
 }
-function applyEffect(e){if(!e)return;for(const[k,v]of Object.entries(e))if(G.stats[k]!==undefined)G.stats[k]=Math.max(0,G.stats[k]+v);}
+function applyEffect(e){
+  if(!e)return;
+  for(const[k,v]of Object.entries(e)){
+    if(G.stats[k]!==undefined){
+      if(k === 'composure' && v > 0 && G.mode === 'witnessed') continue;
+      if(v < 0 && G.charisms.includes('presence_of_absence') && !G._poaAbsorbedThisScene) {
+        G._poaAbsorbedThisScene = true;
+        showToast('—','note');
+        continue;
+      }
+      G.stats[k]=Math.max(0,G.stats[k]+v);
+    }
+  }
+}
 function setCover(key,value){G.cover[key]=value;setFlag('cover_'+key+'_set');}
 function showToast(msg,type){
   const old=document.querySelector('.note-toast');if(old)old.remove();
@@ -400,7 +678,7 @@ function degradeCover(amount){
   else if(G.coverIntegrity<=3&&prev>3){ showToast('Cover is strained.','note'); }
 }
 
-// ── SOUNDINGS (using registry) ──────────────────────────────
+// ── SOUNDINGS (with Kenosis tracking) ───────────────────────
 const MAX_SOUNDINGS=4,SOUNDING_THRESHOLD=8;
 function soundingSlotsFull(){return G.soundings.taken.length+G.soundings.settled.length>=MAX_SOUNDINGS;}
 function offerSounding(id){
@@ -413,13 +691,17 @@ function takeSounding(id){
   if(soundingSlotsFull()){G.soundingPending=id;G.panelOpen='breviary';render();return;}
   G.soundings.available=G.soundings.available.filter(x=>x!==id);
   G.soundings.taken.push({id,progress:0});G.soundingPending=null;
-  showToast(_registries.soundings[id].name+': taking the sounding.','sounding');render();
+  showToast(_registries.soundings[id].name+': taking the sounding.','sounding');
+  if (id === 'kenosis_thought') updateKenosisProgress();
+  render();
 }
 function suspendSounding(id){
   const entry=G.soundings.taken.find(t=>t.id===id);if(!entry)return;
   G.soundings.taken=G.soundings.taken.filter(t=>t.id!==id);
   G.soundings.available.push(id);
-  showToast(_registries.soundings[id].name+': suspended.','sounding');render();
+  showToast(_registries.soundings[id].name+': suspended.','sounding');
+  if (id === 'kenosis_thought') updateKenosisProgress();
+  render();
 }
 function releaseSounding(id){
   G.soundings.taken=G.soundings.taken.filter(t=>t.id!==id);
@@ -427,6 +709,7 @@ function releaseSounding(id){
   if(!G.soundings.released.includes(id))G.soundings.released.push(id);
   const pending=G.soundingPending;G.soundingPending=null;
   if(pending){setTimeout(()=>takeSounding(pending),50);}else render();
+  if (id === 'kenosis_thought') updateKenosisProgress();
 }
 function tickSoundings(){
   const settled=[];
@@ -441,10 +724,11 @@ function tickSoundings(){
     showToast(s.name+': settled.','sounding');
     refreshAtmosMods();
   });
+  if (settled.includes('kenosis_thought') || G.soundings.taken.some(t=>t.id==='kenosis_thought')) updateKenosisProgress();
 }
 function soundingBar(p){const f=Math.round((p/SOUNDING_THRESHOLD)*8);return'█'.repeat(f)+'░'.repeat(8-f);}
 
-// ── ANAMNESIS GHOST TEXT ─────────────────────────────────────
+// ── ANAMNESIS (pastLifeLines integrated) ─────────────────────
 const GHOST_TEXT={
   merky_meet:[0,'You have had this conversation before. The coffee was the same temperature.'],
   pavel_intro:[1,'He has told you his name on other crossings. It has always been Pavel.'],
@@ -464,10 +748,9 @@ function processText(raw){
   return raw.replace(/{ICON}/g,iconWord()).replace(/Спасибо/g,'<span class="sp-cold">Спасибо</span>').replace(/───+/g,'<span class="sp-dim">$&</span>');
 }
 
-// STAT_TIPS from registry
 const STAT_TIPS = _registries.statTips;
 
-// ── RENDER ───────────────────────────────────────────────────
+// ── RENDER (with Kenosis UI dimming) ────────────────────────
 function render(){
   const root=document.getElementById('root');root.innerHTML='';
   if(typeof IS_DEMO!=='undefined'&&IS_DEMO){
@@ -491,10 +774,23 @@ function continueGame(){if(loadGame())render();else{G.phase='mode';render();}}
 function absoluteReset(){
   if(!confirm('Reset all crossings to zero? This cannot be undone.'))return;
   try{localStorage.removeItem(SAVE_KEY);localStorage.removeItem(PLAY_KEY);localStorage.removeItem(FLAGS_KEY);}catch(e){}
-  G={phase:'title',mode:'attended',stats:{vigilance:0,composure:0,communion:0,doubt:0},charisms:[],cover:{posting:null,background:null,denomination:null,connection:null,left:null},coverIntegrity:3,soundings:{available:[],taken:[],settled:[],released:[]},soundingPending:null,notes:[],flags:new Set(),scene:'chapel_waking',lastReaction:null,panelOpen:null,confirmRestart:false,tutorialDone:false,playCount:0,pastFlags:[],inventory:[],time:{day:1,hour:8,maxDays:3},reputation:{},quests:{}};
+  G={phase:'title',mode:'attended',stats:{vigilance:0,composure:0,communion:0,doubt:0},charisms:[],cover:{posting:null,background:null,denomination:null,connection:null,left:null},coverIntegrity:3,soundings:{available:[],taken:[],settled:[],released:[]},soundingPending:null,notes:[],flags:new Set(),scene:'chapel_waking',lastReaction:null,panelOpen:null,confirmRestart:false,tutorialDone:false,playCount:0,pastFlags:[],inventory:[],time:{day:1,hour:8,maxDays:3},reputation:{},quests:{},awareness:0,_poaAbsorbedThisScene:false,_mortificationSpent:false,beliefs:new Set(),knowledge:new Set(),consequenceQueue:[],npcStance:{},eventQueue:[],pastLifeFlags:new Set(),_kenosisProgress:0};
   render();
 }
-function renderMode(root){ const d=document.createElement('div');d.className='sel-screen'; d.innerHTML=`<div class="sel-h">How will you cross?</div><div class="sel-sub">Can be changed on a new crossing.</div><div class="sel-grid"><div class="sel-opt${G.mode==='attended'?' chosen':''}" onclick="G.mode='attended';render()"><div class="sel-name">First Crossing</div><div class="sel-desc">Mechanics visible. Locked choices show their requirements.</div></div><div class="sel-opt${G.mode==='open'?' chosen':''}" onclick="G.mode='open';render()"><div class="sel-name">Open Water</div><div class="sel-desc">Less held. Locked choices are simply absent.</div></div></div><button class="btn" onclick="G.phase='charism';render()">Continue</button>`; root.appendChild(d); }
+function renderMode(root){
+  const d=document.createElement('div');d.className='sel-screen';
+  let modesHtml = '';
+  _registries.availableModes.forEach(mode => {
+    const chosen = G.mode === mode ? ' chosen' : '';
+    let name = '', desc = '';
+    if (mode === 'attended') { name = 'First Crossing'; desc = 'Mechanics visible. Locked choices show their requirements.'; }
+    else if (mode === 'open') { name = 'Open Water'; desc = 'Less held. Locked choices are simply absent.'; }
+    else if (mode === 'witnessed') { name = 'Witnessed'; desc = 'Composure healing does not restore the stat. No retry rolls. Gains to composure have no effect.'; }
+    modesHtml += `<div class="sel-opt${chosen}" onclick="G.mode='${mode}';render()"><div class="sel-name">${name}</div><div class="sel-desc">${desc}</div></div>`;
+  });
+  d.innerHTML = `<div class="sel-h">How will you cross?</div><div class="sel-sub">Can be changed on a new crossing.</div><div class="sel-grid">${modesHtml}</div><button class="btn" onclick="G.phase='charism';render()">Continue</button>`;
+  root.appendChild(d);
+}
 function selCharism(id){ const showWaking=G.playCount>=2,max=showWaking?2:1; if(G.charisms.includes(id)){G.charisms=G.charisms.filter(x=>x!==id);} else if(G.charisms.length<max){G.charisms=[...G.charisms,id];} render(); }
 function renderCharism(root){ const showWaking=G.playCount>=2,max=showWaking?2:1; const div=document.createElement('div');div.className='sel-screen'; let html=`<div class="sel-h">A charism.</div><div class="sel-sub">Not a skill. Something given — though it needs to be used to mean anything.${showWaking?`<br><span style="color:var(--cold);font-size:.8rem">Something new is available. Choose up to two.</span>`:''}</div><div class="sel-section">Sleeping</div>`; const sleeping=_registries.charisms.sleeping; const waking=_registries.charisms.waking; sleeping.forEach(c=>{html+=`<div class="sel-opt${G.charisms.includes(c.id)?' chosen-cold':''}" onclick="selCharism('${c.id}')"><div class="sel-name sel-name-cold">${c.name}</div><div class="sel-desc">${c.desc}</div></div>`;}); if(showWaking){ html+=`<div class="sel-section sel-section-cold">Waking</div>`; waking.forEach(c=>{html+=`<div class="sel-opt${G.charisms.includes(c.id)?' chosen-cold':''}" onclick="selCharism('${c.id}')"><div class="sel-name sel-name-cold">${c.name}</div><div class="sel-desc">${c.desc}</div></div>`;}); } html+=`<div style="font-size:.76rem;color:var(--dim);text-align:center;margin:.8rem 0">${G.charisms.length}/${max} chosen</div><button class="btn btn-cold" style="margin-top:.5rem" ${G.charisms.length===0?'disabled':''} onclick="beginGame()">Board the ship</button>`; div.innerHTML=html; root.appendChild(div); }
 function beginGame(){ if(!G.charisms.length)return; G.charisms.forEach(id=>addNote('charism_'+id)); if(G.charisms.includes('kenosis'))offerSounding('kenosis_thought'); if(G.charisms.includes('apophasis'))offerSounding('via_negativa'); G.phase='game'; G.scene='chapel_waking'; refreshAtmosMods(); render(); }
@@ -503,27 +799,12 @@ function beginGame(){ if(!G.charisms.length)return; G.charisms.forEach(id=>addNo
 function renderTutorial(root){ const div=document.createElement('div');div.className='tutorial-overlay'; div.innerHTML=`<div class="tutorial-box"><div class="tutorial-h">Before you board</div><div class="tutorial-item"><strong>Status bar</strong> — top of screen. Four stats: Vigilance, Composure, Communion, Doubt. Hover each for details. They open and close choices.</div><div class="tutorial-item"><strong>The Breviary</strong> <span class="key">breviary</span> — centre bottom. Soundings are contemplations that surface through choices. Take them deliberately. They develop over time and settle into permanent effects. Four slots total.</div><div class="tutorial-item"><strong>Observations</strong> <span class="key">observations</span> — right bottom. Notes from what you have found and who you have met.</div><div class="tutorial-item"><strong>Status</strong> <span class="key">status</span> — left bottom. Your cover story, charisms, cover integrity, and crossing number.</div><div class="tutorial-item"><strong>Abandon crossing</strong> — at the bottom of each scene. Ends the current crossing.</div><button class="btn" style="margin-top:1.5rem;width:100%" onclick="dismissTutorial()">Board the ship</button></div>`; root.appendChild(div); }
 function dismissTutorial(){ G.tutorialDone=true; saveGame(); render(); }
 
-// ── CHOICE LOCK CHECK ─────────────────────────
-function isChoiceLocked(ch){
-  if(ch.requires_flag && !hasFlag(ch.requires_flag)) return true;
-  if(ch.requires_stat){ const[s,m]=ch.requires_stat; if((G.stats[s]||0)<m) return true; }
-  if(ch.requires_charism && !hasCharism(ch.requires_charism)) return true;
-  if(ch.requires_playcount!==undefined && G.playCount<ch.requires_playcount) return true;
-  if(ch.requires_charism==='kenosis' && G.coverIntegrity>=8) return true;
-  if(ch.requires_item && !hasItem(ch.requires_item)) return true;
-  if(ch.requires_time_from){ const[h]=ch.requires_time_from.split(':'); if(G.time.hour < h) return true; }
-  if(ch.requires_time_until){ const[h]=ch.requires_time_until.split(':'); if(G.time.hour > h) return true; }
-  if(ch.requires_day_lt && G.time.day >= ch.requires_day_lt) return true;
-  if(ch.requires_reputation_min){ for(const[id,min] of Object.entries(ch.requires_reputation_min)) if(getReputation(id)<min) return true; }
-  if(ch.requires_reputation_max){ for(const[id,max] of Object.entries(ch.requires_reputation_max)) if(getReputation(id)>max) return true; }
-  if(ch.requires_quest_state){ for(const[id,state] of Object.entries(ch.requires_quest_state)) if(getQuestState(id)!==state) return true; }
-  return false;
-}
-
-// ── GAME RENDER ──────────────────────────────────────────────
+// ── GAME RENDER (with Kenosis dimming and past life injection) ──
 function renderGame(root){
   if(!G.tutorialDone&&G.scene==='chapel_waking'){ renderTutorial(root); return; }
   if(G.rollResult && G.pendingRoll) { renderRollBox(root); return; }
+  if (isRitualActive()) { renderRitual(root); return; }
+  processConsequenceQueue();
   if(hasFlag('cover_compromised')&&!hasFlag('cover_blown')&&G.scene==='corridor_first'){
     if(!SCENES['merky_confrontation']){ console.warn("Missing scene: merky_confrontation"); G.flags.delete('cover_compromised'); showToast("Cover issue – scene missing.","note"); }
     else{ G.scene='merky_confrontation'; }
@@ -534,12 +815,19 @@ function renderGame(root){
   const visitKey='visited_'+G.scene, isFirstVisit=!hasFlag(visitKey);
   if(isFirstVisit){ setFlag(visitKey); if(scene.on_enter){ if(scene.on_enter.note)addNote(scene.on_enter.note); if(scene.on_enter.flag)setFlag(scene.on_enter.flag); if(scene.on_enter.thought)offerSounding(scene.on_enter.thought); } }
   const wrap=document.createElement('div'); wrap.className='game';
+  // Apply Kenosis UI dimming to entire game container
+  const kenosisOpacity = getKenosisOpacity();
+  if (kenosisOpacity < 1) wrap.style.opacity = kenosisOpacity;
   const hdr=document.createElement('div'); hdr.className='game-header';
   const si=document.createElement('div'); si.className='save-indicator'; si.textContent='◦ autosaved'; si.style.display='none'; hdr.appendChild(si);
   const moodCls=scene.mood==='uncanny'?' uncanny':scene.mood==='revelation'?' revelation':'';
   const lb=document.createElement('div'); lb.className='location-bar'+moodCls; lb.textContent=scene.location; hdr.appendChild(lb);
   const sb=document.createElement('div'); sb.className='sbar';
   Object.entries(G.stats).forEach(([k,v])=>{ const d=document.createElement('div'); d.className='stat'; d.innerHTML=k+' <span class="stat-val">'+v+'</span>'+(STAT_TIPS[k]?'<span class="stat-tip">'+STAT_TIPS[k]+'</span>':''); sb.appendChild(d); });
+  const awarenessDiv = document.createElement('div'); awarenessDiv.className='stat';
+  const awareBonus = Math.floor((G.awareness||0)/2);
+  awarenessDiv.innerHTML = `awareness <span class="stat-val">${G.awareness||0}</span> <span class="stat-tip" title="Reduces roll difficulty by ${awareBonus} when awarenessBonus is enabled">ⓘ</span>`;
+  sb.appendChild(awarenessDiv);
   hdr.appendChild(sb);
   const tags=[];
   G.charisms.forEach(id=>{const c=findCharism(id);if(c)tags.push(`<span class="ctag" title="${c.desc}">${c.name}</span>`);});
@@ -552,8 +840,10 @@ function renderGame(root){
   const body=document.createElement('div'); body.className='game-body';
   if(scene.art&&_registries.art[scene.art]){ const art=document.createElement('pre'); art.className='art-block'; art.textContent=_registries.art[scene.art]; body.appendChild(art); }
   if(G.lastReaction){ const rp=document.createElement('p'); rp.className='sp sp-reaction'; rp.textContent=G.lastReaction; body.appendChild(rp); G.lastReaction=null; }
-  let rawText=typeof scene.text==='function'?scene.text(G):scene.text;
-  rawText=injectGhostText(rawText,G.scene);
+  let rawText = getSceneText(scene);
+  rawText = injectMicroLines(rawText, scene);
+  rawText = injectGhostText(rawText, G.scene);
+  rawText = applyPastLifeLines(rawText, G.scene); // NEW: anamnesis lines
   const stxt=document.createElement('div');
   const wakingCharisms=['anamnesis','kenosis','tathagatagarbha','apophasis'];
   const hasWaking = G.charisms.some(id=>wakingCharisms.includes(id));
@@ -584,10 +874,14 @@ function renderGame(root){
       if(ch.requires_item)hint+=` [requires: ${ch.requires_item}]`;
       if(ch.requires_reputation_min){ for(const[id,min]of Object.entries(ch.requires_reputation_min)) hint+=` [${id}≥${min}]`; }
       if(ch.requires_quest_state){ for(const[id,state]of Object.entries(ch.requires_quest_state)) hint+=` [${id}=${state}]`; }
+      if(ch.requires_belief) hint+=` [belief: ${ch.requires_belief}]`;
+      if(ch.requires_knowledge) hint+=` [knowledge: ${ch.requires_knowledge}]`;
+      if(ch.requires_past_flag) hint+=` [past: ${ch.requires_past_flag}]`;
       btn.textContent=hint;
     } else {
       const tv=ch.next&&hasFlag('visited_'+ch.next)&&scene.hub;
       let cls='choice';
+      if(ch.type === 'silence') cls += ' choice-silence';
       if(ch.style==='cold')cls+=' choice-cold';
       if(ch.style==='return')cls+=' choice-return';
       if(ch.style==='vespers')cls+=' choice-vespers';
@@ -620,11 +914,9 @@ function renderGame(root){
   if(G.confirmRestart){ const msg=document.createElement('span'); msg.className='confirm-msg'; msg.textContent='End this crossing?'; rb2.appendChild(msg); const yes=document.createElement('button'); yes.className='btn confirm-yes'; yes.textContent='Yes — return to shore'; yes.onclick=doRestart; rb2.appendChild(yes); const no=document.createElement('button'); no.className='btn confirm-no'; no.textContent='No — continue'; no.onclick=()=>{G.confirmRestart=false;render();}; rb2.appendChild(no); }
   else{ const rbt=document.createElement('button'); rbt.className='btn restart-btn'; rbt.textContent='abandon crossing'; rbt.onclick=()=>{G.confirmRestart=true;render();}; rb2.appendChild(rbt); }
   body.appendChild(rb2); wrap.appendChild(body); root.appendChild(wrap);
-  // Audio toggle
   const ab=document.createElement('button');ab.id='audio-btn';
   ab.style.cssText='position:fixed;top:.55rem;right:.8rem;background:none;border:none;font-family:\'Courier Prime\',monospace;font-size:.7rem;color:var(--dim);cursor:pointer;z-index:200;letter-spacing:.08em;padding:.2rem .4rem;';
   ab.textContent=_audioOn?'♪ on':'♪ off';ab.onclick=toggleAudio;root.appendChild(ab);
-  // Bottom nav
   const bnav=document.createElement('div');bnav.id='bottom-nav';
   bnav.style.cssText='position:fixed;bottom:0;left:0;width:100%;z-index:100;display:flex;justify-content:center;gap:0;background:rgba(6,8,12,0.96);border-top:1px solid var(--border);';
   [
@@ -644,6 +936,7 @@ function renderGame(root){
   if(G.panelOpen==='glossary')renderGlossaryPanel(root);
 }
 
+// ── ROLL BOX (unchanged) ────────────────────────────────────
 function startRoll(choice) {
   const rd = choice.roll;
   const res = performRoll(rd.stat, rd.difficulty, {
@@ -666,7 +959,20 @@ function renderRollBox(root) {
   const outcomeCls = result.outcome==='success'?'roll-success':result.outcome==='partial'?'roll-partial':'roll-fail';
   const boxCls = `roll-box ${result.outcome==='partial'?'roll-box-partial':result.outcome==='failure'?'roll-box-fail':''}`;
   const box = document.createElement('div'); box.className=boxCls;
-  box.innerHTML = `<div class="roll-label">${rollDef.stat.toUpperCase()} CHECK</div><div class="roll-math">[${result.d1}]+[${result.d2}] = ${result.d1+result.d2} + ${result.statValue} (${rollDef.stat}) ${result.charismBonus?`+ ${result.charismBonus}`:''} = ${result.total} vs. difficulty ${result.difficulty}</div>${result.charismNote?`<div class="roll-charism">${result.charismNote}</div>`:''}<div class="roll-result ${outcomeCls}">░░░░░░░░░░ ${result.outcome.toUpperCase()}</div>`;
+  let opposedHtml = '';
+  if (result.opposed) {
+    const opp = result.opposed;
+    opposedHtml = `<div class="roll-opposed">Opposed (${opp.stat}): ${opp.roll} + ${opp.bonus} = ${opp.total}</div>`;
+  }
+  let critHtml = '';
+  if (result.crit === 'success') critHtml = '<div class="roll-crit success">✦ CRITICAL SUCCESS ✦</div>';
+  else if (result.crit === 'failure') critHtml = '<div class="roll-crit failure">✗ FATAL FUMBLE ✗</div>';
+  box.innerHTML = `<div class="roll-label">${rollDef.stat.toUpperCase()} CHECK</div>
+    <div class="roll-math">[${result.d1}]+[${result.d2}] = ${result.d1+result.d2} + ${result.statValue} (${rollDef.stat}) ${result.charismBonus?`+ ${result.charismBonus}`:''} = ${result.total} vs. difficulty ${result.difficulty}</div>
+    ${result.charismNote?`<div class="roll-charism">${result.charismNote}</div>`:''}
+    ${opposedHtml}
+    ${critHtml}
+    <div class="roll-result ${outcomeCls}">░░░░░░░░░░ ${result.outcome.toUpperCase()}</div>`;
   const cont = document.createElement('button'); cont.className='btn btn-pri'; cont.textContent=`Continue (${result.outcome})`;
   cont.onclick = () => {
     let nextScene = result.outcome==='success' ? rollDef.successNext : (result.outcome==='partial' ? rollDef.partialNext : rollDef.failNext);
@@ -674,6 +980,32 @@ function renderRollBox(root) {
     applyChoice({ ...choice, next: nextScene });
   };
   box.appendChild(cont);
+  const hasMort = G.charisms.includes('mortification');
+  const canSpend = hasMort && (G.stats.composure || 0) >= 2 && !G._mortificationSpent && result.outcome !== 'success' && G.mode === 'attended' && !result.voidGazeUsed;
+  if (canSpend) {
+    const mortBtn = document.createElement('button');
+    mortBtn.className = 'btn mort-btn';
+    mortBtn.textContent = 'Mortification: spend 1 Composure for +2 (reroll)';
+    mortBtn.onclick = () => {
+      G.stats.composure = Math.max((G.stats.composure || 1) - 1, 1);
+      G._mortificationSpent = true;
+      const newResult = performRoll(rollDef.stat, rollDef.difficulty, {
+        awarenessBonus: rollDef.awarenessBonus||false,
+        docCheck: rollDef.docCheck||false,
+        social: rollDef.social||false,
+        corporate: rollDef.corporate||false,
+        threshold: rollDef.threshold||false,
+        advantage: rollDef.advantage||false,
+        critical: rollDef.critical||false,
+        tempBonus: (rollDef.tempBonus||0) + 2,
+        opposed: rollDef.opposed||null
+      });
+      G.rollResult = newResult;
+      G.pendingRoll.result = newResult;
+      render();
+    };
+    box.appendChild(mortBtn);
+  }
   root.appendChild(box);
 }
 
@@ -695,6 +1027,23 @@ function applyChoice(ch){
   if(ch.advance_time) advanceTime(ch.advance_time);
   if(ch.mod_reputation) for(const[id,delta] of Object.entries(ch.mod_reputation)) modReputation(id,delta);
   if(ch.set_quest_state) for(const[id,state] of Object.entries(ch.set_quest_state)) setQuestState(id,state);
+  if(ch.learn) (Array.isArray(ch.learn) ? ch.learn : [ch.learn]).forEach(learn);
+  if(ch.believe) (Array.isArray(ch.believe) ? ch.believe : [ch.believe]).forEach(comeToBelieve);
+  if(ch.contradict) (Array.isArray(ch.contradict) ? ch.contradict : [ch.contradict]).forEach(contradict);
+  if(ch.push_consequence) pushConsequence(ch.push_consequence);
+  if(ch.modStance) {
+    for (const [npcId, changes] of Object.entries(ch.modStance)) {
+      for (const [key, delta] of Object.entries(changes)) modStance(npcId, key, delta);
+    }
+  }
+  if (ch.intent && SCENES[G.scene] && SCENES[G.scene].expectedIntent) {
+    const expected = SCENES[G.scene].expectedIntent;
+    if (Array.isArray(expected) ? !expected.includes(ch.intent) : expected !== ch.intent) {
+      console.warn(`Intent mismatch: choice intent "${ch.intent}" vs scene expected "${expected}"`);
+    }
+  }
+  if(ch.startRitual) { startRitual(ch.startRitual.id, G.scene, ch.next); return; }
+  if(ch.past_flag) G.pastLifeFlags.add(ch.past_flag);
   if(ch.cover_check){
     const result=rollCover(ch.cover_check);
     if(result==='failure')degradeCover(1);
@@ -712,7 +1061,10 @@ function applyChoice(ch){
 
 function navigate(id){
   const isNew=!hasFlag('visited_'+id);
-  G.scene=id; if(isNew)tickSoundings(); window.scrollTo(0,0); render();
+  G.scene=id;
+  G._poaAbsorbedThisScene = false;
+  G._mortificationSpent = false;
+  if(isNew)tickSoundings(); window.scrollTo(0,0); render();
 }
 function newPlay(){
   commitPlay();
@@ -723,6 +1075,11 @@ function newPlay(){
   G.notes=[]; G.flags=new Set(); G.scene='chapel_waking';
   G.lastReaction=null; G.crossingLog=[]; G.phase='charism'; G.panelOpen=null; G.confirmRestart=false;
   G.inventory=[]; G.time={day:1,hour:8,maxDays:3}; G.reputation={}; G.quests={};
+  G.awareness = 0; G._poaAbsorbedThisScene = false; G._mortificationSpent = false;
+  G.beliefs = new Set(); G.knowledge = new Set(); G.consequenceQueue = [];
+  G.npcStance = {}; G.eventQueue = [];
+  G.pastLifeFlags = G.pastLifeFlags || new Set(); // preserve across new plays? Actually reset? Usually carry over. We'll keep.
+  G._kenosisProgress = 0;
   refreshAtmosMods(); render();
 }
 function doRestart(){
@@ -733,11 +1090,17 @@ function doRestart(){
   G.cover={posting:null,background:null,denomination:null,connection:null,left:null};
   G.coverIntegrity=3; G.lastReaction=null; G.panelOpen=null; G.confirmRestart=false; G.scene='chapel_waking';
   G.inventory=[]; G.time={day:1,hour:8,maxDays:3}; G.reputation={}; G.quests={};
+  G.awareness = 0; G._poaAbsorbedThisScene = false; G._mortificationSpent = false;
+  G.beliefs = new Set(); G.knowledge = new Set(); G.consequenceQueue = [];
+  G.npcStance = {}; G.eventQueue = [];
+  G.pastLifeFlags = new Set();  // reset on full restart? Usually keep? We'll reset.
+  G._kenosisProgress = 0;
   refreshAtmosMods(); render();
 }
 function openPanel(w){ G.panelOpen=G.panelOpen===w?null:w; render(); }
 function mkOverlay(fn){ const o=document.createElement('div'); o.className='overlay-bg'; o.onclick=fn; return o; }
 
+// ── PANELS (unchanged) ──────────────────────────────────────
 function renderNotesPanel(root){
   const p=document.createElement('div'); p.className='side-panel side-panel-r';
   const h=document.createElement('h3'); h.style.color='var(--amber)';
@@ -759,18 +1122,12 @@ function renderStatusPanel(root){
   const addSec=t=>{ const s=document.createElement('div'); s.className='panel-sec'; s.textContent=t; p.appendChild(s); };
   const addRow=(a,b,bc)=>{ const r=document.createElement('div'); r.className='stat-row'; r.innerHTML=`<span class="stat-label">${a}</span><span style="color:${bc||'var(--bright)'};font-weight:bold;font-size:.86rem">${b}</span>`; p.appendChild(r); };
   addSec('Stats'); Object.entries(G.stats).forEach(([k,v])=>addRow(k,v));
+  addRow('awareness', `${G.awareness||0} / 5`, 'var(--amber)');
   addSec('Charisms');
   if(!G.charisms.length){ const d=document.createElement('div'); d.className='panel-empty'; d.textContent='None.'; p.appendChild(d); }
   else G.charisms.forEach(id=>{ const c=findCharism(id); if(!c)return; const d=document.createElement('div'); d.className='panel-item'; d.innerHTML='<strong style="color:var(--cold)">'+c.name+'</strong><br>'+c.desc; p.appendChild(d); });
   addSec('Cover');
-  const intDesc={
-    5:'Full — all charisms available',
-    4:'Good — no restrictions',
-    3:'Intact — cover holding',
-    2:'Questioned — Kenosis harder',
-    1:'Thin — one slip breaks it',
-    0:'Blown — Merky knows'
-  };
+  const intDesc={5:'Full — all charisms available',4:'Good — no restrictions',3:'Intact — cover holding',2:'Questioned — Kenosis harder',1:'Thin — one slip breaks it',0:'Blown — Merky knows'};
   const intCol=G.coverIntegrity<=1?'var(--rust)':G.coverIntegrity<=2?'var(--amber-dim)':'var(--amber)';
   addRow('Cover integrity',intDesc[G.coverIntegrity]||G.coverIntegrity,intCol);
   Object.entries(G.cover).forEach(([k,v])=>{ const val=v?(coverLabels[v]||v.replace(/_/g,' ')):'—'; addRow(cl[k]||k,val,v?'var(--amber)':'var(--dim)'); });
@@ -838,12 +1195,19 @@ function renderGlossaryPanel(root){
   root.appendChild(mkOverlay(closeGlossary)); root.appendChild(p);
 }
 
+function hasCharism(id) { return G.charisms.includes(id); }
+
 // Expose registries and public API for game_data.js
 window.SOBORNOST = {
   registerCharisms, registerSounding, registerNote, registerArt,
-  registerGlossaryEntry, registerStatTip,
+  registerGlossaryEntry, registerStatTip, registerRollModifier, setAvailableModes,
   setIconWordFunction, setHarbourWordFunction, setShipWordFunction, setObjectDescriptionFunction,
   allCharisms, findCharism, noteLabel, iconWord, harbourWord, shipWord, objectDescription,
+  learn, comeToBelieve, contradict, knows, believes, pushConsequence,
+  registerScenePool, addToScenePool, navigateToPool, scheduleEvent,
+  getStance, setStance, modStance, registerRitual, startRitual, ritualNextPhase,
+  // v1.6 new exports
+  registerTranslation, registerPostEventShift, registerPastLifeLine,
   G, render
 };
 
