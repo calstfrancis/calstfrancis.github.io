@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// СПАСИБО ENGINE v2.0 – Full featured, backward compatible
-// Inventory, Time, Reputation, Quests, Advanced Rolls
+// SOBORNOST ENGINE v1.0 – Core Mechanics
+// Zero game content. Registries for charisms, soundings, notes, art, glossary, statTips.
 // ═══════════════════════════════════════════════════════════
 
 // ── ATMOSPHERE (canvas, functions) ──────────────────────────
@@ -16,30 +16,6 @@ const MOOD={neutral:[130,170,190,6,8,12],tense:[140,90,70,10,6,4],uncanny:[60,13
 function setMood(m){if(!m||m===targetMood)return;targetMood=m;moodLerp=0;_updateAudioMood();}
 function lerpN(a,b,t){return a+(b-a)*t;}
 
-// ── GLOBAL STATE (extended) ─────────────────────────────────
-let G = {
-  phase:'title',mode:'attended',
-  stats:{vigilance:0,composure:0,communion:0,doubt:0},
-  charisms:[],
-  cover:{posting:null,background:null,denomination:null,connection:null,left:null},
-  coverIntegrity:5,
-  soundings:{available:[],taken:[],settled:[],released:[]},soundingPending:null,
-  notes:[],flags:new Set(),
-  scene:'chapel_waking',lastReaction:null,
-  panelOpen:null,confirmRestart:false,tutorialDone:false,
-  playCount:parseInt(localStorage.getItem('spasibo_plays')||'0'),
-  pastFlags:JSON.parse(localStorage.getItem('spasibo_past_flags')||'[]'),
-  // NEW: inventory, time, reputation, quests
-  inventory: [],
-  time: { day: 1, hour: 8, maxDays: 3 },
-  reputation: {},
-  quests: {},
-  crossingLog:[],
-  // roll state (kept in memory only, not saved)
-  pendingRoll:null,
-  rollResult:null
-};
-
 function refreshAtmosMods(){
   const s = G.soundings.settled;
   atmosMods.fogMult = s.includes('gnoti_seauton') ? 0.55 : 1.0;
@@ -48,7 +24,6 @@ function refreshAtmosMods(){
   atmosMods.soboWarm = s.includes('sobornost');
 }
 
-// ── DRAW FUNCTIONS (unchanged) ──────────────────────────────
 function drawAtmos(){
   T+=.008;
   if(moodLerp<1){moodLerp=Math.min(1,moodLerp+.008);if(moodLerp>=1)mood=targetMood;}
@@ -100,7 +75,71 @@ function drawPorthole(){
 }
 drawAtmos();
 
-// ── PERSISTENCE (extended) ──────────────────────────────────
+// ── GLOBAL STATE ────────────────────────────────────────────
+let G = {
+  phase:'title',mode:'attended',
+  stats:{vigilance:0,composure:0,communion:0,doubt:0},
+  charisms:[],
+  cover:{posting:null,background:null,denomination:null,connection:null,left:null},
+  coverIntegrity:5,
+  soundings:{available:[],taken:[],settled:[],released:[]},soundingPending:null,
+  notes:[],flags:new Set(),
+  scene:'chapel_waking',lastReaction:null,
+  panelOpen:null,confirmRestart:false,tutorialDone:false,
+  playCount:parseInt(localStorage.getItem('spasibo_plays')||'0'),
+  pastFlags:JSON.parse(localStorage.getItem('spasibo_past_flags')||'[]'),
+  inventory: [],
+  time: { day: 1, hour: 8, maxDays: 3 },
+  reputation: {},
+  quests: {},
+  crossingLog:[],
+  pendingRoll:null,
+  rollResult:null
+};
+
+// ── REGISTRIES (game data is injected here) ─────────────────
+const _registries = {
+  charisms: { sleeping: [], waking: [] },
+  soundings: {},
+  notes: {},
+  art: {},
+  glossary: [],
+  statTips: {},
+  iconWordFn: () => 'icon',
+  harbourWordFn: () => 'port',
+  shipWordFn: () => 'the ship',
+  objectDescriptionFn: () => 'an object'
+};
+
+function registerCharisms(sleepingList, wakingList) {
+  if (sleepingList) _registries.charisms.sleeping = sleepingList;
+  if (wakingList) _registries.charisms.waking = wakingList;
+}
+function registerSounding(id, data) { _registries.soundings[id] = data; }
+function registerNote(key, value) { _registries.notes[key] = value; }
+function registerArt(id, ascii) { _registries.art[id] = ascii; }
+function registerGlossaryEntry(term, def) { _registries.glossary.push({term,def}); }
+function registerStatTip(stat, tip) { _registries.statTips[stat] = tip; }
+function setIconWordFunction(fn) { _registries.iconWordFn = fn; }
+function setHarbourWordFunction(fn) { _registries.harbourWordFn = fn; }
+function setShipWordFunction(fn) { _registries.shipWordFn = fn; }
+function setObjectDescriptionFunction(fn) { _registries.objectDescriptionFn = fn; }
+
+function allCharisms() {
+  return [..._registries.charisms.sleeping, ..._registries.charisms.waking];
+}
+function findCharism(id) { return allCharisms().find(c=>c.id===id); }
+function noteLabel(k) {
+  const n = _registries.notes[k];
+  if (!n) return k;
+  return typeof n === 'function' ? n() : n;
+}
+function iconWord() { return _registries.iconWordFn(); }
+function harbourWord() { return _registries.harbourWordFn(); }
+function shipWord() { return _registries.shipWordFn(); }
+function objectDescription() { return _registries.objectDescriptionFn(); }
+
+// ── PERSISTENCE ─────────────────────────────────────────────
 const SAVE_KEY='spasibo_save',PLAY_KEY='spasibo_plays',FLAGS_KEY='spasibo_past_flags',ENDINGS_KEY='spasibo_endings';
 
 function saveGame(){
@@ -110,7 +149,6 @@ function saveGame(){
       cover:G.cover,coverIntegrity:G.coverIntegrity,notes:G.notes,
       flags:[...G.flags],scene:G.scene,mode:G.mode,
       lastReaction:G.lastReaction,tutorialDone:G.tutorialDone,crossingLog:G.crossingLog||[],
-      // new fields
       inventory:G.inventory, time:G.time, reputation:G.reputation, quests:G.quests
     }));
     const el=document.querySelector('.save-indicator');
@@ -127,7 +165,6 @@ function loadGame(){
     G.notes=s.notes||[];G.flags=new Set(s.flags||[]);G.scene=s.scene||'chapel_waking';
     G.mode=s.mode||'attended';G.lastReaction=s.lastReaction||null;
     G.tutorialDone=s.tutorialDone||false;G.crossingLog=s.crossingLog||[];
-    // load new fields (safe defaults)
     G.inventory = s.inventory || [];
     G.time = s.time || { day:1, hour:8, maxDays:3 };
     G.reputation = s.reputation || {};
@@ -182,7 +219,6 @@ function performRoll(statKey, difficulty, options={}) {
   let effectiveDiff = Math.max(difficulty - awareMod, 3);
   const tempBonus = options.tempBonus || 0;
 
-  // Dice roll with optional advantage
   let d1,d2,rollSum;
   if (options.advantage) {
     const r1a=Math.floor(Math.random()*6)+1, r1b=Math.floor(Math.random()*6)+1;
@@ -196,7 +232,6 @@ function performRoll(statKey, difficulty, options={}) {
 
   let total = rollSum + baseStat + charismBonus + tempBonus;
 
-  // Opposed roll (player vs NPC)
   let opposedResult = null;
   if (options.opposed) {
     const oppStat = options.opposed.stat;
@@ -204,7 +239,6 @@ function performRoll(statKey, difficulty, options={}) {
     const oppBonus = G.stats[oppStat] || 0;
     const oppTotal = oppRoll + oppBonus;
     opposedResult = { stat: oppStat, roll: oppRoll, bonus: oppBonus, total: oppTotal };
-    // For opposed rolls, success means total >= oppTotal
     if(total >= oppTotal) { outcome = 'success'; } else { outcome = 'failure'; }
   }
 
@@ -214,20 +248,17 @@ function performRoll(statKey, difficulty, options={}) {
     else if (total >= effectiveDiff - 2) outcome = 'partial';
   }
 
-  // Discernment (existing)
   if (!options.opposed && outcome === 'partial' && options.social && ch.includes('discernment')) {
     outcome = 'success';
     charismNote += 'discernment ';
   }
 
-  // Critical success/failure (new)
   let crit = false;
   if (options.critical && !options.opposed) {
     if (rollSum === 12) { crit = 'success'; outcome = 'success'; charismNote += 'CRIT! '; }
     else if (rollSum === 2) { crit = 'failure'; outcome = 'failure'; charismNote += 'FUMBLE! '; }
   }
 
-  // Void Gaze (roll twice, take higher) – only if not already advantage
   if (options.threshold && ch.includes('void_gaze') && (G.awareness||0)>=3 && !options.advantage && !options.opposed) {
     const d1b = Math.floor(Math.random()*6)+1; const d2b = Math.floor(Math.random()*6)+1;
     const altTotal = d1b + d2b + baseStat + charismBonus;
@@ -242,10 +273,9 @@ function performRoll(statKey, difficulty, options={}) {
   };
 }
 
-
 // ── AUDIO SYSTEM ─────────────────────────────────────────────
 let _actx=null,_gainNode=null,_audioOn=false;
-let _oscNodes=[],_filterNode=null,_reverbGain=null,_belltimer=null;
+let _oscNodes=[],_filterNode=null,_reverbGain=null;
 
 function _makeReverb(ctx, duration=1.8, decay=2.2) {
   const len = ctx.sampleRate * duration;
@@ -263,12 +293,10 @@ function _initAudio(){
     _actx=new(window.AudioContext||window.webkitAudioContext)();
     const master=_actx.createGain();master.gain.value=0;master.connect(_actx.destination);_gainNode=master;
 
-    // Reverb chain
     const reverb = _makeReverb(_actx);
     _reverbGain = _actx.createGain(); _reverbGain.gain.value = 0.18;
     reverb.connect(_reverbGain); _reverbGain.connect(master);
 
-    // Three oscillators for engine hum — stored for per-mood retuning
     _oscNodes = [50,101,149].map((freq,i)=>{
       const o=_actx.createOscillator(),g=_actx.createGain();
       o.frequency.value=freq;o.type='sawtooth';g.gain.value=[0.5,0.25,0.15][i];
@@ -276,7 +304,6 @@ function _initAudio(){
       return o;
     });
 
-    // Low-pass filtered noise layer
     const buf=_actx.createBuffer(1,_actx.sampleRate,_actx.sampleRate);
     const d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1);
     const ns=_actx.createBufferSource();ns.buffer=buf;ns.loop=true;
@@ -290,7 +317,6 @@ function _audioMoodGain(){
   return mood==='tense'?0.055:mood==='revelation'?0.015:mood==='uncanny'?0.008:0.035;
 }
 
-// Retune oscillators and filter for current mood
 function _applyMoodToAudio(m){
   if(!_actx||!_audioOn)return;
   const t=_actx.currentTime;
@@ -305,7 +331,6 @@ function _applyMoodToAudio(m){
   if(_filterNode) _filterNode.frequency.setTargetAtTime(cfg.filter, t, 2.5);
   if(_reverbGain) _reverbGain.gain.setTargetAtTime(cfg.reverbWet, t, 2.5);
 
-  // Revelation: strike a bell partial (sine at 880 Hz, fades over 4s)
   if(m==='revelation'){
     try{
       const bell=_actx.createOscillator(); const bellG=_actx.createGain();
@@ -314,7 +339,6 @@ function _applyMoodToAudio(m){
       bell.connect(bellG); bellG.connect(_gainNode); bell.start(t); bell.stop(t+4);
     }catch(e){}
   }
-  // Uncanny: a high dissonant partial whisper
   if(m==='uncanny'){
     try{
       const whis=_actx.createOscillator(); const whisG=_actx.createGain();
@@ -342,8 +366,7 @@ function _updateAudioMood(){
   }
 }
 
-// ── UTILITIES (unchanged but with new helpers) ───────────────
-function noteLabel(k){const n=NOTES[k];if(!n)return k;return typeof n==='function'?n():n;}
+// ── UTILITIES (with registry integration) ───────────────────
 function hasFlag(f){return G.flags.has(f);}
 function setFlag(f){if(f)G.flags.add(f);}
 function addNote(key){
@@ -360,9 +383,6 @@ function showToast(msg,type){
   t.textContent=msg;document.body.appendChild(t);
   setTimeout(()=>{if(t.parentNode)t.remove();},3200);
 }
-function allCharisms(){return[...CHARISMS.sleeping,...CHARISMS.waking];}
-function findCharism(id){return allCharisms().find(c=>c.id===id);}
-function hasCharism(id){return G.charisms.includes(id);}
 function rollCover(difficulty){
   const roll=Math.ceil(Math.random()*6);
   const bonus=Math.floor(G.stats.composure/2);
@@ -374,33 +394,32 @@ function rollCover(difficulty){
 function degradeCover(amount){
   const prev=G.coverIntegrity;
   G.coverIntegrity=Math.max(0,G.coverIntegrity-amount);
-  // Toast on threshold crossings only
   if(G.coverIntegrity<=0&&prev>0){ setFlag('cover_blown'); setFlag('cover_compromised'); showToast('Cover blown. Merky will confront you.','note'); }
   else if(G.coverIntegrity<=1&&prev>1){ showToast('Cover is thin — one more slip breaks it.','note'); }
   else if(G.coverIntegrity<=2&&prev>2){ showToast('Cover questioned — Kenosis harder to access.','note'); }
   else if(G.coverIntegrity<=3&&prev>3){ showToast('Cover is strained.','note'); }
 }
 
-// ── SOUNDINGS (unchanged) ───────────────────────────────────
+// ── SOUNDINGS (using registry) ──────────────────────────────
 const MAX_SOUNDINGS=4,SOUNDING_THRESHOLD=8;
 function soundingSlotsFull(){return G.soundings.taken.length+G.soundings.settled.length>=MAX_SOUNDINGS;}
 function offerSounding(id){
-  if(!id||!SOUNDINGS[id])return;
+  if(!id||!_registries.soundings[id])return;
   if(G.soundings.available.includes(id)||G.soundings.taken.some(t=>t.id===id)||G.soundings.settled.includes(id))return;
-  G.soundings.available.push(id);showToast('Sounding: '+SOUNDINGS[id].name,'sounding');
+  G.soundings.available.push(id);showToast('Sounding: '+_registries.soundings[id].name,'sounding');
 }
 function takeSounding(id){
   if(G.soundings.taken.some(t=>t.id===id)||G.soundings.settled.includes(id))return;
   if(soundingSlotsFull()){G.soundingPending=id;G.panelOpen='breviary';render();return;}
   G.soundings.available=G.soundings.available.filter(x=>x!==id);
   G.soundings.taken.push({id,progress:0});G.soundingPending=null;
-  showToast(SOUNDINGS[id].name+': taking the sounding.','sounding');render();
+  showToast(_registries.soundings[id].name+': taking the sounding.','sounding');render();
 }
 function suspendSounding(id){
   const entry=G.soundings.taken.find(t=>t.id===id);if(!entry)return;
   G.soundings.taken=G.soundings.taken.filter(t=>t.id!==id);
   G.soundings.available.push(id);
-  showToast(SOUNDINGS[id].name+': suspended.','sounding');render();
+  showToast(_registries.soundings[id].name+': suspended.','sounding');render();
 }
 function releaseSounding(id){
   G.soundings.taken=G.soundings.taken.filter(t=>t.id!==id);
@@ -418,14 +437,14 @@ function tickSoundings(){
   }).filter(Boolean);
   settled.forEach(id=>{
     G.soundings.settled.push(id);
-    const s=SOUNDINGS[id];if(s&&s.effect)applyEffect(s.effect);
+    const s=_registries.soundings[id];if(s&&s.effect)applyEffect(s.effect);
     showToast(s.name+': settled.','sounding');
     refreshAtmosMods();
   });
 }
 function soundingBar(p){const f=Math.round((p/SOUNDING_THRESHOLD)*8);return'█'.repeat(f)+'░'.repeat(8-f);}
 
-// ── ANAMNESIS GHOST TEXT (unchanged) ────────────────────────
+// ── ANAMNESIS GHOST TEXT ─────────────────────────────────────
 const GHOST_TEXT={
   merky_meet:[0,'You have had this conversation before. The coffee was the same temperature.'],
   pavel_intro:[1,'He has told you his name on other crossings. It has always been Pavel.'],
@@ -445,12 +464,8 @@ function processText(raw){
   return raw.replace(/{ICON}/g,iconWord()).replace(/Спасибо/g,'<span class="sp-cold">Спасибо</span>').replace(/───+/g,'<span class="sp-dim">$&</span>');
 }
 
-const STAT_TIPS={
-  vigilance:'Vigilance — attention, pattern recognition. Gates investigation and observation choices.',
-  composure:'Composure — self-possession under pressure. Gates approaches requiring steadiness. Improves cover rolls.',
-  communion:'Communion — openness, pastoral presence. Gates relational and confessional choices.',
-  doubt:'Doubt — theological uncertainty as a tool. Gates apophatic and memory choices.',
-};
+// STAT_TIPS from registry
+const STAT_TIPS = _registries.statTips;
 
 // ── RENDER ───────────────────────────────────────────────────
 function render(){
@@ -481,14 +496,14 @@ function absoluteReset(){
 }
 function renderMode(root){ const d=document.createElement('div');d.className='sel-screen'; d.innerHTML=`<div class="sel-h">How will you cross?</div><div class="sel-sub">Can be changed on a new crossing.</div><div class="sel-grid"><div class="sel-opt${G.mode==='attended'?' chosen':''}" onclick="G.mode='attended';render()"><div class="sel-name">First Crossing</div><div class="sel-desc">Mechanics visible. Locked choices show their requirements.</div></div><div class="sel-opt${G.mode==='open'?' chosen':''}" onclick="G.mode='open';render()"><div class="sel-name">Open Water</div><div class="sel-desc">Less held. Locked choices are simply absent.</div></div></div><button class="btn" onclick="G.phase='charism';render()">Continue</button>`; root.appendChild(d); }
 function selCharism(id){ const showWaking=G.playCount>=2,max=showWaking?2:1; if(G.charisms.includes(id)){G.charisms=G.charisms.filter(x=>x!==id);} else if(G.charisms.length<max){G.charisms=[...G.charisms,id];} render(); }
-function renderCharism(root){ const showWaking=G.playCount>=2,max=showWaking?2:1; const div=document.createElement('div');div.className='sel-screen'; let html=`<div class="sel-h">A charism.</div><div class="sel-sub">Not a skill. Something given — though it needs to be used to mean anything.${showWaking?`<br><span style="color:var(--cold);font-size:.8rem">Something new is available. Choose up to two.</span>`:''}</div><div class="sel-section">Sleeping</div>`; CHARISMS.sleeping.forEach(c=>{html+=`<div class="sel-opt${G.charisms.includes(c.id)?' chosen-cold':''}" onclick="selCharism('${c.id}')"><div class="sel-name sel-name-cold">${c.name}</div><div class="sel-desc">${c.desc}</div></div>`;}); if(showWaking){ html+=`<div class="sel-section sel-section-cold">Waking</div>`; CHARISMS.waking.forEach(c=>{html+=`<div class="sel-opt${G.charisms.includes(c.id)?' chosen-cold':''}" onclick="selCharism('${c.id}')"><div class="sel-name sel-name-cold">${c.name}</div><div class="sel-desc">${c.desc}</div></div>`;}); } html+=`<div style="font-size:.76rem;color:var(--dim);text-align:center;margin:.8rem 0">${G.charisms.length}/${max} chosen</div><button class="btn btn-cold" style="margin-top:.5rem" ${G.charisms.length===0?'disabled':''} onclick="beginGame()">Board the ship</button>`; div.innerHTML=html; root.appendChild(div); }
+function renderCharism(root){ const showWaking=G.playCount>=2,max=showWaking?2:1; const div=document.createElement('div');div.className='sel-screen'; let html=`<div class="sel-h">A charism.</div><div class="sel-sub">Not a skill. Something given — though it needs to be used to mean anything.${showWaking?`<br><span style="color:var(--cold);font-size:.8rem">Something new is available. Choose up to two.</span>`:''}</div><div class="sel-section">Sleeping</div>`; const sleeping=_registries.charisms.sleeping; const waking=_registries.charisms.waking; sleeping.forEach(c=>{html+=`<div class="sel-opt${G.charisms.includes(c.id)?' chosen-cold':''}" onclick="selCharism('${c.id}')"><div class="sel-name sel-name-cold">${c.name}</div><div class="sel-desc">${c.desc}</div></div>`;}); if(showWaking){ html+=`<div class="sel-section sel-section-cold">Waking</div>`; waking.forEach(c=>{html+=`<div class="sel-opt${G.charisms.includes(c.id)?' chosen-cold':''}" onclick="selCharism('${c.id}')"><div class="sel-name sel-name-cold">${c.name}</div><div class="sel-desc">${c.desc}</div></div>`;}); } html+=`<div style="font-size:.76rem;color:var(--dim);text-align:center;margin:.8rem 0">${G.charisms.length}/${max} chosen</div><button class="btn btn-cold" style="margin-top:.5rem" ${G.charisms.length===0?'disabled':''} onclick="beginGame()">Board the ship</button>`; div.innerHTML=html; root.appendChild(div); }
 function beginGame(){ if(!G.charisms.length)return; G.charisms.forEach(id=>addNote('charism_'+id)); if(G.charisms.includes('kenosis'))offerSounding('kenosis_thought'); if(G.charisms.includes('apophasis'))offerSounding('via_negativa'); G.phase='game'; G.scene='chapel_waking'; refreshAtmosMods(); render(); }
 
 // ── TUTORIAL ─────────────────────────────────────────────────
 function renderTutorial(root){ const div=document.createElement('div');div.className='tutorial-overlay'; div.innerHTML=`<div class="tutorial-box"><div class="tutorial-h">Before you board</div><div class="tutorial-item"><strong>Status bar</strong> — top of screen. Four stats: Vigilance, Composure, Communion, Doubt. Hover each for details. They open and close choices.</div><div class="tutorial-item"><strong>The Breviary</strong> <span class="key">breviary</span> — centre bottom. Soundings are contemplations that surface through choices. Take them deliberately. They develop over time and settle into permanent effects. Four slots total.</div><div class="tutorial-item"><strong>Observations</strong> <span class="key">observations</span> — right bottom. Notes from what you have found and who you have met.</div><div class="tutorial-item"><strong>Status</strong> <span class="key">status</span> — left bottom. Your cover story, charisms, cover integrity, and crossing number.</div><div class="tutorial-item"><strong>Abandon crossing</strong> — at the bottom of each scene. Ends the current crossing.</div><button class="btn" style="margin-top:1.5rem;width:100%" onclick="dismissTutorial()">Board the ship</button></div>`; root.appendChild(div); }
 function dismissTutorial(){ G.tutorialDone=true; saveGame(); render(); }
 
-// ── CHOICE LOCK CHECK (extended with new conditions) ─────────
+// ── CHOICE LOCK CHECK ─────────────────────────
 function isChoiceLocked(ch){
   if(ch.requires_flag && !hasFlag(ch.requires_flag)) return true;
   if(ch.requires_stat){ const[s,m]=ch.requires_stat; if((G.stats[s]||0)<m) return true; }
@@ -505,7 +520,7 @@ function isChoiceLocked(ch){
   return false;
 }
 
-// ── GAME RENDER (with roll support and new condition integration) ──
+// ── GAME RENDER ──────────────────────────────────────────────
 function renderGame(root){
   if(!G.tutorialDone&&G.scene==='chapel_waking'){ renderTutorial(root); return; }
   if(G.rollResult && G.pendingRoll) { renderRollBox(root); return; }
@@ -535,7 +550,7 @@ function renderGame(root){
   if(tags.length){ const cb=document.createElement('div'); cb.className='cbar'; cb.innerHTML=tags.join(''); hdr.appendChild(cb); }
   wrap.appendChild(hdr);
   const body=document.createElement('div'); body.className='game-body';
-  if(scene.art&&ART[scene.art]){ const art=document.createElement('pre'); art.className='art-block'; art.textContent=ART[scene.art]; body.appendChild(art); }
+  if(scene.art&&_registries.art[scene.art]){ const art=document.createElement('pre'); art.className='art-block'; art.textContent=_registries.art[scene.art]; body.appendChild(art); }
   if(G.lastReaction){ const rp=document.createElement('p'); rp.className='sp sp-reaction'; rp.textContent=G.lastReaction; body.appendChild(rp); G.lastReaction=null; }
   let rawText=typeof scene.text==='function'?scene.text(G):scene.text;
   rawText=injectGhostText(rawText,G.scene);
@@ -609,7 +624,7 @@ function renderGame(root){
   const ab=document.createElement('button');ab.id='audio-btn';
   ab.style.cssText='position:fixed;top:.55rem;right:.8rem;background:none;border:none;font-family:\'Courier Prime\',monospace;font-size:.7rem;color:var(--dim);cursor:pointer;z-index:200;letter-spacing:.08em;padding:.2rem .4rem;';
   ab.textContent=_audioOn?'♪ on':'♪ off';ab.onclick=toggleAudio;root.appendChild(ab);
-  // Bottom nav — hamburger on mobile, row on desktop
+  // Bottom nav
   const bnav=document.createElement('div');bnav.id='bottom-nav';
   bnav.style.cssText='position:fixed;bottom:0;left:0;width:100%;z-index:100;display:flex;justify-content:center;gap:0;background:rgba(6,8,12,0.96);border-top:1px solid var(--border);';
   [
@@ -662,14 +677,12 @@ function renderRollBox(root) {
   root.appendChild(box);
 }
 
-// ── APPLY CHOICE (extended) ─────────────────────────────────
 function applyChoice(ch){
-  // Crossing log: record meaningful decisions
   if(ch.cover_set||ch.set_note||ch.thought||(ch.requires_charism&&!ch.cover_set)){
     if(!G.crossingLog)G.crossingLog=[];
     const label=ch.cover_set?'Cover: '+ch.cover_set.value.replace(/_/g,' '):
                 ch.thought?'Sounding offered: '+(ch.thought||'').replace(/_/g,' '):
-                ch.set_note&&NOTES[ch.set_note]?noteLabel(ch.set_note).slice(0,52):
+                ch.set_note&&_registries.notes[ch.set_note]?noteLabel(ch.set_note).slice(0,52):
                 ch.text.replace(/\[.*?\]/g,'').trim().slice(0,52);
     G.crossingLog.unshift(label);if(G.crossingLog.length>8)G.crossingLog.pop();
   }
@@ -677,13 +690,11 @@ function applyChoice(ch){
   if(ch.set_flag)setFlag(ch.set_flag); if(ch.set_flag2)setFlag(ch.set_flag2);
   if(ch.set_note)addNote(ch.set_note); if(ch.cover_set)setCover(ch.cover_set.key,ch.cover_set.value);
   if(ch.thought)offerSounding(ch.thought);
-  // New effects
   if(ch.give_item) addItem(ch.give_item);
   if(ch.take_item) removeItem(ch.take_item);
   if(ch.advance_time) advanceTime(ch.advance_time);
   if(ch.mod_reputation) for(const[id,delta] of Object.entries(ch.mod_reputation)) modReputation(id,delta);
   if(ch.set_quest_state) for(const[id,state] of Object.entries(ch.set_quest_state)) setQuestState(id,state);
-  // Cover roll (existing)
   if(ch.cover_check){
     const result=rollCover(ch.cover_check);
     if(result==='failure')degradeCover(1);
@@ -780,18 +791,18 @@ function renderBreviaryPanel(root){
   const h=document.createElement('h3'); h.style.color='var(--thought)';
   h.innerHTML=`<button class="panel-close" onclick="G.soundingPending=null;openPanel('breviary')">✕</button>The Breviary <span class="breviary-count">${total}/${MAX_SOUNDINGS} soundings taken</span>`;
   p.appendChild(h);
-  if(G.soundingPending){ const pd=SOUNDINGS[G.soundingPending]; const warn=document.createElement('div'); warn.className='breviary-warn'; warn.textContent='Breviary full. To take "'+pd.name+'", suspend or release a sounding below.'; p.appendChild(warn); }
+  if(G.soundingPending){ const pd=_registries.soundings[G.soundingPending]; const warn=document.createElement('div'); warn.className='breviary-warn'; warn.textContent='Breviary full. To take "'+pd.name+'", suspend or release a sounding below.'; p.appendChild(warn); }
   if(G.soundings.available.length){ const s=document.createElement('div'); s.className='panel-sec'; s.textContent='Available — not yet taken'; p.appendChild(s);
-    G.soundings.available.forEach(id=>{ const snd=SOUNDINGS[id]; if(!snd)return; const card=document.createElement('div'); card.className='sounding-card'; const effectStr=snd.effect?Object.entries(snd.effect).map(([k,v])=>(v>0?'+':'')+v+' '+k).join(', '):''; card.innerHTML='<div class="sounding-name">'+snd.name+'</div><div class="sounding-fragment">'+snd.fragment+'</div><div class="sounding-origin">'+snd.origin+'</div><div class="sounding-body">'+processText(snd.taking)+'</div>'+(effectStr?'<div class="sounding-preview">When settled: '+effectStr+'</div>':''); const full=soundingSlotsFull()&&!G.soundingPending; const btn=document.createElement('button'); btn.className='sounding-btn sounding-btn-take'; btn.textContent=full?'Breviary full — suspend or release first':'Take this sounding'; btn.disabled=full; if(!full)btn.onclick=()=>takeSounding(id); card.appendChild(btn); p.appendChild(card); });
+    G.soundings.available.forEach(id=>{ const snd=_registries.soundings[id]; if(!snd)return; const card=document.createElement('div'); card.className='sounding-card'; const effectStr=snd.effect?Object.entries(snd.effect).map(([k,v])=>(v>0?'+':'')+v+' '+k).join(', '):''; card.innerHTML='<div class="sounding-name">'+snd.name+'</div><div class="sounding-fragment">'+snd.fragment+'</div><div class="sounding-origin">'+snd.origin+'</div><div class="sounding-body">'+processText(snd.taking)+'</div>'+(effectStr?'<div class="sounding-preview">When settled: '+effectStr+'</div>':''); const full=soundingSlotsFull()&&!G.soundingPending; const btn=document.createElement('button'); btn.className='sounding-btn sounding-btn-take'; btn.textContent=full?'Breviary full — suspend or release first':'Take this sounding'; btn.disabled=full; if(!full)btn.onclick=()=>takeSounding(id); card.appendChild(btn); p.appendChild(card); });
   }
   if(G.soundings.taken.length){ const s=document.createElement('div'); s.className='panel-sec'; s.textContent='Taking — in progress'; p.appendChild(s);
-    G.soundings.taken.forEach(({id,progress})=>{ const snd=SOUNDINGS[id]; if(!snd)return; const card=document.createElement('div'); card.className='sounding-card'; card.innerHTML='<div class="sounding-name">'+snd.name+'</div><div class="sounding-progress">'+soundingBar(progress)+' '+progress+'/'+SOUNDING_THRESHOLD+'</div><div class="sounding-body">'+processText(snd.taking)+'</div>'; const btns=document.createElement('div'); btns.style.cssText='display:flex;gap:.4rem;margin-top:.5rem;'; const susp=document.createElement('button'); susp.className='sounding-btn sounding-btn-suspend'; susp.textContent='Suspend'; susp.onclick=()=>suspendSounding(id); btns.appendChild(susp); const rel=document.createElement('button'); rel.className='sounding-btn sounding-btn-release'; rel.textContent='Release (permanent)'; rel.onclick=()=>{if(confirm('Release "'+snd.name+'"?\nThis sounding will be lost permanently.'))releaseSounding(id);}; btns.appendChild(rel); card.appendChild(btns); p.appendChild(card); });
+    G.soundings.taken.forEach(({id,progress})=>{ const snd=_registries.soundings[id]; if(!snd)return; const card=document.createElement('div'); card.className='sounding-card'; card.innerHTML='<div class="sounding-name">'+snd.name+'</div><div class="sounding-progress">'+soundingBar(progress)+' '+progress+'/'+SOUNDING_THRESHOLD+'</div><div class="sounding-body">'+processText(snd.taking)+'</div>'; const btns=document.createElement('div'); btns.style.cssText='display:flex;gap:.4rem;margin-top:.5rem;'; const susp=document.createElement('button'); susp.className='sounding-btn sounding-btn-suspend'; susp.textContent='Suspend'; susp.onclick=()=>suspendSounding(id); btns.appendChild(susp); const rel=document.createElement('button'); rel.className='sounding-btn sounding-btn-release'; rel.textContent='Release (permanent)'; rel.onclick=()=>{if(confirm('Release "'+snd.name+'"?\nThis sounding will be lost permanently.'))releaseSounding(id);}; btns.appendChild(rel); card.appendChild(btns); p.appendChild(card); });
   }
   if(G.soundings.settled.length){ const s=document.createElement('div'); s.className='panel-sec'; s.textContent='Settled'; p.appendChild(s);
-    G.soundings.settled.forEach(id=>{ const snd=SOUNDINGS[id]; if(!snd)return; const card=document.createElement('div'); card.className='sounding-card sounding-settled'; card.innerHTML='<div class="sounding-name">'+snd.name+' ●</div><div class="sounding-body">'+processText(snd.settled)+'</div><div class="sounding-effect">'+snd.effect_desc+'</div>'; p.appendChild(card); });
+    G.soundings.settled.forEach(id=>{ const snd=_registries.soundings[id]; if(!snd)return; const card=document.createElement('div'); card.className='sounding-card sounding-settled'; card.innerHTML='<div class="sounding-name">'+snd.name+' ●</div><div class="sounding-body">'+processText(snd.settled)+'</div><div class="sounding-effect">'+snd.effect_desc+'</div>'; p.appendChild(card); });
   }
   if(G.soundings.released&&G.soundings.released.length){ const s=document.createElement('div'); s.className='panel-sec'; s.style.color='var(--dim)'; s.textContent='Released — given up'; p.appendChild(s);
-    G.soundings.released.forEach(id=>{ const snd=SOUNDINGS[id]; if(!snd)return; const card=document.createElement('div'); card.className='sounding-card sounding-ghost'; card.innerHTML='<div class="sounding-name sounding-ghost-name">'+snd.name+' ◌</div><div class="sounding-fragment sounding-ghost-frag">'+snd.fragment+'</div><div class="sounding-body sounding-ghost-body">'+processText(snd.taking)+'</div><div style="font-size:.72rem;color:var(--dim);font-style:italic;margin-top:.4rem">Released — this contemplation was set down. It cannot be taken again.</div>'; p.appendChild(card); });
+    G.soundings.released.forEach(id=>{ const snd=_registries.soundings[id]; if(!snd)return; const card=document.createElement('div'); card.className='sounding-card sounding-ghost'; card.innerHTML='<div class="sounding-name sounding-ghost-name">'+snd.name+' ◌</div><div class="sounding-fragment sounding-ghost-frag">'+snd.fragment+'</div><div class="sounding-body sounding-ghost-body">'+processText(snd.taking)+'</div><div style="font-size:.72rem;color:var(--dim);font-style:italic;margin-top:.4rem">Released — this contemplation was set down. It cannot be taken again.</div>'; p.appendChild(card); });
   }
   if(!total&&!G.soundings.available.length){ const d=document.createElement('div'); d.className='panel-empty'; d.textContent='No soundings yet. They surface through choices — and must be deliberately taken.'; p.appendChild(d); }
   root.appendChild(mkOverlay(()=>{G.soundingPending=null;openPanel('breviary');})); root.appendChild(p);
@@ -823,7 +834,17 @@ function renderGlossaryPanel(root){
   const p=document.createElement('div'); p.className='side-panel side-panel-r'; p.style.width='min(420px,94vw)';
   const h=document.createElement('h3'); h.style.color='var(--cold)';
   h.innerHTML='<button class="panel-close" onclick="closeGlossary()">✕</button>Glossary'; p.appendChild(h);
-  GLOSSARY.forEach(({term,def})=>{ const d=document.createElement('div'); d.style.marginBottom='1.1rem'; d.innerHTML=`<div style="font-size:.84rem;color:var(--amber);margin-bottom:.25rem;font-family:'Special Elite',serif">${term}</div><div style="font-size:.8rem;color:var(--text);line-height:1.72">${def}</div>`; p.appendChild(d); });
+  _registries.glossary.forEach(({term,def})=>{ const d=document.createElement('div'); d.style.marginBottom='1.1rem'; d.innerHTML=`<div style="font-size:.84rem;color:var(--amber);margin-bottom:.25rem;font-family:'Special Elite',serif">${term}</div><div style="font-size:.8rem;color:var(--text);line-height:1.72">${def}</div>`; p.appendChild(d); });
   root.appendChild(mkOverlay(closeGlossary)); root.appendChild(p);
 }
+
+// Expose registries and public API for game_data.js
+window.SOBORNOST = {
+  registerCharisms, registerSounding, registerNote, registerArt,
+  registerGlossaryEntry, registerStatTip,
+  setIconWordFunction, setHarbourWordFunction, setShipWordFunction, setObjectDescriptionFunction,
+  allCharisms, findCharism, noteLabel, iconWord, harbourWord, shipWord, objectDescription,
+  G, render
+};
+
 render();

@@ -11,10 +11,15 @@
 <body>
   <canvas id="atmos"></canvas>
   <div id="root"></div>
+  <!-- Engine Core -->
+  <script src="SOBORNOST.js"></script>
+  <!-- Game Data (registers into engine) -->
+  <script src="game_data.js"></script>
+  <!-- Scene files (depend on registries being populated) -->
   <script src="scenes-act1.js"></script>
   <script src="scenes-act2.js"></script>
   <script src="scenes-act3.js"></script>
   <script src="scenes.js"></script>
-  <script src="engine.js"></script>
+  <!-- No separate engine.js – SOBORNOST.js already contains render call -->
 </body>
 </html>
