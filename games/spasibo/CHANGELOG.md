@@ -1,4 +1,18 @@
-# СПАСИБО — Changelog
+# СПАСИБО – Changelog
+
+## v1.3 – 2025-04-30
+
+### Engine Migration to SOBORNOST Core
+
+- **Replaced `engine.js` with `SOBORNOST.js` core engine** and `game_data.js` for all game content.
+- No gameplay changes – all existing functionality preserved.
+- Updated `spasibo.html` to load new files in correct order.
+- Created separate `CHANGELOG_SOBORNOST.md` for engine versioning.
+
+### Previous features (unchanged)
+- All v1.2 features (ghost slots, denomination test, haircut observation, non_erat_dominus branching, consequential container roll)
+- Audio depth, gold‑leaf visual, Witness path, Freezer Beef epilogue
+- Inventory, time, reputation, quests, advanced rolls
 
 ## v1.2 — Five gameplay suggestions implemented
 
