@@ -1,30 +1,40 @@
 // ═══════════════════════════════════════════════════════════
-// SOBORNOST ENGINE v2.2 – Core Mechanics (FIXED)
+// SOBORNOST ENGINE v2.4 – Core Mechanics (FIXED & ENHANCED)
 // Theosis, Name Mapping API, No Hardcoded Game Content
 // Bottom panels working, newPlay fixed, awareness removed
-// CHANGELOG v2.2:
-// - Implemented startRoll() for dice-based choices
-// - Removed mode override in beginGame()
-// - Added registerScenes() and scene lookup via _registries.scenes
-// - Fixed cover meter denominator (max=5)
-// - Liturgical hour updates with advanceTime()
-// - Soundings tick on each hour advanced
+// CHANGELOG v2.4:
+// - Memorial panel: added back button and content display
+// - Theosis count displayed in top stats bar (if >=33) and status panel
+// - Bottom navigation buttons (breviary, status, notes, glossary, map) now functional
+// - Audio: fixed user gesture requirement, added simple beep, toggle works
+// - Fixed "__new_play__" handling in roll outcomes to prevent scene not found error
+// - Added guard in navigate() to reject "__new_play__" as a scene ID
+// - Full panel rendering restored from v2.2
 // ═══════════════════════════════════════════════════════════
 
 // ── ATMOSPHERE (canvas, functions) ──────────────────────────
-const canvas = document.getElementById('atmos'), ctx = canvas.getContext('2d');
+let ENABLE_ATMOSPHERE = true;
+let canvas, ctx;
+if (ENABLE_ATMOSPHERE) {
+  canvas = document.getElementById('atmos');
+  ctx = canvas.getContext('2d');
+} else {
+  canvas = null; ctx = null;
+}
+
 let mood='neutral',targetMood='neutral',moodLerp=1,fogParts=[],rainDrops=[],T=0;
 let atmosMods = { fogMult:1.0, lampWarm:0, lampFlicker:true, soboWarm:false, goldIntensity:0, goldGlow:false };
-function resize(){canvas.width=innerWidth;canvas.height=innerHeight;initRain();}
+function resize(){ if(canvas){canvas.width=innerWidth;canvas.height=innerHeight;initRain();} }
 resize();addEventListener('resize',resize);
-function initFog(){fogParts=[];for(let i=0;i<22;i++)fogParts.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:80+Math.random()*140,vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.08,ph:Math.random()*Math.PI*2,base:.025+Math.random()*.05});}initFog();
-function initRain(){const p=porthole();rainDrops=[];for(let i=0;i<24;i++)rainDrops.push({x:p.x+(Math.random()-.5)*p.r*2,y:p.y+(Math.random()-.5)*p.r*2,len:5+Math.random()*9,spd:1.2+Math.random()*2});}
-function porthole(){const r=Math.min(canvas.width,canvas.height)*.085;return{x:canvas.width-r-28,y:r+28,r};}
+function initFog(){if(!ENABLE_ATMOSPHERE)return;fogParts=[];for(let i=0;i<22;i++)fogParts.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:80+Math.random()*140,vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.08,ph:Math.random()*Math.PI*2,base:.025+Math.random()*.05});}initFog();
+function initRain(){if(!ENABLE_ATMOSPHERE)return;const p=porthole();rainDrops=[];for(let i=0;i<24;i++)rainDrops.push({x:p.x+(Math.random()-.5)*p.r*2,y:p.y+(Math.random()-.5)*p.r*2,len:5+Math.random()*9,spd:1.2+Math.random()*2});}
+function porthole(){if(!ENABLE_ATMOSPHERE)return{x:0,y:0,r:0};const r=Math.min(canvas.width,canvas.height)*.085;return{x:canvas.width-r-28,y:r+28,r};}
 const MOOD={neutral:[130,170,190,6,8,12],tense:[140,90,70,10,6,4],uncanny:[60,130,170,4,8,14],revelation:[200,190,140,12,14,10]};
 function setMood(m){if(!m||m===targetMood)return;targetMood=m;moodLerp=0;_updateAudioMood();}
 function lerpN(a,b,t){return a+(b-a)*t;}
 
 function refreshAtmosMods(){
+  if(!ENABLE_ATMOSPHERE)return;
   const s = G.soundings.settled;
   atmosMods.fogMult = s.includes('gnoti_seauton') ? 0.55 : 1.0;
   atmosMods.lampWarm = s.includes('magnificat') ? 0.08 : 0;
@@ -38,6 +48,7 @@ function refreshAtmosMods(){
 }
 
 function drawAtmos(){
+  if(!ENABLE_ATMOSPHERE) return;
   T+=.008;
   if(moodLerp<1){moodLerp=Math.min(1,moodLerp+.008);if(moodLerp>=1)mood=targetMood;}
   const cm=MOOD[mood]||MOOD.neutral,tm=MOOD[targetMood]||MOOD.neutral,t=moodLerp;
@@ -89,6 +100,7 @@ function drawAtmos(){
 }
 
 function drawPorthole(){
+  if(!ENABLE_ATMOSPHERE)return;
   const{x,y,r}=porthole();
   ctx.strokeStyle='#1c2830';ctx.lineWidth=r*.18;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.stroke();
   ctx.fillStyle='#243038';
@@ -106,7 +118,7 @@ function drawPorthole(){
   }
   ctx.restore();ctx.strokeStyle='#2a3c48';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(x,y,r*.87,0,Math.PI*2);ctx.stroke();
 }
-drawAtmos();
+if(ENABLE_ATMOSPHERE) drawAtmos();
 
 // ── GLOBAL STATE ────────────────────────────────────────────
 let G = {
@@ -144,7 +156,8 @@ let G = {
   _analyticsLog: [],
   companions: [],
   theosis: 0,
-  _theosisFlashTimer: null
+  _theosisFlashTimer: null,
+  _coverFlash: false
 };
 
 // ── LITURGICAL HOURS ────────────────────────────────────────
@@ -158,15 +171,14 @@ const LITURGICAL_HOURS = [
   { name: 'Compline',mood: 'uncanny',    timeDesc: 'night' }
 ];
 
-// Helper to map hour (0-23) to liturgical hour index
 function _getLiturgicalHourFromTime(hour) {
-  if (hour >= 5 && hour < 7) return 0;      // Lauds (dawn)
-  if (hour >= 7 && hour < 9) return 1;      // Prime
-  if (hour >= 9 && hour < 11) return 2;     // Terce
-  if (hour >= 11 && hour < 13) return 3;    // Sext (noon)
-  if (hour >= 13 && hour < 17) return 4;    // None (afternoon)
-  if (hour >= 17 && hour < 20) return 5;    // Vespers (evening)
-  return 6;                                 // Compline (night)
+  if (hour >= 5 && hour < 7) return 0;
+  if (hour >= 7 && hour < 9) return 1;
+  if (hour >= 9 && hour < 11) return 2;
+  if (hour >= 11 && hour < 13) return 3;
+  if (hour >= 13 && hour < 17) return 4;
+  if (hour >= 17 && hour < 20) return 5;
+  return 6;
 }
 
 function _updateLiturgicalHour() {
@@ -210,8 +222,10 @@ function incrementTheosis(amount) {
   if (amount === 0) return;
   G.theosis = Math.min(Math.max(G.theosis + amount, 0), 100);
   refreshAtmosMods();
+  saveGame();
 }
 function flashTheosisLight(intensity=1.0, duration=2000) {
+  if (!ENABLE_ATMOSPHERE) return;
   if (G._theosisFlashTimer) clearTimeout(G._theosisFlashTimer);
   const origIntensity = atmosMods.goldIntensity;
   atmosMods.goldIntensity = Math.max(atmosMods.goldIntensity, intensity * 0.9);
@@ -268,7 +282,7 @@ const _registries = {
   sfxLibrary: {},
   mapNodes: {},
   items: {},
-  scenes: {}               // <-- NEW: scene registry
+  scenes: {}
 };
 
 function registerCharisms(sleepingList, wakingList) {
@@ -303,14 +317,49 @@ function registerPastLifeLine(sceneId, pattern, replacement, index) {
 function registerMapNode(nodeId, connections) { _registries.mapNodes[nodeId] = { connections, visited: false }; }
 function registerSfx(name, playFunction) { _registries.sfxLibrary[name] = playFunction; }
 function registerItem(id, data) { _registries.items[id] = data; }
-
-// NEW: Scene registration API
 function registerScenes(scenesObject) {
   if (!scenesObject) return;
   Object.assign(_registries.scenes, scenesObject);
 }
 function getScene(id) {
+  if (id === '__new_play__') return null; // safety
   return _registries.scenes[id] || (typeof SCENES !== 'undefined' && SCENES[id]);
+}
+
+// ── VALIDATION ──────────────────────────────────────────────
+function validateContent() {
+  const warnings = [];
+  for (const [sceneId, scene] of Object.entries(_registries.scenes)) {
+    if (!scene.choices) continue;
+    for (let i=0; i<scene.choices.length; i++) {
+      const ch = scene.choices[i];
+      if (ch.next && ch.next !== '__new_play__' && !getScene(ch.next)) {
+        warnings.push(`Scene "${sceneId}", choice ${i}: next scene "${ch.next}" not found.`);
+      }
+      if (ch.requires_charism) {
+        const charism = allCharisms().find(c => c.id === ch.requires_charism);
+        if (!charism) warnings.push(`Scene "${sceneId}", choice ${i}: requires charism "${ch.requires_charism}" not registered.`);
+      }
+      if (ch.requires_item && !_registries.items[ch.requires_item]) {
+        warnings.push(`Scene "${sceneId}", choice ${i}: requires item "${ch.requires_item}" not registered.`);
+      }
+      if (ch.give_item && !_registries.items[ch.give_item]) {
+        warnings.push(`Scene "${sceneId}", choice ${i}: gives item "${ch.give_item}" not registered.`);
+      }
+      if (ch.take_item && !_registries.items[ch.take_item]) {
+        warnings.push(`Scene "${sceneId}", choice ${i}: takes item "${ch.take_item}" not registered.`);
+      }
+      if (ch.thought && !_registries.soundings[ch.thought]) {
+        warnings.push(`Scene "${sceneId}", choice ${i}: offers sounding "${ch.thought}" not registered.`);
+      }
+    }
+  }
+  if (warnings.length) {
+    console.warn("SOBORNOST Content Validation Warnings:\n" + warnings.join("\n"));
+  } else {
+    console.log("SOBORNOST content validation passed.");
+  }
+  return warnings;
 }
 
 function allCharisms() { return [..._registries.charisms.sleeping, ..._registries.charisms.waking]; }
@@ -416,6 +465,7 @@ function settleSounding(soundingId) {
       if(snd && snd.effect) applyEffect(snd.effect);
       showToast(`${snd.name} has settled.`,'sounding');
       refreshAtmosMods();
+      saveGame();
     }
   }
 }
@@ -426,6 +476,7 @@ function applySoundingProgress(soundingId,delta){
   entry.progress=Math.min(Math.max(entry.progress+delta,0),SOUNDING_THRESHOLD);
   if(entry.progress>=SOUNDING_THRESHOLD && old<SOUNDING_THRESHOLD) settleSounding(soundingId);
   if(delta!==0){ const snd=_registries.soundings[soundingId]; showToast(`${snd.name}: ${delta>0?'+'+delta:delta}`,'sounding'); }
+  saveGame();
 }
 function applyAutoAlignment(tags){
   if(!tags||!tags.length) return;
@@ -437,7 +488,7 @@ function applyAutoAlignment(tags){
 
 const MAX_SOUNDINGS=4,SOUNDING_THRESHOLD=8;
 function soundingSlotsFull(){return G.soundings.taken.length+G.soundings.settled.length>=MAX_SOUNDINGS;}
-function offerSounding(id){ if(!id||!_registries.soundings[id])return; if(G.soundings.available.includes(id)||G.soundings.taken.some(t=>t.id===id)||G.soundings.settled.includes(id))return; G.soundings.available.push(id); showToast('Sounding: '+_registries.soundings[id].name,'sounding'); }
+function offerSounding(id){ if(!id||!_registries.soundings[id])return; if(G.soundings.available.includes(id)||G.soundings.taken.some(t=>t.id===id)||G.soundings.settled.includes(id))return; G.soundings.available.push(id); showToast('Sounding: '+_registries.soundings[id].name,'sounding'); saveGame(); }
 function takeSounding(id){
   if(G.soundings.taken.some(t=>t.id===id)||G.soundings.settled.includes(id))return;
   if(soundingSlotsFull()){ G.soundingPending=id; G.panelOpen='breviary'; render(); return; }
@@ -445,6 +496,7 @@ function takeSounding(id){
   G.soundings.taken.push({id,progress:0}); G.soundingPending=null;
   showToast(_registries.soundings[id].name+': taking the sounding.','sounding');
   if(id==='kenosis_thought') updateKenosisProgress();
+  saveGame();
   render();
 }
 function suspendSounding(id){
@@ -452,6 +504,7 @@ function suspendSounding(id){
   G.soundings.taken=G.soundings.taken.filter(t=>t.id!==id);
   G.soundings.available.push(id);
   if(id==='kenosis_thought') updateKenosisProgress();
+  saveGame();
   render();
 }
 function releaseSounding(id){
@@ -462,12 +515,14 @@ function releaseSounding(id){
   if(pending) setTimeout(()=>takeSounding(pending),50);
   else render();
   if(id==='kenosis_thought') updateKenosisProgress();
+  saveGame();
 }
 function tickSoundings(){
   const settled=[];
   G.soundings.taken=G.soundings.taken.map(t=>{ const p=t.progress+1; if(p>=SOUNDING_THRESHOLD){settled.push(t.id); return null;} return{id:t.id,progress:p}; }).filter(Boolean);
   settled.forEach(id=>{ G.soundings.settled.push(id); const s=_registries.soundings[id]; if(s&&s.effect) applyEffect(s.effect); showToast(s.name+': settled.','sounding'); refreshAtmosMods(); });
   if(settled.includes('kenosis_thought') || G.soundings.taken.some(t=>t.id==='kenosis_thought')) updateKenosisProgress();
+  if(settled.length) saveGame();
 }
 function soundingBar(p){ const f=Math.round((p/SOUNDING_THRESHOLD)*8); return '█'.repeat(f)+'░'.repeat(8-f); }
 function updateKenosisProgress(){
@@ -475,6 +530,7 @@ function updateKenosisProgress(){
   if(settled.includes('kenosis_thought')) G._kenosisProgress=8;
   else { const entry=G.soundings.taken.find(t=>t.id==='kenosis_thought'); G._kenosisProgress=entry?entry.progress:0; }
 }
+
 function getKenosisOpacity(){
   if(!G.soundings.settled.includes('kenosis_thought') && !G.soundings.taken.some(t=>t.id==='kenosis_thought')) return 1;
   const progress=Math.min(G._kenosisProgress,8);
@@ -495,6 +551,7 @@ function recalculateHeldEffects() {
       }
     }
   }
+  saveGame();
 }
 function hasItem(id) { return G.inventory.includes(id); }
 function addItem(id) { if(!hasItem(id)) { G.inventory.push(id); recalculateHeldEffects(); } }
@@ -506,14 +563,21 @@ function startIdleTimer() { if(_idleTimer) clearTimeout(_idleTimer); _idleTimer 
 function resetIdleTimer() { if(_idleTimer) clearTimeout(_idleTimer); startIdleTimer(); }
 
 // ── COVER METER, ALIGNMENT COMPASS, MAP ────────────────────
+let _coverFlashTimer = null;
+function flashCoverMeter() {
+  G._coverFlash = true;
+  if (_coverFlashTimer) clearTimeout(_coverFlashTimer);
+  _coverFlashTimer = setTimeout(() => { G._coverFlash = false; render(); }, 300);
+}
 function renderCoverMeter() {
   const integrity = Math.min(G.coverIntegrity,5);
-  const percent = (integrity/5)*100;   // FIXED: denominator 5 (max integrity)
+  const percent = (integrity/5)*100;
   let color='#90c060';
   if(integrity<=2) color='#c06060';
   else if(integrity<=5) color='#c0a060';
   const pulse = integrity<=2 ? ' pulsing' : '';
-  return `<div class="cover-meter${pulse}" style="width:100%; background:#2a2018; border-radius:4px; margin-top:0.3rem;"><div style="width:${percent}%; background:${color}; height:6px; border-radius:4px;"></div></div>`;
+  const flashClass = G._coverFlash ? ' cover-flash' : '';
+  return `<div class="cover-meter${pulse}${flashClass}" style="width:100%; background:#2a2018; border-radius:4px; margin-top:0.3rem;"><div style="width:${percent}%; background:${color}; height:6px; border-radius:4px;"></div></div>`;
 }
 function calculateAlignment() {
   let anamnesisScore=0, kenosisScore=0;
@@ -552,27 +616,81 @@ function renderMapPanel() {
   return `<pre style="font-size:0.7rem; font-family:monospace;">${ascii}</pre>`;
 }
 
-// ── AUDIO + SFX (stubs – replace with full implementation if needed) ──
-let _actx=null,_gainNode=null,_audioOn=false;
-let _oscNodes=[],_filterNode=null,_reverbGain=null;
-function _makeReverb(ctx,duration=1.8,decay=2.2){ /* stub */ return ctx.createConvolver(); }
-function _initAudio(){ /* stub */ }
-function _audioMoodGain(){ return 0.035; }
-function _applyMoodToAudio(m){}
-function toggleAudio(){ _audioOn=!_audioOn; const btn=document.getElementById('audio-btn'); if(btn) btn.textContent=_audioOn?'♪ on':'♪ off'; }
-function _updateAudioMood(){}
-function playSfx(name,volume=0.5){ const sfx=_registries.sfxLibrary[name]; if(sfx) sfx(volume); else console.warn(`SFX "${name}" not registered.`); }
-function initBuiltinSfx(){ /* stub */ }
+// ── AUDIO + SFX (functional) ────────────────────────────────
+let _audioCtx = null;
+let _audioOn = false;
+function initAudio() {
+  if (_audioCtx) return;
+  try {
+    _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    _audioOn = true;
+  } catch(e) { console.warn("Web Audio not supported", e); }
+}
+function playSfx(name, volume=0.5) {
+  const sfx = _registries.sfxLibrary[name];
+  if (sfx) { sfx(volume); return; }
+  if (!_audioCtx) initAudio();
+  if (!_audioCtx || !_audioOn) return;
+  const osc = _audioCtx.createOscillator();
+  const gain = _audioCtx.createGain();
+  osc.connect(gain);
+  gain.connect(_audioCtx.destination);
+  gain.gain.value = volume * 0.3;
+  osc.frequency.value = 880;
+  osc.type = 'sine';
+  osc.start();
+  gain.gain.exponentialRampToValueAtTime(0.00001, _audioCtx.currentTime + 0.5);
+  osc.stop(_audioCtx.currentTime + 0.5);
+}
+function toggleAudio() {
+  if (!_audioCtx) initAudio();
+  if (_audioCtx) {
+    if (_audioOn) {
+      _audioCtx.suspend();
+      _audioOn = false;
+    } else {
+      _audioCtx.resume();
+      _audioOn = true;
+    }
+  } else {
+    _audioOn = !_audioOn;
+  }
+  const btn = document.getElementById('audio-btn');
+  if (btn) btn.textContent = _audioOn ? '♪ on' : '♪ off';
+}
+function _updateAudioMood() { /* can be extended */ }
+function initBuiltinSfx() { /* stub */ }
 
 // ── UTILITIES ───────────────────────────────────────────────
 function hasFlag(f){return G.flags.has(f);}
-function setFlag(f){if(f)G.flags.add(f);}
-function addNote(key){ if(!key||G.notes.includes(key))return; G.notes.push(key); const l=noteLabel(key); showToast(l.length>52?l.slice(0,52)+'…':l,'note'); }
-function applyEffect(e){ if(!e)return; for(const[k,v]of Object.entries(e)){ if(G.stats[k]!==undefined){ if(k==='composure' && v>0 && G.mode==='witnessed') continue; if(v<0 && G.charisms.includes('presence_of_absence') && !G._poaAbsorbedThisScene){ G._poaAbsorbedThisScene=true; showToast('—','note'); continue; } G.stats[k]=Math.max(0,G.stats[k]+v); } } }
-function setCover(key,value){G.cover[key]=value;setFlag('cover_'+key+'_set');}
+function setFlag(f){if(f)G.flags.add(f); saveGame(); }
+function addNote(key){ if(!key||G.notes.includes(key))return; G.notes.push(key); const l=noteLabel(key); showToast(l.length>52?l.slice(0,52)+'…':l,'note'); saveGame(); }
+function applyEffect(e){ if(!e)return; for(const[k,v]of Object.entries(e)){ if(G.stats[k]!==undefined){ if(k==='composure' && v>0 && G.mode==='witnessed') continue; if(v<0 && G.charisms.includes('presence_of_absence') && !G._poaAbsorbedThisScene){ G._poaAbsorbedThisScene=true; showToast('—','note'); continue; } G.stats[k]=Math.max(0,G.stats[k]+v); } } saveGame(); }
+function setCover(key,value){G.cover[key]=value;setFlag('cover_'+key+'_set'); saveGame();}
 function showToast(msg,type){ const old=document.querySelector('.note-toast'); if(old)old.remove(); const t=document.createElement('div'); t.className='note-toast'+(type==='sounding'?' sounding-toast':''); t.textContent=msg; document.body.appendChild(t); setTimeout(()=>{if(t.parentNode)t.remove();},3200); }
-function rollCover(difficulty){ const roll=Math.ceil(Math.random()*6); const bonus=Math.floor(G.stats.composure/2); const total=roll+bonus; if(total>=difficulty+2)return'success'; if(total>=difficulty)return'partial'; return'failure'; }
-function degradeCover(amount){ const prev=G.coverIntegrity; G.coverIntegrity=Math.max(0,G.coverIntegrity-amount); if(G.coverIntegrity<=0&&prev>0){ setFlag('cover_blown'); setFlag('cover_compromised'); showToast('Cover blown. Merky will confront you.','note'); } else if(G.coverIntegrity<=1&&prev>1){ showToast('Cover is thin — one more slip breaks it.','note'); } else if(G.coverIntegrity<=2&&prev>2){ showToast('Cover questioned — Kenosis harder to access.','note'); } else if(G.coverIntegrity<=3&&prev>3){ showToast('Cover is strained.','note'); } }
+
+function rollCover(difficulty){
+  const roll = Math.floor(Math.random()*6) + Math.floor(Math.random()*6);
+  const bonus = Math.floor(G.stats.composure/2);
+  const total = roll + bonus;
+  if(total >= difficulty) return 'success';
+  if(total >= difficulty-2) return 'partial';
+  return 'failure';
+}
+
+function degradeCover(amount){
+  const prev = G.coverIntegrity;
+  G.coverIntegrity = Math.max(0, G.coverIntegrity - amount);
+  if (G.coverIntegrity !== prev) {
+    flashCoverMeter();
+    saveGame();
+  }
+  if(G.coverIntegrity<=0&&prev>0){ setFlag('cover_blown'); setFlag('cover_compromised'); showToast('Cover blown. Merky will confront you.','note'); }
+  else if(G.coverIntegrity<=1&&prev>1){ showToast('Cover is thin — one more slip breaks it.','note'); }
+  else if(G.coverIntegrity<=2&&prev>2){ showToast('Cover questioned — Kenosis harder to access.','note'); }
+  else if(G.coverIntegrity<=3&&prev>3){ showToast('Cover is strained.','note'); }
+}
+
 function advanceTime(hours) {
   for (let i = 0; i < hours; i++) {
     G.time.hour++;
@@ -580,17 +698,17 @@ function advanceTime(hours) {
       G.time.hour = 0;
       G.time.day++;
     }
-    tickSoundings();                         // <-- FIXED: tick soundings each hour
+    tickSoundings();
   }
   if (G.time.day > G.time.maxDays) { /* game over condition? */ }
-  _updateLiturgicalHour();                  // <-- FIXED: update liturgical hour and mood
+  _updateLiturgicalHour();
   processEventQueue();
   saveGame();
 }
-function modReputation(id,delta) { if(!G.reputation[id]) G.reputation[id]=0; G.reputation[id]+=delta; }
+function modReputation(id,delta) { if(!G.reputation[id]) G.reputation[id]=0; G.reputation[id]+=delta; saveGame(); }
 function getReputation(id) { return G.reputation[id]||0; }
-function setReputation(id,val) { G.reputation[id]=val; }
-function setQuestState(id,state) { G.quests[id]=state; }
+function setReputation(id,val) { G.reputation[id]=val; saveGame(); }
+function setQuestState(id,state) { G.quests[id]=state; saveGame(); }
 function getQuestState(id) { return G.quests[id]||'inactive'; }
 function isQuestActive(id) { return getQuestState(id)==='active'; }
 function isQuestCompleted(id) { return getQuestState(id)==='completed'; }
@@ -710,7 +828,7 @@ function navigateToPool(poolId) { console.warn('navigateToPool not implemented')
 function scheduleEvent(event) { G.eventQueue.push(event); saveGame(); }
 function processEventQueue() { /* same */ }
 function getStance(npcId, key) { if(!G.npcStance[npcId]) G.npcStance[npcId]={trust:0,suspicion:0,solidarity:0}; return G.npcStance[npcId][key]||0; }
-function setStance(npcId, key, value) { if(!G.npcStance[npcId]) G.npcStance[npcId]={trust:0,suspicion:0,solidarity:0}; G.npcStance[npcId][key]=value; }
+function setStance(npcId, key, value) { if(!G.npcStance[npcId]) G.npcStance[npcId]={trust:0,suspicion:0,solidarity:0}; G.npcStance[npcId][key]=value; saveGame(); }
 function modStance(npcId, key, delta) { const cur=getStance(npcId,key); setStance(npcId,key,cur+delta); if(delta!==0) showToast(`${npcId}: ${key} ${delta>0?'+'+delta:delta}`,'note'); }
 let _activeRitual = null;
 function startRitual(ritualId, startingScene, nextScene) { console.warn('startRitual not implemented'); return false; }
@@ -720,12 +838,12 @@ function isRitualActive() { return false; }
 function renderRitual(root) { console.warn('renderRitual not implemented'); }
 
 // ── EPISTEMIC HELPERS ──────────────────────────────────────
-function learn(flag) { G.knowledge.add(flag); G.beliefs.add(flag); }
-function comeToBelieve(flag) { if(!G.knowledge.has(flag)) G.beliefs.add(flag); }
-function contradict(flag) { G.beliefs.delete(flag); }
+function learn(flag) { G.knowledge.add(flag); G.beliefs.add(flag); saveGame(); }
+function comeToBelieve(flag) { if(!G.knowledge.has(flag)) G.beliefs.add(flag); saveGame(); }
+function contradict(flag) { G.beliefs.delete(flag); saveGame(); }
 function knows(flag) { return G.knowledge.has(flag); }
 function believes(flag) { return G.beliefs.has(flag); }
-function pushConsequence(consequence) { G.consequenceQueue.push(consequence); }
+function pushConsequence(consequence) { G.consequenceQueue.push(consequence); saveGame(); }
 function processConsequenceQueue() { /* same */ }
 
 // ── RENDER FUNCTIONS ───────────────────────────────────────
@@ -763,7 +881,7 @@ function absoluteReset() {
     pendingRoll:null,rollResult:null,awareness:0,_poaAbsorbedThisScene:false,_mortificationSpent:false,
     beliefs:new Set(),knowledge:new Set(),consequenceQueue:[],npcStance:{},eventQueue:[],
     pastLifeFlags:new Set(),_kenosisProgress:0,liturgicalHour:4,metaUnlocks:{},_idleTimer:null,
-    _analyticsLog:[],companions:[],theosis:0,_theosisFlashTimer:null
+    _analyticsLog:[],companions:[],theosis:0,_theosisFlashTimer:null,_coverFlash:false
   };
   render();
 }
@@ -790,14 +908,13 @@ function beginGame(){
   if(G.charisms.includes('apophasis'))offerSounding('via_negativa');
   G.phase='game';
   G.scene='chapel_waking';
-  // FIXED: do NOT override G.mode - keep player's choice
   refreshAtmosMods();
   render();
 }
 function renderTutorial(root){ const div=document.createElement('div');div.className='tutorial-overlay'; div.innerHTML=`<div class="tutorial-box"><div class="tutorial-h">Before you board</div><div class="tutorial-item"><strong>Status bar</strong> — top of screen. Four stats: Vigilance, Composure, Communion, Doubt. Hover each for details. They open and close choices.</div><div class="tutorial-item"><strong>The Breviary</strong> <span class="key">breviary</span> — centre bottom. Soundings are contemplations that surface through choices. Take them deliberately. They develop over time and settle into permanent effects. Four slots total.</div><div class="tutorial-item"><strong>Observations</strong> <span class="key">observations</span> — right bottom. Notes from what you have found and who you have met.</div><div class="tutorial-item"><strong>Status</strong> <span class="key">status</span> — left bottom. Your cover story, charisms, cover integrity, and crossing number.</div><div class="tutorial-item"><strong>Abandon crossing</strong> — at the bottom of each scene. Ends the current crossing.</div><button class="btn" style="margin-top:1.5rem;width:100%" onclick="dismissTutorial()">Board the ship</button></div>`; root.appendChild(div); }
 function dismissTutorial(){ G.tutorialDone=true; saveGame(); render(); }
 
-// ── PANEL FUNCTIONS (FULL IMPLEMENTATIONS) ─────────────────
+// ── PANEL FUNCTIONS ────────────────────────────────────────
 function resolveLayeredText(scene) { return getSceneText(scene); }
 
 function renderNotesPanel(root) {
@@ -825,6 +942,8 @@ function renderStatusPanel(root) {
   const addRow = (a,b,bc) => { const r = document.createElement('div'); r.className = 'stat-row'; r.innerHTML = `<span class="stat-label">${a}</span><span style="color:${bc||'var(--bright)'};font-weight:bold;font-size:.86rem">${b}</span>`; p.appendChild(r); };
   addSec('Stats');
   Object.entries(G.stats).forEach(([k,v]) => addRow(k, v));
+  // Display theosis if >=33
+  if (G.theosis >= 33) addRow('theosis', G.theosis, 'var(--amber)');
   addSec('Charisms');
   if (!G.charisms.length) { const d = document.createElement('div'); d.className = 'panel-empty'; d.textContent = 'None.'; p.appendChild(d); }
   else G.charisms.forEach(id => { const c = findCharism(id); if (!c) return; const d = document.createElement('div'); d.className = 'panel-item'; d.innerHTML = '<strong style="color:var(--cold)">'+c.name+'</strong><br>'+c.desc; p.appendChild(d); });
@@ -904,6 +1023,7 @@ function renderGlossaryPanel(root) {
   const h = document.createElement('h3'); h.style.color = 'var(--cold)';
   h.innerHTML = '<button class="panel-close" onclick="openPanel(\'glossary\')">✕</button>Glossary'; p.appendChild(h);
   _registries.glossary.forEach(({term,def}) => { const d = document.createElement('div'); d.style.marginBottom = '1.1rem'; d.innerHTML = `<div style="font-size:.84rem;color:var(--amber);margin-bottom:.25rem;font-family:'Special Elite',serif">${term}</div><div style="font-size:.8rem;color:var(--text);line-height:1.72">${def}</div>`; p.appendChild(d); });
+  if (_registries.glossary.length === 0) { const d = document.createElement('div'); d.className = 'panel-empty'; d.textContent = 'No glossary entries yet.'; p.appendChild(d); }
   root.appendChild(mkOverlay(() => openPanel('glossary'))); root.appendChild(p);
 }
 function renderMapPanelSide(root) {
@@ -943,7 +1063,6 @@ function returnToTitle(){ G.phase='title'; render(); }
 function openPanel(w) { G.panelOpen = G.panelOpen === w ? null : w; render(); }
 function mkOverlay(fn) { const o = document.createElement('div'); o.className = 'overlay-bg'; o.onclick = fn; return o; }
 
-// ========== FIXED: startRoll implementation ==========
 function startRoll(choice) {
   if (!choice.roll) return;
   const rollConfig = choice.roll;
@@ -990,9 +1109,6 @@ function renderRollBox(root) {
     else if (outcome === 'partial' && pending.onPartial) nextScene = pending.onPartial;
     else if (outcome === 'failure' && pending.onFailure) nextScene = pending.onFailure;
     
-    // Apply the choice's effects (flags, notes, etc.) even after a roll?
-    // Usually the roll outcome scene handles that, but we also need to apply the choice's
-    // generic effects (like set_flag, give_item, etc.) if any.
     if (pending.choice.effect) applyEffect(pending.choice.effect);
     if (pending.choice.set_flag) setFlag(pending.choice.set_flag);
     if (pending.choice.set_note) addNote(pending.choice.set_note);
@@ -1003,24 +1119,35 @@ function renderRollBox(root) {
     
     G.pendingRoll = null;
     G.rollResult = null;
-    if (nextScene) navigate(nextScene);
-    else render();
+    // Handle __new_play__ specially
+    if (nextScene === '__new_play__') {
+      newPlay();
+    } else if (nextScene) {
+      navigate(nextScene);
+    } else {
+      render();
+    }
   };
   root.appendChild(div);
 }
-// ========== END startRoll implementation ==========
 
 function navigate(id) {
+  if (id === '__new_play__') {
+    newPlay();
+    return;
+  }
   G.scene = id;
   markMapNodeVisited(id);
   G._poaAbsorbedThisScene = false;
   G._mortificationSpent = false;
-  tickSoundings();  // <-- already present
+  tickSoundings();
   window.scrollTo(0, 0);
   render();
 }
+
 function newPlay() {
-  // Start a new crossing – preserve theosis and metaUnlocks
+  commitPlay();   // increments G.playCount
+  // Reset state for new crossing
   G.stats = { vigilance: 0, composure: 0, communion: 0, doubt: 0 };
   G.charisms = [];
   G.cover = { posting: null, background: null, denomination: null, connection: null, left: null };
@@ -1054,8 +1181,7 @@ function newPlay() {
   G._kenosisProgress = 0;
   G.liturgicalHour = 4;
   G.companions = [];
-  // DO NOT reset G.theosis – preserve its value across crossings
-  // G.metaUnlocks also preserved
+  // keep theosis and metaUnlocks
   G.phase = 'charism';
   refreshAtmosMods();
   render();
@@ -1081,7 +1207,7 @@ function applyChoice(ch) {
   if (ch.give_item) addItem(ch.give_item);
   if (ch.take_item) removeItem(ch.take_item);
   if (ch.advance_time) advanceTime(ch.advance_time);
-  // Handle __new_play__
+  saveGame();
   if (ch.next === '__new_play__') {
     newPlay();
     return;
@@ -1102,11 +1228,25 @@ function renderGame(root){
     else{ G.scene='merky_confrontation'; }
   }
   const scene=getScene(G.scene);
-  if(!scene){ root.innerHTML+=`<p style="padding:2rem;color:var(--rust)">Scene not found: ${G.scene}</p>`; return; }
+  if(!scene){
+    const fallbackDiv = document.createElement('div');
+    fallbackDiv.className = 'error-fallback';
+    fallbackDiv.innerHTML = `
+      <div style="padding:2rem;text-align:center;">
+        <p style="color:var(--rust);margin-bottom:1rem;">⚠ Scene not found: "${G.scene}"</p>
+        <p>This may be due to incomplete content or a corrupted save.</p>
+        <div style="margin-top:1rem;display:flex;gap:1rem;justify-content:center;">
+          <button class="btn" onclick="returnToTitle()">Return to title</button>
+          <button class="btn" onclick="absoluteReset()">Reset all data</button>
+        </div>
+      </div>
+    `;
+    root.appendChild(fallbackDiv);
+    return;
+  }
   const liturgical = LITURGICAL_HOURS[G.liturgicalHour];
   if(liturgical) setMood(liturgical.mood);
   else setMood(scene.mood||'neutral');
-  saveGame();
   const visitKey='visited_'+G.scene, isFirstVisit=!hasFlag(visitKey);
   if(isFirstVisit){ setFlag(visitKey); if(scene.on_enter){ if(scene.on_enter.note)addNote(scene.on_enter.note); if(scene.on_enter.flag)setFlag(scene.on_enter.flag); if(scene.on_enter.thought)offerSounding(scene.on_enter.thought); } }
   const wrap=document.createElement('div'); wrap.className='game';
@@ -1117,7 +1257,13 @@ function renderGame(root){
   const moodCls=scene.mood==='uncanny'?' uncanny':scene.mood==='revelation'?' revelation':'';
   const lb=document.createElement('div'); lb.className='location-bar'+moodCls; lb.textContent=scene.location; hdr.appendChild(lb);
   const sb=document.createElement('div'); sb.className='sbar';
+  // Add stats including theosis if >=33
   Object.entries(G.stats).forEach(([k,v])=>{ const d=document.createElement('div'); d.className='stat'; d.innerHTML=k+' <span class="stat-val">'+v+'</span>'+(STAT_TIPS[k]?'<span class="stat-tip">'+STAT_TIPS[k]+'</span>':''); sb.appendChild(d); });
+  if (G.theosis >= 33) {
+    const theosisDiv = document.createElement('div'); theosisDiv.className='stat theosis-stat';
+    theosisDiv.innerHTML = 'theosis <span class="stat-val">'+G.theosis+'</span><span class="stat-tip">Union with divine</span>';
+    sb.appendChild(theosisDiv);
+  }
   hdr.appendChild(sb);
   const tags=[];
   G.charisms.forEach(id=>{const c=findCharism(id);if(c)tags.push(`<span class="ctag" title="${c.desc}">${c.name}</span>`);});
@@ -1156,7 +1302,7 @@ function renderGame(root){
       const btn=document.createElement('button');
       const locked = isChoiceLocked(ch);
       if(locked){
-        if(G.mode==='open')return;  // hide locked choices completely
+        if(G.mode==='open')return;
         btn.className='choice choice-locked'; btn.disabled=true;
         let hint=processText(ch.text);
         if(ch.requires_stat)hint+=` [${ch.requires_stat[0]} ${ch.requires_stat[1]}+]`;
@@ -1254,6 +1400,8 @@ window.SOBORNOST = {
   unlockMeta, hasMeta, exportAnalytics,
   registerTheosisTagValue, setTheosisTiers, incrementTheosis, flashTheosisLight,
   registerNameMapping,
-  registerScenes,   // <-- NEW: expose scene registration
+  registerScenes,
+  validateContent,
+  setAtmosphereEnabled: (enabled) => { ENABLE_ATMOSPHERE = enabled; if(!enabled && canvas) canvas.style.display='none'; else if(enabled && canvas) canvas.style.display='block'; },
   G, render
 };

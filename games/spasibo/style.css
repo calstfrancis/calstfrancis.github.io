@@ -365,3 +365,31 @@ body { background: var(--bg); color: var(--text); min-height: 100vh; overflow-x:
 /* ── AUDIO BUTTON ───────────────────────────────────────────── */
 #audio-btn { transition: color .2s; }
 #audio-btn:hover { color: var(--amber); }
+
+
+.cover-meter.cover-flash {
+  animation: coverFlash 0.3s ease-out;
+}
+@keyframes coverFlash {
+  0% { background-color: rgba(212, 175, 55, 0); }
+  50% { background-color: rgba(212, 175, 55, 0.6); }
+  100% { background-color: rgba(212, 175, 55, 0); }
+}
+/* Theosis stat in top bar */
+.stat.theosis-stat {
+  color: var(--amber);
+}
+.stat.theosis-stat .stat-val {
+  color: #d4af37;
+  text-shadow: 0 0 2px rgba(212,175,55,0.5);
+}
+
+/* Cover meter flash animation */
+.cover-meter.cover-flash {
+  animation: coverFlash 0.3s ease-out;
+}
+@keyframes coverFlash {
+  0% { background-color: rgba(212, 175, 55, 0); }
+  50% { background-color: rgba(212, 175, 55, 0.6); }
+  100% { background-color: rgba(212, 175, 55, 0); }
+}
