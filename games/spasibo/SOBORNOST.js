@@ -1,6 +1,14 @@
 // ═══════════════════════════════════════════════════════════
-// SOBORNOST ENGINE v2.1 – Core Mechanics
+// SOBORNOST ENGINE v2.2 – Core Mechanics (FIXED)
 // Theosis, Name Mapping API, No Hardcoded Game Content
+// Bottom panels working, newPlay fixed, awareness removed
+// CHANGELOG v2.2:
+// - Implemented startRoll() for dice-based choices
+// - Removed mode override in beginGame()
+// - Added registerScenes() and scene lookup via _registries.scenes
+// - Fixed cover meter denominator (max=5)
+// - Liturgical hour updates with advanceTime()
+// - Soundings tick on each hour advanced
 // ═══════════════════════════════════════════════════════════
 
 // ── ATMOSPHERE (canvas, functions) ──────────────────────────
@@ -139,7 +147,7 @@ let G = {
   _theosisFlashTimer: null
 };
 
-// ── LITURGICAL HOURS (fix for missing definition) ───────────
+// ── LITURGICAL HOURS ────────────────────────────────────────
 const LITURGICAL_HOURS = [
   { name: 'Lauds',   mood: 'neutral',    timeDesc: 'dawn' },
   { name: 'Prime',   mood: 'neutral',    timeDesc: 'early morning' },
@@ -149,6 +157,26 @@ const LITURGICAL_HOURS = [
   { name: 'Vespers', mood: 'revelation', timeDesc: 'evening' },
   { name: 'Compline',mood: 'uncanny',    timeDesc: 'night' }
 ];
+
+// Helper to map hour (0-23) to liturgical hour index
+function _getLiturgicalHourFromTime(hour) {
+  if (hour >= 5 && hour < 7) return 0;      // Lauds (dawn)
+  if (hour >= 7 && hour < 9) return 1;      // Prime
+  if (hour >= 9 && hour < 11) return 2;     // Terce
+  if (hour >= 11 && hour < 13) return 3;    // Sext (noon)
+  if (hour >= 13 && hour < 17) return 4;    // None (afternoon)
+  if (hour >= 17 && hour < 20) return 5;    // Vespers (evening)
+  return 6;                                 // Compline (night)
+}
+
+function _updateLiturgicalHour() {
+  const newIdx = _getLiturgicalHourFromTime(G.time.hour);
+  if (G.liturgicalHour !== newIdx) {
+    G.liturgicalHour = newIdx;
+    const lit = LITURGICAL_HOURS[G.liturgicalHour];
+    if (lit) setMood(lit.mood);
+  }
+}
 
 // ── THEOSIS SYSTEM ──────────────────────────────────────────
 let _theosisTiers = [
@@ -239,7 +267,8 @@ const _registries = {
   pastLifeLines: {},
   sfxLibrary: {},
   mapNodes: {},
-  items: {}
+  items: {},
+  scenes: {}               // <-- NEW: scene registry
 };
 
 function registerCharisms(sleepingList, wakingList) {
@@ -274,6 +303,15 @@ function registerPastLifeLine(sceneId, pattern, replacement, index) {
 function registerMapNode(nodeId, connections) { _registries.mapNodes[nodeId] = { connections, visited: false }; }
 function registerSfx(name, playFunction) { _registries.sfxLibrary[name] = playFunction; }
 function registerItem(id, data) { _registries.items[id] = data; }
+
+// NEW: Scene registration API
+function registerScenes(scenesObject) {
+  if (!scenesObject) return;
+  Object.assign(_registries.scenes, scenesObject);
+}
+function getScene(id) {
+  return _registries.scenes[id] || (typeof SCENES !== 'undefined' && SCENES[id]);
+}
 
 function allCharisms() { return [..._registries.charisms.sleeping, ..._registries.charisms.waking]; }
 function findCharism(id) { return allCharisms().find(c=>c.id===id); }
@@ -349,7 +387,6 @@ function loadMetaUnlocks() { try { const raw=localStorage.getItem(META_KEY); if(
 function saveMetaUnlocks() { try { localStorage.setItem(META_KEY, JSON.stringify(G.metaUnlocks)); } catch(e) {} }
 function unlockMeta(id) { if(!G.metaUnlocks[id]) { G.metaUnlocks[id]=true; saveMetaUnlocks(); showToast(`Meta‑achievement unlocked: ${id}`,'note'); } }
 function hasMeta(id) { return !!G.metaUnlocks[id]; }
-function logChoice(choice, sceneId) { /* unchanged */ }
 function exportAnalytics() {
   const data = JSON.stringify(G._analyticsLog, null, 2);
   const blob = new Blob([data], {type:'application/json'});
@@ -465,13 +502,13 @@ function removeItem(id) { G.inventory = G.inventory.filter(i=>i!==id); recalcula
 
 // ── RUMINATION ENGINE ───────────────────────────────────────
 let _idleTimer = null;
-function startIdleTimer() { if(_idleTimer) clearTimeout(_idleTimer); _idleTimer = setTimeout(() => { const scene = SCENES[G.scene]; if(scene && (!scene.choices || scene.choices.length===0) && !G.pendingRoll) { const doubt = G.stats.doubt||0; let rumination = ''; if(doubt>=4) rumination = 'What if I am not supposed to be here?'; else if(doubt>=2) rumination = 'The silence is heavy.'; else rumination = 'I wonder what time it is.'; showToast(rumination,'note'); } startIdleTimer(); }, 10000); }
+function startIdleTimer() { if(_idleTimer) clearTimeout(_idleTimer); _idleTimer = setTimeout(() => { const scene = getScene(G.scene); if(scene && (!scene.choices || scene.choices.length===0) && !G.pendingRoll) { const doubt = G.stats.doubt||0; let rumination = ''; if(doubt>=4) rumination = 'What if I am not supposed to be here?'; else if(doubt>=2) rumination = 'The silence is heavy.'; else rumination = 'I wonder what time it is.'; showToast(rumination,'note'); } startIdleTimer(); }, 10000); }
 function resetIdleTimer() { if(_idleTimer) clearTimeout(_idleTimer); startIdleTimer(); }
 
 // ── COVER METER, ALIGNMENT COMPASS, MAP ────────────────────
 function renderCoverMeter() {
-  const integrity = Math.min(G.coverIntegrity,10);
-  const percent = (integrity/10)*100;
+  const integrity = Math.min(G.coverIntegrity,5);
+  const percent = (integrity/5)*100;   // FIXED: denominator 5 (max integrity)
   let color='#90c060';
   if(integrity<=2) color='#c06060';
   else if(integrity<=5) color='#c0a060';
@@ -536,7 +573,20 @@ function setCover(key,value){G.cover[key]=value;setFlag('cover_'+key+'_set');}
 function showToast(msg,type){ const old=document.querySelector('.note-toast'); if(old)old.remove(); const t=document.createElement('div'); t.className='note-toast'+(type==='sounding'?' sounding-toast':''); t.textContent=msg; document.body.appendChild(t); setTimeout(()=>{if(t.parentNode)t.remove();},3200); }
 function rollCover(difficulty){ const roll=Math.ceil(Math.random()*6); const bonus=Math.floor(G.stats.composure/2); const total=roll+bonus; if(total>=difficulty+2)return'success'; if(total>=difficulty)return'partial'; return'failure'; }
 function degradeCover(amount){ const prev=G.coverIntegrity; G.coverIntegrity=Math.max(0,G.coverIntegrity-amount); if(G.coverIntegrity<=0&&prev>0){ setFlag('cover_blown'); setFlag('cover_compromised'); showToast('Cover blown. Merky will confront you.','note'); } else if(G.coverIntegrity<=1&&prev>1){ showToast('Cover is thin — one more slip breaks it.','note'); } else if(G.coverIntegrity<=2&&prev>2){ showToast('Cover questioned — Kenosis harder to access.','note'); } else if(G.coverIntegrity<=3&&prev>3){ showToast('Cover is strained.','note'); } }
-function advanceTime(hours) { G.time.hour+=hours; while(G.time.hour>=24){ G.time.hour-=24; G.time.day++; } if(G.time.day>G.time.maxDays){} processEventQueue(); saveGame(); }
+function advanceTime(hours) {
+  for (let i = 0; i < hours; i++) {
+    G.time.hour++;
+    if (G.time.hour >= 24) {
+      G.time.hour = 0;
+      G.time.day++;
+    }
+    tickSoundings();                         // <-- FIXED: tick soundings each hour
+  }
+  if (G.time.day > G.time.maxDays) { /* game over condition? */ }
+  _updateLiturgicalHour();                  // <-- FIXED: update liturgical hour and mood
+  processEventQueue();
+  saveGame();
+}
 function modReputation(id,delta) { if(!G.reputation[id]) G.reputation[id]=0; G.reputation[id]+=delta; }
 function getReputation(id) { return G.reputation[id]||0; }
 function setReputation(id,val) { G.reputation[id]=val; }
@@ -733,22 +783,283 @@ function renderMode(root){
 }
 function selCharism(id){ const showWaking=G.playCount>=2, max=showWaking?2:1; if(G.charisms.includes(id)){G.charisms=G.charisms.filter(x=>x!==id);} else if(G.charisms.length<max){G.charisms=[...G.charisms,id];} render(); }
 function renderCharism(root){ const showWaking=G.playCount>=2, max=showWaking?2:1; const div=document.createElement('div');div.className='sel-screen'; let html=`<div class="sel-h">A charism.</div><div class="sel-sub">Not a skill. Something given — though it needs to be used to mean anything.${showWaking?`<br><span style="color:var(--cold);font-size:.8rem">Something new is available. Choose up to two.</span>`:''}</div><div class="sel-section">Sleeping</div>`; const sleeping=_registries.charisms.sleeping; const waking=_registries.charisms.waking; sleeping.forEach(c=>{html+=`<div class="sel-opt${G.charisms.includes(c.id)?' chosen-cold':''}" onclick="selCharism('${c.id}')"><div class="sel-name sel-name-cold">${c.name}</div><div class="sel-desc">${c.desc}</div></div>`;}); if(showWaking){ html+=`<div class="sel-section sel-section-cold">Waking</div>`; waking.forEach(c=>{html+=`<div class="sel-opt${G.charisms.includes(c.id)?' chosen-cold':''}" onclick="selCharism('${c.id}')"><div class="sel-name sel-name-cold">${c.name}</div><div class="sel-desc">${c.desc}</div></div>`;}); } html+=`<div style="font-size:.76rem;color:var(--dim);text-align:center;margin:.8rem 0">${G.charisms.length}/${max} chosen</div><button class="btn btn-cold" style="margin-top:.5rem" ${G.charisms.length===0?'disabled':''} onclick="beginGame()">Board the ship</button>`; div.innerHTML=html; root.appendChild(div); }
-function beginGame(){ if(!G.charisms.length)return; G.charisms.forEach(id=>addNote('charism_'+id)); if(G.charisms.includes('kenosis'))offerSounding('kenosis_thought'); if(G.charisms.includes('apophasis'))offerSounding('via_negativa'); G.phase='game'; G.scene='chapel_waking'; refreshAtmosMods(); render(); }
+function beginGame(){
+  if(!G.charisms.length)return;
+  G.charisms.forEach(id=>addNote('charism_'+id));
+  if(G.charisms.includes('kenosis'))offerSounding('kenosis_thought');
+  if(G.charisms.includes('apophasis'))offerSounding('via_negativa');
+  G.phase='game';
+  G.scene='chapel_waking';
+  // FIXED: do NOT override G.mode - keep player's choice
+  refreshAtmosMods();
+  render();
+}
 function renderTutorial(root){ const div=document.createElement('div');div.className='tutorial-overlay'; div.innerHTML=`<div class="tutorial-box"><div class="tutorial-h">Before you board</div><div class="tutorial-item"><strong>Status bar</strong> — top of screen. Four stats: Vigilance, Composure, Communion, Doubt. Hover each for details. They open and close choices.</div><div class="tutorial-item"><strong>The Breviary</strong> <span class="key">breviary</span> — centre bottom. Soundings are contemplations that surface through choices. Take them deliberately. They develop over time and settle into permanent effects. Four slots total.</div><div class="tutorial-item"><strong>Observations</strong> <span class="key">observations</span> — right bottom. Notes from what you have found and who you have met.</div><div class="tutorial-item"><strong>Status</strong> <span class="key">status</span> — left bottom. Your cover story, charisms, cover integrity, and crossing number.</div><div class="tutorial-item"><strong>Abandon crossing</strong> — at the bottom of each scene. Ends the current crossing.</div><button class="btn" style="margin-top:1.5rem;width:100%" onclick="dismissTutorial()">Board the ship</button></div>`; root.appendChild(div); }
 function dismissTutorial(){ G.tutorialDone=true; saveGame(); render(); }
 
+// ── PANEL FUNCTIONS (FULL IMPLEMENTATIONS) ─────────────────
 function resolveLayeredText(scene) { return getSceneText(scene); }
-function renderNotesPanel(root){ /* stub */ const p=document.createElement('div'); p.textContent='Notes panel'; root.appendChild(p); }
-function renderStatusPanel(root){ /* stub */ const p=document.createElement('div'); p.textContent='Status panel'; root.appendChild(p); }
-function renderBreviaryPanel(root){ /* stub */ const p=document.createElement('div'); p.textContent='Breviary panel'; root.appendChild(p); }
-function renderGlossaryPanel(root){ /* stub */ const p=document.createElement('div'); p.textContent='Glossary panel'; root.appendChild(p); }
-function renderMapPanelSide(root){ /* stub */ const p=document.createElement('div'); p.textContent='Map panel'; root.appendChild(p); }
-function renderMemorial(root){ /* stub */ const p=document.createElement('div'); p.textContent='Memorial'; root.appendChild(p); }
-function openPanel(w) { G.panelOpen=G.panelOpen===w?null:w; render(); }
-function startRoll(choice) { /* stub */ }
-function renderRollBox(root) { /* stub */ root.innerHTML='<div class="roll-box">Roll box</div>'; }
-function navigate(id) { G.scene=id; G._poaAbsorbedThisScene=false; G._mortificationSpent=false; render(); }
-function newPlay() { doRestart(); }
+
+function renderNotesPanel(root) {
+  const p = document.createElement('div'); p.className = 'side-panel side-panel-r';
+  const h = document.createElement('h3'); h.style.color = 'var(--amber)';
+  h.innerHTML = '<button class="panel-close" onclick="openPanel(\'notes\')">✕</button>Observations'; p.appendChild(h);
+  if (!G.notes.length) { const d = document.createElement('div'); d.className = 'panel-empty'; d.textContent = 'Nothing noted yet.'; p.appendChild(d); }
+  else {
+    const cats = [{label:'People',test:k=>k.startsWith('met_')},{label:'Cover',test:k=>k.startsWith('cover_')},{label:'Charisms',test:k=>k.startsWith('charism_')},{label:'Events',test:k=>!k.startsWith('met_')&&!k.startsWith('cover_')&&!k.startsWith('charism_')}];
+    const shown = new Set();
+    cats.forEach(cat => {
+      const items = [...G.notes].reverse().filter(k => cat.test(k) && !shown.has(k));
+      if (!items.length) return;
+      const sec = document.createElement('div'); sec.className = 'panel-sec'; sec.textContent = cat.label; p.appendChild(sec);
+      items.forEach(k => { shown.add(k); const d = document.createElement('div'); d.className = 'panel-item'; d.textContent = '• ' + noteLabel(k); p.appendChild(d); });
+    });
+  }
+  root.appendChild(mkOverlay(() => openPanel('notes'))); root.appendChild(p);
+}
+function renderStatusPanel(root) {
+  const p = document.createElement('div'); p.className = 'side-panel side-panel-l';
+  const h = document.createElement('h3'); h.style.color = 'var(--cold)';
+  h.innerHTML = '<button class="panel-close" onclick="openPanel(\'status\')">✕</button>Status'; p.appendChild(h);
+  const addSec = t => { const s = document.createElement('div'); s.className = 'panel-sec'; s.textContent = t; p.appendChild(s); };
+  const addRow = (a,b,bc) => { const r = document.createElement('div'); r.className = 'stat-row'; r.innerHTML = `<span class="stat-label">${a}</span><span style="color:${bc||'var(--bright)'};font-weight:bold;font-size:.86rem">${b}</span>`; p.appendChild(r); };
+  addSec('Stats');
+  Object.entries(G.stats).forEach(([k,v]) => addRow(k, v));
+  addSec('Charisms');
+  if (!G.charisms.length) { const d = document.createElement('div'); d.className = 'panel-empty'; d.textContent = 'None.'; p.appendChild(d); }
+  else G.charisms.forEach(id => { const c = findCharism(id); if (!c) return; const d = document.createElement('div'); d.className = 'panel-item'; d.innerHTML = '<strong style="color:var(--cold)">'+c.name+'</strong><br>'+c.desc; p.appendChild(d); });
+  addSec('Cover');
+  const intDesc = {5:'Full — all charisms available',4:'Good — no restrictions',3:'Intact — cover holding',2:'Questioned — Kenosis harder',1:'Thin — one slip breaks it',0:'Blown — Merky knows'};
+  const intCol = G.coverIntegrity<=1?'var(--rust)':G.coverIntegrity<=2?'var(--amber-dim)':'var(--amber)';
+  addRow('Cover integrity', intDesc[G.coverIntegrity] || G.coverIntegrity, intCol);
+  p.innerHTML += renderCoverMeter();
+  const cl = { posting:'Reason here', background:'Prior work', denomination:'Declared tradition', connection:'Claims to know', left:'Left behind' };
+  const coverLabels = { posting_requested:'Requested posting', posting_assigned:'Assigned — no choice', posting_escape:'Needed to leave', posting_summoned:'Summoned by someone', bg_teacher:'Former teacher', bg_medical:'Medical background', bg_functionary:'Civil service', bg_scholar:'Long-term student', denom_orthodox:'Orthodox', denom_protestant:'Protestant', denom_ecumenical:'Ecumenical', denom_catholic:'Catholic' };
+  Object.entries(G.cover).forEach(([k, v]) => { const val = v ? (coverLabels[v] || v.replace(/_/g,' ')) : '—'; addRow(cl[k]||k, val, v?'var(--amber)':'var(--dim)'); });
+  addSec('Crossing'); addRow('number', G.playCount+1);
+  if (G.crossingLog && G.crossingLog.length) {
+    addSec('Recent Decisions');
+    G.crossingLog.slice(0,5).forEach(entry => {
+      const d = document.createElement('div'); d.className = 'panel-item'; d.style.cssText = 'font-size:.76rem;padding-left:.5rem;border-left:2px solid var(--border-mid);margin-bottom:.3rem;';
+      d.textContent = '◦ ' + entry; p.appendChild(d);
+    });
+  }
+  root.appendChild(mkOverlay(() => openPanel('status'))); root.appendChild(p);
+}
+function renderBreviaryPanel(root) {
+  const p = document.createElement('div'); p.className = 'side-panel side-panel-c';
+  const taken = G.soundings.taken.length, settled = G.soundings.settled.length, total = taken + settled;
+  const h = document.createElement('h3'); h.style.color = 'var(--thought)';
+  h.innerHTML = `<button class="panel-close" onclick="G.soundingPending=null;openPanel('breviary')">✕</button>The Breviary <span class="breviary-count">${total}/${MAX_SOUNDINGS} soundings taken</span>`;
+  p.appendChild(h);
+  if (G.soundingPending) { const pd = _registries.soundings[G.soundingPending]; const warn = document.createElement('div'); warn.className = 'breviary-warn'; warn.textContent = 'Breviary full. To take "'+pd.name+'", suspend or release a sounding below.'; p.appendChild(warn); }
+  if (G.soundings.available.length) {
+    const s = document.createElement('div'); s.className = 'panel-sec'; s.textContent = 'Available — not yet taken'; p.appendChild(s);
+    G.soundings.available.forEach(id => {
+      const snd = _registries.soundings[id]; if (!snd) return;
+      const card = document.createElement('div'); card.className = 'sounding-card';
+      const effectStr = snd.effect ? Object.entries(snd.effect).map(([k,v]) => (v>0?'+':'')+v+' '+k).join(', ') : '';
+      card.innerHTML = '<div class="sounding-name">'+snd.name+'</div><div class="sounding-fragment">'+snd.fragment+'</div><div class="sounding-origin">'+snd.origin+'</div><div class="sounding-body">'+processText(snd.taking)+'</div>'+(effectStr?'<div class="sounding-preview">When settled: '+effectStr+'</div>':'');
+      const full = soundingSlotsFull() && !G.soundingPending;
+      const btn = document.createElement('button'); btn.className = 'sounding-btn sounding-btn-take'; btn.textContent = full ? 'Breviary full — suspend or release first' : 'Take this sounding'; btn.disabled = full;
+      if (!full) btn.onclick = () => takeSounding(id);
+      card.appendChild(btn); p.appendChild(card);
+    });
+  }
+  if (G.soundings.taken.length) {
+    const s = document.createElement('div'); s.className = 'panel-sec'; s.textContent = 'Taking — in progress'; p.appendChild(s);
+    G.soundings.taken.forEach(({id,progress}) => {
+      const snd = _registries.soundings[id]; if (!snd) return;
+      const card = document.createElement('div'); card.className = 'sounding-card';
+      card.innerHTML = '<div class="sounding-name">'+snd.name+'</div><div class="sounding-progress">'+soundingBar(progress)+' '+progress+'/'+SOUNDING_THRESHOLD+'</div><div class="sounding-body">'+processText(snd.taking)+'</div>';
+      const btns = document.createElement('div'); btns.style.cssText = 'display:flex;gap:.4rem;margin-top:.5rem;';
+      const susp = document.createElement('button'); susp.className = 'sounding-btn sounding-btn-suspend'; susp.textContent = 'Suspend'; susp.onclick = () => suspendSounding(id); btns.appendChild(susp);
+      const rel = document.createElement('button'); rel.className = 'sounding-btn sounding-btn-release'; rel.textContent = 'Release (permanent)'; rel.onclick = () => { if(confirm('Release "'+snd.name+'"?\nThis sounding will be lost permanently.')) releaseSounding(id); }; btns.appendChild(rel);
+      card.appendChild(btns); p.appendChild(card);
+    });
+  }
+  if (G.soundings.settled.length) {
+    const s = document.createElement('div'); s.className = 'panel-sec'; s.textContent = 'Settled'; p.appendChild(s);
+    G.soundings.settled.forEach(id => {
+      const snd = _registries.soundings[id]; if (!snd) return;
+      const card = document.createElement('div'); card.className = 'sounding-card sounding-settled';
+      card.innerHTML = '<div class="sounding-name">'+snd.name+' ●</div><div class="sounding-body">'+processText(snd.settled)+'</div><div class="sounding-effect">'+snd.effect_desc+'</div>';
+      p.appendChild(card);
+    });
+  }
+  if (G.soundings.released && G.soundings.released.length) {
+    const s = document.createElement('div'); s.className = 'panel-sec'; s.style.color = 'var(--dim)'; s.textContent = 'Released — given up'; p.appendChild(s);
+    G.soundings.released.forEach(id => {
+      const snd = _registries.soundings[id]; if (!snd) return;
+      const card = document.createElement('div'); card.className = 'sounding-card sounding-ghost';
+      card.innerHTML = '<div class="sounding-name sounding-ghost-name">'+snd.name+' ◌</div><div class="sounding-fragment sounding-ghost-frag">'+snd.fragment+'</div><div class="sounding-body sounding-ghost-body">'+processText(snd.taking)+'</div><div style="font-size:.72rem;color:var(--dim);font-style:italic;margin-top:.4rem">Released — this contemplation was set down. It cannot be taken again.</div>';
+      p.appendChild(card);
+    });
+  }
+  if (!total && !G.soundings.available.length) { const d = document.createElement('div'); d.className = 'panel-empty'; d.textContent = 'No soundings yet. They surface through choices — and must be deliberately taken.'; p.appendChild(d); }
+  root.appendChild(mkOverlay(() => { G.soundingPending = null; openPanel('breviary'); })); root.appendChild(p);
+}
+function renderGlossaryPanel(root) {
+  const p = document.createElement('div'); p.className = 'side-panel side-panel-r'; p.style.width = 'min(420px,94vw)';
+  const h = document.createElement('h3'); h.style.color = 'var(--cold)';
+  h.innerHTML = '<button class="panel-close" onclick="openPanel(\'glossary\')">✕</button>Glossary'; p.appendChild(h);
+  _registries.glossary.forEach(({term,def}) => { const d = document.createElement('div'); d.style.marginBottom = '1.1rem'; d.innerHTML = `<div style="font-size:.84rem;color:var(--amber);margin-bottom:.25rem;font-family:'Special Elite',serif">${term}</div><div style="font-size:.8rem;color:var(--text);line-height:1.72">${def}</div>`; p.appendChild(d); });
+  root.appendChild(mkOverlay(() => openPanel('glossary'))); root.appendChild(p);
+}
+function renderMapPanelSide(root) {
+  const p = document.createElement('div'); p.className = 'side-panel side-panel-r';
+  const h = document.createElement('h3'); h.style.color = 'var(--amber)';
+  h.innerHTML = '<button class="panel-close" onclick="openPanel(\'map\')">✕</button>Map'; p.appendChild(h);
+  p.innerHTML += renderMapPanel();
+  root.appendChild(mkOverlay(() => openPanel('map'))); root.appendChild(p);
+}
+function renderMemorial(root) {
+  try {
+    const endings = JSON.parse(localStorage.getItem(ENDINGS_KEY) || '[]');
+    const plays = parseInt(localStorage.getItem(PLAY_KEY) || '0');
+    const endingNames = { intercept:'Intercept — authentication signed', facilitate:'Facilitate — return enabled', witness:'Witness — delay created' };
+    const align = calculateAlignment();
+    const compassHtml = renderAlignmentCompass();
+    const exportBtn = `<button class="btn" onclick="window.SOBORNOST.exportAnalytics()" style="margin-top:1rem;">Export Analytics</button>`;
+    const div = document.createElement('div'); div.className = 'sel-screen'; div.style.animation = 'fi .4s ease';
+    let html = '<div class="sel-h" style="color:var(--cold)">The Memorial</div>';
+    html += `<div style="font-size:.82rem;color:var(--dim);text-align:center;margin-bottom:2rem;font-style:italic">Crossings completed: ${plays}</div>`;
+    html += `<div style="margin:1rem 0;text-align:center;">${compassHtml}</div>`;
+    if (!endings.length) { html += '<div style="font-size:.84rem;color:var(--dim);text-align:center;font-style:italic;margin-bottom:2rem">No crossings recorded yet.</div>'; }
+    else {
+      html += '<div class="panel-sec" style="text-align:center">Endings reached</div>';
+      const seen = new Set();
+      endings.forEach(e => { if (!seen.has(e.ending)) { seen.add(e.ending); html += `<div style="border:1px solid var(--border-mid);padding:.8rem 1rem;margin-bottom:.6rem;background:rgba(10,14,20,0.5)"><div style="font-size:.88rem;color:var(--cold);margin-bottom:.3rem">${endingNames[e.ending]||e.ending}</div><div style="font-size:.74rem;color:var(--dim)">First reached: crossing ${e.play + 1}${e.charisms && e.charisms.length ? ' · charism: ' + e.charisms.join(', ') : ''}</div></div>`; } });
+      const endingSet = new Set(endings.map(e => e.ending));
+      const missing = ['intercept','facilitate','witness'].filter(e => !endingSet.has(e));
+      if (missing.length) { html += '<div style="font-size:.76rem;color:var(--border-mid);font-style:italic;margin-top:.5rem">'; missing.forEach(e => { html += `<div>— ${endingNames[e]} (not yet reached)</div>`; }); html += '</div>'; }
+    }
+    html += `<div style="margin-top:1.5rem;text-align:center">${exportBtn}</div>`;
+    html += '<button class="btn btn-sm" style="margin-top:2rem;display:block" onclick="returnToTitle()">Return</button>';
+    div.innerHTML = html; root.appendChild(div);
+  } catch(e) { root.innerHTML += '<p style="padding:2rem;color:var(--rust)">Memorial unavailable.</p>'; }
+}
+function returnToTitle(){ G.phase='title'; render(); }
+function openPanel(w) { G.panelOpen = G.panelOpen === w ? null : w; render(); }
+function mkOverlay(fn) { const o = document.createElement('div'); o.className = 'overlay-bg'; o.onclick = fn; return o; }
+
+// ========== FIXED: startRoll implementation ==========
+function startRoll(choice) {
+  if (!choice.roll) return;
+  const rollConfig = choice.roll;
+  const result = performRoll(rollConfig.stat, rollConfig.difficulty, rollConfig.options || {});
+  G.pendingRoll = {
+    choice: choice,
+    result: result,
+    onSuccess: rollConfig.onSuccess,
+    onPartial: rollConfig.onPartial,
+    onFailure: rollConfig.onFailure
+  };
+  G.rollResult = result;
+  render();
+}
+
+function renderRollBox(root) {
+  if (!G.pendingRoll || !G.rollResult) {
+    G.pendingRoll = null;
+    G.rollResult = null;
+    render();
+    return;
+  }
+  const r = G.rollResult;
+  const pending = G.pendingRoll;
+  const outcome = r.outcome;
+  const outcomeText = outcome === 'success' ? '✓ Success' : (outcome === 'partial' ? '◔ Partial' : '✗ Failure');
+  
+  const div = document.createElement('div');
+  div.className = 'roll-overlay';
+  div.innerHTML = `
+    <div class="roll-box">
+      <div class="roll-dice">🎲 ${r.d1} + ${r.d2} = ${r.roll}</div>
+      <div class="roll-stat">+ ${r.statValue} (${pending.choice.roll.stat})</div>
+      ${r.charismBonus ? `<div class="roll-bonus">+ ${r.charismBonus} (${r.charismNote})</div>` : ''}
+      <div class="roll-total">Total: ${r.total}</div>
+      <div class="roll-outcome ${outcome}">${outcomeText}</div>
+      <button class="btn roll-continue">Continue</button>
+    </div>
+  `;
+  const btn = div.querySelector('.roll-continue');
+  btn.onclick = () => {
+    let nextScene = null;
+    if (outcome === 'success' && pending.onSuccess) nextScene = pending.onSuccess;
+    else if (outcome === 'partial' && pending.onPartial) nextScene = pending.onPartial;
+    else if (outcome === 'failure' && pending.onFailure) nextScene = pending.onFailure;
+    
+    // Apply the choice's effects (flags, notes, etc.) even after a roll?
+    // Usually the roll outcome scene handles that, but we also need to apply the choice's
+    // generic effects (like set_flag, give_item, etc.) if any.
+    if (pending.choice.effect) applyEffect(pending.choice.effect);
+    if (pending.choice.set_flag) setFlag(pending.choice.set_flag);
+    if (pending.choice.set_note) addNote(pending.choice.set_note);
+    if (pending.choice.thought) offerSounding(pending.choice.thought);
+    if (pending.choice.give_item) addItem(pending.choice.give_item);
+    if (pending.choice.take_item) removeItem(pending.choice.take_item);
+    if (pending.choice.advance_time) advanceTime(pending.choice.advance_time);
+    
+    G.pendingRoll = null;
+    G.rollResult = null;
+    if (nextScene) navigate(nextScene);
+    else render();
+  };
+  root.appendChild(div);
+}
+// ========== END startRoll implementation ==========
+
+function navigate(id) {
+  G.scene = id;
+  markMapNodeVisited(id);
+  G._poaAbsorbedThisScene = false;
+  G._mortificationSpent = false;
+  tickSoundings();  // <-- already present
+  window.scrollTo(0, 0);
+  render();
+}
+function newPlay() {
+  // Start a new crossing – preserve theosis and metaUnlocks
+  G.stats = { vigilance: 0, composure: 0, communion: 0, doubt: 0 };
+  G.charisms = [];
+  G.cover = { posting: null, background: null, denomination: null, connection: null, left: null };
+  G.coverIntegrity = 5;
+  G.soundings = { available: [], taken: [], settled: [], released: [] };
+  G.soundingPending = null;
+  G.notes = [];
+  G.flags = new Set();
+  G.scene = 'chapel_waking';
+  G.lastReaction = null;
+  G.panelOpen = null;
+  G.confirmRestart = false;
+  G.tutorialDone = false;
+  G.pastFlags = [];
+  G.inventory = [];
+  G.time = { day: 1, hour: 8, maxDays: 3 };
+  G.reputation = {};
+  G.quests = {};
+  G.crossingLog = [];
+  G.pendingRoll = null;
+  G.rollResult = null;
+  G.awareness = 0;
+  G._poaAbsorbedThisScene = false;
+  G._mortificationSpent = false;
+  G.beliefs = new Set();
+  G.knowledge = new Set();
+  G.consequenceQueue = [];
+  G.npcStance = {};
+  G.eventQueue = [];
+  G.pastLifeFlags = new Set();
+  G._kenosisProgress = 0;
+  G.liturgicalHour = 4;
+  G.companions = [];
+  // DO NOT reset G.theosis – preserve its value across crossings
+  // G.metaUnlocks also preserved
+  G.phase = 'charism';
+  refreshAtmosMods();
+  render();
+}
 function doRestart() { absoluteReset(); }
 
 function applyChoice(ch) {
@@ -764,13 +1075,18 @@ function applyChoice(ch) {
     flashTheosisLight(intensity, duration);
   }
   applyEffect(ch.effect);
-  if(ch.set_flag) setFlag(ch.set_flag);
-  if(ch.set_note) addNote(ch.set_note);
-  if(ch.thought) offerSounding(ch.thought);
-  if(ch.give_item) addItem(ch.give_item);
-  if(ch.take_item) removeItem(ch.take_item);
-  if(ch.advance_time) advanceTime(ch.advance_time);
-  if(ch.next) navigate(ch.next);
+  if (ch.set_flag) setFlag(ch.set_flag);
+  if (ch.set_note) addNote(ch.set_note);
+  if (ch.thought) offerSounding(ch.thought);
+  if (ch.give_item) addItem(ch.give_item);
+  if (ch.take_item) removeItem(ch.take_item);
+  if (ch.advance_time) advanceTime(ch.advance_time);
+  // Handle __new_play__
+  if (ch.next === '__new_play__') {
+    newPlay();
+    return;
+  }
+  if (ch.next) navigate(ch.next);
 }
 
 function hasCharism(id) { return G.charisms.includes(id); }
@@ -782,10 +1098,10 @@ function renderGame(root){
   processConsequenceQueue();
   resetIdleTimer();
   if(hasFlag('cover_compromised')&&!hasFlag('cover_blown')&&G.scene==='corridor_first'){
-    if(!SCENES['merky_confrontation']){ console.warn("Missing scene: merky_confrontation"); G.flags.delete('cover_compromised'); showToast("Cover issue – scene missing.","note"); }
+    if(!getScene('merky_confrontation')){ console.warn("Missing scene: merky_confrontation"); G.flags.delete('cover_compromised'); showToast("Cover issue – scene missing.","note"); }
     else{ G.scene='merky_confrontation'; }
   }
-  const scene=SCENES[G.scene];
+  const scene=getScene(G.scene);
   if(!scene){ root.innerHTML+=`<p style="padding:2rem;color:var(--rust)">Scene not found: ${G.scene}</p>`; return; }
   const liturgical = LITURGICAL_HOURS[G.liturgicalHour];
   if(liturgical) setMood(liturgical.mood);
@@ -802,10 +1118,6 @@ function renderGame(root){
   const lb=document.createElement('div'); lb.className='location-bar'+moodCls; lb.textContent=scene.location; hdr.appendChild(lb);
   const sb=document.createElement('div'); sb.className='sbar';
   Object.entries(G.stats).forEach(([k,v])=>{ const d=document.createElement('div'); d.className='stat'; d.innerHTML=k+' <span class="stat-val">'+v+'</span>'+(STAT_TIPS[k]?'<span class="stat-tip">'+STAT_TIPS[k]+'</span>':''); sb.appendChild(d); });
-  const awarenessDiv = document.createElement('div'); awarenessDiv.className='stat';
-  const awareBonus = Math.floor((G.awareness||0)/2);
-  awarenessDiv.innerHTML = `awareness <span class="stat-val">${G.awareness||0}</span> <span class="stat-tip" title="Reduces roll difficulty by ${awareBonus} when awarenessBonus is enabled">ⓘ</span>`;
-  sb.appendChild(awarenessDiv);
   hdr.appendChild(sb);
   const tags=[];
   G.charisms.forEach(id=>{const c=findCharism(id);if(c)tags.push(`<span class="ctag" title="${c.desc}">${c.name}</span>`);});
@@ -844,7 +1156,7 @@ function renderGame(root){
       const btn=document.createElement('button');
       const locked = isChoiceLocked(ch);
       if(locked){
-        if(G.mode==='open')return;
+        if(G.mode==='open')return;  // hide locked choices completely
         btn.className='choice choice-locked'; btn.disabled=true;
         let hint=processText(ch.text);
         if(ch.requires_stat)hint+=` [${ch.requires_stat[0]} ${ch.requires_stat[1]}+]`;
@@ -942,5 +1254,6 @@ window.SOBORNOST = {
   unlockMeta, hasMeta, exportAnalytics,
   registerTheosisTagValue, setTheosisTiers, incrementTheosis, flashTheosisLight,
   registerNameMapping,
+  registerScenes,   // <-- NEW: expose scene registration
   G, render
 };
