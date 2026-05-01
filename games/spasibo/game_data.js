@@ -1,7 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// СПАСИБО – Game Data for SOBORNOST Engine
-// Registers charisms, soundings, notes, art, glossary, statTips.
-// Must be loaded after SOBORNOST.js and before scenes.
+// СПАСИБО – Game Data for SOBORNOST Engine v2.1
+// Full registrations with theosis integration
 // ═══════════════════════════════════════════════════════════
 
 // ── CHARISMS ─────────────────────────────────────────────────
@@ -131,9 +130,9 @@ SOBORNOST.registerArt('haircut', `
      ┌───────────────────┐
      │  H A I R C U T    │
      │                   │
-     │   /\\_____/\\      │
+     │   /\_____/\      │
      │  ( ◈     ◈ )      │
-     │   \\  ───  /       │
+     │   \  ───  /       │
      │    '─────'        │
      │  ≋≋≋≋≋≋≋≋≋≋≋    │
      │  [evaluating you] │
@@ -144,9 +143,9 @@ SOBORNOST.registerArt('freezer_beef', `
      │ F R E E Z E R     │
      │ B E E F           │
      │                   │
-     │   /\\___/\\        │
+     │   /\___/\        │
      │  ( ─   ─ )  z z   │
-     │   \\  ω  /         │
+     │   \  ω  /         │
      │    '───'          │
      │  [calico, small]  │
      │  [asleep: always] │
@@ -180,21 +179,58 @@ SOBORNOST.registerStatTip('composure', 'Composure — self-possession under pres
 SOBORNOST.registerStatTip('communion', 'Communion — openness, pastoral presence. Gates relational and confessional choices.');
 SOBORNOST.registerStatTip('doubt', 'Doubt — theological uncertainty as a tool. Gates apophatic and memory choices.');
 
-// ── DYNAMIC WORD FUNCTIONS (uses G exposed via SOBORNOST) ────
+// ── THEOSIS INTEGRATION (adds hidden mechanic, word shifts, name mapping) ──
+
+// Disable witnessed mode for Spasibo (optional, keep only Attended and Open)
+SOBORNOST.setAvailableModes(['attended','open']);
+
+// Theosis tag values – how much each tag contributes to the hidden counter
+SOBORNOST.registerTheosisTagValue('solidarity', 3);
+SOBORNOST.registerTheosisTagValue('agape', 3);
+SOBORNOST.registerTheosisTagValue('sacrifice', 2);
+SOBORNOST.registerTheosisTagValue('communion', 2);
+SOBORNOST.registerTheosisTagValue('confession', 2);
+SOBORNOST.registerTheosisTagValue('witness', 2);
+SOBORNOST.registerTheosisTagValue('kenosis', 1);
+SOBORNOST.registerTheosisTagValue('contemplation', 1);
+SOBORNOST.registerTheosisTagValue('silence', 1);
+SOBORNOST.registerTheosisTagValue('doubt', -1);
+
+// Name mapping – transforms character names as theosis rises
+SOBORNOST.registerNameMapping('Stacy', 'Stacya', 'Стаси', 'Стаси');
+SOBORNOST.registerNameMapping('Pavel', 'Pável', 'Павел', 'Павел');
+SOBORNOST.registerNameMapping('Merky', 'Merký', 'Мерки', 'Мерки');
+SOBORNOST.registerNameMapping('Vance', 'Vánce', 'Ванс', 'Ванс');
+SOBORNOST.registerNameMapping('Craigslist', 'Craigslist', 'Крейгслист', 'Крейгслист');
+SOBORNOST.registerNameMapping('Butterantonio', 'Butterántonio', 'Буттерантонио', 'Буттерантонио');
+SOBORNOST.registerNameMapping('Eider', 'Éider', 'Эйдер', 'Эйдер');
+SOBORNOST.registerNameMapping('Sinhola', 'Sínhola', 'Синхола', 'Синхола');
+SOBORNOST.registerNameMapping('Tim', 'Tím', 'Тим', 'Тим');
+SOBORNOST.registerNameMapping('Haircut', 'Háircut', 'Хейркат', 'Хейркат');
+SOBORNOST.registerNameMapping('Freezer Beef', 'Freezér Beef', 'Фризер Биф', 'Фризер Биф');
+
+// Override dynamic word functions to use theosis instead of playCount
 SOBORNOST.setIconWordFunction(() => {
   const G = SOBORNOST.G;
-  return G.playCount >= 4 ? 'Икон' : G.playCount >= 2 ? 'ikon' : 'icon';
+  if (G.theosis >= 66) return 'Икон';
+  if (G.theosis >= 33) return 'ikon';
+  return 'icon';
 });
 SOBORNOST.setHarbourWordFunction(() => {
   const G = SOBORNOST.G;
-  return G.playCount >= 4 ? 'Ленинград' : G.playCount >= 2 ? 'the Eastern port' : 'port';
+  if (G.theosis >= 66) return 'Ленинград';
+  if (G.theosis >= 33) return 'the Eastern port';
+  return 'port';
 });
 SOBORNOST.setShipWordFunction(() => {
   const G = SOBORNOST.G;
-  return G.playCount >= 3 ? 'the Sobornost' : G.playCount >= 1 ? 'this ship' : 'the ship';
+  if (G.theosis >= 66) return 'the Соборность';
+  if (G.theosis >= 33) return 'the Sobornost';
+  return 'the ship';
 });
 SOBORNOST.setObjectDescriptionFunction(() => {
   const G = SOBORNOST.G;
-  if (G.playCount >= 4) return 'a Torah scroll — very old, of the original two. Entrusted. From a different dispersed community, the same century of loss.';
+  if (G.theosis >= 66) return 'a Torah scroll — very old, of the original two. Entrusted. From a different dispersed community, the same century of loss.';
+  if (G.theosis >= 33) return 'an icon — very old, face worn to near-nothing. The gold is beginning to show through the dark.';
   return 'an icon — very old, face worn to near-nothing.';
 });
