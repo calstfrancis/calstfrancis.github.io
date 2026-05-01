@@ -393,3 +393,33 @@ body { background: var(--bg); color: var(--text); min-height: 100vh; overflow-x:
   50% { background-color: rgba(212, 175, 55, 0.6); }
   100% { background-color: rgba(212, 175, 55, 0); }
 }
+
+/* Make sure breviary buttons are visible */
+.sounding-btn {
+  background: rgba(30,40,50,0.9);
+  border: 1px solid var(--border);
+  color: var(--bright);
+  padding: 0.3rem 0.6rem;
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+.sounding-btn-take { background: #2a3c48; }
+.sounding-btn-suspend { background: #3a2c28; }
+.sounding-btn-release { background: #4a1c18; }
+
+/* Cover meter numeric display */
+.cover-meter + div {
+  font-size: 0.7rem;
+  text-align: right;
+  margin-top: 0.2rem;
+  color: var(--dim);
+}
+
+/* Theosis stat highlight */
+.stat.theosis-stat {
+  color: var(--amber);
+}
+.stat.theosis-stat .stat-val {
+  color: #d4af37;
+  text-shadow: 0 0 2px rgba(212,175,55,0.5);
+}
