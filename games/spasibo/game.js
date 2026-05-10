@@ -37,6 +37,13 @@ S.registerNameMapping('Nadia',  'Nadya',   'Nadia',   'Надежда');
 S.registerNameMapping('The Dawn', 'Zarya', 'Zarya',   'Заря');
 
 S.setAvailableModes(['attended', 'witnessed']);
+
+// Cyrillic linguistic drift — triggers as doubt rises
+// Ship/mission vocabulary drifts toward Russian under cover strain
+S.registerTranslation('The Dawn', 'Заря');
+S.registerTranslation('archive', 'архив');
+S.registerTranslation('mission', 'задание');
+S.registerTranslation('cover', 'прикрытие');
 S.setInitialScene('cabin_wake');
 
 // ─────────────────────────────────────────────────────────────────
@@ -2118,6 +2125,8 @@ You have not decided what you are going to do.`,
       { text: 'Othis is waiting in the corridor.',                       next: 'othis_confrontation', condition: { type: 'and', conditions: [{ type: 'flag', id: 'archive_discovered' }, { type: 'not', condition: { type: 'flag', id: 'othis_confrontation_happened' } }] } },
       { text: 'Sunday — lead the service.',                              next: 'sunday_service_begin', condition: { type: 'not', condition: { type: 'flag', id: 'sunday_service_started' } } },
       { text: 'Main deck.',                                              next: 'main_deck_hub' },
+      { text: 'The brass wants polishing. The bilge wants checking.',       next: 'ship_maintenance', condition: { type: 'not', condition: { type: 'flag', id: 'maintenance_done' } } },
+      { text: 'Alexei has charts spread across the table.',                 next: 'anomaly_diagnosis', condition: { type: 'flag', id: 'anomaly_first_noticed' } },
     ],
   },
 
@@ -2656,7 +2665,7 @@ Pavel is near the door. He is letting you start.`,
       S.incrementTheosis(2);
     },
     choices: [
-      { text: 'Begin the service. Start the ritual.', next: '__start_ritual__sunday_service__main_deck_hub' },
+      { text: 'Begin the service.', start_ritual: ['sunday_service', 'sunday_service_begin', 'act_two_begin'] },
     ],
   },
 
@@ -2795,6 +2804,278 @@ The question is how far you are willing to go.`,
       { text: 'Refuse the mission. Hide the archive.',   next: 'ending_witness',     set_flag: 'mission_refused'  },
       { text: 'Transmit the archive. Broadcast it.',     next: 'ending_restoration', requires_flag: 'radio_existence_known', flags: ['archive_transmitted', 'mission_refused'] },
       { text: 'Complete the mission.',                    next: 'ending_erasure',     set_flag: 'mission_accepted' },
+    ],
+  },
+
+
+
+  // ── MATERIAL ROUTINES — banal anchoring ─────────────────────────
+
+  ship_maintenance: {
+    id: 'ship_maintenance', location: 'Main Deck — Morning', mood: 'neutral',
+    text: `Miguel has put a list on the companionway hatch. Not a request — a fact about what needs doing.
+
+The brass on the forward cleats wants polishing. The bilge pump needs inspection. Two lines on the foremast have developed a twist that, uncorrected, will become a problem by nightfall.
+
+You are a chaplain. These are not your tasks.
+
+Nobody else is up yet.`,
+    choices: [
+      { text: 'Polish the brass. It is something to do with your hands.',          next: 'maintenance_brass', theosis: 2, composure: 1 },
+      { text: 'Check the bilge. It is not glamorous but it is useful.',             next: 'maintenance_bilge', communion: 1 },
+      { text: 'Leave the list for the crew. Go find coffee.',                       next: 'galley_hub' },
+    ],
+  },
+
+  maintenance_brass: {
+    id: 'maintenance_brass', location: 'Foredeck — Dawn', mood: 'neutral',
+    text: `The brass is cold. The cloth is cold. The sea is cold.
+
+You work along the forward cleats. The metal warms under your hands. The surface goes from green-hazy to gold-hazy. You do not think about anything in particular. The anomaly is lower at dawn. The instruments are quieter. The ship makes the sounds of a ship.
+
+Haircut appears after twenty minutes and sits at a distance that is not quite close enough to be companionship but is not quite far enough to be indifference. She watches the work.
+
+After a while Miguel comes up and looks at the cleats.
+
+He nods once. He goes back below.
+
+That is everything.`,
+    onEnter: () => {
+      S.incrementTheosis(3);
+      S.applyEffect({ composure: 2 });
+      S.modReputation('miguel', 1);
+      if (S.G.worldState) S.G.worldState.shipStability = Math.min(10, S.G.worldState.shipStability + 1);
+      S.offerSounding('sounding_crossing');
+    },
+    onEnter: () => { S.setFlag('maintenance_done'); },
+    choices: [
+      { text: 'Go get coffee. Find Lena.', next: 'galley_hub' },
+      { text: 'Go to the main deck.',       next: 'main_deck_hub' },
+    ],
+  },
+
+  maintenance_bilge: {
+    id: 'maintenance_bilge', location: 'Hold — Below', mood: 'neutral',
+    text: `The bilge is not romantic.
+
+It smells of old water and iron and something organic that has been in the dark for a long time. The pump itself is manual — a lever system, brass again, that requires a specific rhythm to get water moving. You find the rhythm by failing to find it three times first.
+
+Freezer Beef is here. She watches the lever with scientific interest.
+
+You pump for fifteen minutes. The water moves. The pump is fine. Nothing was actually wrong with it — it just needed someone to check.
+
+You sit on the floor of the hold afterward, slightly damp, next to the archive.
+
+This is also a kind of presence.`,
+    onEnter: () => {
+      S.incrementTheosis(4);
+      S.applyEffect({ communion: 2 });
+      if (S.G.worldState) S.G.worldState.shipStability = Math.min(10, S.G.worldState.shipStability + 1);
+      S.offerSounding('sounding_solidarity');
+    },
+    choices: [
+      { text: 'Go find Lena. Tell her the bilge is clear.',  next: 'lena_after_bilge' },
+      { text: 'Sit with the archive a while longer.',         next: 'hold_sit' },
+    ],
+  },
+
+  lena_after_bilge: {
+    id: 'lena_after_bilge', location: 'Galley', mood: 'neutral',
+    art: 'portrait_lena',
+    text: `She looks at your hands. She looks at your coat.
+
+She puts a cup of coffee down without being asked.
+
+— You checked the bilge. She says. Not a question.
+
+— Yes.
+
+She goes back to what she was doing. After a moment:
+
+— He used to do that. Every morning. The cook before me.
+
+She does not say who. She does not say more. She refills your cup before you have finished it, which is her version of a great deal.`,
+    onEnter: () => {
+      S.incrementTheosis(2);
+      S.modReputation('lena', 3);
+      S.applyEffect({ communion: 1 });
+      if (S.G.worldState) S.G.worldState.socialTrust = Math.min(10, S.G.worldState.socialTrust + 1);
+    },
+    choices: [
+      { text: '"Who did?"',                                next: 'lena_cook_before' },
+      { text: 'Drink the coffee. Say nothing.',             next: 'galley_hub', theosis: 1 },
+    ],
+  },
+
+  lena_cook_before: {
+    id: 'lena_cook_before', location: 'Galley', mood: 'neutral',
+    text: `— The cook before me. She says. — His name was Volkov. He was on the ship for nine years. He checked the bilge every morning because he said the ship needed to know someone was paying attention.
+
+She adjusts something on the stove.
+
+— He is in the archive. She says. — One of the photographs. I found him once, when I first came aboard, looking through the boxes. He put one photograph in his breast pocket. I never asked which one.
+
+She is not looking at you.
+
+— The archive is the ship's memory. She says. — Someone wants to end that.
+
+She goes back to cooking. The conversation is over. You have been told something you were meant to be told.`,
+    onEnter: () => {
+      S.incrementTheosis(5);
+      S.modReputation('lena', 4);
+      S.setFlag('lena_volkov_told');
+      if (S.G.worldState) S.G.worldState.sanctity = Math.min(10, S.G.worldState.sanctity + 2);
+    },
+    choices: [
+      { text: 'Go to the hold. Find Volkov photograph.', next: 'hold_volkov_photo' },
+      { text: 'Go to the main deck.',                        next: 'main_deck_hub' },
+    ],
+  },
+
+  hold_volkov_photo: {
+    id: 'hold_volkov_photo', location: 'Hold', mood: 'uncanny',
+    text: `The 1972 box is already open from before. The photographs are still there.
+
+You go through them slowly. The sea from different angles. Instruments. Groups of people squinting. Ships in harbour.
+
+There is a man who appears in seven of them. He is in the background of most — at the stove in one, hauling line in another, sitting at the stern in a third reading something. He has the quality of someone who belongs so completely to a place that photographs take him accidentally.
+
+In the seventh photograph he is looking directly at the camera. He is not smiling. He looks like someone who has decided that the record should include him, too.
+
+On the back: nothing. No name. But on the margin of the photographic paper, in pencil so faint it is nearly gone: *В.*
+
+Freezer Beef sits beside you. She looks at the photograph. She looks at you. She looks at the photograph again.`,
+    onEnter: () => {
+      S.incrementTheosis(6);
+      S.applyEffect({ communion: 2 });
+      S.setFlag('volkov_photo_found');
+      S.addItem('volkov_photograph');
+      S.showToast('Something is found.', 'theosis');
+    },
+    choices: [
+      { text: 'Keep it. Put it with the other photograph.', next: 'hold_first' },
+      { text: 'Return it to the box.',                       next: 'main_deck_hub' },
+    ],
+  },
+
+  // ── COGNITIVE DIAGNOSTIC SCENES ──────────────────────────────────
+
+  anomaly_diagnosis: {
+    id: 'anomaly_diagnosis', location: 'Chart Room', mood: 'uncanny',
+    text: `Alexei has spread three different charts on the table, overlapping. He is comparing them.
+
+Two are current — the route charts, the depth soundings. One is from the 1961 binder. He has marked corresponding positions on all three with different coloured pencils.
+
+— Look at this. He says.
+
+The 1961 chart shows an anomaly at a position approximately forty kilometres from the current ship's position. The current instruments show the anomaly centred directly below the ship.
+
+— The anomaly has moved. He says. — Or rather — He pauses. — The field has changed around the anomaly. The structure below is the same. But the field it generates has expanded. Significantly.
+
+He looks at you.
+
+— What does that suggest to you?`,
+    choices: [
+      {
+        text: 'Something below has become more active.',
+        next: 'anomaly_diagnosis_active', theosis: 3, composure: 1
+      },
+      {
+        text: 'The measurements from 1961 were less accurate.',
+        next: 'anomaly_diagnosis_error', vigilance: 1
+      },
+      {
+        text: 'The ship itself has changed — the archive, perhaps.',
+        next: 'anomaly_diagnosis_ship', theosis: 5
+      },
+    ],
+  },
+
+  anomaly_diagnosis_active: {
+    id: 'anomaly_diagnosis_active', location: 'Chart Room', mood: 'uncanny',
+    text: `— Yes. He says immediately. — That is the scientific reading. Something below has changed. Or is changing. Or is responding to something above.
+
+He taps the chart.
+
+— What is above it? He asks. Not rhetorically.
+
+— The ship. The archive. The instruments. Us.
+
+He nods. He has the expression of a scientist who has arrived at a conclusion that falls outside the category of science and is deciding how to file it.
+
+— The ship was built to measure without distorting. He says. — But to measure is also to acknowledge. Perhaps acknowledgement — sustained, careful, thirty years of it — does something.
+
+He gathers the charts.
+
+— Or perhaps I am projecting. He says. — I do that.`,
+    onEnter: () => { S.incrementTheosis(4); S.modReputation('alexei', 3); if (S.G.worldState) S.G.worldState.sanctity = Math.min(10, S.G.worldState.sanctity + 2); },
+    choices: [
+      { text: 'Go to the instrument room.', next: 'instrument_room_first' },
+      { text: 'Go to the main deck.',        next: 'main_deck_hub' },
+    ],
+  },
+
+  anomaly_diagnosis_error: {
+    id: 'anomaly_diagnosis_error', location: 'Chart Room', mood: 'neutral',
+    text: `— Possible. He says, in the tone of someone for whom this is not the interesting answer. — The 1961 instruments were less sensitive. The deviation radius may have been underestimated.
+
+He looks at the charts.
+
+— But the readings are internally consistent across the decade. And Nadia's sonar image has a structure that does not vary with instrument sensitivity.
+
+He sets down his pencil.
+
+— I think you are applying scientific caution to something that has moved beyond caution jurisdiction. He says this without judgment. — Which is understandable. I did it too, for the first two hours.`,
+    onEnter: () => { S.applyEffect({ vigilance: 1 }); S.modReputation('alexei', 1); },
+    choices: [
+      { text: 'Ask what moved it beyond caution jurisdiction.', next: 'anomaly_diagnosis_active' },
+      { text: 'Go to the main deck.',                               next: 'main_deck_hub' },
+    ],
+  },
+
+  anomaly_diagnosis_ship: {
+    id: 'anomaly_diagnosis_ship', location: 'Chart Room', mood: 'uncanny',
+    text: `He stops.
+
+He looks at you with the expression of someone who has been thinking this for six hours and has not said it aloud.
+
+— The archive. He says slowly. — The archive has been in this hold for how long? Since the Academy arranged this crossing. The archive contains — He is very careful now. — the accumulated record of the ship's engagement with this field. Thirty years of measurement. And we are now directly above the structure that generated the field being measured.
+
+He puts his hands on the table.
+
+— The ship came back. He says. — With everything it found. And the field knows.
+
+He sits down. He has not sat down during this entire conversation. He sits down.`,
+    onEnter: () => {
+      S.incrementTheosis(8);
+      S.modReputation('alexei', 5);
+      S.setFlag('anomaly_archive_connected');
+      if (S.G.worldState) S.G.worldState.sanctity = Math.min(10, S.G.worldState.sanctity + 3);
+      S.showToast('Something understood.', 'theosis');
+    },
+    choices: [
+      { text: 'Go to the hold. Be with the archive.', next: 'anomaly_peak_hold', theosis: 2 },
+      { text: 'Find the radio. Now.',                  next: 'radio_discovery', condition: { type: 'not', condition: { type: 'flag', id: 'radio_found' } } },
+      { text: 'Sit with Alexei for a moment.',          next: 'anomaly_diagnosis_sit', theosis: 2 },
+    ],
+  },
+
+  anomaly_diagnosis_sit: {
+    id: 'anomaly_diagnosis_sit', location: 'Chart Room', mood: 'uncanny',
+    text: `You sit across from him.
+
+Neither of you says anything. The charts are on the table between you. The ship moves. The instruments in the next room are making their sound.
+
+After a while Alexei picks up his pencil and draws a very small circle on the current chart, at the ship's position.
+
+He looks at it.
+
+— Good. He says. — Good.
+
+He does not explain what is good. He does not need to.`,
+    onEnter: () => { S.incrementTheosis(4); S.applyEffect({ composure: 1, communion: 1 }); },
+    choices: [
+      { text: 'Go to the main deck.', next: 'main_deck_hub' },
     ],
   },
 
@@ -2963,6 +3244,7 @@ From here you can go anywhere on the ship.`,
       { text: 'Hold — Freezer Beef.',           next: 'hold_first',      condition: { type: 'and', conditions: [{ type: 'flag', id: 'hold_visited' }, { type: 'not', condition: { type: 'flag', id: 'instrument_room_visited' } }] } },
       { text: 'Instrument room — the anomaly.', next: 'instrument_room_first', condition: { type: 'flag', id: 'instrument_room_visited' }          },
       { text: '— Continue the crossing.',       next: 'act_two_begin',   requires_flag: 'mission_reality_known'                                    },
+      { text: 'The brass. The bilge. The morning.',    next: 'ship_maintenance', condition: { type: 'and', conditions: [{ type: 'flag', id: 'act_two_begun' }, { type: 'not', condition: { type: 'flag', id: 'maintenance_done' } }] } },
     ],
   },
 
@@ -3028,6 +3310,8 @@ He means none of this last part.`,
 // ─────────────────────────────────────────────────────────────────
 
 S.on('newPlay', () => {
+  // Crossing Tax enforcement: carried theosis is already taxed in engine newPlay(),
+  // but ensure waking charism assignment uses the post-tax value
   if (S.G.playCount <= 1) return;
   const t = S.G.theosis;
   const id = t >= 90 ? 'rememberer' : t >= 71 ? 'prophet' : t >= 46 ? 'witness' : t >= 20 ? 'penitent' : 'sleeper';
@@ -3043,6 +3327,13 @@ S.on('magneticDeviationChanged', (val) => {
   document.body.classList.toggle('anomaly-low',    val > 0.1 && val <= 0.4);
   document.body.classList.toggle('anomaly-medium', val > 0.4 && val <= 0.7);
   document.body.classList.toggle('anomaly-high',   val > 0.7);
+  // Also update worldState sanctity based on anomaly intensity
+  if (S.G.worldState && val > 0.6) {
+    const was = S.G.worldState.sanctity;
+    S.G.worldState.sanctity = Math.min(10, was + 0.5);
+    if (S.G.worldState.sanctity >= 7) document.body.classList.add('sanctity-high');
+    else document.body.classList.remove('sanctity-high');
+  }
 });
 
 S.on('theosisChanged', (val) => {
@@ -3050,6 +3341,11 @@ S.on('theosisChanged', (val) => {
   if      (val <= 32) document.body.classList.add('tier-asleep');
   else if (val <= 65) document.body.classList.add('tier-waking');
   else                document.body.classList.add('tier-illumined');
+  // Sanctity from theosis
+  if (S.G.worldState && val > 50) {
+    S.G.worldState.sanctity = Math.min(10, (S.G.worldState.sanctity || 0) + 0.2);
+    if (S.G.worldState.sanctity >= 7) document.body.classList.add('sanctity-high');
+  }
 });
 
 // ─────────────────────────────────────────────────────────────────
@@ -3077,6 +3373,50 @@ S.setTutorialContent(`
     This is the first of several crossings. What you carry forward from each one — and how much of it — will depend on how far you've come.
   </div>
 `);
+
+// ─────────────────────────────────────────────────────────────────
+// WORLD STATE — persistent reactive object
+// ─────────────────────────────────────────────────────────────────
+
+// Initialise worldState if not already on G
+S.on('gameStarted', () => {
+  if (!S.G.worldState) {
+    S.G.worldState = { shipStability: 5, sanctity: 0, socialTrust: 5 };
+  }
+});
+S.on('loadSlot', () => {
+  if (!S.G.worldState) {
+    S.G.worldState = { shipStability: 5, sanctity: 0, socialTrust: 5 };
+  }
+});
+
+// Helper used in scenes
+function mutateWorld(delta) {
+  if (!S.G.worldState) S.G.worldState = { shipStability: 5, sanctity: 0, socialTrust: 5 };
+  if (delta.shipStability) S.G.worldState.shipStability = Math.max(0, Math.min(10, S.G.worldState.shipStability + delta.shipStability));
+  if (delta.sanctity)      S.G.worldState.sanctity      = Math.max(0, Math.min(10, S.G.worldState.sanctity      + delta.sanctity));
+  if (delta.socialTrust)   S.G.worldState.socialTrust   = Math.max(0, Math.min(10, S.G.worldState.socialTrust   + delta.socialTrust));
+}
+
+// ─────────────────────────────────────────────────────────────────
+// LITURGICAL CLOCK
+// ─────────────────────────────────────────────────────────────────
+
+// Matins (0): cold, industrial. Lauds (1): dawn, beginning.
+// Vespers (3): candour, settling. Compline (4): dark, intimate, anomaly peak.
+S.on('liturgicalHourChanged', (hour) => {
+  const body = document.body;
+  body.classList.remove('hour-matins','hour-lauds','hour-terce','hour-vespers','hour-compline');
+  if      (hour <= 1)  body.classList.add('hour-matins');
+  else if (hour <= 3)  body.classList.add('hour-lauds');
+  else if (hour <= 5)  body.classList.add('hour-terce');
+  else if (hour <= 7)  body.classList.add('hour-vespers');
+  else                 body.classList.add('hour-compline');
+  // Compline: increase anomaly slightly
+  if (hour >= 7 && S.getMagneticDeviation() < 0.5) {
+    S.setMagneticDeviation(S.getMagneticDeviation() + 0.08);
+  }
+});
 
 // ─────────────────────────────────────────────────────────────────
 // START

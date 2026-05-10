@@ -609,3 +609,80 @@ body.tier-illumined .location-bar.revelation {
   font-size: .48rem; color: var(--dim); letter-spacing: .1em;
   opacity: 0.35; z-index: 50; pointer-events: none;
 }
+
+/* ── Cyrillic flicker ────────────────────────────────────────── */
+.cyrillic-flicker {
+  color: var(--amber-dim);
+  font-style: italic;
+  transition: color .4s;
+}
+/* High doubt: flicker pulses */
+@keyframes cyr-pulse {
+  0%, 100% { opacity: 1;   color: var(--amber-dim); }
+  50%       { opacity: 0.6; color: var(--amber); }
+}
+.sp .cyrillic-flicker { animation: cyr-pulse 2.8s ease-in-out infinite; }
+
+/* ── Liturgical hour body classes ────────────────────────────── */
+body.hour-matins  { --border: #1c2c40; }  /* cold, pre-dawn */
+body.hour-lauds   { --border: #223244; }  /* dawn, opening */
+body.hour-terce   { --border: #1e2e42; }  /* morning work */
+body.hour-vespers {
+  --border: #2a3448;
+  --cold-dim: #4a7090;
+}
+body.hour-compline {
+  --border: #1a2838;
+  --bg2: #080e1a;
+  --dim: #526070;
+}
+body.hour-compline .location-bar { color: var(--amber-dim); }
+body.hour-compline .sp { line-height: 1.96; }
+
+/* ── Anomaly body classes (from JS magneticDeviation) ─────────── */
+/* anomaly-low handled by data-deviation on #root */
+body.anomaly-medium .game-body { filter: blur(0.28px) contrast(1.08); }
+body.anomaly-high   .game-body {
+  filter: blur(0.52px) contrast(1.12);
+}
+@keyframes jitter {
+  0%   { transform: translate(0,0); }
+  20%  { transform: translate(-0.5px, 0.3px); }
+  40%  { transform: translate(0.4px, -0.2px); }
+  60%  { transform: translate(-0.3px, 0.4px); }
+  80%  { transform: translate(0.2px, -0.3px); }
+  100% { transform: translate(0,0); }
+}
+body.anomaly-high .stxt { animation: jitter 3.2s ease-in-out infinite; }
+body.anomaly-high::after {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 6;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 4px,
+    rgba(120,184,214,0.012) 4px,
+    rgba(120,184,214,0.012) 5px
+  );
+  animation: scanline-drift 8s linear infinite;
+}
+@keyframes scanline-drift {
+  0%   { background-position: 0 0; }
+  100% { background-position: 0 100px; }
+}
+
+/* ── worldState visual hints ─────────────────────────────────── */
+/* Sanctity rising: gold tint on location bar at high levels */
+/* Applied via JS body class */
+body.sanctity-high .location-bar {
+  color: var(--gold);
+  text-shadow: 0 0 6px var(--gold-dim);
+}
+body.sanctity-high.tier-waking .sp { color: var(--fg); }
+
+/* ── Observation note style ──────────────────────────────────── */
+.obs-note {
+  font-size: .86rem; color: var(--fg-dim); line-height: 1.72;
+  padding: .35rem 0; border-bottom: 1px solid var(--border);
+}
+.obs-note:last-child { border-bottom: none; }

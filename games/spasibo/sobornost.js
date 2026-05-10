@@ -982,7 +982,7 @@ function saveGameSlot(slotId) {
       ambientTriggered: [...G.ambientTriggered],
       magneticDeviation: G.magneticDeviation || 0,
     };
-    localStorage.setItem(SAVE_KEY_PREFIX + slotId, JSON.stringify(state));
+    try { localStorage.setItem(SAVE_KEY_PREFIX + slotId, JSON.stringify(state)); } catch(e) { console.warn('Save write failed:', e); showToast('Save failed — storage full?', 'warning'); return; }
     saveJournal(slotId);
     showToast(`Saved to slot ${slotId}`, 'note');
     emit('saveSlot', slotId);
@@ -1374,6 +1374,7 @@ function applyChoice(ch) {
     if (G.scene && ch.text) G.choiceHistory[G.scene] = { text: ch.text, timestamp: Date.now(), crossing: G.playCount };
     if (consequenceRedirected || deadlineRedirect) { emit('choiceApplied', ch); return; }
     if (ch.next === '__new_play__') { newPlay(); return; }
+    if (ch.start_ritual) { const [rid,sscene,nscene] = ch.start_ritual; startRitual(rid, sscene, nscene); return; }
     if (ch.next) navigate(ch.next);
     emit('choiceApplied', ch);
   } finally { _processingChoice = false; }
@@ -1856,7 +1857,19 @@ function resolveTextBlock(textBlock){
 function getSceneText(scene){return resolveTextBlock(scene.text);}
 function resolveLayeredText(scene){return getSceneText(scene);}
 function injectMicroLines(a,_s){return a;}
-function applyLinguisticToggle(t){return t;}
+function applyLinguisticToggle(t){
+  // As doubt rises, registered translations occasionally replace original text
+  const doubt = G.stats.doubt || 0;
+  if (doubt < 4 || !_registries.translations || !Object.keys(_registries.translations).length) return t;
+  const flicker = doubt >= 7 ? 0.35 : doubt >= 5 ? 0.18 : 0.08;
+  let result = t;
+  for (const [orig, trans] of Object.entries(_registries.translations)) {
+    if (Math.random() < flicker) {
+      result = result.replaceAll(orig, `<span class="cyrillic-flicker" title="${orig}">${trans}</span>`);
+    }
+  }
+  return result;
+}
 function applyPostEventShifts(t){return t;}
 function applyPastLifeLines(a,_id){return a;}
 function injectGhostText(t,_id){return t;}
@@ -2322,12 +2335,15 @@ function _appendBottomNav(root){
   const bnav=document.createElement('div');bnav.id='bottom-nav';
   bnav.style.cssText='position:fixed;bottom:0;left:0;width:100%;z-index:100;display:flex;justify-content:center;background:rgba(6,8,12,0.96);border-top:1px solid var(--border)';
   const codexCount=getUnlockedCodex().length;
+  const doubt = G.stats.doubt || 0;
+  const flicker = doubt >= 7 ? 0.4 : doubt >= 5 ? 0.2 : 0;
+  const fl = (en, ru) => (flicker > 0 && Math.random() < flicker) ? ru : en;
   const navItems=[
-    {label:'observations',fn:()=>openPanel('notes')},
-    {label:'status',fn:()=>openPanel('status')},
+    {label:fl('observations','наблюдения'),fn:()=>openPanel('notes')},
+    {label:fl('status','статус'),fn:()=>openPanel('status')},
     {label:'breviary'+(G.soundings.available.length?' \u2691':''),fn:()=>openPanel('breviary'),cls:G.soundings.available.length?' has-available':''},
-    {label:'codex',fn:()=>openPanel('glossary')},
-    {label:'map',fn:()=>openPanel('map')},
+    {label:fl('codex','кодекс'),fn:()=>openPanel('glossary')},
+    {label:fl('map','карта'),fn:()=>openPanel('map')},
   ];
   navItems.forEach(({label,fn,cls=''})=>{
     const b=document.createElement('button');
@@ -2377,7 +2393,7 @@ function _renderNotesPanel(root) {
         ['mission_reality_known',     'The sealed envelope is open. You know what the crossing is for.'],
         ['mission_fully_understood',  'The archive is to be destroyed. Evidence made inconvenient.'],
         ['miguel_knows',              'Miguel knows. He has always known.'],
-        ['pablo_knows',               'Pavel knows. He was not surprised.'],
+        ['pavel_knows',               'Pavel knows. He was not surprised.'],
         ['mission_refused',           'You have refused the mission.'],
         ['radio_existence_known',     'There is a radio in the instrument room Othis does not know about.'],
     ]},
