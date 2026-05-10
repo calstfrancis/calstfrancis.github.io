@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Shop · Cal St Francis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Spectral:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+<svg width="0" height="0" style="position:absolute;pointer-events:none" aria-hidden="true">
+<defs>
+  <g id="sf">
+    <g fill="#e06030">
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(0)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(25.7)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(51.4)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(77.1)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(102.8)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(128.5)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(154.2)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(180)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(205.7)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(231.4)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(257.1)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(282.8)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(308.5)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(334.2)"/>
+    </g>
+    <circle r="16" fill="#5a2c10"/>
+    <circle r="11" fill="#3e1a08"/>
+    <circle r="2.2" cx="0"  cy="-5.5" fill="#6a3818" opacity=".7"/>
+    <circle r="2.2" cx="5"  cy="2"    fill="#6a3818" opacity=".7"/>
+    <circle r="2.2" cx="-5" cy="2"    fill="#6a3818" opacity=".7"/>
+    <circle r="2.2" cx="2"  cy="-10"  fill="#6a3818" opacity=".5"/>
+    <circle r="2.2" cx="-2" cy="-10"  fill="#6a3818" opacity=".5"/>
+    <circle r="2.2" cx="8"  cy="-5"   fill="#6a3818" opacity=".5"/>
+    <circle r="2.2" cx="-8" cy="-5"   fill="#6a3818" opacity=".5"/>
+  </g>
+  <path id="lf-b" d="M0,0 C12,-10 22,-8 26,-2 C30,6 24,20 10,24 C-4,28 -16,18 -14,8 C-12,0 -6,-2 0,0Z" fill="#7a8840"/>
+  <g id="lf-v">
+    <path d="M0,0 C10,-8 18,-6 20,2 C18,12 8,18 0,16 C-8,18 -18,12 -20,2 C-18,-6 -10,-8 0,0Z" fill="#7a8840"/>
+    <path d="M0,0 L0,16" stroke="#5a6428" stroke-width="1" fill="none"/>
+    <path d="M0,6 L6,10" stroke="#5a6428" stroke-width=".7" fill="none"/>
+    <path d="M0,6 L-6,10" stroke="#5a6428" stroke-width=".7" fill="none"/>
+  </g>
+</defs>
+</svg>
+
+<style>
+:root {
+  --bg:        #6a1710;
+  --bg-2:      #7c1e14;
+  --bg-3:      #8e2218;
+  --nav-bg:    rgba(28,6,4,.97);
+  --border:    #4a0e0b;
+  --border-hi: #8a2a1a;
+  --text:      #f2e4c4;
+  --text-2:    #d8c4a0;
+  --text-3:    #b89c72;
+  --coral:     #e06030;
+  --coral-hi:  #f07848;
+  --cpale:     rgba(224,96,48,.12);
+  --olive:     #7a8840;
+  --olive-hi:  #96aa52;
+  --opale:     rgba(122,136,64,.15);
+  --black:     #100c08;
+  --ok:        #96aa52;
+}
+[data-theme="light"] {
+  --bg:        #f0e4c8;
+  --bg-2:      #fdf6e8;
+  --bg-3:      #e4d4b0;
+  --nav-bg:    rgba(34,10,4,.96);
+  --border:    #c8b890;
+  --border-hi: #a89060;
+  --text:      #28120c;
+  --text-2:    #4a2e18;
+  --text-3:    #7a5a38;
+  --coral:     #b83818;
+  --coral-hi:  #d04825;
+  --cpale:     rgba(184,56,24,.1);
+  --olive:     #4a6018;
+  --olive-hi:  #5a7820;
+  --opale:     rgba(74,96,24,.12);
+  --black:     #faf4e4;
+  --ok:        #4a6018;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:'Spectral',Georgia,serif;font-size:1rem;line-height:1.75;
+  -webkit-font-smoothing:antialiased;transition:background .25s,color .25s;
+}
+a{color:var(--coral);text-decoration:none;transition:color .15s}
+a:hover{color:var(--coral-hi)}
+.container{max-width:860px;margin:0 auto;padding:0 1.75rem}
+
+/* ── NAV ── */
+nav{background:var(--nav-bg);border-bottom:2px solid var(--border);position:sticky;top:0;z-index:200;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;height:52px;max-width:860px;margin:0 auto;padding:0 1.75rem;}
+.nav-brand{font-family:'IM Fell English',serif;font-size:1.05rem;color:var(--coral);letter-spacing:.03em;display:flex;align-items:center;gap:.45rem;}
+.nav-brand svg{width:20px;height:20px;overflow:visible;flex-shrink:0}
+.nav-links{display:flex;align-items:center;gap:1.8rem;list-style:none}
+.nav-links a{font-family:'Spectral',serif;font-size:.78rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text-3);transition:color .15s;}
+.nav-links a:hover,.nav-links a.active{color:var(--coral)}
+.theme-toggle{background:none;border:1px solid var(--border-hi);padding:.22rem .65rem;font-family:'Spectral',serif;font-size:.72rem;font-weight:600;letter-spacing:.06em;color:var(--text-3);cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:border-color .15s,color .15s;}
+.theme-toggle:hover{border-color:var(--coral);color:var(--coral)}
+.nav-toggle{display:none;flex-direction:column;justify-content:center;gap:5px;width:36px;height:36px;background:none;border:1px solid var(--border-hi);cursor:pointer;padding:8px 7px;}
+.nav-toggle span{display:block;height:1px;background:var(--text-3);transition:all .2s}
+.nav-toggle.open span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+.nav-toggle.open span:nth-child(2){opacity:0}
+.nav-toggle.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+
+/* cart button in nav */
+.nav-cart-btn{
+  background:none;border:1px solid var(--border-hi);padding:.22rem .65rem;
+  font-family:'Spectral',serif;font-size:.72rem;font-weight:600;letter-spacing:.06em;
+  color:var(--text-3);cursor:pointer;display:inline-flex;align-items:center;gap:5px;
+  transition:border-color .15s,color .15s;position:relative;
+}
+.nav-cart-btn:hover{border-color:var(--coral);color:var(--coral)}
+.cart-badge{
+  display:none;background:var(--coral);color:#fff;
+  font-size:.6rem;font-family:'Courier Prime',monospace;
+  border-radius:0;padding:1px 4px;min-width:16px;text-align:center;
+}
+.cart-badge.visible{display:inline-block}
+
+/* ── SECTIONS ── */
+section{padding:3.5rem 0;border-bottom:2px solid var(--border)}
+section:last-of-type{border-bottom:none}
+.section-eyebrow{font-family:'Spectral',serif;font-size:.7rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--olive);margin-bottom:.3rem;}
+.section-title-row{display:flex;align-items:center;gap:.7rem;margin-bottom:.35rem;}
+.section-title-row svg{width:32px;height:32px;overflow:visible}
+.section-title{font-family:'IM Fell English',serif;font-size:1.7rem;font-weight:400;color:var(--text);line-height:1.2;}
+.section-intro{color:var(--text-3);font-size:.93rem;line-height:1.8;max-width:580px;margin-top:.5rem;margin-bottom:1.8rem;}
+
+/* ── PRODUCT GRID ── */
+.product-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.1rem;}
+.product-card{
+  border:1px solid var(--border-hi);background:rgba(0,0,0,.18);
+  display:flex;flex-direction:column;position:relative;overflow:hidden;
+  transition:border-color .2s,background .2s,transform .18s;
+}
+[data-theme="light"] .product-card{background:var(--bg-2)}
+.product-card:hover{border-color:var(--coral);background:var(--cpale);transform:translateY(-2px);}
+.product-card-flower{position:absolute;right:-20px;bottom:-20px;opacity:.09;pointer-events:none;}
+
+.product-thumb{
+  width:100%;aspect-ratio:1/1;background:var(--bg-3);
+  border-bottom:1px solid var(--border-hi);
+  display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;
+}
+.product-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+.product-thumb-glyph{font-family:'IM Fell English',serif;font-size:4rem;color:var(--border-hi);opacity:.5;user-select:none;}
+
+.product-body{padding:1rem 1.1rem 1.1rem;flex:1;display:flex;flex-direction:column;gap:.35rem;}
+.product-name{font-family:'IM Fell English',serif;font-size:1.05rem;color:var(--text);line-height:1.3;}
+.product-material{font-family:'Courier Prime',monospace;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);}
+.product-desc{font-size:.875rem;color:var(--text-2);line-height:1.65;margin-top:.15rem;flex:1;}
+
+/* colour swatches */
+.product-colours{display:flex;gap:.45rem;margin-top:.3rem;flex-wrap:wrap;}
+.colour-swatch{
+  width:18px;height:18px;border:2px solid var(--border-hi);
+  cursor:pointer;transition:transform .12s,border-color .12s;
+  position:relative;flex-shrink:0;
+}
+.colour-swatch:hover{transform:scale(1.15)}
+.colour-swatch.selected{border-color:var(--coral);transform:scale(1.1)}
+.colour-swatch[title]::after{
+  content:attr(title);
+  position:absolute;bottom:calc(100% + 5px);left:50%;transform:translateX(-50%);
+  background:var(--black);color:var(--text);font-family:'Courier Prime',monospace;
+  font-size:.6rem;letter-spacing:.06em;white-space:nowrap;
+  padding:2px 6px;pointer-events:none;opacity:0;transition:opacity .15s;
+}
+.colour-swatch:hover::after{opacity:1}
+
+/* size selector */
+.product-sizes{display:flex;gap:.35rem;margin-top:.25rem;flex-wrap:wrap;}
+.size-btn{
+  font-family:'Courier Prime',monospace;font-size:.62rem;letter-spacing:.08em;
+  text-transform:uppercase;background:none;border:1px solid var(--border-hi);
+  color:var(--text-3);padding:.18rem .45rem;cursor:pointer;
+  transition:border-color .12s,color .12s,background .12s;
+}
+.size-btn:hover{border-color:var(--text-3);color:var(--text)}
+.size-btn.selected{border-color:var(--coral);color:var(--coral);background:var(--cpale);}
+
+.product-footer{display:flex;align-items:center;justify-content:space-between;margin-top:.75rem;padding-top:.65rem;border-top:1px solid var(--border);}
+.product-price{font-family:'IM Fell English',serif;font-size:1.1rem;color:var(--coral);}
+.product-price small{font-family:'Spectral',serif;font-size:.7rem;color:var(--text-3);font-style:italic;margin-left:.2rem;}
+
+.btn-add{
+  font-family:'Spectral',serif;font-size:.72rem;font-weight:600;
+  letter-spacing:.09em;text-transform:uppercase;color:var(--text);
+  background:none;border:1px solid var(--border-hi);padding:.28rem .7rem;
+  cursor:pointer;transition:border-color .15s,color .15s,background .15s;
+}
+.btn-add:hover:not(:disabled){border-color:var(--coral);color:var(--coral);background:var(--cpale);}
+.btn-add:disabled{opacity:.38;cursor:not-allowed;}
+.btn-add.added{border-color:var(--ok);color:var(--ok);background:var(--opale);}
+
+/* ── CART DRAWER ── */
+.cart-overlay{
+  position:fixed;inset:0;background:rgba(16,12,8,.72);z-index:300;
+  opacity:0;pointer-events:none;transition:opacity .25s;
+}
+.cart-overlay.open{opacity:1;pointer-events:auto;}
+.cart-drawer{
+  position:fixed;top:0;right:0;bottom:0;width:min(400px,100vw);
+  background:var(--nav-bg);border-left:2px solid var(--border-hi);
+  display:flex;flex-direction:column;z-index:301;
+  transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);
+}
+.cart-drawer.open{transform:translateX(0);}
+.cart-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.1rem 1.4rem;border-bottom:1px solid var(--border-hi);flex-shrink:0;
+}
+.cart-title{font-family:'IM Fell English',serif;font-size:1.1rem;color:var(--text);}
+.cart-close{
+  background:none;border:1px solid var(--border-hi);color:var(--text-3);
+  font-size:1rem;line-height:1;padding:.2rem .5rem;cursor:pointer;
+  transition:border-color .15s,color .15s;
+}
+.cart-close:hover{border-color:var(--coral);color:var(--coral)}
+.cart-items{flex:1;overflow-y:auto;padding:1rem 1.4rem;}
+.cart-empty{color:var(--text-3);font-size:.88rem;font-style:italic;text-align:center;padding:2rem 0;}
+.cart-item{
+  display:grid;grid-template-columns:1fr auto;gap:.5rem .8rem;
+  padding:.85rem 0;border-bottom:1px solid var(--border);
+}
+.cart-item:last-child{border-bottom:none}
+.cart-item-name{font-family:'IM Fell English',serif;font-size:.95rem;color:var(--text);line-height:1.3;}
+.cart-item-meta{font-family:'Courier Prime',monospace;font-size:.62rem;letter-spacing:.07em;text-transform:uppercase;color:var(--text-3);margin-top:.18rem;}
+.cart-item-price{font-family:'IM Fell English',serif;font-size:.95rem;color:var(--coral);text-align:right;white-space:nowrap;}
+.cart-item-remove{
+  background:none;border:none;color:var(--text-3);font-size:.72rem;
+  font-family:'Courier Prime',monospace;letter-spacing:.06em;text-transform:uppercase;
+  cursor:pointer;padding:0;text-align:right;text-decoration:underline;
+  transition:color .12s;
+}
+.cart-item-remove:hover{color:var(--coral)}
+.cart-footer{padding:1.1rem 1.4rem;border-top:1px solid var(--border-hi);flex-shrink:0;}
+.cart-total-row{display:flex;justify-content:space-between;margin-bottom:1rem;}
+.cart-total-label{font-family:'Spectral',serif;font-size:.82rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);}
+.cart-total-amount{font-family:'IM Fell English',serif;font-size:1.2rem;color:var(--text);}
+.btn-checkout{
+  width:100%;padding:.7rem 1rem;
+  font-family:'Spectral',serif;font-size:.82rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+  background:var(--coral);color:#fff;border:none;cursor:pointer;
+  transition:background .15s;
+}
+.btn-checkout:hover:not(:disabled){background:var(--coral-hi)}
+.btn-checkout:disabled{opacity:.45;cursor:not-allowed;}
+.cart-note{margin-top:.65rem;font-size:.72rem;color:var(--text-3);line-height:1.6;font-style:italic;}
+
+/* ── FULFILMENT NOTE ── */
+.fulfilment-note{
+  margin-top:1.6rem;padding:1rem 1.25rem;
+  border:1px solid var(--border-hi);background:rgba(0,0,0,.14);
+  font-size:.82rem;color:var(--text-3);line-height:1.75;
+}
+[data-theme="light"] .fulfilment-note{background:var(--bg-3)}
+.fulfilment-note strong{font-family:'IM Fell English',serif;font-size:.9rem;color:var(--olive);font-weight:400;display:block;margin-bottom:.2rem;}
+
+/* ── FOOTER ── */
+footer{padding:2.2rem 0 1.8rem;border-top:2px solid var(--border);text-align:center;}
+.footer-vine{display:block;margin:0 auto .8rem;max-width:500px;}
+footer p{font-size:.78rem;color:var(--text-3);}
+footer a{color:var(--text-3)}
+footer a:hover{color:var(--coral)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:680px){
+  .nav-toggle{display:flex}
+  .nav-links{
+    display:none;position:fixed;top:52px;left:0;right:0;
+    background:var(--nav-bg);border-bottom:2px solid var(--border);
+    flex-direction:column;gap:0;padding:.5rem 0;z-index:199;
+  }
+  .nav-links.open{display:flex}
+  .nav-links li a,.nav-links li button{display:block;padding:.85rem 1.75rem;font-size:.82rem;width:100%;text-align:left;}
+  .theme-toggle{border:none;padding:.85rem 1.75rem;width:100%;justify-content:flex-start}
+  .product-grid{grid-template-columns:1fr}
+  .section-title{font-size:1.4rem}
+}
+
+@keyframes riseIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.product-card{animation:riseIn .45s ease both}
+.product-card:nth-child(1){animation-delay:.05s}
+.product-card:nth-child(2){animation-delay:.12s}
+.product-card:nth-child(3){animation-delay:.19s}
+.product-card:nth-child(4){animation-delay:.26s}
+.product-card:nth-child(5){animation-delay:.33s}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a class="nav-brand" href="index.html">
+      <svg viewBox="-55 -55 110 110" aria-hidden="true"><use href="#sf"/></svg>
+      Cal St Francis
+    </a>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html#projects">Projects</a></li>
+      <li><a href="index.html#about">About</a></li>
+      <li><a href="index.html#support">Support</a></li>
+      <li><a href="shop.html" class="active">Shop</a></li>
+      <li>
+        <button class="nav-cart-btn" id="cartBtn" aria-label="Open cart">
+          Cart <span class="cart-badge" id="cartBadge">0</span>
+        </button>
+      </li>
+      <li><button class="theme-toggle" id="themeToggle"><span>🌙</span> Dark</button></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- CART DRAWER -->
+<div class="cart-overlay" id="cartOverlay"></div>
+<div class="cart-drawer" id="cartDrawer" role="dialog" aria-modal="true" aria-label="Shopping cart">
+  <div class="cart-header">
+    <span class="cart-title">Your Cart</span>
+    <button class="cart-close" id="cartClose" aria-label="Close cart">✕</button>
+  </div>
+  <div class="cart-items" id="cartItems">
+    <p class="cart-empty">Your cart is empty.</p>
+  </div>
+  <div class="cart-footer" id="cartFooter" style="display:none">
+    <div class="cart-total-row">
+      <span class="cart-total-label">Total</span>
+      <span class="cart-total-amount" id="cartTotal">$0.00 CAD</span>
+    </div>
+    <button class="btn-checkout" id="checkoutBtn">Proceed to Checkout →</button>
+    <p class="cart-note">Secure checkout via Stripe. Shirts printed and shipped by Printful. Your purchase keeps these tools free.</p>
+  </div>
+</div>
+
+<!-- SHOP -->
+<section>
+  <div class="container">
+    <div class="section-eyebrow">Merchandise</div>
+    <div class="section-title-row">
+      <h2 class="section-title">Shirts &amp; Apparel</h2>
+      <svg viewBox="-55 -55 110 110" aria-hidden="true"><use href="#sf"/></svg>
+    </div>
+    <p class="section-intro">
+      Printed on demand through Printful. Each purchase supports seminary studies and
+      keeps the free tools free. All designs are original — theology you can wear.
+    </p>
+
+    <div class="product-grid" id="productGrid">
+      <!-- populated by JS from products.json -->
+    </div>
+
+    <div class="fulfilment-note">
+      <strong>How it works</strong>
+      Select a colour and size, then add to cart. Checkout is handled securely through Stripe —
+      I never see your payment details. Shirts are printed to order by Printful and shipped worldwide.
+      Sizing questions and returns go through Printful directly.
+      Your purchase keeps the games, liturgical tools, and everything else here free and open.
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <svg class="footer-vine" viewBox="0 0 500 50" style="height:50px;overflow:hidden" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <path d="M 0,30 C 60,12 120,40 180,25 C 240,10 310,42 370,25 C 430,8 480,35 500,28"
+        stroke="#5a6428" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <g transform="translate(180,22) scale(.38)"><use href="#sf"/></g>
+      <g transform="translate(370,22) scale(.38)"><use href="#sf"/></g>
+      <g transform="translate(90,28) rotate(-20) scale(.42)"><use href="#lf-v"/></g>
+      <g transform="translate(275,28) rotate(18) scale(.38)"><use href="#lf-b"/></g>
+      <g transform="translate(450,26) rotate(-15) scale(.38)"><use href="#lf-v"/></g>
+    </svg>
+    <p>
+      Cal St Francis · Halifax, Nova Scotia<br>
+      <a href="mailto:calstfrancis@disroot.org">calstfrancis@disroot.org</a> ·
+      <a href="https://github.com/calstfrancis" target="_blank" rel="noopener">GitHub</a>
+    </p>
+    <p style="margin-top:.4rem;opacity:.45">Merch proceeds support seminary studies. All other content freely given.</p>
+  </div>
+</footer>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────────────────────
+// Replace with your actual Netlify Functions URL after deployment
+const BACKEND_URL = 'https://YOUR-NETLIFY-SITE.netlify.app';
+
+// ── THEME ───────────────────────────────────────────────────────────────────
+const themeBtn = document.getElementById('themeToggle');
+const setTheme = t => {
+  document.documentElement.setAttribute('data-theme', t);
+  localStorage.setItem('theme', t);
+  if (themeBtn) themeBtn.innerHTML = t === 'dark' ? '<span>🌙</span> Dark' : '<span>☀️</span> Light';
+};
+const saved = localStorage.getItem('theme');
+setTheme(saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+themeBtn.addEventListener('click', () => {
+  setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+});
+
+// ── NAV TOGGLE ──────────────────────────────────────────────────────────────
+const toggle = document.getElementById('navToggle');
+const links  = document.getElementById('navLinks');
+toggle.addEventListener('click', () => {
+  toggle.classList.toggle('open');
+  links.classList.toggle('open');
+});
+links.querySelectorAll('a').forEach(a => {
+  a.addEventListener('click', () => {
+    toggle.classList.remove('open');
+    links.classList.remove('open');
+  });
+});
+
+// ── CART STATE ───────────────────────────────────────────────────────────────
+// Cart items: [{ productId, productName, colour, size, variantId, price, qty }]
+let cart = JSON.parse(sessionStorage.getItem('csf_cart') || '[]');
+
+function saveCart() {
+  sessionStorage.setItem('csf_cart', JSON.stringify(cart));
+}
+
+function cartCount() {
+  return cart.reduce((n, i) => n + i.qty, 0);
+}
+
+function cartTotalCents() {
+  return cart.reduce((n, i) => n + i.price * 100 * i.qty, 0);
+}
+
+function updateBadge() {
+  const badge = document.getElementById('cartBadge');
+  const n = cartCount();
+  badge.textContent = n;
+  badge.classList.toggle('visible', n > 0);
+}
+
+// ── CART DRAWER ──────────────────────────────────────────────────────────────
+const overlay  = document.getElementById('cartOverlay');
+const drawer   = document.getElementById('cartDrawer');
+const cartBtn  = document.getElementById('cartBtn');
+const closeBtn = document.getElementById('cartClose');
+
+function openCart() {
+  overlay.classList.add('open');
+  drawer.classList.add('open');
+  renderCartDrawer();
+}
+function closeCart() {
+  overlay.classList.remove('open');
+  drawer.classList.remove('open');
+}
+cartBtn.addEventListener('click', openCart);
+closeBtn.addEventListener('click', closeCart);
+overlay.addEventListener('click', closeCart);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCart(); });
+
+function renderCartDrawer() {
+  const itemsEl  = document.getElementById('cartItems');
+  const footerEl = document.getElementById('cartFooter');
+  const totalEl  = document.getElementById('cartTotal');
+
+  if (cart.length === 0) {
+    itemsEl.innerHTML = '<p class="cart-empty">Your cart is empty.</p>';
+    footerEl.style.display = 'none';
+    return;
+  }
+
+  footerEl.style.display = 'block';
+  totalEl.textContent = '$' + (cartTotalCents() / 100).toFixed(2) + ' CAD';
+
+  itemsEl.innerHTML = cart.map((item, idx) => `
+    <div class="cart-item">
+      <div>
+        <div class="cart-item-name">${item.productName}</div>
+        <div class="cart-item-meta">${item.colour} · ${item.size} · qty ${item.qty}</div>
+      </div>
+      <div>
+        <div class="cart-item-price">$${(item.price * item.qty).toFixed(2)}</div>
+        <button class="cart-item-remove" data-idx="${idx}">Remove</button>
+      </div>
+    </div>
+  `).join('');
+
+  itemsEl.querySelectorAll('.cart-item-remove').forEach(btn => {
+    btn.addEventListener('click', () => {
+      cart.splice(Number(btn.dataset.idx), 1);
+      saveCart();
+      updateBadge();
+      renderCartDrawer();
+    });
+  });
+}
+
+// ── CHECKOUT ─────────────────────────────────────────────────────────────────
+document.getElementById('checkoutBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('checkoutBtn');
+  btn.disabled = true;
+  btn.textContent = 'Redirecting…';
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/create-checkout`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items: cart })
+    });
+    const data = await res.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      throw new Error(data.error || 'No checkout URL returned');
+    }
+  } catch (err) {
+    alert('Checkout failed: ' + err.message + '\n\nPlease try again or email calstfrancis@disroot.org');
+    btn.disabled = false;
+    btn.textContent = 'Proceed to Checkout →';
+  }
+});
+
+// ── PRODUCT RENDERING ─────────────────────────────────────────────────────────
+async function loadProducts() {
+  const grid = document.getElementById('productGrid');
+  try {
+    const res = await fetch('products.json');
+    const products = await res.json();
+    grid.innerHTML = products.map(p => renderProductCard(p)).join('');
+    products.forEach(p => initProductCard(p));
+  } catch (e) {
+    grid.innerHTML = '<p style="color:var(--text-3);font-style:italic">Could not load products. Please refresh.</p>';
+  }
+}
+
+function renderProductCard(p) {
+  const firstColour = p.colours[0];
+  const sizes = Object.keys(firstColour.variants);
+  const hasImage = firstColour.image;
+
+  const thumbHtml = hasImage
+    ? `<img src="${firstColour.image}" alt="${p.name} in ${firstColour.name}" loading="lazy">`
+    : `<span class="product-thumb-glyph" aria-hidden="true">${p.glyph || '✦'}</span>`;
+
+  const swatches = p.colours.map((c, i) => `
+    <span class="colour-swatch${i === 0 ? ' selected' : ''}"
+      style="background:${c.hex}"
+      title="${c.name}"
+      data-product="${p.id}"
+      data-colour-idx="${i}"
+      role="button"
+      tabindex="0"
+      aria-label="${c.name}${i === 0 ? ' (selected)' : ''}">
+    </span>
+  `).join('');
+
+  const sizeButtons = sizes.map(s => `
+    <button class="size-btn" data-product="${p.id}" data-size="${s}">${s}</button>
+  `).join('');
+
+  return `
+    <div class="product-card" id="card-${p.id}">
+      <svg class="product-card-flower" width="110" height="110" viewBox="-55 -55 110 110" aria-hidden="true">
+        <use href="#sf"/>
+      </svg>
+      <div class="product-thumb" id="thumb-${p.id}">
+        ${thumbHtml}
+      </div>
+      <div class="product-body">
+        <div class="product-name">${p.name}</div>
+        <div class="product-material">${p.material}</div>
+        <p class="product-desc">${p.description}</p>
+        <div class="product-colours" aria-label="Colour">${swatches}</div>
+        <div class="product-sizes" aria-label="Size">${sizeButtons}</div>
+        <div class="product-footer">
+          <div class="product-price">$${p.price_cad.toFixed(2)} <small>CAD</small></div>
+          <button class="btn-add" id="add-${p.id}" data-product="${p.id}" disabled>
+            Select size
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function initProductCard(p) {
+  // track selected colour/size per card
+  const state = { colourIdx: 0, size: null };
+
+  function getVariantId() {
+    const colour = p.colours[state.colourIdx];
+    return colour.variants[state.size] || 0;
+  }
+
+  function updateAddBtn() {
+    const btn = document.getElementById(`add-${p.id}`);
+    if (!state.size) {
+      btn.textContent = 'Select size';
+      btn.disabled = true;
+    } else {
+      const vid = getVariantId();
+      if (!vid) {
+        btn.textContent = 'Unavailable';
+        btn.disabled = true;
+      } else {
+        btn.textContent = 'Add to Cart';
+        btn.disabled = false;
+        btn.classList.remove('added');
+      }
+    }
+  }
+
+  // colour swatches
+  document.querySelectorAll(`.colour-swatch[data-product="${p.id}"]`).forEach(swatch => {
+    const activate = () => {
+      state.colourIdx = Number(swatch.dataset.colourIdx);
+      state.size = null; // reset size when colour changes
+
+      // update selected swatch
+      document.querySelectorAll(`.colour-swatch[data-product="${p.id}"]`).forEach(s => s.classList.remove('selected'));
+      swatch.classList.add('selected');
+
+      // update thumb image
+      const colour = p.colours[state.colourIdx];
+      const thumb = document.getElementById(`thumb-${p.id}`);
+      if (colour.image) {
+        thumb.innerHTML = `<img src="${colour.image}" alt="${p.name} in ${colour.name}" loading="lazy">`;
+      } else {
+        thumb.innerHTML = `<span class="product-thumb-glyph" aria-hidden="true">${p.glyph || '✦'}</span>`;
+      }
+
+      // reset size buttons
+      document.querySelectorAll(`.size-btn[data-product="${p.id}"]`).forEach(s => s.classList.remove('selected'));
+      updateAddBtn();
+    };
+    swatch.addEventListener('click', activate);
+    swatch.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') activate(); });
+  });
+
+  // size buttons
+  document.querySelectorAll(`.size-btn[data-product="${p.id}"]`).forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.size = btn.dataset.size;
+      document.querySelectorAll(`.size-btn[data-product="${p.id}"]`).forEach(s => s.classList.remove('selected'));
+      btn.classList.add('selected');
+      updateAddBtn();
+    });
+  });
+
+  // add to cart
+  document.getElementById(`add-${p.id}`).addEventListener('click', () => {
+    const colour = p.colours[state.colourIdx];
+    const variantId = getVariantId();
+    if (!variantId || !state.size) return;
+
+    // check if already in cart — increment qty
+    const existing = cart.find(i =>
+      i.productId === p.id && i.colour === colour.name && i.size === state.size
+    );
+    if (existing) {
+      existing.qty++;
+    } else {
+      cart.push({
+        productId: p.id,
+        productName: p.name,
+        colour: colour.name,
+        size: state.size,
+        variantId: variantId,
+        price: p.price_cad,
+        qty: 1
+      });
+    }
+
+    saveCart();
+    updateBadge();
+
+    // brief "Added" feedback
+    const btn = document.getElementById(`add-${p.id}`);
+    btn.textContent = 'Added ✓';
+    btn.classList.add('added');
+    btn.disabled = true;
+    setTimeout(() => {
+      btn.textContent = 'Add to Cart';
+      btn.classList.remove('added');
+      btn.disabled = false;
+    }, 1400);
+  });
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+loadProducts();
+updateBadge();
+</script>
+</body>
+</html>

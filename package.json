@@ -1,0 +1,9 @@
+{
+  "name": "calstfrancis-shop-backend",
+  "version": "1.0.0",
+  "description": "Netlify Functions backend for Cal St Francis Printful shop",
+  "private": true,
+  "dependencies": {
+    "stripe": "^14.0.0"
+  }
+}

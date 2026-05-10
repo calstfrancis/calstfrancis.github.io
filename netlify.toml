@@ -1,0 +1,32 @@
+[build]
+  functions = "netlify/functions"
+
+# ── CORS headers for all API functions ──────────────────────────────────────
+# Allows your GitHub Pages site to call these functions
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Access-Control-Allow-Origin  = "https://calstfrancis.github.io"
+    Access-Control-Allow-Methods = "POST, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type"
+
+# ── Handle OPTIONS preflight requests ───────────────────────────────────────
+[[redirects]]
+  from    = "/api/*"
+  to      = "/.netlify/functions/:splat"
+  status  = 200
+
+# ── Friendly function URLs (/api/create-checkout instead of /.netlify/functions/create-checkout)
+[[redirects]]
+  from   = "/api/create-checkout"
+  to     = "/.netlify/functions/create-checkout"
+  status = 200
+
+[[redirects]]
+  from   = "/api/stripe-webhook"
+  to     = "/.netlify/functions/stripe-webhook"
+  status = 200
+
+[functions]
+  # Use Node.js 20
+  node_bundler = "esbuild"

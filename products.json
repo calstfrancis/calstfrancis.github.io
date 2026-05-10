@@ -1,0 +1,104 @@
+[
+  {
+    "id": "liberation-tee",
+    "name": "\"Liberation\" Tee",
+    "description": "Bold type inspired by process theology. God's power as invitation, not coercion — worn on your chest.",
+    "material": "100% organic cotton · unisex · S–2XL",
+    "price_cad": 28.00,
+    "glyph": "☧",
+    "colours": [
+      {
+        "name": "Black",
+        "hex": "#1a1a1a",
+        "image": "img/liberation-tee-black.jpg",
+        "variants": {
+          "S":  0,
+          "M":  0,
+          "L":  0,
+          "XL": 0,
+          "2XL":0
+        }
+      },
+      {
+        "name": "White",
+        "hex": "#f0ece0",
+        "image": "img/liberation-tee-white.jpg",
+        "variants": {
+          "S":  0,
+          "M":  0,
+          "L":  0,
+          "XL": 0,
+          "2XL":0
+        }
+      }
+    ]
+  },
+  {
+    "id": "sobornost-tee",
+    "name": "SOBORNOST Sunflower Tee",
+    "description": "The coral sunflower from the SOBORNOST engine — a quiet emblem for those who know contemplative interactive fiction is a serious art form.",
+    "material": "Heavy cotton · preshrunk · unisex · S–2XL",
+    "price_cad": 32.00,
+    "glyph": "✦",
+    "colours": [
+      {
+        "name": "Crimson",
+        "hex": "#6a1710",
+        "image": "img/sobornost-tee-crimson.jpg",
+        "variants": {
+          "S":  0,
+          "M":  0,
+          "L":  0,
+          "XL": 0,
+          "2XL":0
+        }
+      },
+      {
+        "name": "Black",
+        "hex": "#1a1a1a",
+        "image": "img/sobornost-tee-black.jpg",
+        "variants": {
+          "S":  0,
+          "M":  0,
+          "L":  0,
+          "XL": 0,
+          "2XL":0
+        }
+      }
+    ]
+  },
+  {
+    "id": "rubric-tee",
+    "name": "\"Rubric\" Liturgy Tee",
+    "description": "For worship leaders and typesetters. A calligraphy motif and a subtle nod to the beauty of the printed order of service.",
+    "material": "Soft ring-spun cotton · S–2XL",
+    "price_cad": 30.00,
+    "glyph": "❧",
+    "colours": [
+      {
+        "name": "Olive",
+        "hex": "#7a8840",
+        "image": "img/rubric-tee-olive.jpg",
+        "variants": {
+          "S":  0,
+          "M":  0,
+          "L":  0,
+          "XL": 0,
+          "2XL":0
+        }
+      },
+      {
+        "name": "Natural",
+        "hex": "#e8dfc0",
+        "image": "img/rubric-tee-natural.jpg",
+        "variants": {
+          "S":  0,
+          "M":  0,
+          "L":  0,
+          "XL": 0,
+          "2XL":0
+        }
+      }
+    ]
+  }
+]
