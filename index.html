@@ -100,7 +100,6 @@
   --black:     #faf4e4;
   --ok:        #4a6018;
 
-  /* Light mode overrides for game card text */
   --game-title: #3a2c1c;
   --game-desc:  #4a3a28;
   --game-ascii: #5a4a30;
@@ -137,7 +136,7 @@
 
 /* SPASIBO – light mode overrides */
 [data-theme="light"] .game-feature.spasibo {
-  background: #d8e4ec;        /* pale fog / ice reflection */
+  background: #d8e4ec;
   border-color: #8ab0c0;
 }
 [data-theme="light"] .game-feature.spasibo .game-ascii {
@@ -151,7 +150,7 @@
   color: #2c5060;
 }
 [data-theme="light"] .game-feature.spasibo .game-link {
-  color: #a06030;             /* coral accent for warmth in light mode */
+  color: #a06030;
 }
 [data-theme="light"] .game-feature.spasibo .game-link:hover {
   color: #c07848;
@@ -577,54 +576,72 @@ section:nth-of-type(4){animation-delay:.2s}
       </div>
     </div>
 
-    <!-- SOBORNOST game engine card -->
-    <div class="game-feature">
+    <!-- SPASIBO game card (the game, not the engine) -->
+    <div class="game-feature spasibo">
       <svg class="game-bota-top" viewBox="0 0 800 38" style="height:38px;display:block;overflow:hidden" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-        <rect width="800" height="38" fill="#0e0b09"/>
+        <rect width="800" height="38" fill="#0a1018"/>
         <path d="M -5,22 C 60,8 130,30 200,18 C 270,6 340,28 400,18 C 460,8 530,30 600,18 C 670,6 740,28 805,18"
-          stroke="#7a8840" stroke-width="2" fill="none" stroke-linecap="round"/>
+          stroke="#2a5a6a" stroke-width="2" fill="none" stroke-linecap="round"/>
         <g transform="translate(200,15) scale(.32)"><use href="#sf"/></g>
         <g transform="translate(400,15) scale(.38)"><use href="#sf"/></g>
         <g transform="translate(600,15) scale(.32)"><use href="#sf"/></g>
-        <g transform="translate(110,20) rotate(-20) scale(.4)"><use href="#lf-v"/></g>
-        <g transform="translate(320,18) rotate(25) scale(.36)"><use href="#lf-b"/></g>
-        <g transform="translate(490,20) rotate(-18) scale(.38)"><use href="#lf-v"/></g>
-        <g transform="translate(690,18) rotate(22) scale(.36)"><use href="#lf-b"/></g>
+        <g transform="translate(100,20) rotate(-15) scale(.38)"><use href="#lf-v"/></g>
+        <g transform="translate(300,18) rotate(20) scale(.35)"><use href="#lf-b"/></g>
+        <g transform="translate(500,20) rotate(-20) scale(.36)"><use href="#lf-v"/></g>
+        <g transform="translate(700,18) rotate(15) scale(.35)"><use href="#lf-b"/></g>
       </svg>
       <div class="game-body">
         <div class="game-header">
-          <div class="game-ascii">╔══════════════════════════════╗
-║     SOBORNOST  v3.3.1        ║
-║  contemplative IF engine     ║
+          <pre class="game-ascii">╔══════════════════════════════╗
+║           СПАСИБО            ║
+║        a crossing            ║
 ╚══════════════════════════════╝
-    JS · ES6 · MIT · no build
-      ✟   ༄   ✟   ༄   ✟</div>
+    bronze · fog · north atlantic
+         ✟   ༄   ✟   ༄   ✟</pre>
           <div>
-            <div class="game-label">Narrative Engine · Open Source · MIT</div>
-            <div class="game-title">СОБОРНОСТЬ / SOBORNOST</div>
+            <div class="game-label">Theotic Mystery · Browser · MIT</div>
+            <div class="game-title">SPASIBO</div>
             <p class="game-desc">
-              A browser-native engine for contemplative, theologically-grounded interactive fiction.
-              Plain JavaScript — no build step, no framework, no compiler. Deploy directly to GitHub Pages.
-              Soundings, theosis, charisms, branching dialogue, and authored endings.
-              Written by a minister-in-formation. Built for contemplative stories.
+              A contemplative mystery set aboard a research schooner making a winter North Atlantic crossing. 
+              You are an agent posing as the ship's chaplain. The archive in the hold holds thirty years 
+              of scientific discovery — and someone wants it destroyed. 
+              Built on the <strong>SOBORNOST</strong> engine. Theosis, soundings, cover, and the slow disclosure of memory.
             </p>
           </div>
         </div>
         <div class="game-footer">
-          <span class="game-status"><span class="status-pip"></span> engine · 3.3.1 · stable core</span>
-          <a href="https://github.com/calstfrancis/SOBORNOST" target="_blank" rel="noopener" class="game-link">GitHub →</a>
+          <span class="game-status"><span class="status-pip"></span> Act One complete · Playable demo</span>
+          <a href="spasibo.html" target="_blank" rel="noopener" class="game-link">Cross the Atlantic →</a>
         </div>
       </div>
     </div>
 
-    <!-- COMMENT OUT SPASIBO FOR NOW -->
-    <!--
-    <div class="game-feature spasibo">
-      ...
-    </div>
-    -->
-
     <div class="project-list">
+      <!-- SOBORNOST Engine project card -->
+      <div class="project-card">
+        <svg class="project-card-flower" width="80" height="80" viewBox="-55 -55 110 110" aria-hidden="true">
+          <use href="#sf"/>
+        </svg>
+        <div class="project-body-wrap">
+          <div class="project-initial">S</div>
+          <div class="project-body">
+            <div class="project-meta">
+              <span class="project-name">СОБОРНОСТЬ / SOBORNOST — Game Engine</span>
+              <span class="project-type">Narrative Engine · Open Source · MIT</span>
+              <span class="project-status-dev">Stable · v3.3.1</span>
+            </div>
+            <p class="project-desc">
+              A browser‑native engine for contemplative, state‑reactive interactive fiction. 
+              Plain JavaScript — no build step, no framework, no compiler. 
+              Soundings, theosis, charisms, branching dialogue, rituals, magnetic deviation, and cross‑playthrough memory.
+              Written by a minister‑in‑formation. Designed for theological, atmospheric, and psychological narrative games.
+            </p>
+            <a href="https://github.com/calstfrancis/SOBORNOST" target="_blank" rel="noopener" class="project-link">View on GitHub →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rubric project card -->
       <div class="project-card">
         <svg class="project-card-flower" width="80" height="80" viewBox="-55 -55 110 110" aria-hidden="true">
           <use href="#sf"/>
@@ -638,36 +655,34 @@ section:nth-of-type(4){animation-delay:.2s}
               <span class="project-status-dev">In development</span>
             </div>
             <p class="project-desc">
-              A LaTeX-based worship planning system for United Church of Canada congregations.
-              Full service flows, lectionary integration, and print-ready orders of service.
+              A LaTeX‑based worship planning system for United Church of Canada congregations. 
+              Full service flows, lectionary integration, and print‑ready orders of service.
             </p>
             <a href="https://github.com/calstfrancis/rubric" target="_blank" rel="noopener" class="project-link">View on GitHub →</a>
           </div>
         </div>
       </div>
 
+      <!-- LaTemplater project card -->
       <div class="project-card">
         <svg class="project-card-flower" width="80" height="80" viewBox="-55 -55 110 110" aria-hidden="true">
           <use href="#sf"/>
         </svg>
         <div class="project-body-wrap">
-          <div class="project-initial">R</div>
+          <div class="project-initial">L</div>
           <div class="project-body">
             <div class="project-meta">
               <span class="project-name">LaTemplater — LaTeX Template Creator</span>
-              <span class="project-type">LaTeX</span>
+              <span class="project-type">LaTeX · Tool</span>
               <span class="project-status-dev">In development</span>
             </div>
             <p class="project-desc">
-              A simple program for creating LaTeX templates for Academic papers.
+              A simple command‑line tool for generating LaTeX templates for academic papers and liturgical documents.
             </p>
-            <a href="https://github.com/calstfrancis/rubric" target="_blank" rel="noopener" class="project-link">View on GitHub →</a>
+            <a href="https://github.com/calstfrancis/latemplater" target="_blank" rel="noopener" class="project-link">View on GitHub →</a>
           </div>
         </div>
       </div>
-
-
-
     </div>
   </div>
 </section>
