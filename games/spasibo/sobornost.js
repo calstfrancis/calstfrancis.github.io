@@ -207,12 +207,20 @@ function setTutorialContent(contentHtml)      { _registries.tutorialContent = co
 // SECTION: systems/mechanics.js
 // ============================================================
 
-function showToast(msg, type) {
-  const old = document.querySelector('.note-toast'); if (old) old.remove();
+let _toastQueue = [], _toastActive = false;
+function showToast(msg, type='note') {
+  _toastQueue.push({ msg, type });
+  if (!_toastActive) _flushToast();
+}
+function _flushToast() {
+  if (!_toastQueue.length) { _toastActive = false; return; }
+  _toastActive = true;
+  const { msg, type } = _toastQueue.shift();
+  const old = document.querySelector('.toast'); if (old) old.remove();
   const t = document.createElement('div');
-  t.className = 'note-toast' + (type === 'sounding' ? ' sounding-toast' : '');
+  t.className = 'toast ' + (type || 'note');
   t.textContent = msg; document.body.appendChild(t);
-  setTimeout(() => { if (t.parentNode) t.remove(); }, 3200);
+  setTimeout(() => { if (t.parentNode) t.remove(); _flushToast(); }, 2600);
 }
 
 function hasFlag(f) { return G.flags.has(f); }
@@ -1859,19 +1867,27 @@ function resolveTextBlock(textBlock){
 function getSceneText(scene){return resolveTextBlock(scene.text);}
 function resolveLayeredText(scene){return getSceneText(scene);}
 function injectMicroLines(a,_s){return a;}
+const _toggleMemo = new Map();
 function applyLinguisticToggle(t){
-  // As doubt rises, registered translations occasionally replace original text
   const doubt = G.stats.doubt || 0;
   if (doubt < 4 || !_registries.translations || !Object.keys(_registries.translations).length) return t;
-  const flicker = doubt >= 7 ? 0.35 : doubt >= 5 ? 0.18 : 0.08;
+  // Memoize per scene+doubt-tier to prevent per-render flickering
+  const tier = doubt >= 7 ? 'H' : doubt >= 5 ? 'M' : 'L';
+  const key = G.scene + '|' + tier + '|' + t.slice(0, 32);
+  if (_toggleMemo.has(key)) return _toggleMemo.get(key);
+  const flicker = tier === 'H' ? 0.35 : tier === 'M' ? 0.18 : 0.08;
   let result = t;
   for (const [orig, trans] of Object.entries(_registries.translations)) {
     if (Math.random() < flicker) {
       result = result.replaceAll(orig, `<span class="cyrillic-flicker" title="${orig}">${trans}</span>`);
     }
   }
+  _toggleMemo.set(key, result);
+  // Expire memo on scene change
   return result;
 }
+// Clear memo on navigation
+function _clearToggleMemo() { _toggleMemo.clear(); }
 function applyPostEventShifts(t){return t;}
 function applyPastLifeLines(a,_id){return a;}
 function injectGhostText(t,_id){return t;}
@@ -2301,6 +2317,16 @@ function _buildHeader(scene){
   const sb=document.createElement('div');sb.className='sbar'+(sbarDoubt>=7?' sbar-jitter':'');
   Object.entries(G.stats).forEach(([k,v])=>{const d=document.createElement('div');d.className='stat';d.innerHTML=k+' <span class="stat-val">'+v+'</span>'+(_registries.statTips[k]?'<span class="stat-tip">'+_registries.statTips[k]+'</span>':'');sb.appendChild(d);});
   if(G.theosis>32){const td=document.createElement('div');td.className='stat stat-theosis';const tier=G.theosis>65?'\u041a\u041a\u0410':String(G.theosis);td.innerHTML='<span class="stat-val" style="color:var(--gold)">'+tier+'</span><span class="stat-tip">theosis</span>';sb.appendChild(td);}
+  // Deviation compass — shown when magneticDeviation > 0.2
+  if(G.magneticDeviation>0.2){
+    const dev=G.magneticDeviation;
+    const needlePos=Math.round(dev*8)-4; // -4 to +4
+    const bar='─'.repeat(Math.max(0,4+needlePos))+'N'+'─'.repeat(Math.max(0,4-needlePos));
+    const cd2=document.createElement('div');cd2.className='stat stat-compass';
+    const cmpColor=dev>0.7?'var(--amber)':'var(--cold-dim)';
+    cd2.innerHTML='<span class="stat-val" style="color:'+cmpColor+';font-family:var(--font-display)">'+bar+'</span><span class="stat-tip">magnetic deviation '+Math.round(dev*100)+'%</span>';
+    sb.appendChild(cd2);
+  }
   hdr.appendChild(sb);
   const tags=[];
   G.charisms.forEach(id=>{const c=findCharism(id);if(c)tags.push(`<span class="ctag" title="${c.desc}">${c.name}</span>`);});

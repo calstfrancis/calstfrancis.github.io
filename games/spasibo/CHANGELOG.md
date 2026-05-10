@@ -1,3 +1,30 @@
+## v1.2.1 "Zarya — Release Patch" — May 2026
+
+### Critical Bug Fixes (from multi-AI audit)
+- **`maintenance_brass` duplicate `onEnter`**: Merged two conflicting `onEnter` blocks. Second was silently overwriting first, meaning theosis (+3), composure (+2), Miguel reputation, shipStability, and the crossing sounding were **never firing**. Now a single merged block.
+- **`miguel_response` duplicate `onEnter`**: Same issue — `toast_cover_connection` was never showing, and `miguel_introduced` flag was the only thing firing. Merged.
+
+### Cover Challenge System Activated
+- `startCoverChallenge('background')` now triggers automatically in `kylie_background_response` on second visit (after `kylie_initial_met` flag is set).
+- `startCoverChallenge('posting')` triggers in `connie_pastoral` when posting is established.
+- `startCoverChallenge('connection')` triggers in `othis_cabinet_direct`.
+- Cover challenge overlay now has entrance animation (`challenge-enter` keyframe).
+
+### Engine Fixes
+- **Toast queue**: `showToast` replaced with queued system — simultaneous toasts no longer overwrite each other. Each toast shows for 2.6s, then the next fires.
+- **Linguistic memoization**: `applyLinguisticToggle` now memoizes results per `scene + doubt-tier + text-prefix`. Prevents per-render flickering of Cyrillic drift. Memo cleared on scene navigation.
+- **Compass display**: Magnetic deviation now shown as ASCII needle compass in stat bar when `magneticDeviation > 0.2`. `True N` vs `Mag N` deviation visible. `registerCompassAxes('True', 'Mag')` registered; `updateCompass()` called on deviation events.
+
+### New Content
+- **`maintenance_rigging`**: Third ship maintenance task — fixing a twist in the port-side jib sheet. Requires two people; Alexei appears, helps without comment, reveals he does fieldwork. Short, banal, character-building.
+- **`hold_bless_archive`**: Available after `sunday_service_led` flag — the player can offer an informal blessing over the archive in the hold. Highest sanctity grant in the game (+3). Freezer Beef witnesses. Scene is careful not to theologise its own act.
+- **`radio_lore` repetition guard**: Miguel no longer repeats the radio lore if the scene is revisited.
+
+### CSS
+- Cover challenge overlay entrance animation.
+- Compass stat-val styling.
+- `body.sanctity-high .location-bar.uncanny` — gold glow when archive is blessed.
+
 ## v1.2 "Zarya" — May 2026
 
 ### Critical Fixes

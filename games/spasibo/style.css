@@ -748,3 +748,27 @@ body.hour-compline .location-bar { color: var(--amber-dim); }
 /* worldState sanctity body class refinements */
 body.sanctity-high .choice:hover { border-color: var(--gold-dim); }
 body.sanctity-high .game-header { border-bottom-color: var(--border-mid); }
+
+/* ── v1.2 release additions ──────────────────────────────────── */
+
+/* Cover challenge overlay pulse on start */
+@keyframes challenge-enter {
+  0%   { border-color: var(--border); opacity: 0; transform: translateY(4px); }
+  100% { border-color: var(--amber-dim); opacity: 1; transform: translateY(0); }
+}
+.cover-challenge-overlay { animation: challenge-enter .3s ease forwards; }
+
+/* Compass stat in header */
+.stat-compass .stat-val {
+  letter-spacing: .06em;
+  font-size: .68rem;
+}
+
+/* Toast queue — ensure stacking works */
+.toast { white-space: nowrap; }
+
+/* Blessed archive — sanctity-high border glow on hold scenes */
+body.sanctity-high .location-bar.uncanny {
+  color: var(--gold-dim);
+  text-shadow: 0 0 6px rgba(212,175,55,0.3);
+}

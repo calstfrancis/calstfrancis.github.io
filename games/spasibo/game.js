@@ -38,6 +38,9 @@ S.registerNameMapping('The Dawn', 'Zarya', 'Zarya',   'Заря');
 
 S.setAvailableModes(['attended', 'witnessed']);
 
+// Compass axes — magnetic deviation between true north and instrument north
+S.registerCompassAxes('True', 'Mag');
+
 // Cyrillic linguistic drift — triggers as doubt rises
 // Ship/mission vocabulary drifts toward Russian under cover strain
 S.registerTranslation('The Dawn', 'Заря');
@@ -655,6 +658,7 @@ Haircut is on the bridge. She is on the chart table. She looks at you with the p
   miguel_response: {
     id: 'miguel_response', location: 'Bridge', mood: 'neutral',
     onEnter: () => {
+      S.setFlag('miguel_introduced');
       if (S.G.cover.connection && !S.hasFlag('toast_cover_connection')) {
         S.setFlag('toast_cover_connection');
         S.showToast('Cover: connection established.', 'note');
@@ -665,7 +669,6 @@ Haircut is on the bridge. She is on the chart table. She looks at you with the p
 — The mess is aft. Lena makes coffee. Crew eats at seven and noon. Sunday, if you want to do something in the mess, entirely up to you.
 
 He returns to the horizon. He has filed what you said. He will return to it.`,
-    onEnter: () => { S.setFlag('miguel_introduced'); },
     choices: [
       { text: '"The ship is beautiful. Does it have a history?"',      next: 'miguel_history_probe' },
       { text: '"Tell me about the crew."',                              next: 'miguel_crew_intro'   },
@@ -1328,8 +1331,37 @@ The ship moves. The sea is loud from here.
 Something in you — not a thought, more like a shift of weight — moves from neutral to something that has not yet found its name.`,
     onEnter: () => { S.incrementTheosis(3); S.applyEffect({ communion: 2 }); S.setFlag('hold_witnessed'); },
     choices: [
-      { text: 'Go up. Find someone to talk to.',  next: 'main_deck_hub' },
-      { text: 'Open the 1972 box.',               next: 'hold_1972_box' },
+      { text: 'Go up. Find someone to talk to.',          next: 'main_deck_hub' },
+      { text: 'Open the 1972 box.',                        next: 'hold_1972_box' },
+      { text: 'Offer a blessing. Quietly. For the record.', next: 'hold_bless_archive', theosis: 4, condition: { type: 'flag', id: 'sunday_service_led' } },
+    ],
+  },
+
+  hold_bless_archive: {
+    id: 'hold_bless_archive', location: 'Hold', mood: 'uncanny',
+    text: `It is not a formal blessing. There is no form for this.
+
+You stand in the hold of a non-magnetic ship with thirty years of geomagnetic measurement at your back, and you say something. Not loudly. The words are not important — or they are important but not because of their content.
+
+The act is: you stand here and you acknowledge that this exists. That these boxes exist. That the years in them happened.
+
+Freezer Beef watches from her box. She does not seem surprised that the chaplain is blessing the archive in the middle of the North Atlantic at 3am. Nothing on this ship surprises her.
+
+You finish. The hold is the same hold.
+
+Something in it is different.`,
+    onEnter: () => {
+      S.incrementTheosis(7);
+      S.applyEffect({ composure: 2, communion: 2 });
+      if (S.G.worldState) {
+        S.G.worldState.sanctity = Math.min(10, S.G.worldState.sanctity + 3);
+        if (S.G.worldState.sanctity >= 7) document.body.classList.add('sanctity-high');
+      }
+      S.setFlag('archive_blessed');
+      S.showToast('The archive is witnessed.', 'theosis');
+    },
+    choices: [
+      { text: 'Go up.', next: 'main_deck_hub' },
     ],
   },
 
@@ -1512,6 +1544,11 @@ She clicks her pen.
         S.setFlag('toast_cover_background');
         S.showToast('Cover: background established.', 'note');
       }
+      // Kylie challenges background on follow-up visit
+      if (S.G.cover.background && S.hasFlag('kylie_initial_met') && !S.hasFlag('kylie_challenged')) {
+        S.setFlag('kylie_challenged');
+        setTimeout(() => S.startCoverChallenge('background'), 400);
+      }
     },
     text: `She writes something. Her pen moves in a direction that suggests she found the answer interesting in ways she isn't saying.
 
@@ -1650,6 +1687,12 @@ She closes the textbook.
 
   connie_pastoral: {
     id: 'connie_pastoral', location: 'Mess Hall', mood: 'neutral',
+    onEnter: () => {
+      if (S.G.cover.posting && !S.hasFlag('connie_posting_challenged')) {
+        S.setFlag('connie_posting_challenged');
+        setTimeout(() => S.startCoverChallenge('posting'), 600);
+      }
+    },
     text: `— Nadia is anxious about something. Not medical. Alexei sleeps badly when the anomalies are active — his instruments wake him. Miguel is carrying something.
 
 She closes the textbook.
@@ -2066,6 +2109,12 @@ He is giving you more than he wanted to. His face is doing something carefully n
 
   othis_cabinet_direct: {
     id: 'othis_cabinet_direct', location: 'Hold Access', mood: 'neutral',
+    onEnter: () => {
+      if (S.G.cover.connection && !S.hasFlag('othis_connection_challenged')) {
+        S.setFlag('othis_connection_challenged');
+        setTimeout(() => S.startCoverChallenge('connection'), 300);
+      }
+    },
     text: `He looks at you. Something recalibrates.
 
 — Mission documentation. Standard crossing protocol. Not accessible to non-mission personnel.
@@ -2447,10 +2496,13 @@ He returns to the wheel.
 
 — Now you know.`,
     onEnter: () => {
-      S.setFlag('radio_existence_known');
-      S.incrementTheosis(3);
-      S.modReputation('miguel', 3);
-      S.showToast('The radio exists.', 'note');
+      if (!S.hasFlag('radio_lore_heard')) {
+        S.setFlag('radio_lore_heard');
+        S.setFlag('radio_existence_known');
+        S.incrementTheosis(3);
+        S.modReputation('miguel', 3);
+        S.showToast('The radio exists.', 'note');
+      }
     },
     choices: [
       { text: 'Go to the instrument room.', next: 'radio_discovery' },
@@ -2883,6 +2935,7 @@ Nobody else is up yet.`,
     choices: [
       { text: 'Polish the brass. It is something to do with your hands.',          next: 'maintenance_brass', theosis: 2, composure: 1 },
       { text: 'Check the bilge. It is not glamorous but it is useful.',             next: 'maintenance_bilge', communion: 1 },
+      { text: 'Check the rigging. The foremast lines have a twist.',                next: 'maintenance_rigging' },
       { text: 'Leave the list for the crew. Go find coffee.',                       next: 'galley_hub' },
     ],
   },
@@ -2904,10 +2957,10 @@ That is everything.`,
       S.incrementTheosis(3);
       S.applyEffect({ composure: 2 });
       S.modReputation('miguel', 1);
+      S.setFlag('maintenance_done');
       if (S.G.worldState) S.G.worldState.shipStability = Math.min(10, S.G.worldState.shipStability + 1);
       S.offerSounding('sounding_crossing');
     },
-    onEnter: () => { S.setFlag('maintenance_done'); },
     choices: [
       { text: 'Go get coffee. Find Lena.', next: 'galley_hub' },
       { text: 'Go to the main deck.',       next: 'main_deck_hub' },
@@ -2937,6 +2990,38 @@ This is also a kind of presence.`,
     choices: [
       { text: 'Go find Lena. Tell her the bilge is clear.',  next: 'lena_after_bilge' },
       { text: 'Sit with the archive a while longer.',         next: 'hold_sit' },
+    ],
+  },
+
+  maintenance_rigging: {
+    id: 'maintenance_rigging', location: 'Foremast', mood: 'neutral',
+    text: `The twist is in the port-side jib sheet — a slow rotation that accumulated over the last two days of sailing. Left alone it would foul the block at the next tack.
+
+Fixing it requires releasing the sheet, letting the line run through, retensioning. It requires two people. You are one person.
+
+Alexei appears at the foremast hatch, coffee in hand, looking up at the sky.
+
+He puts down the coffee without being asked.
+
+Together you work the line. He handles the cleat. You handle the sheet. The twist comes out in three passes. He retensions with the economy of someone who has done this before, which you did not expect from a meteorologist.
+
+— Theoretical meteorology requires fieldwork. He says, as if this explains it.
+
+You retie the cleat.
+
+The foremast is fine. The rigging is fine. Alexei retrieves his coffee.
+
+— Good morning. He says. And goes back below.`,
+    onEnter: () => {
+      S.incrementTheosis(2);
+      S.applyEffect({ composure: 1, communion: 1 });
+      S.setFlag('maintenance_done');
+      S.modReputation('alexei', 2);
+      if (S.G.worldState) S.G.worldState.shipStability = Math.min(10, S.G.worldState.shipStability + 1);
+    },
+    choices: [
+      { text: 'Go find coffee.',      next: 'galley_hub' },
+      { text: 'Go to the main deck.', next: 'main_deck_hub' },
     ],
   },
 
@@ -3388,6 +3473,8 @@ S.on('magneticDeviationChanged', (val) => {
   document.body.classList.toggle('anomaly-low',    val > 0.1 && val <= 0.4);
   document.body.classList.toggle('anomaly-medium', val > 0.4 && val <= 0.7);
   document.body.classList.toggle('anomaly-high',   val > 0.7);
+  // Update compass — deviation displaces magnetic north from true north
+  S.updateCompass(Math.round((1 - val) * 100), Math.round(val * 100));
   // Also update worldState sanctity based on anomaly intensity
   if (S.G.worldState && val > 0.6) {
     const was = S.G.worldState.sanctity;
