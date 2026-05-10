@@ -1,3 +1,30 @@
+## v1.2 "Zarya" — May 2026
+
+### Critical Fixes
+- **worldState save/load**: `{ shipStability, sanctity, socialTrust }` now included in save object and restored on load. Was lost on every session end.
+- **maintenance_bilge**: `S.setFlag('maintenance_done')` added — bilge scene no longer loops indefinitely in Act Two hub.
+- **maintenance_brass onEnter**: Confirmed single, clean block. `setFlag('maintenance_done')` fires correctly.
+- **`pablo_knows` → `pavel_knows`**: Standardised throughout observations panel and scene logic.
+- **Version watermark**: Updated to `SPASIBO v1.2 — Zarya`.
+
+### Engine Additions
+- **Liturgical hour in header**: Location bar now reads `Hold — Below  ·  Compline` etc. Hour name pulled from `LITURGICAL_HOURS` array.
+- **Nav tooltips**: All five bottom nav buttons have `title=` attributes. Custom CSS `::after` tooltip also implemented for browsers that don't show default tooltips on non-anchor elements.
+- **sbar-jitter**: Stat bar (`sbar`) gets class `sbar-jitter` when `doubt >= 7` — reflects psychological strain of performance through UI instability.
+- **worldState in save/load**: Persists across sessions.
+
+### Game Content
+- **`radio_lore` scene**: Replaces `act_two_placeholder` in Miguel's radio branch. Miguel explains the two-radio system installed in 1957 — the deviation-carrier radio that gets stronger as the anomaly intensifies — and tells you where it is. Scene has full art (portrait_miguel), theosis grant, and reputation increase.
+- **Cover toasts**: All five cover fields now produce `showToast('Cover: [field] established.', 'note')` on first establishment. Denomination (Pavel), background (Kylie), connection (Miguel response), left-behind (Connie), posting (Miguel first question).
+
+### Systems
+- **Anomaly-high CSS friction increased**: `blur(0.6px) contrast(1.18) brightness(0.96)` on `.game-body`. Choices also slightly blurred. Text shadow on `.sp`. Jitter animation strengthened.
+- **Liturgical hour body classes refined**: Vespers/Compline header border colours. Compline location bar amber.
+- **worldState persistence**: Mutations (bilge: +shipStability, Volkov: +sanctity, Lena solidarity: +socialTrust) now survive session.
+
+### Directive
+Named updates going forward. This release: **Zarya** — for the ship that came back with what it found.
+
 ## v1.2 — May 2026
 
 ### Critical Fixes

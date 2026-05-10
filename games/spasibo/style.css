@@ -686,3 +686,65 @@ body.sanctity-high.tier-waking .sp { color: var(--fg); }
   padding: .35rem 0; border-bottom: 1px solid var(--border);
 }
 .obs-note:last-child { border-bottom: none; }
+
+/* ── v1.2 Zarya additions ────────────────────────────────────── */
+
+/* Stat bar jitter under high doubt */
+@keyframes sbar-jitter {
+  0%   { transform: translate(0,0) rotate(0deg); }
+  15%  { transform: translate(-1px, 0.5px); }
+  30%  { transform: translate(0.8px, -0.4px); }
+  45%  { transform: translate(-0.5px, 0.6px); }
+  60%  { transform: translate(0.6px, -0.3px); }
+  75%  { transform: translate(-0.4px, 0.2px); }
+  100% { transform: translate(0,0); }
+}
+.sbar-jitter {
+  animation: sbar-jitter 1.8s ease-in-out infinite;
+}
+
+/* Increased anomaly-high friction */
+body.anomaly-high .game-body {
+  filter: blur(0.6px) contrast(1.18) brightness(0.96);
+}
+body.anomaly-high .sp {
+  text-shadow: 0 0 1px rgba(120,184,214,0.12);
+}
+body.anomaly-high .choices {
+  filter: blur(0.2px);
+}
+@keyframes jitter {
+  0%   { transform: translate(0,0); }
+  20%  { transform: translate(-0.8px, 0.4px); }
+  40%  { transform: translate(0.6px, -0.5px); }
+  60%  { transform: translate(-0.5px, 0.5px); }
+  80%  { transform: translate(0.4px, -0.3px); }
+  100% { transform: translate(0,0); }
+}
+
+/* Liturgical hour name in location bar */
+.location-bar .hour-sep { color: var(--dim); margin: 0 .5rem; }
+
+/* Hour-specific border glow on header */
+body.hour-vespers .game-header { border-bottom-color: #303a52; }
+body.hour-compline .game-header { border-bottom-color: #1e2a3a; }
+body.hour-compline .location-bar { color: var(--amber-dim); }
+
+/* Nav tooltip styling (relies on browser default title= behaviour — 
+   add custom tooltip for browsers that handle it poorly) */
+#bottom-nav button[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 2.8rem;
+  left: 50%; transform: translateX(-50%);
+  background: var(--bg3); border: 1px solid var(--border-mid);
+  padding: .25rem .55rem; font-size: .6rem; color: var(--fg-dim);
+  white-space: nowrap; pointer-events: none; z-index: 200;
+  border-radius: 2px; letter-spacing: .04em;
+  font-family: var(--font); text-transform: none;
+}
+#bottom-nav { position: fixed; } /* ensure ::after positioned relative to nav */
+
+/* worldState sanctity body class refinements */
+body.sanctity-high .choice:hover { border-color: var(--gold-dim); }
+body.sanctity-high .game-header { border-bottom-color: var(--border-mid); }

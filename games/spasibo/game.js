@@ -654,6 +654,12 @@ Haircut is on the bridge. She is on the chart table. She looks at you with the p
 
   miguel_response: {
     id: 'miguel_response', location: 'Bridge', mood: 'neutral',
+    onEnter: () => {
+      if (S.G.cover.connection && !S.hasFlag('toast_cover_connection')) {
+        S.setFlag('toast_cover_connection');
+        S.showToast('Cover: connection established.', 'note');
+      }
+    },
     text: `He is quiet for a moment. The wheel. The horizon.
 
 — The mess is aft. Lena makes coffee. Crew eats at seven and noon. Sunday, if you want to do something in the mess, entirely up to you.
@@ -817,6 +823,7 @@ Then, without transition:
         next:      'pavel_denomination_response',
         set_cover: { key: 'denomination', value: 'United Church' },
         set_flag:  'cover_denomination_united',
+        theosis:   1,
       },
       {
         text:      '"Roman Catholic. On sabbatical from it, if I\'m honest."',
@@ -835,6 +842,12 @@ Then, without transition:
 
   pavel_denomination_response: {
     id: 'pavel_denomination_response', location: 'Foredeck', mood: 'neutral',
+    onEnter: () => {
+      if (!S.hasFlag('toast_cover_denomination')) {
+        S.setFlag('toast_cover_denomination');
+        S.showToast('Cover: denomination established.', 'note');
+      }
+    },
     text: `He nods as though this confirms something.
 
 — Good. The tradition matters less than whether you've actually thought about it. Most people haven't. You have. I can tell because you answered without checking whether it was the right answer.
@@ -932,6 +945,7 @@ He looks at the horizon.
         next:      'pavel_denomination_response',
         set_cover: { key: 'denomination', value: 'United Church' },
         set_flag:  'cover_denomination_united',
+        theosis:   1,
       },
       {
         text:      '"Roman Catholic. On sabbatical from it."',
@@ -1493,6 +1507,12 @@ She clicks her pen.
 
   kylie_background_response: {
     id: 'kylie_background_response', location: 'Mess Hall', mood: 'neutral',
+    onEnter: () => {
+      if (S.G.cover.background && !S.hasFlag('toast_cover_background')) {
+        S.setFlag('toast_cover_background');
+        S.showToast('Cover: background established.', 'note');
+      }
+    },
     text: `She writes something. Her pen moves in a direction that suggests she found the answer interesting in ways she isn't saying.
 
 — And what brings you on this particular ship?
@@ -1607,6 +1627,12 @@ She doesn't elaborate on the isn't. She doesn't have to.
 
   connie_left_response: {
     id: 'connie_left_response', location: 'Mess Hall', mood: 'neutral',
+    onEnter: () => {
+      if (S.G.cover.left && !S.hasFlag('toast_cover_left')) {
+        S.setFlag('toast_cover_left');
+        S.showToast('Cover: left-behind established.', 'note');
+      }
+    },
     text: `She nods. Not sympathy — recognition. She has heard the shape of this before, in different forms.
 
 — That makes sense. She says.
@@ -2398,6 +2424,40 @@ He doesn't need to.`,
 
   // ── RADIO DISCOVERY ─────────────────────────────────────────────
 
+  radio_lore: {
+    id: 'radio_lore', location: 'Bridge', mood: 'neutral',
+    art: 'portrait_miguel',
+    text: `Miguel is quiet for a long time. He adjusts the wheel. He adjusts it back.
+
+— In 1957 the ship was fitted with two radio systems. He says. — The standard one, which is what we use for weather and position. And a second one, installed by the Institute at the request of the scientific team. For communication in high-deviation magnetic fields.
+
+He pauses.
+
+— Standard radio works by keeping the signal clean. The second system works differently. It uses the deviation itself as a carrier. The more distorted the field, the stronger the signal. They built it because they were sailing directly into anomaly zones and needed to be able to call back to shore.
+
+He looks at the horizon.
+
+— The standard radio fails in those zones. The second one is just getting started.
+
+He is telling you this for a reason. He is not saying the reason.
+
+— The Instrument Room. He says. — Behind the starboard panel. Bronze hinge. You would need to know it was there.
+
+He returns to the wheel.
+
+— Now you know.`,
+    onEnter: () => {
+      S.setFlag('radio_existence_known');
+      S.incrementTheosis(3);
+      S.modReputation('miguel', 3);
+      S.showToast('The radio exists.', 'note');
+    },
+    choices: [
+      { text: 'Go to the instrument room.', next: 'radio_discovery' },
+      { text: 'Stay with this for a moment.', next: 'bridge_hub', theosis: 2, composure: 1 },
+    ],
+  },
+
   radio_discovery: {
     id: 'radio_discovery', location: 'Instrument Room', mood: 'uncanny',
     text: `Miguel showed you where it was, but finding it is another matter.
@@ -2738,7 +2798,7 @@ He looks at you.
     onEnter: () => { S.setFlag('radio_existence_known'); S.setFlag('act_two_plan_forming'); },
     choices: [
       { text: '"That\'s the plan."',             next: 'act_two_resolve', set_flag: 'mission_refused' },
-      { text: '"Tell me more about the radio."', next: 'act_two_placeholder'                          },
+      { text: '"Tell me more about the radio."', next: 'radio_lore'                                  },
     ],
   },
 
@@ -2870,6 +2930,7 @@ This is also a kind of presence.`,
     onEnter: () => {
       S.incrementTheosis(4);
       S.applyEffect({ communion: 2 });
+      S.setFlag('maintenance_done');
       if (S.G.worldState) S.G.worldState.shipStability = Math.min(10, S.G.worldState.shipStability + 1);
       S.offerSounding('sounding_solidarity');
     },

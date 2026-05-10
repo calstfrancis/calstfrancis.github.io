@@ -981,6 +981,7 @@ function saveGameSlot(slotId) {
       codexUnlocked: [...G.codexUnlocked],
       ambientTriggered: [...G.ambientTriggered],
       magneticDeviation: G.magneticDeviation || 0,
+      worldState: G.worldState || { shipStability: 5, sanctity: 0, socialTrust: 5 },
     };
     try { localStorage.setItem(SAVE_KEY_PREFIX + slotId, JSON.stringify(state)); } catch(e) { console.warn('Save write failed:', e); showToast('Save failed — storage full?', 'warning'); return; }
     saveJournal(slotId);
@@ -1031,6 +1032,7 @@ function loadGameSlot(slotId) {
     G.codexUnlocked    = new Set(s.codexUnlocked   || []);
     G.ambientTriggered = new Set(s.ambientTriggered || []);
     G.magneticDeviation = s.magneticDeviation !== undefined ? s.magneticDeviation : 0;
+    G.worldState = s.worldState || { shipStability: 5, sanctity: 0, socialTrust: 5 };
     loadJournal(slotId);
     refreshAtmosMods();
     scheduleRender();
@@ -2276,7 +2278,7 @@ function renderGame(root){
   body.appendChild(_buildRestartBar());wrap.appendChild(body);root.appendChild(wrap);
   _appendAudioBtn(root);_appendBottomNav(root);
   // Version watermark
-  { const vm=document.createElement('div');vm.className='version-mark';vm.textContent='SPASIBO v1.1';root.appendChild(vm); }
+  { const vm=document.createElement('div');vm.className='version-mark';vm.textContent='SPASIBO v1.2 — Zarya';root.appendChild(vm); }
   if(G.panelOpen==='notes')    _renderNotesPanel(root);
   if(G.panelOpen==='status')   _renderStatusPanel(root);
   if(G.panelOpen==='breviary') _renderBreviaryPanel(root);
@@ -2291,8 +2293,12 @@ function _buildHeader(scene){
   const hdr=document.createElement('div');hdr.className='game-header';
   const si=document.createElement('div');si.className='save-indicator';si.textContent='\u25e6 autosaved';si.style.display='none';hdr.appendChild(si);
   const moodCls=scene.mood==='uncanny'?' uncanny':scene.mood==='revelation'?' revelation':'';
-  const lb=document.createElement('div');lb.className='location-bar'+moodCls;lb.textContent=scene.location;hdr.appendChild(lb);
-  const sb=document.createElement('div');sb.className='sbar';
+  const lb=document.createElement('div');lb.className='location-bar'+moodCls;
+  const hourName = LITURGICAL_HOURS[G.liturgicalHour]?.name;
+  lb.textContent = hourName ? `${scene.location}  ·  ${hourName}` : scene.location;
+  hdr.appendChild(lb);
+  const sbarDoubt = G.stats.doubt || 0;
+  const sb=document.createElement('div');sb.className='sbar'+(sbarDoubt>=7?' sbar-jitter':'');
   Object.entries(G.stats).forEach(([k,v])=>{const d=document.createElement('div');d.className='stat';d.innerHTML=k+' <span class="stat-val">'+v+'</span>'+(_registries.statTips[k]?'<span class="stat-tip">'+_registries.statTips[k]+'</span>':'');sb.appendChild(d);});
   if(G.theosis>32){const td=document.createElement('div');td.className='stat stat-theosis';const tier=G.theosis>65?'\u041a\u041a\u0410':String(G.theosis);td.innerHTML='<span class="stat-val" style="color:var(--gold)">'+tier+'</span><span class="stat-tip">theosis</span>';sb.appendChild(td);}
   hdr.appendChild(sb);
@@ -2339,16 +2345,16 @@ function _appendBottomNav(root){
   const flicker = doubt >= 7 ? 0.4 : doubt >= 5 ? 0.2 : 0;
   const fl = (en, ru) => (flicker > 0 && Math.random() < flicker) ? ru : en;
   const navItems=[
-    {label:fl('observations','наблюдения'),fn:()=>openPanel('notes')},
-    {label:fl('status','статус'),fn:()=>openPanel('status')},
-    {label:'breviary'+(G.soundings.available.length?' \u2691':''),fn:()=>openPanel('breviary'),cls:G.soundings.available.length?' has-available':''},
-    {label:fl('codex','кодекс'),fn:()=>openPanel('glossary')},
-    {label:fl('map','карта'),fn:()=>openPanel('map')},
+    {label:fl('observations','наблюдения'),fn:()=>openPanel('notes'),   title:'What has been noticed this crossing'},
+    {label:fl('status','статус'),          fn:()=>openPanel('status'),  title:'Stats, cover, charisms, inventory'},
+    {label:'breviary'+(G.soundings.available.length?' \u2691':''),fn:()=>openPanel('breviary'),cls:G.soundings.available.length?' has-available':'', title:'Soundings — moments of contemplation'},
+    {label:fl('codex','кодекс'),           fn:()=>openPanel('glossary'),title:'What has been learned about the ship'},
+    {label:fl('map','карта'),              fn:()=>openPanel('map'),     title:'Where things are'},
   ];
-  navItems.forEach(({label,fn,cls=''})=>{
+  navItems.forEach(({label,fn,cls='',title=''})=>{
     const b=document.createElement('button');
-    b.style.cssText="flex:1;background:none;border:none;border-right:1px solid var(--border);font-family:'Courier Prime',monospace;font-size:.66rem;letter-spacing:.07em;padding:.55rem .3rem;cursor:pointer;color:var(--dim)";
-    b.className=cls;b.textContent=label;b.onclick=fn;bnav.appendChild(b);
+    b.style.cssText="flex:1;background:none;border:none;border-right:1px solid var(--border);font-family:'GOST type B','Share Tech Mono','Courier Prime',monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;padding:.65rem .2rem;cursor:pointer;color:var(--dim)";
+    b.className=cls;b.textContent=label;b.onclick=fn;if(title)b.title=title;bnav.appendChild(b);
   });
   root.appendChild(bnav);
 }
