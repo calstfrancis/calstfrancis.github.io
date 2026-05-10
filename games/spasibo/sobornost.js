@@ -128,7 +128,7 @@ function scheduleRender() {
   if (_scheduled) return;
   if (!_renderFn) { console.warn('[SOBORNOST] scheduleRender() called before renderer registered'); return; }
   _scheduled = true;
-  queueMicrotask(() => { _scheduled = false; _renderFn(); });
+  queueMicrotask(() => { _scheduled = false; _renderFn(); window.scrollTo({ top: 0, behavior: 'instant' }); });
 }
 
 
@@ -603,6 +603,18 @@ function incrementTheosis(amount) {
 function setMagneticDeviation(val) {
   G.magneticDeviation = Math.max(0, Math.min(1, val));
   emit('magneticDeviationChanged', G.magneticDeviation);
+  // Apply diegetic CSS filter to game body
+  const dev = G.magneticDeviation;
+  const body = document.getElementById('root');
+  if (body) {
+    if (dev > 0.7) {
+      body.dataset.deviation = 'high';
+    } else if (dev > 0.4) {
+      body.dataset.deviation = 'mid';
+    } else {
+      body.dataset.deviation = 'low';
+    }
+  }
   scheduleRender();
 }
 function getMagneticDeviation() { return G.magneticDeviation || 0; }
@@ -655,7 +667,7 @@ function _initFog() {
   for (let i = 0; i < 22; i++) fogParts.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, r: 80+Math.random()*140, vx: (Math.random()-.5)*.25, vy: (Math.random()-.5)*.08, ph: Math.random()*Math.PI*2, base: .025+Math.random()*.05 });
 }
 _initFog();
-function _porthole() { const r = Math.min(canvas.width,canvas.height)*.085; return { x: canvas.width-r-28, y: r+28, r }; }
+function _porthole() { const r = Math.min(canvas.width,canvas.height)*.14; return { x: canvas.width-r-36, y: r+36, r }; }
 function _initRain() {
   const p = _porthole(); rainDrops = [];
   for (let i = 0; i < 24; i++) rainDrops.push({ x: p.x+(Math.random()-.5)*p.r*2, y: p.y+(Math.random()-.5)*p.r*2, len: 5+Math.random()*9, spd: 1.2+Math.random()*2 });
@@ -717,19 +729,81 @@ function drawAtmos() {
 
 function _drawPorthole() {
   const {x,y,r}=_porthole();
-  ctx.strokeStyle='#1c2830'; ctx.lineWidth=r*.18; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.stroke();
-  ctx.fillStyle='#243038';
-  for (let i=0;i<8;i++) { const a=(i/8)*Math.PI*2; ctx.beginPath(); ctx.arc(x+Math.cos(a)*(r+r*.1),y+Math.sin(a)*(r+r*.1),r*.045,0,Math.PI*2); ctx.fill(); }
-  ctx.save(); ctx.beginPath(); ctx.arc(x,y,r*.87,0,Math.PI*2); ctx.clip();
-  const sc=mood==='uncanny'?'#060e18':mood==='revelation'?'#202810':'#0e1820';
-  const sg=ctx.createLinearGradient(x,y-r,x,y+r); sg.addColorStop(0,sc); sg.addColorStop(1,'#182430');
+  const gi=atmosMods.goldIntensity;
+  // Outer brass ring — thick and visible
+  const brassR = gi>0 ? `rgba(${Math.round(lerpN(100,180,gi))},${Math.round(lerpN(80,140,gi))},${Math.round(lerpN(40,60,gi))},0.9)` : 'rgba(95,78,42,0.88)';
+  ctx.strokeStyle=brassR; ctx.lineWidth=r*.22;
+  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.stroke();
+  // Bolts around ring
+  ctx.fillStyle=gi>0?`rgba(160,130,60,0.95)`:'rgba(80,65,35,0.9)';
+  for (let i=0;i<8;i++) { const a=(i/8)*Math.PI*2; ctx.beginPath(); ctx.arc(x+Math.cos(a)*(r+r*.06),y+Math.sin(a)*(r+r*.06),r*.052,0,Math.PI*2); ctx.fill(); }
+  // Glass interior
+  ctx.save(); ctx.beginPath(); ctx.arc(x,y,r*.86,0,Math.PI*2); ctx.clip();
+  // Sky gradient — changes with mood and theosis
+  let skyTop, skyBot, horizY;
+  if (mood==='revelation'||gi>0.5) {
+    skyTop=`rgba(${Math.round(lerpN(8,40,gi))},${Math.round(lerpN(20,55,gi))},${Math.round(lerpN(35,25,gi))},1)`;
+    skyBot=`rgba(${Math.round(lerpN(10,60,gi))},${Math.round(lerpN(25,45,gi))},${Math.round(lerpN(40,20,gi))},1)`;
+  } else if (mood==='uncanny') {
+    skyTop='rgba(4,8,20,1)'; skyBot='rgba(6,14,28,1)';
+  } else if (mood==='tense') {
+    skyTop='rgba(14,16,22,1)'; skyBot='rgba(18,22,28,1)';
+  } else {
+    skyTop='rgba(8,18,32,1)'; skyBot='rgba(12,26,40,1)';
+  }
+  horizY = y + r*0.08 + Math.sin(T*0.15)*r*0.06;
+  const sg=ctx.createLinearGradient(x,y-r,x,y+r);
+  sg.addColorStop(0,skyTop); sg.addColorStop(0.5,skyBot);
+  // Water
+  let waterDeep, waterSurf;
+  if (gi>0.4) { waterDeep=`rgba(${Math.round(20+gi*30)},${Math.round(30+gi*20)},${Math.round(15+gi*10)},1)`; waterSurf=`rgba(${Math.round(30+gi*40)},${Math.round(50+gi*30)},${Math.round(30+gi*15)},1)`; }
+  else if (mood==='uncanny') { waterDeep='rgba(2,6,18,1)'; waterSurf='rgba(4,12,24,1)'; }
+  else { waterDeep='rgba(4,14,28,1)'; waterSurf='rgba(8,22,40,1)'; }
+  sg.addColorStop(0.52,waterSurf); sg.addColorStop(1,waterDeep);
   ctx.fillStyle=sg; ctx.fillRect(x-r,y-r,r*2,r*2);
-  const sw=atmosMods.soboWarm;
-  ctx.strokeStyle=`rgba(${sw?80:60},${sw?110:100},${sw?120:130},${mood==='uncanny'?0.5:0.25})`; ctx.lineWidth=.8;
-  for (let i=0;i<6;i++) { const wy=y+r*.2+i*r*.12+Math.sin(T*.6+i*1.2)*2; ctx.beginPath(); ctx.moveTo(x-r,wy); ctx.quadraticCurveTo(x,wy+Math.sin(T+i)*3,x+r,wy); ctx.stroke(); }
-  ctx.strokeStyle=`rgba(100,150,180,${mood==='tense'?0.35:0.18})`; ctx.lineWidth=.6;
-  for (const d of rainDrops) { d.y+=d.spd; if (d.y>y+r) { d.y=y-r; d.x=x+(Math.random()-.5)*r*2; } ctx.beginPath(); ctx.moveTo(d.x,d.y); ctx.lineTo(d.x-1,d.y+d.len); ctx.stroke(); }
-  ctx.restore(); ctx.strokeStyle='#2a3c48'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.arc(x,y,r*.87,0,Math.PI*2); ctx.stroke();
+  // Horizon glow
+  const hg=ctx.createLinearGradient(x-r,horizY-r*.08,x+r,horizY+r*.08);
+  let hAlpha = mood==='revelation'?0.18:mood==='uncanny'?0.04:0.08;
+  if(gi>0) hAlpha=lerpN(hAlpha,0.25,gi);
+  const hR=gi>0?Math.round(lerpN(120,200,gi)):100, hG=gi>0?Math.round(lerpN(140,170,gi)):140, hB=gi>0?Math.round(lerpN(160,80,gi)):160;
+  hg.addColorStop(0,`rgba(${hR},${hG},${hB},0)`);
+  hg.addColorStop(0.5,`rgba(${hR},${hG},${hB},${hAlpha.toFixed(3)})`);
+  hg.addColorStop(1,`rgba(${hR},${hG},${hB},0)`);
+  ctx.fillStyle=hg; ctx.fillRect(x-r,horizY-r*.08,r*2,r*.16);
+  // Wave lines
+  const wAlpha = mood==='uncanny'?0.55:mood==='tense'?0.45:0.35;
+  const wR=gi>0?Math.round(lerpN(60,120,gi)):50;
+  const wG=gi>0?Math.round(lerpN(100,140,gi)):100;
+  const wB=gi>0?Math.round(lerpN(130,90,gi)):140;
+  ctx.strokeStyle=`rgba(${wR},${wG},${wB},${wAlpha})`; ctx.lineWidth=0.9;
+  for (let i=0;i<7;i++) {
+    const wy=horizY+r*.14+i*r*.1+Math.sin(T*.5+i*.9)*r*.025;
+    const amp=r*.03*(1-i/10);
+    ctx.beginPath(); ctx.moveTo(x-r*.9,wy);
+    for(let xi=-r*.9;xi<=r*.9;xi+=4) ctx.lineTo(x+xi,wy+Math.sin(T*0.7+xi*.04+i*.5)*amp);
+    ctx.stroke();
+  }
+  // Rain when tense
+  if(mood==='tense') {
+    ctx.strokeStyle='rgba(120,160,200,0.3)'; ctx.lineWidth=0.5;
+    for (const d of rainDrops) { d.y+=d.spd; if (d.y>y+r) { d.y=y-r; d.x=x+(Math.random()-.5)*r*2; } ctx.beginPath(); ctx.moveTo(d.x,d.y); ctx.lineTo(d.x-1,d.y+d.len); ctx.stroke(); }
+  }
+  // Gold shimmer for high theosis
+  if(gi>0.3) {
+    const shimmer=ctx.createRadialGradient(x,horizY,0,x,horizY,r*.6);
+    shimmer.addColorStop(0,`rgba(212,175,55,${(gi*0.12).toFixed(3)})`);
+    shimmer.addColorStop(1,'rgba(212,175,55,0)');
+    ctx.fillStyle=shimmer; ctx.fillRect(x-r,y-r,r*2,r*2);
+  }
+  ctx.restore();
+  // Inner ring shadow
+  ctx.strokeStyle='rgba(0,0,0,0.6)'; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(x,y,r*.86,0,Math.PI*2); ctx.stroke();
+  // Gleam highlight
+  ctx.save(); ctx.beginPath(); ctx.arc(x,y,r*.86,0,Math.PI*2); ctx.clip();
+  const gleam=ctx.createLinearGradient(x-r*.4,y-r*.7,x+r*.1,y-r*.2);
+  gleam.addColorStop(0,'rgba(255,255,255,0.06)'); gleam.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.fillStyle=gleam; ctx.fillRect(x-r,y-r,r*2,r*2);
+  ctx.restore();
 }
 drawAtmos();
 
@@ -755,23 +829,43 @@ function _initAudio() {
     _actx=new(window.AudioContext||window.webkitAudioContext)();
     const master=_actx.createGain(); master.gain.value=0; master.connect(_actx.destination); _gainNode=master;
     const rev=_makeReverb(_actx); _reverbGain=_actx.createGain(); _reverbGain.gain.value=0.18; rev.connect(_reverbGain); _reverbGain.connect(master);
-    _oscNodes=[50,101,149].map((freq,i)=>{const o=_actx.createOscillator(),g=_actx.createGain();o.frequency.value=freq;o.type='sawtooth';g.gain.value=[0.5,0.25,0.15][i];o.connect(g);g.connect(master);o.connect(rev);o.start();return o;});
-    const buf=_actx.createBuffer(1,_actx.sampleRate,_actx.sampleRate);const d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
-    const ns=_actx.createBufferSource();ns.buffer=buf;ns.loop=true;
-    _filterNode=_actx.createBiquadFilter();_filterNode.type='lowpass';_filterNode.frequency.value=90;
-    const ng=_actx.createGain();ng.gain.value=0.03;ns.connect(_filterNode);_filterNode.connect(ng);ng.connect(master);ns.start();
+    // Sea sounds: layered filtered noise (deep swell + surface chop)
+    const sr=_actx.sampleRate;
+    // Deep swell noise buffer (4 seconds, looped)
+    const swellBuf=_actx.createBuffer(2,sr*4,sr);
+    for(let c=0;c<2;c++){const d=swellBuf.getChannelData(c);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*0.5;}
+    const swell=_actx.createBufferSource();swell.buffer=swellBuf;swell.loop=true;
+    _filterNode=_actx.createBiquadFilter();_filterNode.type='lowpass';_filterNode.frequency.value=120;
+    const swellHigh=_actx.createBiquadFilter();swellHigh.type='highpass';swellHigh.frequency.value=20;
+    const swellGain=_actx.createGain();swellGain.gain.value=0.06;
+    swell.connect(_filterNode);_filterNode.connect(swellHigh);swellHigh.connect(swellGain);swellGain.connect(master);swell.start();
+    // Surface chop noise (higher frequency, quieter)
+    const chopBuf=_actx.createBuffer(1,sr*2,sr);
+    const cd2=chopBuf.getChannelData(0);for(let i=0;i<cd2.length;i++)cd2[i]=(Math.random()*2-1);
+    const chop=_actx.createBufferSource();chop.buffer=chopBuf;chop.loop=true;
+    const chopF=_actx.createBiquadFilter();chopF.type='bandpass';chopF.frequency.value=600;chopF.Q.value=0.4;
+    const chopGain=_actx.createGain();chopGain.gain.value=0.012;
+    chop.connect(chopF);chopF.connect(chopGain);chopGain.connect(master);chop.start();
+    // LFO for swell modulation (slow wave rhythm ~0.08Hz)
+    _oscNodes=[_actx.createOscillator(),_actx.createOscillator()];
+    _oscNodes[0].type='sine';_oscNodes[0].frequency.value=0.08;
+    _oscNodes[1].type='sine';_oscNodes[1].frequency.value=0.13;
+    const lfoGain0=_actx.createGain();lfoGain0.gain.value=0.025;
+    const lfoGain1=_actx.createGain();lfoGain1.gain.value=0.015;
+    _oscNodes[0].connect(lfoGain0);lfoGain0.connect(swellGain.gain);_oscNodes[0].start();
+    _oscNodes[1].connect(lfoGain1);lfoGain1.connect(chopGain.gain);_oscNodes[1].start();
   } catch(e) { console.warn('Audio:',e); }
 }
 function _gain() { return _currentMoodRef==='tense'?0.055:_currentMoodRef==='revelation'?0.015:_currentMoodRef==='uncanny'?0.008:0.035; }
 function _applyMood(m) {
   if (!_actx||!_audioOn) return;
   const t=_actx.currentTime;
-  const cfg={neutral:{freqs:[50,101,149],filter:90,rv:0.18},tense:{freqs:[48,98,146],filter:60,rv:0.08},uncanny:{freqs:[44,88,132],filter:200,rv:0.35},revelation:{freqs:[55,110,165],filter:420,rv:0.45}}[m]||{freqs:[50,101,149],filter:90,rv:0.18};
-  _oscNodes.forEach((o,i)=>{if(o)o.frequency.setTargetAtTime(cfg.freqs[i],t,2.5);});
-  if(_filterNode)_filterNode.frequency.setTargetAtTime(cfg.filter,t,2.5);
-  if(_reverbGain)_reverbGain.gain.setTargetAtTime(cfg.rv,t,2.5);
-  if(m==='revelation'){try{const b=_actx.createOscillator(),bg=_actx.createGain();b.type='sine';b.frequency.value=880;bg.gain.setValueAtTime(0.07,t);bg.gain.exponentialRampToValueAtTime(0.0001,t+4);b.connect(bg);bg.connect(_gainNode);b.start(t);b.stop(t+4);}catch(e){}}
-  if(m==='uncanny'){try{const w=_actx.createOscillator(),wg=_actx.createGain();w.type='sine';w.frequency.value=333;wg.gain.setValueAtTime(0.012,t);wg.gain.exponentialRampToValueAtTime(0.0001,t+5);w.connect(wg);wg.connect(_gainNode);w.start(t);w.stop(t+5);}catch(e){}}
+  // Sea mood: modulate filter cutoff and reverb to change wave character
+  // neutral: deep ocean swell; tense: choppier higher freqs; uncanny: muffled below surface; revelation: bright open water
+  const cfg={neutral:{filter:120,rv:0.18,lfo:0.08},tense:{filter:800,rv:0.06,lfo:0.22},uncanny:{filter:55,rv:0.45,lfo:0.04},revelation:{filter:2200,rv:0.55,lfo:0.11}}[m]||{filter:120,rv:0.18,lfo:0.08};
+  if(_filterNode)_filterNode.frequency.setTargetAtTime(cfg.filter,t,3.0);
+  if(_reverbGain)_reverbGain.gain.setTargetAtTime(cfg.rv,t,3.0);
+  if(_oscNodes&&_oscNodes[0])_oscNodes[0].frequency.setTargetAtTime(cfg.lfo,t,4.0);
 }
 function _updateAudioMood(newMood) {
   _currentMoodRef=newMood;
@@ -1856,14 +1950,17 @@ function renderTitle(root){
   const d=document.createElement('div');d.className='title-screen';
   d.innerHTML=`
     <div class="title-cyrillic">${window.GAME_TITLE||'GAME'}</div>
-    <div style="font-size:.72rem;color:var(--dim);letter-spacing:.3em;text-transform:uppercase;margin-bottom:.2rem">${window.GAME_SUBTITLE||''}</div>
-    <div style="font-size:.68rem;color:var(--amber-dim);letter-spacing:.18em;font-style:italic;margin-bottom:${isDemo?'1.2':'3.5'}rem">${window.GAME_MOTTO||'Thank You'}</div>
+    <div style="font-family:'GOST type B','Share Tech Mono',monospace;font-size:.7rem;color:var(--dim);letter-spacing:.3em;text-transform:uppercase;margin-bottom:.2rem">${window.GAME_SUBTITLE||''}</div>
+    <div style="font-family:'GOST type B','Share Tech Mono',monospace;font-size:.66rem;color:var(--amber-dim);letter-spacing:.22em;margin-bottom:${isDemo?'1.2':'2'}rem">${window.GAME_MOTTO||'Thank You'}</div>
     ${isDemo?'<div style="font-size:.8rem;color:var(--amber);border:1px solid var(--amber-dim);padding:.5rem 1.2rem;margin-bottom:2.5rem">DEMO VERSION \u2014 Act One Only</div>':''}
-    <pre style="font-size:.62rem;color:var(--border-mid);white-space:pre;line-height:1.3;margin-bottom:3rem">
-            ___
-       ____/ | \\____
-  ~~~~|______________|~~~~
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~</pre>
+    <pre class="title-ship-art" style="font-family:'GOST type B','Share Tech Mono',monospace;font-size:.62rem;color:var(--cold-dim);white-space:pre;line-height:1.25;margin-bottom:2.5rem;text-align:center;opacity:0.7">
+      |    |    |
+     )_)  )_)  )_)
+    )___))___))___)\\
+   )____)____)_____)\\\\
+___|____|____|____\\\\\\__
+--\\                    /--
+~~~  ~~~~  ~~~  ~~~  ~~~</pre>
     <div style="font-size:.78rem;color:${replay?'var(--cold-dim)':'var(--dim)'};letter-spacing:.12em;font-style:italic;margin-bottom:2rem">${replay?'another crossing.':'a crossing.'}</div>
     <div style="display:flex;flex-direction:column;gap:.6rem;align-items:center">
       ${hasSave?`<button class="btn" id="tc">Continue crossing</button><button class="btn btn-sm" id="tn">New crossing</button>`:`<button class="btn" id="tb">Begin the crossing</button>`}
@@ -1882,7 +1979,7 @@ function renderTitle(root){
 }
 function _continueGame(){
   if(loadGameLegacy()){
-    // Validate the saved scene still exists; if not, restart from initial scene
+    G.phase = 'game';
     if(G.scene && !getScene(G.scene)){
       console.warn('[SOBORNOST] Saved scene "'+G.scene+'" not found — resetting to initial scene');
       G.scene = getInitialScene();
@@ -2163,20 +2260,10 @@ function renderGame(root){
     });
   }
   body.appendChild(cd);
-  if(G.notes.length){
-    const od=document.createElement('div');od.className='obs-section';
-    const ot=document.createElement('div');ot.className='obs-title';ot.textContent='observations';od.appendChild(ot);
-    const cats=[{label:'People',test:k=>k.startsWith('met_')},{label:'Cover',test:k=>k.startsWith('cover_')},{label:'Events',test:k=>!k.startsWith('met_')&&!k.startsWith('cover_')&&!k.startsWith('charism_')}];
-    const shown=new Set();
-    cats.forEach(cat=>{
-      const items=[...G.notes].reverse().filter(k=>cat.test(k)&&!shown.has(k)).slice(0,3);if(!items.length)return;
-      const sec=document.createElement('div');sec.style.cssText='font-size:.6rem;color:var(--amber-dim);letter-spacing:.12em;text-transform:uppercase;margin:.4rem 0 .2rem';sec.textContent=cat.label;od.appendChild(sec);
-      items.forEach(k=>{shown.add(k);const d=document.createElement('div');d.className='obs-item';d.textContent='\u2022 '+noteLabel(k);od.appendChild(d);});
-    });
-    body.appendChild(od);
-  }
   body.appendChild(_buildRestartBar());wrap.appendChild(body);root.appendChild(wrap);
   _appendAudioBtn(root);_appendBottomNav(root);
+  // Version watermark
+  { const vm=document.createElement('div');vm.className='version-mark';vm.textContent='SPASIBO v1.1';root.appendChild(vm); }
   if(G.panelOpen==='notes')    _renderNotesPanel(root);
   if(G.panelOpen==='status')   _renderStatusPanel(root);
   if(G.panelOpen==='breviary') _renderBreviaryPanel(root);
@@ -2204,6 +2291,16 @@ function _buildHeader(scene){
   const tc=G.soundings.taken.length+G.soundings.settled.length,ta=G.soundings.available.length;
   if(tc>0||ta>0)tags.push(`<span class="breviary-tag">\u2693 ${tc}/${MAX_SOUNDINGS}${ta?' +'+ta:''}</span>`);
   if(tags.length){const cb=document.createElement('div');cb.className='cbar';cb.innerHTML=tags.join('');hdr.appendChild(cb);}
+  // Cover integrity bar — only show when cover has been partially established
+  const coverFields = Object.values(G.cover).filter(Boolean).length;
+  if(coverFields > 0) {
+    const cib = document.createElement('div'); cib.className='cover-hud';
+    const pct = (G.coverIntegrity / 5) * 100;
+    const hue = G.coverIntegrity >= 4 ? 'var(--cold)' : G.coverIntegrity >= 3 ? 'var(--amber)' : 'var(--rust)';
+    const pulse = G.coverIntegrity <= 2 ? ' cover-hud-pulse' : '';
+    cib.innerHTML = `<div class="cover-hud-label">cover</div><div class="cover-hud-track${pulse}"><div class="cover-hud-fill" style="width:${pct}%;background:${hue}"></div></div>`;
+    hdr.appendChild(cib);
+  }
   return hdr;
 }
 

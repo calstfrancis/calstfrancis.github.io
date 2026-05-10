@@ -8,13 +8,13 @@
   --bg2:         #0a1120;
   --bg3:         #0e182e;
   --bg4:         #141f38;
-  --fg:          #ccdae8;
-  --fg-dim:      #849ab0;
-  --dim:         #4e6070;
+  --fg:          #d4e4f0;
+  --fg-dim:      #9ab0c8;
+  --dim:         #607888;
   --border:      #1c2c40;
   --border-mid:  #283c54;
-  --cold:        #78b8d6;
-  --cold-dim:    #3a6882;
+  --cold:        #84c4e0;
+  --cold-dim:    #4a7898;
   --cold-faint:  rgba(120,184,214,0.07);
   --amber:       #ccaa4a;
   --amber-dim:   #765c26;
@@ -53,7 +53,7 @@ html, body {
 #atmos {
   position: fixed; inset: 0; z-index: 0;
   pointer-events: none;
-  opacity: 0.9;  /* High opacity so porthole and fog are visible */
+  opacity: 1.0;  /* Full opacity — porthole and atmosphere fully visible */
 }
 
 /* ── Root: above canvas, with a narrow semi-transparent centre ── */
@@ -61,14 +61,15 @@ html, body {
   position: relative; z-index: 10;
   min-height: 100vh;
   display: flex; flex-direction: column; align-items: center;
-  /* Gradient: more transparent at sides so canvas shows through, */
-  /* opaque enough in the centre for text readability             */
+  /* Vertical strip that protects text readability.
+     Right edge stays transparent so the porthole shows through. */
   background: linear-gradient(
     90deg,
-    transparent 0%,
-    rgba(5,8,14,0.82) 15%,
-    rgba(5,8,14,0.88) 50%,
-    rgba(5,8,14,0.82) 85%,
+    rgba(5,8,14,0.75) 0%,
+    rgba(5,8,14,0.86) 20%,
+    rgba(5,8,14,0.90) 45%,
+    rgba(5,8,14,0.86) 70%,
+    rgba(5,8,14,0.40) 88%,
     transparent 100%
   );
 }
@@ -122,6 +123,7 @@ html, body {
 .sbar { display: flex; gap: 1.4rem; flex-wrap: wrap; align-items: baseline; }
 
 .stat {
+  font-family: var(--font-display);
   font-size: .6rem; color: var(--dim);
   letter-spacing: .1em; text-transform: uppercase;
   position: relative; cursor: default; user-select: none;
@@ -143,6 +145,7 @@ html, body {
 .cbar { display: flex; flex-wrap: wrap; gap: .35rem; }
 
 .ctag, .cover-tag, .breviary-tag, .journal-tag {
+  font-family: var(--font-display);
   font-size: .55rem; letter-spacing: .09em;
   padding: .1rem .48rem; border: 1px solid var(--border);
   color: var(--dim); border-radius: var(--r);
@@ -176,7 +179,7 @@ html, body {
 .sp.sp-reaction   { color: var(--amber-dim); font-style: italic; border-left: 2px solid var(--amber-dim); padding-left: .75rem; }
 .sp.sp-anamnesis  { color: var(--gold-dim); font-style: italic; border-left: 2px solid var(--gold-dim); padding-left: .75rem; }
 .scene-echo { margin-bottom: .8rem; }
-.art-block  { font-size: .58rem; line-height: 1.3; color: var(--dim); margin-bottom: 1.2rem; }
+.art-block  { font-family: var(--font-display); font-size: .62rem; line-height: 1.25; color: var(--cold-dim); margin-bottom: 1.4rem; letter-spacing: .04em; }
 
 /* ── Choices ─────────────────────────────────────────────────── */
 .choices { display: flex; flex-direction: column; gap: .38rem; margin-top: 1.3rem; }
@@ -185,7 +188,7 @@ html, body {
   background: none;
   border: none;
   border-left: 2px solid var(--border);
-  color: var(--fg-dim);
+  color: var(--fg);
   font-family: var(--font);
   font-size: .92rem;
   padding: .5rem 0 .5rem 1.1rem;
@@ -230,6 +233,7 @@ html, body {
 .btn.confirm-yes { border-color: var(--rust); color: var(--rust); }
 .btn.confirm-no  { border-color: var(--dim); color: var(--dim); }
 .btn.restart-btn {
+  font-family: var(--font-display);
   font-size: .62rem; color: var(--dim); padding: .26rem .58rem;
   border-color: var(--border); letter-spacing: .09em; text-transform: uppercase;
 }
@@ -302,7 +306,7 @@ html, body {
   transition: color .14s;
 }
 .panel-close:hover { color: var(--fg); }
-.panel-body { font-size: .88rem; line-height: 1.8; }
+.panel-body { font-size: .88rem; line-height: 1.8; color: var(--fg); }
 
 .panel-section {
   font-family: var(--font-display);
@@ -418,8 +422,9 @@ html, body {
 }
 .sounding-card.settled .sounding-name { color: var(--cold); }
 .sounding-progress {
+  font-family: var(--font-display);
   font-size: .65rem; color: var(--cold-dim);
-  letter-spacing: .12em; margin: .32rem 0; font-family: var(--font-display);
+  letter-spacing: .12em; margin: .32rem 0;
 }
 .sounding-text {
   font-size: .82rem; color: var(--dim); line-height: 1.72; font-style: italic; margin-top: .42rem;
@@ -532,4 +537,75 @@ body.tier-illumined .title-cyrillic { text-shadow: 0 0 40px rgba(228,196,92,0.2)
   .sp { font-size: 1rem; }
   .choice { font-size: .88rem; }
   .panel { padding: 0 1.2rem 2rem; }
+}
+
+/* ── Magnetic deviation filters ──────────────────────────────── */
+#root[data-deviation="mid"] .sp {
+  filter: blur(0.25px);
+}
+#root[data-deviation="high"] .sp {
+  filter: blur(0.5px);
+  text-shadow: 0 0 2px rgba(120,184,214,0.15);
+}
+#root[data-deviation="high"] .game-body::after {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 5;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(120,184,214,0.015) 3px,
+    rgba(120,184,214,0.015) 4px
+  );
+}
+
+/* ── Theosis ambient pulse (tier-illumined) ───────────────────── */
+@keyframes theosis-pulse {
+  0%   { --border: #283e2e; }
+  50%  { --border: #3a5838; }
+  100% { --border: #283e2e; }
+}
+body.tier-illumined {
+  animation: theosis-pulse 20s ease-in-out infinite;
+}
+@keyframes gold-breathe {
+  0%, 100% { opacity: 0.7; }
+  50%       { opacity: 1.0; }
+}
+body.tier-illumined .location-bar.revelation {
+  animation: gold-breathe 8s ease-in-out infinite;
+}
+
+/* ── Cover integrity HUD ─────────────────────────────────────── */
+.cover-hud {
+  display: flex; align-items: center; gap: .55rem;
+  padding: .18rem 0;
+}
+.cover-hud-label {
+  font-family: var(--font-display);
+  font-size: .55rem; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--dim);
+  min-width: 38px;
+}
+.cover-hud-track {
+  flex: 1; max-width: 120px; height: 2px;
+  background: var(--bg4); border: 1px solid var(--border);
+  border-radius: 1px; overflow: hidden;
+}
+.cover-hud-fill {
+  height: 100%; border-radius: 1px;
+  transition: width .6s ease, background .6s ease;
+}
+@keyframes cover-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+.cover-hud-pulse { animation: cover-pulse 1.4s ease-in-out infinite; }
+
+/* ── Version watermark ───────────────────────────────────────── */
+.version-mark {
+  position: fixed; bottom: 3.2rem; right: .6rem;
+  font-family: var(--font-display);
+  font-size: .48rem; color: var(--dim); letter-spacing: .1em;
+  opacity: 0.35; z-index: 50; pointer-events: none;
 }
