@@ -440,36 +440,75 @@ S.on('ritualCompleted', (ritualId) => {
 // ENDINGS
 // ─────────────────────────────────────────────────────────────────
 
+// ─────────────────────────────────────────────────────────────────
+// ENDINGS — condition-driven, not player-selected.
+//
+// The ending you reach is determined by what you did and who you
+// became during the crossing. Theosis gates access; flags record
+// what happened. No ending is chosen. They are arrived at.
+//
+// Priority order (highest wins when multiple conditions met):
+//   20 The Knowing   — rememberer charism + theosis 90 + transmitted
+//   10 Restoration   — theosis 66+ + transmitted + radio team
+//    5 Witness       — theosis 33+ + refused mission
+//    0 Erasure       — default (accepted mission OR theosis < 33 with no refusal)
+// ─────────────────────────────────────────────────────────────────
+
+// Erasure: mission accepted, OR theosis too low to have acted otherwise.
+// This is the default ending for players who completed the mission
+// or who never built enough theosis to perceive what the ship carried.
 S.registerEnding({
   id: 'erasure', priority: 0,
-  condition: { type: 'flag', id: 'mission_accepted' },
+  condition: { type: 'or', conditions: [
+    { type: 'flag', id: 'mission_accepted' },
+    // Reached Day Three without having refused — and without the
+    // theosis required to reach a higher ending
+    { type: 'and', conditions: [
+      { type: 'flag', id: 'act_three_begun' },
+      { type: 'not', condition: { type: 'flag', id: 'mission_refused' } },
+    ]},
+  ]},
   scene: 'ending_erasure',
 });
 
+// Witness: refused the mission AND had enough theosis to know why.
+// The archive is hidden, not transmitted. A wounded hope.
+// Requires: mission_refused + theosis >= 33.
+// Blocked by: archive_transmitted (which upgrades to Restoration).
 S.registerEnding({
   id: 'witness', priority: 5,
   condition: { type: 'and', conditions: [
     { type: 'flag',    id: 'mission_refused' },
     { type: 'theosis', min: 33 },
+    { type: 'not', condition: { type: 'flag', id: 'archive_transmitted' } },
   ]},
   scene: 'ending_witness',
 });
 
+// Restoration: transmitted the archive into the world.
+// Requires: archive_transmitted + theosis >= 66 + radio team assembled.
+// The theosis gate ensures this isn't reached by accident — you had
+// to have become someone capable of understanding what needed doing.
 S.registerEnding({
   id: 'restoration', priority: 10,
   condition: { type: 'and', conditions: [
     { type: 'flag',    id: 'archive_transmitted' },
+    { type: 'flag',    id: 'radio_team_assembled' },
     { type: 'theosis', min: 66 },
   ]},
   scene: 'ending_restoration',
 });
 
+// The Knowing: second crossing or later, rememberer charism,
+// theosis 90+, transmitted. You have been here before.
+// This ending cannot be reached on a first crossing.
 S.registerEnding({
   id: 'the_knowing', priority: 20,
   condition: { type: 'and', conditions: [
     { type: 'charism', id: 'rememberer' },
     { type: 'theosis', min: 90 },
     { type: 'flag',    id: 'archive_transmitted' },
+    { type: 'flag',    id: 'radio_team_assembled' },
   ]},
   scene: 'ending_the_knowing',
 });
@@ -2896,26 +2935,122 @@ He doesn't explain what he means by *there.* He doesn't need to.`,
     ],
   },
 
+  // ── DAY THREE CONVERGENCE ────────────────────────────────────────
+  // act_two_resolve is the point where the crossing converges.
+  // It reads your state and routes to the appropriate end-sequence.
+  // The player does not select an ending here. What you did determines
+  // what happens. The scene text reflects what theosis tier you are at.
+
   act_two_resolve: {
     id: 'act_two_resolve', location: 'The Crossing', mood: 'revelation',
     text: `Day Three.
 
-The anomaly is at its peak. The instruments are reading something they have never read. Nadia is crying in the good way. Alexei is using words that are not scientific words. Miguel has his hand on the wheel and his face turned toward the bow, and he looks like someone who has been trying to bring a ship home for a very long time.
+The anomaly is at its peak. The instruments are reading something they have never read. Nadia is crying in the good way. Alexei is using words that are not scientific words. Miguel has his hand on the wheel and his face turned toward the bow.
 
-You know what you are doing.
+The ship holds its course.
 
-The question is how far you are willing to go.`,
+The crossing is ending.`,
     onEnter: () => {
       S.incrementTheosis(4);
       S.setFlag('act_three_begun');
       S.unlockCodexEntry('codex_zarya_history');
       S.unlockCodexEntry('codex_solidarity');
+      // Route to the appropriate end-sequence based on state
+      // (checkEndings will fire on the next scene transition)
+    },
+    choices: [
+      { text: 'Continue.', next: 'day_three_landing' },
+    ],
+  },
+
+  // Day Three landing — reads current state, routes accordingly
+  // This is where the crossing resolves into consequence
+  day_three_landing: {
+    id: 'day_three_landing', location: 'The Crossing', mood: 'revelation',
+    text: `Day Three. The anomaly holds.
+
+The ship continues on its heading. The crossing is ending.`,
+    onEnter: () => {
+      // Pre-set the routing flag so the single choice knows where to go
+      const t = S.G.theosis;
+      const transmitted = S.hasFlag('archive_transmitted') && S.hasFlag('radio_team_assembled');
+      const refused = S.hasFlag('mission_refused');
+      if (transmitted && t >= 66) {
+        S.setFlag('_route_restoration');
+      } else if (refused && t >= 33) {
+        S.setFlag('_route_witness');
+      } else {
+        S.setFlag('_route_erasure');
+      }
+    },
+    choices: [
+      { text: 'The crossing ends.',  next: 'ending_approach_restoration', condition: { type: 'flag', id: '_route_restoration' } },
+      { text: 'The crossing ends.',  next: 'ending_approach_witness',     condition: { type: 'flag', id: '_route_witness'      } },
+      { text: 'The crossing ends.',  next: 'ending_approach_erasure',     condition: { type: 'flag', id: '_route_erasure'      } },
+    ],
+  },
+
+  // ── APPROACH SCENES — brief transition before each ending ───────
+  // These give the player a moment to understand where they've arrived
+  // before the ending text. They are short. They are consequential.
+
+  ending_approach_erasure: {
+    id: 'ending_approach_erasure', location: 'Hold — Night', mood: 'uncanny',
+    text: `Othis meets you at the hold access at 2am. He has the key.
+
+He doesn't say anything. He hands it over. He goes back to his cabin.
+
+The hold smells of salt and old paper. Freezer Beef is on her box. She watches you with the particular attention of something that does not intervene.
+
+The instructions were clear. You have always been clear about what the instructions said.
+
+You go in.`,
+    onEnter: () => { S.setFlag('mission_accepted'); S.checkEndings(); },
+    choices: [
+      { text: 'Continue.', next: 'ending_erasure' },
+    ],
+  },
+
+  ending_approach_witness: {
+    id: 'ending_approach_witness', location: 'Hold — Night', mood: 'uncanny',
+    text: `You find Miguel in the chart room at 11pm.
+
+You don't say much. You tell him what you're going to do. He listens. He tells you where on the ship things can be put that aren't in the current manifest.
+
+It takes two hours. The work is quiet. The archive is heavy — heavier than you expected from paper and photographs, heavier than the weight of the boxes explains.
+
+At one point Pavel appears in the hold access. He doesn't come in. He stands there long enough to see what's happening and then he goes back up.
+
+That is enough.`,
+    onEnter: () => { S.setFlag('mission_refused'); S.checkEndings(); },
+    choices: [
+      { text: 'Continue.', next: 'ending_witness' },
+    ],
+  },
+
+  ending_approach_restoration: {
+    id: 'ending_approach_restoration', location: 'Instrument Room — Night', mood: 'revelation',
+    text: `The three of you work for four hours.
+
+Alexei reads. Nadia records the photographs in words — she has a system, she has clearly been preparing this. You operate the radio, because Miguel showed you how and because the radio, it turns out, recognises something in your hands on the brass. The anomaly is at its peak. The signal is strong.
+
+At one point Othis tries the instrument room door. It is not locked. He stands in the doorway for thirty seconds. He closes the door. He goes back to his cabin.
+
+You don't stop.
+
+At 4am the transmission is complete. Alexei writes the timestamp in his deviation log. Nadia puts her hands flat on the nearest box and keeps them there for a moment.
+
+Pavel is outside, on the foredeck, facing the bow.
+
+He has been there all night.`,
+    onEnter: () => {
+      S.setFlag('mission_refused');
+      S.setFlag('archive_transmitted');
+      S.flashTheosisLight(1.0, 6000);
       S.checkEndings();
     },
     choices: [
-      { text: 'Refuse the mission. Hide the archive.',   next: 'ending_witness',     set_flag: 'mission_refused'  },
-      { text: 'Transmit the archive. Broadcast it.',     next: 'ending_restoration', requires_flag: 'radio_existence_known', flags: ['archive_transmitted', 'mission_refused'] },
-      { text: 'Complete the mission.',                    next: 'ending_erasure',     set_flag: 'mission_accepted' },
+      { text: 'Continue.', next: 'ending_restoration' },
     ],
   },
 
@@ -3255,6 +3390,7 @@ You made a crossing.
     onEnter: () => {
       S.setFlag('ending_erasure_reached');
       S.addJournalEntry({ type: 'ending', text: 'Erasure — the archive is gone.' });
+      S.showToast('Erasure.', 'warning');
     },
     choices: [
       { text: 'Begin a new crossing.', next: '__new_play__' },
@@ -3283,6 +3419,7 @@ You witnessed.
     onEnter: () => {
       S.setFlag('ending_witness_reached');
       S.addJournalEntry({ type: 'ending', text: 'Witness — the archive is hidden.' });
+      S.showToast('Witness.', 'note');
     },
     choices: [
       { text: 'Begin a new crossing.', next: '__new_play__' },
@@ -3315,6 +3452,7 @@ She was doing what she was built for.
       S.addJournalEntry({ type: 'ending', text: 'Restoration — the record goes into the world.' });
       S.unlockCodexEntry('codex_zarya_history');
       S.flashTheosisLight(1.0, 5000);
+      S.showToast('Restoration.', 'theosis');
     },
     choices: [
       { text: 'Begin a new crossing.', next: '__new_play__' },

@@ -293,7 +293,7 @@ function recalculateHeldEffects() {
   }
 }
 function hasItem(id) { return G.inventory.includes(id); }
-function addItem(id) { if (!hasItem(id)) { G.inventory.push(id); recalculateHeldEffects(); emit('itemAdded', id); scheduleRender(); } }
+function addItem(id) { if (!hasItem(id)) { G.inventory.push(id); recalculateHeldEffects(); const it=_registries.items?_registries.items[id]:null; showToast('Carried: '+(it&&it.name?it.name:id)+'.', 'note'); emit('itemAdded', id); scheduleRender(); } }
 function removeItem(id) { G.inventory = G.inventory.filter(i => i !== id); recalculateHeldEffects(); emit('itemRemoved', id); scheduleRender(); }
 
 function _ensureStance(npcId) { if (!G.npcStance[npcId]) G.npcStance[npcId] = { trust: 0, suspicion: 0, solidarity: 0, memories: [] }; }
@@ -304,7 +304,7 @@ function setStance(npcId, key, value) {
 }
 function modStance(npcId, key, delta) {
   const cur = getStance(npcId, key); setStance(npcId, key, cur + delta);
-  if (delta !== 0) showToast(`${npcId}: ${key} ${delta > 0 ? '+' + delta : delta}`, 'note');
+  // Reputation changes are silent — tracked in observations panel
 }
 function recordNpcMemory(npcId, memory) {
   _ensureStance(npcId);
@@ -479,7 +479,8 @@ function offerSounding(id) {
   if (!id || !_registries.soundings[id]) return;
   if (G.soundings.available.includes(id) || G.soundings.taken.some(t => t.id === id) || G.soundings.settled.includes(id)) return;
   G.soundings.available.push(id);
-  showToast('Sounding: ' + _registries.soundings[id].name, 'sounding');
+  const _snd = _registries.soundings[id];
+  showToast('Sounding available: ' + (_snd ? _snd.name : id) + '.', 'sounding');
   emit('soundingOffered', id);
 }
 
@@ -491,7 +492,7 @@ function settleSounding(soundingId) {
       G.soundings.settled.push(soundingId);
       const snd = _registries.soundings[soundingId];
       if (snd && snd.effect) applyEffect(snd.effect);
-      showToast(`${snd.name} has settled.`, 'sounding');
+      showToast(`${snd.name} — settled.`, 'theosis');
       refreshAtmosMods(); emit('soundingSettled', soundingId);
     }
   }
@@ -502,7 +503,16 @@ function applySoundingProgress(soundingId, delta) {
   const old = entry.progress;
   entry.progress = Math.min(Math.max(entry.progress + delta, 0), SOUNDING_THRESHOLD);
   if (entry.progress >= SOUNDING_THRESHOLD && old < SOUNDING_THRESHOLD) settleSounding(soundingId);
-  if (delta !== 0) { showToast(`${_registries.soundings[soundingId].name}: ${delta > 0 ? '+' + delta : delta}`, 'sounding'); emit('soundingProgress', { soundingId, progress: entry.progress, delta }); }
+  if (delta !== 0) {
+    // Only toast at halfway and near-complete thresholds, not every increment
+    const half = Math.floor(SOUNDING_THRESHOLD / 2);
+    if ((old < half && entry.progress >= half) || (old < SOUNDING_THRESHOLD - 1 && entry.progress >= SOUNDING_THRESHOLD - 1)) {
+      const snd = _registries.soundings[soundingId];
+      const pct = entry.progress >= SOUNDING_THRESHOLD - 1 ? 'almost settled' : 'halfway';
+      showToast((snd ? snd.name : soundingId) + ': ' + pct + '.', 'sounding');
+    }
+    emit('soundingProgress', { soundingId, progress: entry.progress, delta });
+  }
 }
 
 function applyAutoAlignment(tags) {
@@ -518,7 +528,8 @@ function takeSounding(id) {
   if (soundingSlotsFull()) { G.soundingPending = id; G.panelOpen = 'breviary'; scheduleRender(); return; }
   G.soundings.available = G.soundings.available.filter(x => x !== id);
   G.soundings.taken.push({ id, progress: 0 }); G.soundingPending = null;
-  showToast(_registries.soundings[id].name + ': taking the sounding.', 'sounding');
+  const _takenSnd = _registries.soundings[id];
+  showToast((_takenSnd ? _takenSnd.name : id) + ' — sounding begun.', 'sounding');
   emit('soundingTaken', id); scheduleRender();
 }
 
@@ -548,7 +559,7 @@ function tickSoundings() {
     G.soundings.settled.push(id);
     const s = _registries.soundings[id];
     if (s && s.effect) applyEffect(s.effect);
-    showToast(s.name + ': settled.', 'sounding');
+    showToast(s.name + ' — settled.', 'theosis');
     refreshAtmosMods(); emit('soundingSettled', id);
   });
 }
@@ -600,7 +611,13 @@ function getTheosisTagValues() { return _theosisTagValues; }
 function incrementTheosis(amount) {
   if (amount === 0) return;
   const oldValue = G.theosis;
+  const oldTier = oldValue <= 32 ? 0 : oldValue <= 65 ? 1 : 2;
   G.theosis = Math.min(Math.max(G.theosis + amount, 0), 100);
+  const newTier = G.theosis <= 32 ? 0 : G.theosis <= 65 ? 1 : 2;
+  if (newTier > oldTier) {
+    const tierMsg = ['Asleep', 'Waking', 'Illumined'];
+    setTimeout(() => showToast(tierMsg[newTier] + '.', 'theosis'), 500);
+  }
   refreshAtmosMods();
   checkJournalThresholds(G.theosis, oldValue);
   emit('theosisChanged', G.theosis);
@@ -2153,19 +2170,20 @@ function beginGame(){
 
 function _renderTutorial(root){
   const div=document.createElement('div');div.className='tutorial-overlay';
-  if(_registries.tutorialContent)
-    div.innerHTML=`<div class="tutorial-box">${_registries.tutorialContent}<button class="btn" style="margin-top:1.5rem;width:100%" id="dt">Board the ship</button></div>`;
-  else
-    div.innerHTML=`<div class="tutorial-box">
-      <div class="tutorial-h">Before you board</div>
-      <div class="tutorial-item"><strong>Status bar</strong> \u2014 top of screen. Vigilance, Composure, Communion, Doubt.</div>
-      <div class="tutorial-item"><strong>The Breviary</strong> <span class="key">breviary</span> \u2014 centre bottom. Soundings settle through choices.</div>
-      <div class="tutorial-item"><strong>Observations</strong> <span class="key">observations</span> \u2014 right bottom.</div>
-      <div class="tutorial-item"><strong>Status</strong> <span class="key">status</span> \u2014 left bottom.</div>
-      <div class="tutorial-item"><strong>Abandon crossing</strong> \u2014 bottom of each scene.</div>
-      <button class="btn" style="margin-top:1.5rem;width:100%" id="dt">Board the ship</button>
-    </div>`;
-  div.querySelector('#dt').addEventListener('click',dismissTutorial);root.appendChild(div);
+  div.setAttribute('role','dialog');
+  div.setAttribute('aria-label','Before you board');
+  // Tap backdrop to dismiss on mobile
+  div.addEventListener('click',(e)=>{if(e.target===div)dismissTutorial();});
+  const boxHtml = _registries.tutorialContent || `
+    <div class="tutorial-h">Before you board</div>
+    <div class="tutorial-item"><strong>Stats</strong> \u2014 top of screen. Bearing, Stillness, Solidarity, Static.</div>
+    <div class="tutorial-item"><strong>Cover</strong> \u2014 build it through conversation. Be consistent.</div>
+    <div class="tutorial-item"><strong>Breviary</strong> \u2014 bottom centre. Soundings settle through choices.</div>
+    <div class="tutorial-item"><strong>Observations / Status / Codex / Map</strong> \u2014 bottom row.</div>
+    <div class="tutorial-item" style="color:var(--dim);font-size:.78rem;margin-top:.6rem">Multiple crossings. What carries forward depends on how far you have come.</div>`;
+  div.innerHTML=`<div class="tutorial-box">${boxHtml}<button class="btn" style="margin-top:1.5rem;width:100%;min-height:48px;font-size:1rem" id="dt">Board the ship</button></div>`;
+  div.querySelector('#dt').addEventListener('click',dismissTutorial);
+  root.appendChild(div);
 }
 
 function _renderRollBox(root){
@@ -2293,6 +2311,17 @@ function renderGame(root){
   body.appendChild(cd);
   body.appendChild(_buildRestartBar());wrap.appendChild(body);root.appendChild(wrap);
   _appendAudioBtn(root);_appendBottomNav(root);
+  // Mobile stat tip tap handler
+  if ('ontouchstart' in window) {
+    root.querySelectorAll('.stat').forEach(s => {
+      s.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        document.querySelectorAll('.stat.tip-open').forEach(o => { if (o !== s) o.classList.remove('tip-open'); });
+        s.classList.toggle('tip-open');
+        setTimeout(() => s.classList.remove('tip-open'), 2500);
+      }, { passive: false });
+    });
+  }
   // Version watermark
   { const vm=document.createElement('div');vm.className='version-mark';vm.textContent='SPASIBO v1.2 — Zarya';root.appendChild(vm); }
   if(G.panelOpen==='notes')    _renderNotesPanel(root);

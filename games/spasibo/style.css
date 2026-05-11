@@ -772,3 +772,126 @@ body.sanctity-high .location-bar.uncanny {
   color: var(--gold-dim);
   text-shadow: 0 0 6px rgba(212,175,55,0.3);
 }
+
+/* ────────────────────────────────────────────────────────────────
+   MOBILE / PHONE FIXES
+   ──────────────────────────────────────────────────────────────── */
+
+/* Tutorial overlay — scrollable on small screens, tap backdrop to close */
+.tutorial-overlay {
+  align-items: flex-start;        /* allow scroll from top */
+  overflow-y: auto;
+  padding: 1.2rem;
+  -webkit-overflow-scrolling: touch;
+}
+.tutorial-box {
+  margin: auto;                   /* centre vertically when content fits */
+  max-height: none;               /* don't clip */
+}
+/* Board button — large tap target */
+.tutorial-box .btn#dt,
+.tutorial-box button {
+  min-height: 48px;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Touch targets — all interactive elements min 44px */
+.choice {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+.btn, button {
+  min-height: 36px;
+}
+#bottom-nav button {
+  min-height: 48px;
+  padding: .5rem .15rem;
+}
+
+/* Stat tooltips — tap-toggle on mobile (hover unreliable) */
+@media (hover: none) and (pointer: coarse) {
+  .stat-tip { display: none !important; }
+  .stat { cursor: pointer; }
+  .stat:active .stat-tip,
+  .stat.tip-open .stat-tip { display: block !important; }
+}
+
+/* Panel overflow on phone */
+.panel {
+  max-height: 85vh;              /* more room on phone */
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Prevent horizontal scroll bleed */
+body { overflow-x: hidden; max-width: 100vw; }
+#root { overflow-x: hidden; }
+
+/* Art block — smaller on phone so it doesn't push content off screen */
+@media (max-width: 520px) {
+  .art-block {
+    font-size: .5rem;
+    line-height: 1.15;
+    letter-spacing: .02em;
+    overflow-x: auto;
+    white-space: pre;
+    max-width: 100%;
+  }
+  /* Reduce game body padding for more text space */
+  .game-body { padding: 1.1rem .9rem .5rem; }
+  /* Choices more compact */
+  .choices { gap: .3rem; margin-top: .9rem; }
+  .choice { padding: .45rem 0 .45rem .85rem; font-size: .88rem; }
+  /* Header more compact */
+  .game-header { padding: .55rem .9rem .4rem; }
+  .sbar { gap: .9rem; }
+  .stat { font-size: .56rem; }
+  /* Location bar shorter */
+  .location-bar { font-size: .62rem; letter-spacing: .12em; }
+  /* Panel padding */
+  .panel { padding: 0 .9rem 2rem; }
+  .panel-header { padding: .8rem 0 .6rem; }
+  /* Toast above nav — more clearance */
+  .toast { bottom: 4.2rem; font-size: .68rem; max-width: 90vw; white-space: normal; text-align: center; }
+  /* Cover hud track wider */
+  .cover-hud-track { max-width: 80px; }
+  /* Title smaller */
+  .title-cyrillic { font-size: 1.9rem; letter-spacing: .2em; }
+  /* Version mark hidden on phone */
+  .version-mark { display: none; }
+}
+
+/* Very small screens (< 380px) */
+@media (max-width: 380px) {
+  html, body { font-size: 15px; }
+  .game-body { padding: 1rem .75rem .5rem; }
+  .choice { font-size: .84rem; }
+  #bottom-nav button { font-size: .5rem; letter-spacing: .06em; }
+}
+
+/* Porthole — hide on very small screens (it overlaps content) */
+@media (max-width: 420px) {
+  #atmos { opacity: 0.5; }
+}
+
+/* Panel overlay — full screen on phone */
+@media (max-width: 520px) {
+  .panel-overlay { align-items: stretch; }
+  .panel { max-height: 90vh; border-radius: 0; }
+}
+
+/* Charism cards — larger tap targets */
+.charism-card { min-height: 60px; }
+
+/* Mode buttons */
+.mode-btn { min-height: 60px; }
+
+/* Map nodes — larger tap targets */
+.map-node { min-height: 44px; }
+
+/* Sounding take button */
+.sounding-card .btn { min-height: 44px; width: 100%; justify-content: center; }

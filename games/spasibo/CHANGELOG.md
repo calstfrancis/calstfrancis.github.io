@@ -1,3 +1,39 @@
+## v1.3 "Sounding" — May 2026
+
+### Toast System Overhaul
+- **Sounding available**: `Sounding available: [name].` — fires when `offerSounding()` is called.
+- **Sounding begun**: `[name] — sounding begun.` — fires on `takeSounding()`.
+- **Sounding halfway**: `[name]: halfway.` — fires when progress crosses SOUNDING_THRESHOLD/2. Replaces noisy per-delta toast.
+- **Sounding near-settle**: `[name]: almost settled.` — fires one step before completion.
+- **Sounding settled**: `[name] — settled.` — upgraded to `theosis` type toast (gold).
+- **Theosis tier change**: `Waking.` / `Illumined.` — fires with 500ms delay when tier boundary is crossed.
+- **Codex unlock**: `Codex: [title].` — fires when `unlockCodexEntry()` adds a new entry.
+- **Item acquired**: `Carried: [name].` — fires on `addItem()`.
+- **Reputation changes**: Now silent — were verbose and confusing (`miguel: reputation +1`). Tracked in observations panel instead.
+- **Toast queue**: Confirmed working — simultaneous toasts now stack and fire sequentially.
+
+### Tutorial — Phone Fix
+- Tutorial overlay now `align-items: flex-start` with `overflow-y: auto` — scrollable on small screens.
+- Board button has `min-height: 48px; font-size: 1rem` — proper touch target.
+- Tapping the backdrop (outside the tutorial box) dismisses the tutorial — `click` handler on overlay checks `e.target === div`.
+- `role="dialog"` and `aria-label` added for accessibility.
+
+### Mobile / Phone Display Fixes
+- **Touch targets**: All choices `min-height: 44px`, bottom nav buttons `min-height: 48px`, charism cards `min-height: 60px`, map nodes `min-height: 44px`, sounding take button full-width.
+- **Stat tooltips**: `:hover` alone unreliable on touch. CSS `:active .stat-tip` and JS `touchstart` handler now toggle `.tip-open` class with 2.5s auto-close.
+- **Panel**: `max-height: 85vh` on phone, `90vh` with `border-radius: 0` when panel-overlay stretches full screen.
+- **Art blocks**: `font-size: .5rem` and `overflow-x: auto` on phone — prevents ASCII art from causing horizontal scroll.
+- **Toasts**: `max-width: 90vw; white-space: normal; text-align: center` on phone.
+- **Porthole**: Canvas opacity reduced to 0.5 on `max-width: 420px` screens — porthole was overlapping content on small phones.
+- **Body**: `overflow-x: hidden; max-width: 100vw` — prevents horizontal bleed from wide art blocks.
+- **Game body**: Tighter padding on phone (1.1rem / .9rem).
+- **Version mark**: Hidden on phone (`display: none`).
+- Very small screens (< 380px): `font-size: 15px` base, further padding reduction.
+
+### Other
+- `maintenance_rigging` Alexei scene confirmed — theoretical meteorology requires fieldwork.
+- `hold_bless_archive` confirmed — fires highest sanctity grant, gold toast on completion.
+
 ## v1.2.1 "Zarya — Release Patch" — May 2026
 
 ### Critical Bug Fixes (from multi-AI audit)
