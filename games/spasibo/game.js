@@ -2239,8 +2239,13 @@ You have not decided what you are going to do.`,
       { text: 'Othis is waiting in the corridor.',                       next: 'othis_confrontation', condition: { type: 'and', conditions: [{ type: 'flag', id: 'archive_discovered' }, { type: 'not', condition: { type: 'flag', id: 'othis_confrontation_happened' } }] } },
       { text: 'Sunday — lead the service.',                              next: 'sunday_service_begin', condition: { type: 'not', condition: { type: 'flag', id: 'sunday_service_started' } } },
       { text: 'Main deck.',                                              next: 'main_deck_hub' },
-      { text: 'The brass wants polishing. The bilge wants checking.',       next: 'ship_maintenance', condition: { type: 'not', condition: { type: 'flag', id: 'maintenance_done' } } },
-      { text: 'Alexei has charts spread across the table.',                 next: 'anomaly_diagnosis', condition: { type: 'flag', id: 'anomaly_first_noticed' } },
+      { text: 'The brass wants polishing. The bilge wants checking.',       next: 'ship_maintenance',      condition: { type: 'not', condition: { type: 'flag', id: 'maintenance_done' } } },
+      { text: 'Alexei has charts spread across the table.',                 next: 'anomaly_diagnosis',     condition: { type: 'flag', id: 'anomaly_first_noticed' } },
+      { text: 'Someone in the mess hall. He has been there a while.',       next: 'oblong_first',          condition: { type: 'not', condition: { type: 'flag', id: 'met_oblong' } } },
+      { text: 'Kylie is waiting.',                                           next: 'kylie_act_two',         condition: { type: 'and', conditions: [{ type: 'flag', id: 'kylie_initial_met' }, { type: 'not', condition: { type: 'flag', id: 'kylie_act_two_confronted' } }] } },
+      { text: 'Landstorm is on the radio.',                                  next: 'landstorm_radio_call',  condition: { type: 'and', conditions: [{ type: 'flag', id: 'mission_orders_read' }, { type: 'not', condition: { type: 'flag', id: 'landstorm_called' } }] } },
+      { text: 'Something below the forward hold.',                           next: 'stink_patrol_encounter', condition: { type: 'and', conditions: [{ type: 'flag', id: 'hold_visited' }, { type: 'not', condition: { type: 'flag', id: 'stink_patrol_encountered' } }] } },
+      { text: "Connie needs you. Alexei's cabin.",                          next: 'connie_emergency',      condition: { type: 'and', conditions: [{ type: 'flag', id: 'anomaly_peak_occurred' }, { type: 'not', condition: { type: 'flag', id: 'connie_emergency_happened' } }] } },
     ],
   },
 
@@ -3360,33 +3365,743 @@ He does not explain what is good. He does not need to.`,
     ],
   },
 
+
+  // ── OBLONG VASSILITHUNE ──────────────────────────────────────────
+  // He is present. No one is quite sure how long he has been present.
+
+  oblong_first: {
+    id: 'oblong_first', location: 'Mess Hall', mood: 'uncanny',
+    text: `He is at the corner table. He has been at the corner table. The distinction between these two statements is not clear.
+
+He is a large man arranged with great care. His suit belongs to a decade that cannot be precisely named. He is eating something Lena apparently prepared for him, though Lena, when you ask later, will say she has no recollection of doing so.
+
+His name, which you will learn through a process that involves no introduction, is Oblong Vassilithune.
+
+He looks at you without surprise.
+
+— Chaplain. He says. The word sounds like something he has been keeping in a drawer.
+
+He returns to his food.`,
+    onEnter: () => {
+      S.setFlag('met_oblong');
+      S.incrementTheosis(3);
+      S.applyEffect({ doubt: 1 });
+    },
+    choices: [
+      { text: '"Have you been on this ship long?"',          next: 'oblong_how_long'    },
+      { text: '"What do you do?"',                           next: 'oblong_what_he_does' },
+      { text: 'Sit across from him. Say nothing.',           next: 'oblong_silence', theosis: 2 },
+    ],
+  },
+
+  oblong_how_long: {
+    id: 'oblong_how_long', location: 'Mess Hall', mood: 'uncanny',
+    text: `He considers the question with more weight than it appears to warrant.
+
+— The ship is very old. He says finally. This is not an answer to the question. It may be all the answer there is.
+
+He cuts something on his plate with great precision.
+
+— You are the chaplain. He says. — That is a useful thing to be on a crossing like this one.
+
+He emphasises *this* crossing in a way that suggests he knows something about what kind of crossing it is. He does not elaborate. He refills his own water glass from a carafe that was not on the table a moment ago.
+
+— Useful. He says again. And goes back to eating.`,
+    onEnter: () => { S.incrementTheosis(2); S.applyEffect({ doubt: 1 }); },
+    choices: [
+      { text: '"What do you know about this crossing?"',     next: 'oblong_the_crossing' },
+      { text: 'Leave him to it.',                            next: 'mess_hub' },
+    ],
+  },
+
+  oblong_what_he_does: {
+    id: 'oblong_what_he_does', location: 'Mess Hall', mood: 'uncanny',
+    text: `— What do I do. He repeats this phrase at length, as if testing its shape.
+
+— I observe. He says at last. — I have always observed. It is what I am suited for.
+
+He does not say who he observes for. He does not say what he does with what he observes. He eats another bite and looks at the middle distance.
+
+— You are doing something similar. He says. — Though you do not know it yet.
+
+He says this without threat or warmth. It is an observation. He is observing.`,
+    onEnter: () => { S.incrementTheosis(2); S.applyEffect({ vigilance: 1 }); S.setFlag('oblong_observer_known'); },
+    choices: [
+      { text: '"Who do you work for?"',                     next: 'oblong_who_for'     },
+      { text: '"What am I doing?"',                         next: 'oblong_what_doing'  },
+      { text: 'Leave him to it.',                            next: 'mess_hub'           },
+    ],
+  },
+
+  oblong_silence: {
+    id: 'oblong_silence', location: 'Mess Hall', mood: 'uncanny',
+    text: `You sit across from him.
+
+He continues eating. He does not acknowledge you with any specific gesture. He simply includes you in the radius of his presence, which is wider than it looks.
+
+After a while he says:
+
+— The ship knows you are here. That is not a metaphor.
+
+He wipes his mouth. He stands. He leaves. His plate is clean.
+
+The carafe is gone. You are not sure when it left.`,
+    onEnter: () => { S.incrementTheosis(5); S.applyEffect({ composure: 1 }); S.setFlag('oblong_silence_sat'); },
+    choices: [
+      { text: 'Go to the main deck.', next: 'main_deck_hub' },
+    ],
+  },
+
+  oblong_the_crossing: {
+    id: 'oblong_the_crossing', location: 'Mess Hall', mood: 'uncanny',
+    text: `He sets his fork down.
+
+— This crossing has a specific purpose. He says. — As all crossings do. Most crossings have small purposes. This one has a large purpose.
+
+He folds his hands.
+
+— The archive in the hold. He says. — The anomaly below. The ship built to not interfere. These are not coincidences. They are a convergence. Someone arranged for the convergence. Someone else is trying to prevent it.
+
+He picks his fork back up.
+
+— You are in the middle of it. He says. — Most people in the middle of things do not know they are in the middle of things. You are beginning to know. That is why I said the chaplain is useful.
+
+He eats. He does not explain further.
+
+— The rest you will have to find yourself. He says. — That is how it works.`,
+    onEnter: () => {
+      S.incrementTheosis(5);
+      S.setFlag('oblong_convergence_told');
+      if (S.G.worldState) S.G.worldState.sanctity = Math.min(10, S.G.worldState.sanctity + 1);
+    },
+    choices: [
+      { text: '"Who are you?"',                              next: 'oblong_who_he_is'   },
+      { text: 'Leave him to it.',                            next: 'mess_hub'           },
+    ],
+  },
+
+  oblong_who_for: {
+    id: 'oblong_who_for', location: 'Mess Hall', mood: 'uncanny',
+    text: `He looks at you for a long moment. His expression does not change, which may be the change.
+
+— For the record. He says.
+
+He stands. He leaves. His chair tucks itself in.`,
+    onEnter: () => { S.incrementTheosis(3); },
+    choices: [
+      { text: 'Go to the main deck.', next: 'main_deck_hub' },
+    ],
+  },
+
+  oblong_what_doing: {
+    id: 'oblong_what_doing', location: 'Mess Hall', mood: 'uncanny',
+    text: `He looks at you.
+
+— You are becoming someone. He says. — It is slow work. Most people do not notice while it is happening. You are beginning to notice. That is the useful part.
+
+He has more water from the carafe.
+
+— The ship does the same thing. He says. — It passes through. It does not distort. Something comes through. That is the design.
+
+He means this literally. He means something else by it as well. Both are true.`,
+    onEnter: () => { S.incrementTheosis(4); },
+    choices: [
+      { text: '"Who are you?"',    next: 'oblong_who_he_is' },
+      { text: 'Go to the main deck.', next: 'main_deck_hub' },
+    ],
+  },
+
+  oblong_who_he_is: {
+    id: 'oblong_who_he_is', location: 'Mess Hall', mood: 'uncanny',
+    text: `He considers this for a long time.
+
+— I am someone who has been on this ship before. He says. — In various capacities. That is the most accurate answer.
+
+He folds his napkin into a rectangle.
+
+— You might ask Pavel the same question. He says. — He would give you a different answer. Both answers would be true.
+
+He stands. He picks up the carafe.
+
+— The ship knows you are here. He says again, as if confirming something. And leaves.
+
+The carafe is gone. Haircut appears from somewhere and sits on the table where his plate was. She regards the space where he sat.`,
+    onEnter: () => {
+      S.incrementTheosis(5);
+      S.setFlag('oblong_identity_approached');
+    },
+    choices: [
+      { text: 'Find Pavel.', next: 'act_two_pavel', condition: { type: 'flag', id: 'act_two_begun' } },
+      { text: 'Go to the main deck.', next: 'main_deck_hub' },
+    ],
+  },
+
+  // ── STINK PATROL ─────────────────────────────────────────────────
+  // Below the waterline. Their jurisdiction. One scene.
+
+  stink_patrol_encounter: {
+    id: 'stink_patrol_encounter', location: 'Below Decks — Aft', mood: 'uncanny',
+    text: `You are looking for something — a hatch, a panel, a way through — when you hear them.
+
+Not voices exactly. More like the sound of people who are very competent at something specific and are currently doing it. The sounds come from below the forward hold, from a level of the ship that is not on the schematic you were given.
+
+Lena, when you mention it later, nods once, as if you have passed some threshold.
+
+— The Stink Patrol. She says. — They manage the ballast. And some other things.
+
+— What other things?
+
+She ladles soup.
+
+— They have been on this ship for as long as I have. She says. — Possibly longer. Nobody has asked them directly about the other things. It seems like the kind of question that would be rude.
+
+She hands you the soup.
+
+— They know about the archive. She says. — They have always known. They are not concerned. That is reassuring, in my view.
+
+There is a warmth in her voice when she says *the Stink Patrol* that is not quite affection but is close to it. Something like respect for something that does its work without requiring your understanding of it.`,
+    onEnter: () => {
+      S.incrementTheosis(4);
+      S.setFlag('stink_patrol_encountered');
+      S.applyEffect({ composure: 1 });
+      S.modReputation('lena', 2);
+    },
+    choices: [
+      { text: '"Have you ever spoken to them?"',             next: 'stink_patrol_spoken' },
+      { text: 'Drink the soup. Say nothing.',                next: 'galley_hub', theosis: 2 },
+    ],
+  },
+
+  stink_patrol_spoken: {
+    id: 'stink_patrol_spoken', location: 'Galley', mood: 'uncanny',
+    text: `Lena thinks about this.
+
+— Once. She says. — I brought food down. I left it at the hatch. One of them — I only saw hands — took it through. The hands were warm. That is the only conversation.
+
+She adjusts the heat.
+
+— They are not unfriendly. She says. — They are just — very much below. That is their place. They manage what is below. The ship is stable because they manage it.
+
+A pause.
+
+— Alexei thinks they might be related to the anomaly somehow. He thinks this about a lot of things. But in this case he may be right.`,
+    onEnter: () => { S.incrementTheosis(3); S.modReputation('lena', 1); S.setFlag('stink_patrol_hands_known'); },
+    choices: [
+      { text: 'Go to the main deck.', next: 'main_deck_hub' },
+    ],
+  },
+
+  // ── VANCE LANDSTORM (radio, never boards) ────────────────────────
+
+  landstorm_radio_call: {
+    id: 'landstorm_radio_call', location: 'Instrument Room', mood: 'tense',
+    text: `The standard radio crackles. It has not crackled before — the anomaly has kept the standard frequencies mostly inert.
+
+The voice is clear despite the interference. It is the voice of someone who has learned to be clear in all conditions.
+
+— This is Landstorm. How is the crossing proceeding?
+
+A pause. He is not asking about the sea conditions. The question has a specific meaning and he expects you to understand it.
+
+You hold the receiver.`,
+    onEnter: () => {
+      S.setFlag('landstorm_called');
+      S.applyEffect({ doubt: 2, vigilance: 1 });
+      S.showToast('Landstorm on the radio.', 'warning');
+    },
+    choices: [
+      {
+        text: '"The crossing is proceeding. Everything is in order."',
+        next: 'landstorm_lie',
+        vigilance: 1,
+      },
+      {
+        text: '"I need more time to assess the situation."',
+        next: 'landstorm_delay',
+      },
+      {
+        text: 'Set the receiver down without answering.',
+        next: 'landstorm_silence',
+        theosis: 3,
+        requires_flag: 'mission_reality_known',
+      },
+    ],
+  },
+
+  landstorm_lie: {
+    id: 'landstorm_lie', location: 'Instrument Room', mood: 'tense',
+    text: `— Good. He says. The word is brief and dry. — The timing is important. We are on schedule?
+
+— On schedule.
+
+— The material is secure?
+
+— Secure.
+
+A pause. He is listening to something in the way you answer. He is always listening to something.
+
+— Contact me when it is complete. He says. And the line goes quiet.
+
+The standard radio returns to static. The anomaly resumes its interference. Alexei's instruments continue measuring.
+
+You said it was in order. For now, it is not in order. At some point these two facts will resolve into one.`,
+    onEnter: () => {
+      S.applyEffect({ doubt: 2 });
+      S.degradeCover(1);
+    },
+    choices: [
+      { text: 'Go find Miguel.', next: 'act_two_miguel' },
+      { text: 'Go to the main deck.', next: 'main_deck_hub' },
+    ],
+  },
+
+  landstorm_delay: {
+    id: 'landstorm_delay', location: 'Instrument Room', mood: 'tense',
+    text: `A pause.
+
+— The situation. He says. — What situation requires assessment?
+
+— The magnetic conditions are unusual. The crew are aware of the archive. There are variables.
+
+Another pause. Longer.
+
+— The variables are not your concern. The task is your concern.
+
+— I understand.
+
+— Do you.
+
+It is not a question. The line goes quiet.
+
+You have bought some time. You are not sure what it cost.`,
+    onEnter: () => {
+      S.applyEffect({ doubt: 1, vigilance: 1 });
+      S.setFlag('landstorm_delayed');
+    },
+    choices: [
+      { text: 'Go find Miguel. Tell him.', next: 'act_two_miguel' },
+      { text: 'Go find the radio.',         next: 'radio_discovery', condition: { type: 'not', condition: { type: 'flag', id: 'radio_found' } } },
+      { text: 'Go to the main deck.',       next: 'main_deck_hub'   },
+    ],
+  },
+
+  landstorm_silence: {
+    id: 'landstorm_silence', location: 'Instrument Room', mood: 'uncanny',
+    text: `You set the receiver down.
+
+The static continues.
+
+After a moment, the standard radio crackles again. He waits. He does not know the anomaly is strong enough to mask the fact that you did not respond. He thinks the interference ate the call.
+
+Or he knows you did not respond. You cannot tell which.
+
+The line goes quiet. The anomaly continues. The instruments measure.
+
+Alexei, who came in at some point, says: — That was the standard frequency.
+
+— Yes.
+
+He nods slowly. — It will not reach us again tonight. He says. — Not at this deviation.
+
+He does not ask what the call was about.`,
+    onEnter: () => {
+      S.incrementTheosis(4);
+      S.applyEffect({ composure: 2 });
+      S.setFlag('landstorm_silenced');
+      S.setFlag('mission_refused');
+    },
+    choices: [
+      { text: 'Find the radio. The other one.', next: 'radio_discovery', condition: { type: 'not', condition: { type: 'flag', id: 'radio_found' } } },
+      { text: 'Go to the main deck.',            next: 'main_deck_hub'   },
+    ],
+  },
+
+  // ── KYLIE MID-ACT (Day Two confrontation) ────────────────────────
+
+  kylie_act_two: {
+    id: 'kylie_act_two', location: 'Mess Hall — Night', mood: 'tense',
+    art: 'portrait_kylie',
+    text: `She is at the table with her notebook closed, which is the first time you have seen the notebook closed.
+
+— Sit down. She says. It is not quite an order. It is not quite a request.
+
+She is looking at you the way she looks at the sea when she thinks no one is watching. Calculating the distance.
+
+— I know who you are. She says. — Or rather — I know what you are. What you are is not a chaplain. What you are is the same thing I am, which is someone who was sent on this ship by someone else to do something specific. My something is not the same as yours.
+
+She opens her notebook. She closes it again.
+
+— What I want to know is whether you are going to do it.`,
+    onEnter: () => {
+      S.setFlag('kylie_act_two_confronted');
+      S.applyEffect({ vigilance: 2, doubt: 1 });
+    },
+    choices: [
+      {
+        text: 'Hold cover. Deny everything calmly.',
+        next: 'kylie_act_two_deny',
+        vigilance: 1,
+      },
+      {
+        text: '"What are you going to do with the answer?"',
+        next: 'kylie_act_two_question',
+        vigilance: 1,
+      },
+      {
+        text: "'No. Not going to do it.'",
+        next: 'kylie_act_two_truth',
+        theosis: 3,
+        requires_flag: 'mission_reality_known',
+      },
+    ],
+  },
+
+  kylie_act_two_deny: {
+    id: 'kylie_act_two_deny', location: 'Mess Hall — Night', mood: 'tense',
+    text: `You give her the cover. Smoothly. All five fields in the right order.
+
+She listens. She writes nothing.
+
+— That's very good. She says. — I've heard better, but not on a ship this size.
+
+She stands.
+
+— You should know. She says. — What is in that hold matters to more people than the people who sent you. The article I am writing has been planned for eighteen months. It requires the ship to arrive with the archive intact.
+
+She picks up her notebook.
+
+— You may do what you are going to do. She says. — I will do what I am going to do. We will see whose version of events reaches shore first.
+
+She leaves.
+
+The cover held. Something else did not.`,
+    onEnter: () => {
+      S.degradeCover(1);
+      S.applyEffect({ doubt: 2 });
+      S.setFlag('kylie_knows_truth');
+    },
+    choices: [
+      { text: 'Go find Miguel.', next: 'act_two_miguel' },
+      { text: 'Go to the main deck.', next: 'main_deck_hub' },
+    ],
+  },
+
+  kylie_act_two_question: {
+    id: 'kylie_act_two_question', location: 'Mess Hall — Night', mood: 'tense',
+    text: `She considers this.
+
+— I'm going to write about it. She says. — Whatever happens. The archive, the ship, the crossing. What it is and who it belongs to. I have eighteen months of groundwork. I have sources in Finland and Germany and Moscow.
+
+She looks at you.
+
+— What you do will be part of the story. She says. — I would prefer it to be the part of the story where the chaplain helped.
+
+She means this. The warmth in her voice when she says *helped* is the first unstructured warmth she has shown on this ship. It is brief. It is real.`,
+    onEnter: () => {
+      S.applyEffect({ vigilance: 1 });
+      S.setFlag('kylie_knows_truth');
+      S.modReputation('kylie', 3);
+    },
+    choices: [
+      {
+        text: '"Then let me help."',
+        next: 'kylie_alliance',
+        requires_flag: 'mission_reality_known',
+      },
+      {
+        text: '"I understand."',
+        next: 'main_deck_hub',
+      },
+    ],
+  },
+
+  kylie_alliance: {
+    id: 'kylie_alliance', location: 'Mess Hall — Night', mood: 'neutral',
+    text: `Something changes in her face. Not relief exactly — she is too professional for relief — but something adjacent to it.
+
+— Good. She says.
+
+She reopens the notebook.
+
+— Tell me what you know about the archive. Everything. I will record it separately from my other notes, in a format that can be transmitted.
+
+She looks up.
+
+— If something goes wrong with the radio. She says. — I have other ways to get material off this ship. I have been doing this for a long time.
+
+She taps the notebook.
+
+— Talk.`,
+    onEnter: () => {
+      S.setFlag('kylie_in_alliance');
+      S.setFlag('mission_refused');
+      S.modReputation('kylie', 4);
+      S.incrementTheosis(4);
+      S.applyEffect({ communion: 2 });
+      S.showToast('Kylie knows. She is recording.', 'note');
+    },
+    choices: [
+      { text: 'Tell her everything.', next: 'main_deck_hub' },
+    ],
+  },
+
+  kylie_act_two_truth: {
+    id: 'kylie_act_two_truth', location: 'Mess Hall — Night', mood: 'neutral',
+    text: `She is quiet for a long moment.
+
+— No. She repeats. As if verifying the word.
+
+— No.
+
+She looks at you for a while. Then she nods. Once. A different kind of acknowledgment than she has given anything else on this ship.
+
+— Then we have the same problem. She says. — And possibly the same solution.
+
+She opens the notebook.
+
+— Tell me about the archive. All of it. Everything you've seen.`,
+    onEnter: () => {
+      S.setFlag('kylie_in_alliance');
+      S.setFlag('mission_refused');
+      S.modReputation('kylie', 5);
+      S.incrementTheosis(6);
+      S.applyEffect({ communion: 2 });
+      S.degradeCover(2);
+      S.showToast('Cover blown. Kylie knows.', 'warning');
+    },
+    choices: [
+      { text: 'Tell her everything.', next: 'main_deck_hub' },
+    ],
+  },
+
+  // ── CONNIE FRANK: MEDICAL EMERGENCY ──────────────────────────────
+  // Alexei collapses during the anomaly peak. Connie is the doctor.
+  // The chaplain is needed. This is what a chaplain is for.
+
+  connie_emergency: {
+    id: 'connie_emergency', location: "Alexei's Cabin", mood: 'tense',
+    art: 'portrait_connie',
+    text: `Connie comes for you at 3am.
+
+She does not explain on the way. You follow her down the companionway, through the forward passage, to Alexei's cabin. The anomaly has been at its peak for six hours.
+
+Alexei is on his bunk. His instruments — he keeps a portable unit in his cabin — are still running. He is not looking at them. He is looking at the ceiling.
+
+— He is not in danger. Connie says, quietly, at the door. — Physiologically. His blood pressure is elevated. He is exhausted. He has not slept in thirty-six hours because the instruments kept alerting.
+
+She looks at him.
+
+— He is also very frightened. She says. — Which is not a medical diagnosis. But it is accurate.
+
+She steps back.
+
+— He won't talk to me about it. She says. — That is what chaplains are for.`,
+    onEnter: () => {
+      S.setFlag('connie_emergency_happened');
+      S.applyEffect({ communion: 1 });
+      S.modReputation('connie', 3);
+    },
+    choices: [
+      { text: 'Go in.',  next: 'alexei_emergency_cabin' },
+    ],
+  },
+
+  alexei_emergency_cabin: {
+    id: 'alexei_emergency_cabin', location: "Alexei's Cabin", mood: 'uncanny',
+    art: 'portrait_alexei',
+    text: `He looks at you when you come in. He has the expression of a man who has been alone with something for too long.
+
+— The structure below. He says. — I have been measuring it for six hours. It is not getting smaller.
+
+He means the anomaly. He means more than the anomaly.
+
+— In my career. He says. — I have measured things. Things that were there. Things that the models predicted and then confirmed. Things that were surprising but explicable.
+
+He looks at the ceiling.
+
+— This is not any of those. He says. — The structure is enormous. The field it generates is — the readings I am getting require a source that is either very old or very — He stops. — I do not have a scientific word for what I mean. The readings require a source that is *aware* of being measured.
+
+He looks at you.
+
+— Is that possible? He asks. — Theologically.`,
+    onEnter: () => {
+      S.incrementTheosis(5);
+      S.setFlag('alexei_emergency_talked');
+      S.modReputation('alexei', 4);
+    },
+    choices: [
+      {
+        text: '"Gregory Palamas would say: yes. And no. And the distinction is everything."',
+        next: 'alexei_palamas',
+        theosis: 4,
+      },
+      {
+        text: "'I do not know. But the question is correct.'",
+        next: 'alexei_honest_answer',
+        theosis: 2,
+      },
+      {
+        text: 'Sit with him. No answer yet.',
+        next: 'alexei_sit_together',
+        theosis: 3,
+        composure: 1,
+      },
+    ],
+  },
+
+  alexei_palamas: {
+    id: 'alexei_palamas', location: "Alexei's Cabin", mood: 'uncanny',
+    text: `He sits up slightly.
+
+You tell him about the distinction between the divine essence and the divine energies. The essence unknowable, unreachable, utterly beyond. The energies: real, participable, present in creation. Not the same as the thing itself. The light on Tabor. The field that makes certain things more likely. The anomaly that pulls the compass off true north.
+
+He listens with the focus of someone who has been waiting for the right language.
+
+— So the field. He says. — Is not God. But is — a property of — a medium through which—
+
+— Something like that.
+
+He looks at his instruments.
+
+— Then measuring it. He says slowly. — Would be—
+
+— Participating in it. Yes.
+
+He is quiet for a long time.
+
+— I have been doing that for thirty years. He says. — Without knowing I was doing that.
+
+He lies back.
+
+— I think I can sleep now. He says.`,
+    onEnter: () => {
+      S.incrementTheosis(8);
+      S.modReputation('alexei', 5);
+      S.applyEffect({ communion: 2 });
+      if (S.G.worldState) S.G.worldState.sanctity = Math.min(10, S.G.worldState.sanctity + 2);
+      S.setFlag('alexei_palamas_told');
+    },
+    choices: [
+      { text: 'Stay until he sleeps.', next: 'alexei_sleeps', theosis: 2, composure: 1 },
+      { text: 'Leave him to it.',       next: 'main_deck_hub' },
+    ],
+  },
+
+  alexei_honest_answer: {
+    id: 'alexei_honest_answer', location: "Alexei's Cabin", mood: 'uncanny',
+    text: `He looks at you for a moment. Then nods.
+
+— That is the most useful thing anyone has said to me in six hours. He says. — Including myself.
+
+He sits up.
+
+— The question being correct. He says. — That is already something.
+
+He looks at his instruments.
+
+— I will continue measuring. He says. — If the question is correct, the measurements are also correct. They are — measuring something real.
+
+He seems steadier. Not resolved. Steadied.
+
+— Thank you. He says. — That is what chaplains are for, I suppose.`,
+    onEnter: () => {
+      S.incrementTheosis(5);
+      S.modReputation('alexei', 4);
+      S.applyEffect({ communion: 1 });
+    },
+    choices: [
+      { text: 'Stay until he sleeps.', next: 'alexei_sleeps', theosis: 2 },
+      { text: 'Leave him to it.',       next: 'main_deck_hub' },
+    ],
+  },
+
+  alexei_sit_together: {
+    id: 'alexei_sit_together', location: "Alexei's Cabin", mood: 'uncanny',
+    text: `You sit in the chair by his bunk.
+
+He doesn't say anything for a long time. The instruments run. The anomaly continues.
+
+After a while his breathing slows.
+
+After a while longer he says: — Do you think it knows we are here?
+
+— I think. Yes.
+
+— Good. He says. — That is good.
+
+He closes his eyes. He does not sleep immediately. But he stops being alone with it.
+
+That is enough.`,
+    onEnter: () => {
+      S.incrementTheosis(6);
+      S.modReputation('alexei', 5);
+      S.applyEffect({ composure: 2, communion: 2 });
+      S.offerSounding('sounding_solidarity');
+    },
+    choices: [
+      { text: 'Stay until he sleeps.', next: 'alexei_sleeps' },
+    ],
+  },
+
+  alexei_sleeps: {
+    id: 'alexei_sleeps', location: 'Corridor', mood: 'neutral',
+    text: `Connie is in the corridor.
+
+She looks at you. She looks at the cabin door.
+
+— He is sleeping. You tell her.
+
+She nods. She writes something in her small notebook — not the medical one.
+
+— That. She says, without looking up. — Was the chaplain thing.
+
+She puts the notebook away.
+
+— Not the cover. She says. — The actual thing.
+
+She goes back to her own cabin. The corridor is quiet. The instruments in Alexei's cabin are still running. The ship is still measuring.`,
+    onEnter: () => {
+      S.incrementTheosis(4);
+      S.modReputation('connie', 5);
+      S.applyEffect({ composure: 2 });
+      S.setFlag('connie_saw_chaplain');
+      if (S.G.worldState) S.G.worldState.socialTrust = Math.min(10, S.G.worldState.socialTrust + 2);
+    },
+    choices: [
+      { text: 'Go to the main deck.', next: 'main_deck_hub' },
+    ],
+  },
+
   // ─────────────────────────────────────────────────────────────
   // ENDINGS
   // ─────────────────────────────────────────────────────────────
 
   ending_erasure: {
     id: 'ending_erasure', location: 'Hold', mood: 'uncanny',
-    text: `The instructions were clear. You followed them.
-
-The materials were in the cabinet. Othis gave you the key once you showed him the envelope. He didn't look at you after. He went up to the deck and stood at the rail.
-
-The archive burned slowly. Paper that has lasted thirty years does not go easily.
-
-Alexei stayed in the instrument room throughout. His instruments were still measuring. Even at the end, the ship was doing what she was built for.
-
-Pavel was on the foredeck. He did not watch the smoke.
-
-Miguel stood at the wheel. The ship continued north.
-
-The dawn, when it came, was ordinary. Nothing had happened to it.
-
-The ship will have a different name in the documents now. A different history. The history it had — thirty years of finding, of measuring, of sharing what it found with the world — is over.
-
-You made a crossing.
-
-━━━━━━━━━━━━━━━━━━━━━━━━
-  ERASURE
-━━━━━━━━━━━━━━━━━━━━━━━━`,
+    get text() {
+      const lines = [];
+      lines.push(`The instructions were clear. You followed them.`);
+      lines.push(`The materials were in the cabinet. Othis gave you the key once you showed him the envelope. He didn't look at you after. He went up to the deck and stood at the rail.`);
+      lines.push(`The archive burned slowly. Paper that has lasted thirty years does not go easily.`);
+      if (S.hasFlag('alexei_emergency_talked')) {
+        lines.push(`Alexei stayed in the instrument room throughout. Earlier you had sat with him when the anomaly frightened him. He had said: I think I can sleep now. He did not sleep. His instruments were still measuring.`);
+      } else {
+        lines.push(`Alexei stayed in the instrument room throughout. His instruments were still measuring. Even at the end, the ship was doing what she was built for.`);
+      }
+      if (S.hasFlag('met_oblong')) {
+        lines.push(`Oblong Vassilithune was not visible. He was not visible before the burning either. Whether he saw it or not is unclear.`);
+      }
+      lines.push(`Pavel was on the foredeck. He did not watch the smoke.`);
+      lines.push(`Miguel stood at the wheel. The ship continued north.`);
+      if (S.hasFlag('lena_volkov_told')) {
+        lines.push(`In the galley, Lena made breakfast. She made it the same way she always made it. She knew what had happened. She made breakfast anyway. The cook before her had checked the bilge every morning. That was his way of paying attention.`);
+      }
+      lines.push(`The dawn, when it came, was ordinary. Nothing had happened to it.`);
+      lines.push(`The ship will have a different name in the documents now. The history it had — thirty years of finding, of measuring, of sharing — is over.`);
+      lines.push(`You made a crossing.`);
+      lines.push(`━━━━━━━━━━━━━━━━━━━━━━━━\n  ERASURE\n━━━━━━━━━━━━━━━━━━━━━━━━`);
+      return lines.join('\n\n');
+    },
     onEnter: () => {
       S.setFlag('ending_erasure_reached');
       S.addJournalEntry({ type: 'ending', text: 'Erasure — the archive is gone.' });
@@ -3399,23 +4114,27 @@ You made a crossing.
 
   ending_witness: {
     id: 'ending_witness', location: 'Hold', mood: 'uncanny',
-    text: `You refused.
-
-Quietly. In the hold, in the dark, with Freezer Beef watching. You moved the most important boxes to a location not on the current manifest. A place Miguel showed you, because Miguel knows this ship in ways the people who chartered it do not.
-
-Othis will discover this. Landstorm will be informed. Consequences will arrive on land.
-
-On land is not here.
-
-The ship is still moving. Alexei is still measuring. Nadia found something in the data this morning that made her go very still and then start writing. Pavel is on the foredeck. The bronze fittings caught the last of the day's light and held it longer than they should have.
-
-The ship will continue under another name in other documents. But the archive is still in the world. Somewhere on a ship built to be transparent, thirty years of finding is still findable.
-
-You witnessed.
-
-━━━━━━━━━━━━━━━━━━━━━━━━
-  WITNESS
-━━━━━━━━━━━━━━━━━━━━━━━━`,
+    get text() {
+      const lines = [];
+      lines.push(`You refused.`);
+      lines.push(`Quietly. In the hold, in the dark, with Freezer Beef watching. You moved the most important boxes to a location not on the current manifest. A place Miguel showed you, because Miguel knows this ship in ways the people who chartered it do not.`);
+      if (S.hasFlag('kylie_in_alliance')) {
+        lines.push(`Kylie recorded everything you told her. The notebook is in her coat. Whatever happens when the ship docks, there are now two accounts.`);
+      }
+      if (S.hasFlag('connie_saw_chaplain')) {
+        lines.push(`Connie Frank will write something in her own report. What she writes will not be about the cargo.`);
+      }
+      lines.push(`Othis will discover this. Landstorm will be informed. Consequences will arrive on land.`);
+      lines.push(`On land is not here.`);
+      lines.push(`The ship is still moving. Alexei is still measuring. Nadia found something in the data this morning that made her go very still and then start writing. Pavel is on the foredeck. The bronze fittings caught the last of the day's light and held it longer than they should have.`);
+      if (S.hasFlag('archive_blessed')) {
+        lines.push(`The archive in its new location has been blessed. You are not sure if that changes anything. You are not sure it does not.`);
+      }
+      lines.push(`The ship will continue under another name in other documents. But the archive is still in the world. Somewhere on a ship built to be transparent, thirty years of finding is still findable.`);
+      lines.push(`You witnessed.`);
+      lines.push(`━━━━━━━━━━━━━━━━━━━━━━━━\n  WITNESS\n━━━━━━━━━━━━━━━━━━━━━━━━`);
+      return lines.join('\n\n');
+    },
     onEnter: () => {
       S.setFlag('ending_witness_reached');
       S.addJournalEntry({ type: 'ending', text: 'Witness — the archive is hidden.' });
@@ -3428,25 +4147,30 @@ You witnessed.
 
   ending_restoration: {
     id: 'ending_restoration', location: 'Instrument Room', mood: 'revelation',
-    text: `The radio — forty years old, original equipment, brass fittings, designed for high-deviation fields — was built for this.
-
-You broadcast what you could. The names. The coordinates. The dates. The photograph at the anomaly, described in words because a radio is not a camera. The names of the scientists — from five countries, across three decades — who had been on this ship. Who had found things. Who had shared what they found.
-
-The anomaly was at its peak. The signal went out in a direction that should not have been possible given the interference. It went anyway. The ship, which does not interfere, made room for it.
-
-Somewhere, someone heard.
-
-Alexei put his hand flat on the brass casing of the radio when the transmission ended. Then went back to his instruments.
-
-Pavel was there. You don't know when he arrived. He said: *yes.* Just that.
-
-Заря was in the anomaly, at the peak, broadcasting the record of everything she had found.
-
-She was doing what she was built for.
-
-━━━━━━━━━━━━━━━━━━━━━━━━
-  RESTORATION
-━━━━━━━━━━━━━━━━━━━━━━━━`,
+    get text() {
+      const lines = [];
+      lines.push(`The radio — forty years old, original equipment, brass fittings, designed for high-deviation fields — was built for this.`);
+      lines.push(`You broadcast what you could. The names. The coordinates. The dates. The photograph at the anomaly, described in words because a radio is not a camera. The names of the scientists — from five countries, across three decades — who had been on this ship. Who had found things. Who had shared what they found.`);
+      if (S.hasFlag('kylie_in_alliance')) {
+        lines.push(`Kylie Matterhorn was outside the instrument room door for the last two hours of the transmission. She was taking her own notes. Whatever she does with them, there are now two records going into the world.`);
+      }
+      if (S.hasFlag('archive_blessed')) {
+        lines.push(`The archive had been blessed before the transmission. The blessing was not a cause of anything. It was a witness. That is what blessing does.`);
+      }
+      lines.push(`The anomaly was at its peak. The signal went out in a direction that should not have been possible given the interference. It went anyway. The ship, which does not interfere, made room for it.`);
+      lines.push(`Somewhere, someone heard.`);
+      if (S.hasFlag('othis_turned')) {
+        lines.push(`Othis stood at the instrument room door for thirty seconds and then went back to his cabin. He did not report what he saw. That was also a choice.`);
+      }
+      lines.push(`Alexei put his hand flat on the brass casing of the radio when the transmission ended. Then went back to his instruments.`);
+      lines.push(`Pavel was there. You don't know when he arrived. He said: *yes.* Just that.`);
+      if (S.hasFlag('anomaly_archive_connected')) {
+        lines.push(`The anomaly below — the structure that Alexei had calculated was aware of being measured — received the transmission on its own frequency. What it does with that is not a question science can answer.`);
+      }
+      lines.push(`Заря was in the anomaly, at the peak, broadcasting the record of everything she had found.\n\nShe was doing what she was built for.`);
+      lines.push(`━━━━━━━━━━━━━━━━━━━━━━━━\n  RESTORATION\n━━━━━━━━━━━━━━━━━━━━━━━━`);
+      return lines.join('\n\n');
+    },
     onEnter: () => {
       S.setFlag('ending_restoration_reached');
       S.addJournalEntry({ type: 'ending', text: 'Restoration — the record goes into the world.' });
@@ -3454,6 +4178,33 @@ She was doing what she was built for.
       S.flashTheosisLight(1.0, 5000);
       S.showToast('Restoration.', 'theosis');
     },
+    choices: [
+      { text: 'After the transmission.', next: 'restoration_after' },
+    ],
+  },
+
+  restoration_after: {
+    id: 'restoration_after', location: 'Foredeck — Dawn', mood: 'revelation',
+    text: `At 4:18am the anomaly begins to recede.
+
+Not all at once. Like water drawing back from a shore. Alexei marks the timestamp. He will write about this for years. He does not know that yet.
+
+The ship is Заря.
+
+She has been Заря since 1952. The documents that call her something else are the documents that are wrong. This has always been true. It is now slightly more true than it was yesterday.
+
+Pavel is on the foredeck facing the bow. You stand beside him. You have been beside him, on and off, for three days.
+
+He does not say anything. After a while, you understand that he is not not-saying anything. There is simply nothing more to say. What was needed to be said has been said, and now it has been transmitted, and now it is in the world.
+
+The horizon lightens.
+
+Haircut sits between you.
+
+Freezer Beef comes up from below, which she rarely does at this hour, and sits on the other side.
+
+The four of you watch the dawn.`,
+    onEnter: () => { S.flashTheosisLight(0.8, 8000); },
     choices: [
       { text: 'Begin a new crossing.', next: '__new_play__' },
     ],
@@ -3517,6 +4268,7 @@ From here you can go anywhere on the ship.`,
     onEnter: () => { S.checkEndings(); },
     choices: [
       { text: 'Foredeck — Pavel is there.',    next: 'foredeck_first',   condition: { type: 'not', condition: { type: 'flag', id: 'met_pavel'  } } },
+      { text: 'Mess hall — someone at the corner table.',  next: 'oblong_first', condition: { type: 'and', conditions: [{ type: 'flag', id: 'met_miguel' }, { type: 'not', condition: { type: 'flag', id: 'met_oblong' } }] } },
       { text: 'Bridge — find the First Mate.', next: 'first_mate_first', condition: { type: 'not', condition: { type: 'flag', id: 'met_miguel' } } },
       { text: 'Bridge.',                        next: 'bridge_hub',       condition: { type: 'flag', id: 'met_miguel' }                            },
       { text: 'Mess hall.',                     next: 'mess_hub'                                                                                   },

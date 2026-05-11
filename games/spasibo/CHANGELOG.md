@@ -1,3 +1,38 @@
+## v1.4 "Full Crossing" — May 2026
+
+### Narrative Completion
+
+All previously missing or stub narrative content is now written and wired.
+
+**Oblong Vassilithune** — 7 scenes. He is at the corner table. He has been at the corner table. He manages the carafe that appears without being placed. He is an observer. He has been on this ship before, in various capacities. He knows the crossing has a specific purpose. He says: the ship knows you are here. That is not a metaphor. He is introduced in both Act One (main deck hub) and Act Two (act_two_begin hub).
+
+**The Stink Patrol** — 2 scenes. Encountered as sounds from below the forward hold — a level of the ship not on the schematic. Lena explains them: warm hands, once, through a hatch. They manage what is below. The ship is stable because they do. Nobody has asked about the other things. That seems like the kind of question that would be rude.
+
+**Vance Landstorm** — 4 scenes (`landstorm_radio_call`, `landstorm_lie`, `landstorm_delay`, `landstorm_silence`). He calls on the standard radio during the anomaly. Three choices: lie smoothly (cover degrades anyway), delay (buys time at cost), or set the receiver down without answering (theosis +4, sets `mission_refused`). The third path requires `mission_reality_known`. The anomaly masks the silence.
+
+**Kylie Matterhorn Act Two** — 5 scenes (`kylie_act_two`, `kylie_act_two_deny`, `kylie_act_two_question`, `kylie_alliance`, `kylie_act_two_truth`). Night, notebook closed. She knows what you are. She has 18 months of groundwork. Her piece requires the archive to arrive intact. Three paths: hold cover (it degrades anyway), ask what she'll do with the truth (she says she'll write it; alliance available), or say outright you're not going to do it (cover blown, full alliance). Kylie in alliance = second backup transmission path.
+
+**Connie Frank medical emergency** — 6 scenes (`connie_emergency`, `alexei_emergency_cabin`, `alexei_palamas`, `alexei_honest_answer`, `alexei_sit_together`, `alexei_sleeps`). Connie comes for you at 3am during the anomaly peak. Alexei has been measuring for 36 hours and is frightened by what he found. The chaplain is needed for the actual thing, not the performance. Three pastoral choices: give him Palamas (essence vs energies, the field as participation — highest theosis grant), give him the honest answer (the question being correct is already something), or sit with him without answering. Connie watches you leave his cabin. *That was the chaplain thing. Not the cover. The actual thing.*
+
+### Dynamic Ending Text
+
+All three main endings now vary based on what happened during the crossing:
+
+- **Erasure**: includes Alexei's night (if you sat with him), Lena making breakfast anyway and her memory of Volkov (if that story was told), Oblong's absence (if met).
+- **Witness**: includes Kylie's notebook (if in alliance), Connie's report (if she saw the chaplain work), the blessing of the archive (if performed).
+- **Restoration**: includes Kylie outside the door (if in alliance), Othis's 30 seconds (if he turned), the anomaly receiving the transmission on its own frequency (if `anomaly_archive_connected` was set).
+
+### Epilogue Scenes
+
+Each ending now has a brief epilogue before "Begin a new crossing":
+
+- **Erasure → `erasure_memorial`**: The smoke is gone. The sea absorbed it. The anomaly is still measurable. Something remains to be decided. Not now.
+- **Witness → `witness_morning`**: Nadia slides a coffee toward your seat without being asked. That is a kind of speaking.
+- **Restoration → `restoration_after`**: The ship is Заря. She has been Заря since 1952. The documents that call her something else are wrong. The four of you — player, Pavel, Haircut, Freezer Beef — watch the dawn.
+
+### Scene Count
+165 defined scenes. 0 referenced-but-missing. Game is complete for personal testing.
+
 ## v1.3 "Sounding" — May 2026
 
 ### Toast System Overhaul
