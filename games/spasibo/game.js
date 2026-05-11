@@ -37,6 +37,18 @@ S.registerNameMapping('Nadia',  'Nadya',   'Nadia',   'Надежда');
 S.registerNameMapping('The Dawn', 'Zarya', 'Zarya',   'Заря');
 
 S.setAvailableModes(['attended', 'witnessed']);
+S.setModeDescriptions({
+  attended: {
+    name: 'Attended',
+    short: 'The crossing as it is lived.',
+    long: 'You are present in the crossing. Your choices, your cover, your pastoral acts — they accumulate and have weight. What you do on this ship matters to the people on it, and the consequences of your actions will be visible in how things resolve. This is the standard mode. The difficulty is the difficulty of actually being somewhere.',
+  },
+  witnessed: {
+    name: 'Witnessed',
+    short: 'The crossing as it is observed.',
+    long: 'You are watching rather than acting. The major decisions of the crossing are determined by the system — by your theosis, your flags, your accumulated history — rather than by explicit choices at branching points. What you did in previous crossings becomes the story. This mode is for players who have been on this ship before and want to see what the world has made of them.',
+  },
+});
 
 // Compass axes — magnetic deviation between true north and instrument north
 S.registerCompassAxes('True', 'Mag');
@@ -181,34 +193,34 @@ S.registerCharisms(
     {
       id:     'confessor',
       name:   'The Confessor',
-      desc:   'People tell you things they shouldn\'t.',
-      effect: 'Unlocks dialogue branches where characters confess unprompted.',
+      desc:   'People tell you things they shouldn\'t. You have never been entirely sure why. There is something in how you listen — or in what you do not do while listening — that opens the interior of a room before you have been invited in.',
+      effect: 'Some conversations go further than they would for others.',
     },
     {
       id:     'faster',
       name:   'The Faster',
-      desc:   'You have trained the body\'s hunger into a tool.',
-      effect: 'Stillness actions cost nothing. The body does not protest.',
+      desc:   'You have trained the body\'s hunger into a particular kind of attention. What most people experience as depletion you have learned to experience as clarity. The body\'s protest has become, over time, a frequency you can tune.',
+      effect: 'Acts of stillness and restraint carry a different weight.',
     },
     {
       id:     'fool',
       name:   'The Fool',
-      desc:   'You say the wrong thing and it turns out to be right.',
-      effect: 'Occasional positive outcomes on failed rolls.',
+      desc:   'The correct thing to say is often not the thing you say. What you say instead occasionally turns out to be more correct than the correct thing. You have stopped trying to understand this. It has not stopped happening.',
+      effect: 'Failure sometimes opens what success would have closed.',
     },
     {
       id:     'healer',
       name:   'The Healer',
-      desc:   'You know what people need before they name it.',
-      effect: 'Unlocks Connie Frank friendship track. Medical assistance options.',
+      desc:   'Before someone tells you what they need, you already know. Not always. Often enough that it has shaped how you move through rooms, how you time silences, what you notice first when you arrive somewhere new.',
+      effect: 'What people carry becomes more visible to you than it is to them.',
     },
   ],
   [
-    { id: 'sleeper',    name: 'The Sleeper',    desc: 'You forgot. Almost everything. But something stayed.',        effect: 'Occasional flashes from the last crossing.',                             requires_playcount: 1 },
-    { id: 'penitent',   name: 'The Penitent',   desc: 'You know what you did.',                                     effect: 'Past-life flags alter scene text.',                                      requires_playcount: 1 },
-    { id: 'witness',    name: 'The Witness',    desc: 'You saw something last time. You\'re not sure what.',         effect: 'Map memory persists between crossings.',                                requires_playcount: 1 },
-    { id: 'prophet',    name: 'The Prophet',    desc: 'You see through the anomaly.',                               effect: 'Interference scenes reveal additional text.',                            requires_playcount: 1 },
-    { id: 'rememberer', name: 'The Rememberer', desc: 'You have been on this ship before.',                         effect: 'Significant scene alterations. Pavel speaks in Cyrillic from the first.', requires_playcount: 2 },
+    { id: 'sleeper',    name: 'The Sleeper',    desc: 'You forgot almost everything. The body forgets. Something else did not quite forget — something you cannot name or locate, only notice at the edges of recognition.',                                           effect: 'Occasional flashes from the last crossing surface at unexpected moments.',   requires_playcount: 1 },
+    { id: 'penitent',   name: 'The Penitent',   desc: 'You know what you did. This is not the same as understanding it. You carry the specific weight of specific actions. It is very precise. It has changed how you move through rooms.',                                         effect: 'The world registers what was done before. Some of it is visible in how things are.',  requires_playcount: 1 },
+    { id: 'witness',    name: 'The Witness',    desc: 'You were there last time. Something in your body retained the geography — where things were, how to get between them — without you consciously holding it. The ship feels partially familiar in a way you cannot account for.', effect: 'You arrive knowing the layout. Some things do not need to be found again.',      requires_playcount: 1 },
+    { id: 'prophet',    name: 'The Prophet',    desc: 'The anomaly did something to your perception that did not fully reverse when the crossing ended. You see through interference that others experience as obstruction. What this reveals is not always comfortable.',             effect: 'The field shows you things that are not available to the untuned.',            requires_playcount: 1 },
+    { id: 'rememberer', name: 'The Rememberer', desc: 'You have been on this ship before. Not metaphorically. The crossing is not new to you — it is recurring. This changes what Pavel is willing to say in your presence, and what the ship is willing to show.',                 effect: 'The crossing has a different texture. Some things have been waiting for you.', requires_playcount: 2 },
   ]
 );
 
@@ -258,6 +270,14 @@ S.registerSounding('sounding_history', {
   stat: 'composure', statDelta: 1,
 });
 
+S.registerSounding('sounding_sobornost', {
+  id:   'sounding_sobornost',
+  name: 'On conciliarity',
+  text: 'The ship was built to measure without interfering. Many instruments, many hands across thirty years, many countries. One field. The old word is sobornost — conciliarity, the unity of a council, many voices in which no voice is erased. Not consensus. Something more demanding than consensus: full presence of all, without any being dissolved into the whole.',
+  theosis: 8,
+  stat: 'communion', statDelta: 2,
+});
+
 S.registerSounding('sounding_solidarity', {
   id:   'sounding_solidarity',
   name: 'On the body of suffering',
@@ -282,6 +302,21 @@ S.registerAmbientEvent({
   weight: 0.06,
   oncePerCrossing: true,
   text: 'The bronze fittings hum. Not loudly. More like a frequency the inner ear catches before the outer one does. Haircut watches the bowsprit. Unblinking.',
+});
+
+S.registerAmbientEvent({
+  id: 'freezer_beef_tests',
+  weight: 0.07,
+  oncePerCrossing: true,
+  condition: { type: 'flag', id: 'hold_visited' },
+  text: 'Freezer Beef has relocated to your cabin. She is on your bunk. She is in the exact centre. She looks at you when you come in with the expression of someone who has made a logistical assessment and reached a conclusion.',
+});
+
+S.registerAmbientEvent({
+  id: 'freezer_beef_mission',
+  weight: 0.09,
+  condition: { type: 'and', conditions: [{ type: 'flag', id: 'hold_sat' }, { type: 'flag', id: 'hold_witnessed' }] },
+  text: 'Freezer Beef is on your lap. She arrived while you were sitting still and made the decision without consultation. She has arranged herself with maximum surface area contact and is emitting a low vibration. She is asleep. This is apparently her mission now.',
 });
 
 S.registerAmbientEvent({
@@ -381,6 +416,17 @@ S.registerCoverChallenge('posting', [
   {
     prompt: 'Connie is asking about your clinical experience — the specifics, the protocols. She has an MD and she is listening carefully.',
     stat: 'composure',
+  },
+]);
+
+S.registerCoverChallenge('left', [
+  {
+    prompt: 'Connie asks, not unkindly: "What did you leave behind? Not the thing. The cost of leaving it."',
+    stat: 'composure',
+  },
+  {
+    prompt: 'Kylie, notebook open: "Everyone on this ship is running from something. What are you running from?"',
+    stat: 'vigilance',
   },
 ]);
 
@@ -486,14 +532,12 @@ S.registerEnding({
 });
 
 // Restoration: transmitted the archive into the world.
-// Requires: archive_transmitted + theosis >= 66 + radio team assembled.
-// The theosis gate ensures this isn't reached by accident — you had
-// to have become someone capable of understanding what needed doing.
+// Requires: archive_transmitted + theosis >= 66.
+// radio_team_assembled adds to ending text but is not required.
 S.registerEnding({
   id: 'restoration', priority: 10,
   condition: { type: 'and', conditions: [
     { type: 'flag',    id: 'archive_transmitted' },
-    { type: 'flag',    id: 'radio_team_assembled' },
     { type: 'theosis', min: 66 },
   ]},
   scene: 'ending_restoration',
@@ -506,7 +550,7 @@ S.registerEnding({
   id: 'the_knowing', priority: 20,
   condition: { type: 'and', conditions: [
     { type: 'charism', id: 'rememberer' },
-    { type: 'theosis', min: 90 },
+    { type: 'theosis', min: 85 },
     { type: 'flag',    id: 'archive_transmitted' },
     { type: 'flag',    id: 'radio_team_assembled' },
   ]},
@@ -559,7 +603,8 @@ A figure on the foredeck, despite the cold. Small. Gesturing. Apparently talking
 There is something about open water that loosens the categories. Not destroys them. Loosens them. The things you have been told about yourself feel, from here, like clothes you put on in someone else's house.
 
 This will pass once you have coffee. For now: the water. The grey.`,
-    onEnter: () => { S.offerSounding('sounding_crossing'); },
+    onEnter: () => {       S.progressSounding('sounding_crossing', 2);
+S.offerSounding('sounding_crossing'); },
     choices: [
       { text: 'Go up to the foredeck.',   next: 'foredeck_first' },
       { text: 'Open the letter.',          next: 'cabin_letter'   },
@@ -1050,7 +1095,8 @@ After a while:
 — The ship likes to be listened to. Most people don't bother.
 
 She hands you something wrapped in bread — warm, slightly oily, perfect — without explanation.`,
-    onEnter: () => { S.modReputation('lena', 2); S.offerSounding('sounding_crossing'); },
+    onEnter: () => {       S.progressSounding('sounding_crossing', 2);
+S.modReputation('lena', 2); S.offerSounding('sounding_crossing'); },
     choices: [
       { text: 'Eat. Stay.',             next: 'lena_tenure'   },
       { text: 'Thank her and go.',       next: 'main_deck_hub' },
@@ -1196,6 +1242,7 @@ The scientist's observations, and beside them, in the margins, small notes by th
     choices: [
       { text: 'Read the later logs.',                next: 'chartroom_late_logs' },
       { text: 'Look at the current documentation.',  next: 'chartroom_current'   },
+      { text: 'Return to the chart room entrance.', next: 'chart_room_first'    },
       { text: 'Return to the main deck.',            next: 'main_deck_hub'       },
     ],
   },
@@ -1218,7 +1265,8 @@ You do not open it yet.`,
     },
     choices: [
       { text: 'Open the final manifest.',  next: 'chartroom_manifest' },
-      { text: 'Leave it. Come back.',       next: 'main_deck_hub'     },
+      { text: 'Return to the 1957 logs.',  next: 'chartroom_1957'     },
+      { text: 'Leave it. Come back.',      next: 'main_deck_hub'      },
     ],
   },
 
@@ -1242,9 +1290,10 @@ You put it back.`,
       S.showToast('Something becomes clear.', 'theosis');
     },
     choices: [
-      { text: 'Go to the hold. Now.',              next: 'hold_first'    },
-      { text: 'Find Lena. Ask what she knows.',    next: 'galley_first'  },
-      { text: 'Say nothing yet.',                  next: 'main_deck_hub' },
+      { text: 'Go to the hold.',                   next: 'hold_first'        },
+      { text: 'Find Lena. Ask what she knows.',    next: 'galley_first'      },
+      { text: 'Return to the earlier logs.',        next: 'chartroom_1957'   },
+      { text: 'Go to the main deck.',              next: 'main_deck_hub'     },
     ],
   },
 
@@ -1401,6 +1450,35 @@ Something in it is different.`,
     },
     choices: [
       { text: 'Go up.', next: 'main_deck_hub' },
+      {
+        text: 'Empty something you have been carrying. Let the water have it.',
+        next: 'kenosis_act',
+        requires_charism: 'faster',
+        condition: { type: 'not', condition: { type: 'flag', id: 'kenosis_performed' } },
+      },
+    ],
+  },
+
+  kenosis_act: {
+    id: 'kenosis_act', location: 'Hold', mood: 'uncanny',
+    text: `You are not sure what you let go of. That is the nature of letting go of something you have been carrying for long enough that you stopped noticing it was there.
+
+The hold is the same hold. Freezer Beef is on her box. The archive is in its boxes.
+
+The weight is different.
+
+Not less. Different. Something that was vertical has become horizontal. Something that was compressed has spread out to the size of its actual surface area, which is larger than you thought.
+
+Freezer Beef is watching you with the patience of someone who has been waiting for this specifically.`,
+    onEnter: () => {
+      S.incrementTheosis(6);
+      S.applyEffect({ doubt: -3, composure: 3 });
+      S.setFlag('kenosis_performed');
+      S.progressSounding('sounding_forgiveness', 4);
+      S.showToast('Something released.', 'theosis');
+    },
+    choices: [
+      { text: 'Go up.', next: 'main_deck_hub' },
     ],
   },
 
@@ -1426,8 +1504,9 @@ You stand in the hold for a long time with this photograph.`,
     },
     choices: [
       { text: 'Put it back carefully. Go find Miguel.',  next: 'miguel_photo_return' },
-      { text: 'Keep the photograph.',                    next: 'main_deck_hub', set_flag: 'photo_kept', give_item: 'zarya_photograph' },
-      { text: 'Put it back. Seal the box.',              next: 'main_deck_hub'       },
+      { text: 'Keep the photograph.',                    next: 'hold_first', set_flag: 'photo_kept', give_item: 'zarya_photograph' },
+      { text: 'Look at the other boxes.',                next: 'hold_boxes'           },
+      { text: 'Put it back. Go up.',                     next: 'main_deck_hub'       },
     ],
   },
 
@@ -1500,6 +1579,7 @@ He looks at the horizon again.
 
 The ship moves under you both.`,
     onEnter: () => {
+      S.progressSounding('sounding_forgiveness', 2);
       S.setFlag('mission_refused');
       S.incrementTheosis(5);
       S.showToast('The crossing shifts.', 'theosis');
@@ -1756,6 +1836,12 @@ She looks at you steadily.
 
   connie_honest: {
     id: 'connie_honest', location: 'Mess Hall', mood: 'neutral',
+    onEnter: () => {
+      if (S.G.cover.left && !S.hasFlag('left_challenged')) {
+        S.setFlag('left_challenged');
+        setTimeout(() => S.startCoverChallenge('left'), 500);
+      }
+    },
     text: `She looks at you for a moment.
 
 — That's the most honest thing anyone's said to me since we left port. She says. — I find that concerning and refreshing in equal measure.
@@ -2037,7 +2123,12 @@ In the far corner: a locked cabinet. The label says, in someone's handwriting: *
 Alexei is taking notes. Very quiet.
 
 You stand together in the small room with the singing instruments and the uncertain air, and for a while nothing is required except to be there.`,
-    onEnter: () => { S.incrementTheosis(5); S.applyEffect({ composure: 2 }); S.offerSounding('sounding_history'); },
+    onEnter: () => {
+      S.incrementTheosis(5);
+      S.applyEffect({ composure: 2 });
+      S.offerSounding('sounding_history');
+      if (S.G.theosis >= 66) S.offerSounding('sounding_sobornost');
+    },
     choices: [
       { text: 'Ask about the locked cabinet.',  next: 'alexei_cabinet' },
       { text: 'Return to the main deck.',        next: 'main_deck_hub'  },
@@ -2249,13 +2340,7 @@ You have not decided what you are going to do.`,
     ],
   },
 
-  act_two_placeholder: {
-    id: 'act_two_placeholder', location: 'The Crossing', mood: 'uncanny',
-    text: `Day Two continues. The anomaly deepens. There are things that need doing.`,
-    choices: [
-      { text: 'Go to the main deck.', next: 'main_deck_hub' },
-    ],
-  },
+
 
   // ── ACT TWO: THE CROSSING ──────────────────────────────────────
   // Sequence 1: Anomaly Peak
@@ -2978,7 +3063,7 @@ The ship continues on its heading. The crossing is ending.`,
     onEnter: () => {
       // Pre-set the routing flag so the single choice knows where to go
       const t = S.G.theosis;
-      const transmitted = S.hasFlag('archive_transmitted') && S.hasFlag('radio_team_assembled');
+      const transmitted = S.hasFlag('archive_transmitted');
       const refused = S.hasFlag('mission_refused');
       if (transmitted && t >= 66) {
         S.setFlag('_route_restoration');
@@ -3446,7 +3531,8 @@ After a while he says:
 He wipes his mouth. He stands. He leaves. His plate is clean.
 
 The carafe is gone. You are not sure when it left.`,
-    onEnter: () => { S.incrementTheosis(5); S.applyEffect({ composure: 1 }); S.setFlag('oblong_silence_sat'); },
+    onEnter: () => {       S.progressSounding('sounding_crossing', 2);
+S.incrementTheosis(5); S.applyEffect({ composure: 1 }); S.setFlag('oblong_silence_sat'); },
     choices: [
       { text: 'Go to the main deck.', next: 'main_deck_hub' },
     ],
@@ -4187,24 +4273,67 @@ She goes back to her own cabin. The corridor is quiet. The instruments in Alexei
     id: 'restoration_after', location: 'Foredeck — Dawn', mood: 'revelation',
     text: `At 4:18am the anomaly begins to recede.
 
-Not all at once. Like water drawing back from a shore. Alexei marks the timestamp. He will write about this for years. He does not know that yet.
+Not all at once. Like water drawing back from a shore. Alexei marks the timestamp in his deviation log. He writes, beside the number: *received.* This is not a scientific annotation. He makes it anyway.
 
 The ship is Заря.
 
-She has been Заря since 1952. The documents that call her something else are the documents that are wrong. This has always been true. It is now slightly more true than it was yesterday.
+She has been Заря since 1952. The documents that call her something else are the documents that are wrong. This has always been true. It is now slightly more true than it was yesterday, in the sense that the truth has now been transmitted.
 
-Pavel is on the foredeck facing the bow. You stand beside him. You have been beside him, on and off, for three days.
+The morning after:
 
-He does not say anything. After a while, you understand that he is not not-saying anything. There is simply nothing more to say. What was needed to be said has been said, and now it has been transmitted, and now it is in the world.
+Alexei goes to his cabin and sleeps for eleven hours. Before he does, he leaves his deviation log open on the chart table to the page with the timestamp. He does not close it.
+
+Nadia is at breakfast when you come in. She does not look up. But the data she submitted to the standard channels last night contained, appended to the standard measurements, a full description of the anomaly, the archive, the transmission, and the scientists whose names were broadcast. She filed it under *supplemental observations.* It will be found.
+
+Miguel is at the wheel. He is looking at the horizon the way someone looks at something they have agreed to trust, but differently than before. The agreement is different. It is no longer provisional.
+
+Lena made something in the night — not a meal, something smaller. It is on the mess table when you pass through: a small arrangement of items from the galley that is not quite a shrine and not quite not. She has already gone back to the galley. You do not see her take it down.
+
+Kylie Matterhorn is in her cabin, writing. The door is open for the first time. You do not go in.
+
+Othis is on the aft deck, facing away from the ship. He stays there for most of the morning. He is not monitoring anything. He has nothing left to monitor.
+
+Pavel is on the foredeck facing the bow. You stand beside him. You have been beside him, on and off, for three days. He does not say anything. After a while you understand that he is not not-saying anything. There is nothing more that needs to be said.
 
 The horizon lightens.
 
 Haircut sits between you.
 
-Freezer Beef comes up from below, which she rarely does at this hour, and sits on the other side.
+Freezer Beef comes up from below, which she rarely does at this hour, and sits on your lap, which she has decided is her mission. She is asleep before the sun fully clears the horizon.
 
-The four of you watch the dawn.`,
+The four of you watch the dawn.
+
+The transmission is in the world. Somewhere on the frequencies that use anomaly deviation as a carrier, it is still going. The field does not have an off switch.
+
+The ship holds her course.
+
+She is doing what she was built for.`,
     onEnter: () => { S.flashTheosisLight(0.8, 8000); },
+    choices: [
+      { text: 'The real Zarya.', next: 'zarya_real_history' },
+    ],
+  },
+
+  // ── THE REAL ZARYA ─────────────────────────────────────────────
+  zarya_real_history: {
+    id: 'zarya_real_history', location: 'The Record', mood: 'neutral',
+    text: `The real Zarya.
+
+Built in Finland in 1952 by the Wärtsilä shipyard, for the Academy of Sciences of the Soviet Union. She was non-magnetic throughout — pine, spruce, oak, brass fastenings, bronze fittings. No iron, or almost none. She was designed to measure the Earth's magnetic field without distorting it.
+
+She did this for thirty years.
+
+She sailed the Atlantic, the Pacific, the Arctic, the Mediterranean, the Indian Ocean. She mapped magnetic anomalies — places where the field diverges from the model, where unmapped mountains or unusual rock formations beneath the seafloor pull the compass off true north. She measured things nobody had measured. She corrected charts that sailors used. She found anomalies at the Mid-Atlantic Ridge that contributed to the scientific understanding of seafloor spreading and plate tectonics.
+
+She was crewed by Soviet scientists and sailors, and she shared her data. During the decades of the Cold War, when scientific information was routinely classified and access was restricted, the Zarya's measurements were made available to researchers in Finland, in Germany, in Japan, in the United States, in Poland, in France. The geomagnetic field does not respect political borders. The Zarya proceeded on this basis.
+
+She was a ship of the Soviet Academy of Sciences, and she was one of the most internationally cooperative scientific ventures of the twentieth century. Both of these things are true.
+
+Her final research cruise was in 1982. After the dissolution of the Soviet Union, funding for the Academy of Sciences collapsed. The Zarya was sold. She was eventually scrapped.
+
+The research she conducted contributed to every major atlas of Earth's magnetic field produced in the second half of the twentieth century. Her measurements are still used. The anomalies she found are still there.
+
+Her name means dawn.`,
     choices: [
       { text: 'Begin a new crossing.', next: '__new_play__' },
     ],
@@ -4350,7 +4479,7 @@ S.on('newPlay', () => {
   // but ensure waking charism assignment uses the post-tax value
   if (S.G.playCount <= 1) return;
   const t = S.G.theosis;
-  const id = t >= 90 ? 'rememberer' : t >= 71 ? 'prophet' : t >= 46 ? 'witness' : t >= 20 ? 'penitent' : 'sleeper';
+  const id = t >= 85 ? 'rememberer' : t >= 71 ? 'prophet' : t >= 46 ? 'witness' : t >= 20 ? 'penitent' : 'sleeper';
   const sleeping = S.G.charisms.filter(c => ['confessor','faster','fool','healer'].includes(c));
   S.G.charisms = [...new Set([...sleeping, id])];
 });
@@ -4391,24 +4520,30 @@ S.on('theosisChanged', (val) => {
 // ─────────────────────────────────────────────────────────────────
 
 S.setTutorialContent(`
-  <div class="tutorial-h">The Crossing</div>
-  <div class="tutorial-item" style="font-style:italic;color:var(--cold-dim);margin-bottom:1.2rem">
-    You are on a ship. You don't entirely remember how you got here, but you know what you're supposed to do. You may not end up doing it.
+  <div style="font-family:'GOST type B','Share Tech Mono',monospace;font-size:.62rem;color:var(--cold-dim);letter-spacing:.12em;margin-bottom:1.4rem;white-space:pre;line-height:1.3">      |    |    |
+     )_)  )_)  )_)
+    )___))___))___)\\
+   )____)____)_____)\\\\ 
+  ___|____|____|____\\\\\\__
+ --\\                    /--
+  ~ ~~~  ~~  ~~~  ~~  ~~ ~</div>
+  <div class="tutorial-item" style="font-style:italic;color:var(--fg);margin-bottom:1.1rem;line-height:1.9">
+    You are on a ship in the North Atlantic. You have a mission. You also have, or are beginning to have, something that will complicate it.
   </div>
-  <div class="tutorial-item">
-    <span class="key">Bearing / Stillness / Solidarity / Static</span> — the four stats at the top. They shift with your choices. Static rises when you're performing something you don't believe. Stillness rises when you stop performing.
+  <div class="tutorial-item" style="color:var(--dim);font-size:.82rem;line-height:1.75;margin-bottom:.7rem">
+    The ship is called The Dawn in the current documentation. Its name before that was different. Whether a ship can remember its own name is a question the game will not answer directly.
   </div>
-  <div class="tutorial-item">
-    <span class="key">Cover</span> — you are posing as a chaplain. Your cover is built through conversation, not through a menu. Be consistent. People are watching.
+  <div class="tutorial-item" style="color:var(--dim);font-size:.82rem;line-height:1.75;margin-bottom:.7rem">
+    Your cover — chaplain — is established through conversation, not menus. What you say shapes who you are. This will matter later, and in ways that are not immediately legible.
   </div>
-  <div class="tutorial-item">
-    <span class="key">Breviary</span> — bottom centre. Soundings are moments of contemplation available at certain points. They take time. They settle into something permanent.
+  <div class="tutorial-item" style="color:var(--dim);font-size:.82rem;line-height:1.75;margin-bottom:.7rem">
+    The four numbers at the top are: <strong style="color:var(--fg)">bearing</strong> (how well you maintain cover), <strong style="color:var(--fg)">stillness</strong> (how present you are), <strong style="color:var(--fg)">solidarity</strong> (what you have given to others), <strong style="color:var(--fg)">static</strong> (the cost of performing something you do not believe).
   </div>
-  <div class="tutorial-item">
-    <span class="key">Observations / Status / Codex / Map</span> — bottom row. What you've noticed, what you are, what you know, where you are.
+  <div class="tutorial-item" style="color:var(--dim);font-size:.82rem;line-height:1.75;margin-bottom:.7rem">
+    Below, in the Breviary: soundings. They arise from moments of stillness and deepen through aligned action. When they settle they become permanent. They change what you can see.
   </div>
-  <div class="tutorial-item" style="color:var(--dim);font-size:.78rem;margin-top:.8rem">
-    This is the first of several crossings. What you carry forward from each one — and how much of it — will depend on how far you've come.
+  <div class="tutorial-item" style="color:var(--dim);font-size:.78rem;line-height:1.72;margin-top:.9rem;font-style:italic">
+    This is the first crossing. It will not be the last. What carries forward depends on how far you have come. Some things carry further than others.
   </div>
 `);
 

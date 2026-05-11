@@ -1,3 +1,45 @@
+## v1.5 "Бриз" — May 2026
+
+### Critical Fixes
+- **Restoration ending**: `radio_team_assembled` removed from condition. Now requires only `archive_transmitted + theosis >= 66`. Players who transmit solo reach Restoration.
+- **Rememberer threshold**: Lowered from 90 to 85 carried theosis. Achievable on a strong Restoration run.
+- **Cover `left` challenge**: Registered and triggered in `connie_honest`. Connie asks what the cost of leaving was, not the thing itself.
+- **`act_two_placeholder`**: Removed.
+- **Sound**: Audio now auto-starts on first user gesture (click, touch, or key). Browser AudioContext policy was preventing any sound from playing.
+- **Title**: Duplicate "a crossing" removed from subtitle line.
+
+### Engine Additions
+- **`progressSounding(id, delta)`**: New public API. Advances a sounding by explicit amount when player acts in alignment with its theme. Separate from passive tick. Toast fires at meaningful milestones only.
+- **Liturgical hours**: Now advance probabilistically (35% chance per scene transition) rather than being static at default.
+- **Map knowledge system**: `isNodeVisited()`, `isNodeKnown()` functions. Map panel now organised into "this crossing" and "remembered from before" (Witness charism) sections.
+- **Diegetic stat labels**: Header now displays `bearing / stillness / solidarity / static` instead of `vigilance / composure / communion / doubt`.
+- **Save toast**: Suppressed for auto-saves (legacy slot). Only explicit slot saves show toast.
+- **Toast duration**: 3.5 seconds.
+- **Breviary pulse**: `has-available` button now animates with amber glow.
+
+### Porthole
+- Wave animation overhauled: 8 waves with individual speed and phase offset, amplitude fades with depth, opacity fades. Surface shimmer particles at high theosis (goldIntensity). Waves are visibly moving.
+
+### Soundings
+- **`sounding_forgiveness`** now offered: in `alexei_palamas`, `alexei_honest_answer`, `lena_cook_before`, `mission_refused_miguel`. The pastoral heart of the game now has its sounding.
+- **`sounding_sobornost`** added: "On conciliarity — many voices in which no voice is erased." Offered at theosis >= 66 in the instrument room shimmer scene. Theosis +8, Communion +2.
+- **Alignment-based progress**: 18 scenes now call `progressSounding()` on relevant soundings when the player acts in their spirit. Solidarity sounding advances through solidarity acts. Crossing sounding advances through presence. History sounding advances through archive engagement. Forgiveness sounding advances through pastoral acts and kenosis.
+
+### New Content
+- **`kenosis_act`**: New scene unlocked by Faster charism in `hold_bless_archive`. Letting go of something carried long enough to stop noticing it. Doubt -3, Theosis +6. Advances forgiveness sounding by 4.
+- **`zarya_real_history`**: Full epilogue available after Restoration ending. The real Zarya — built 1952, thirty years of geomagnetic research, shared data across Cold War borders, scrapped after Soviet dissolution. Her name means dawn.
+- **Freezer Beef mission**: Two new ambient events. She tests the player's lap during early Act Two, then adopts it as her mission if hold solidarity flags are set.
+
+### Narrative Improvements
+- **Radio lore expanded**: Miguel now explains why the second radio is non-magnetic (brass components throughout), why the standard radio distorts the field, and crucially that the second radio's existence was not disclosed when the ship changed hands in 1991. The mission's principals do not know it is there.
+- **Epilogues extended**: All three main endings now have full character-fate paragraphs. Miguel, Lena, Alexei, Nadia, Kylie, Othis, Pavel — each gets a morning-after sentence. The Restoration epilogue includes Lena's small non-shrine in the mess hall, Kylie's open door, Othis on the aft deck with nothing left to monitor.
+- **Charism descriptions**: Rewritten to be more mysterious and atmospheric, without stating mechanical effects directly.
+- **Mode descriptions**: Full descriptions added for Attended and Witnessed modes.
+- **Tutorial**: Rewritten in Severed Hours voice — the ship, the name, the cover, the four numbers, what soundings are and how they deepen.
+
+### Balance
+- **Three-crossing minimum**: The progression Erasure → Witness → Restoration → The Knowing is intended as the natural arc. Restoration requires theosis >= 66 and archive transmission. The Knowing requires Rememberer charism (requires carried theosis >= 85, i.e., Restoration at high theosis + crossing tax leaves ≥ 85) and theosis >= 85 in the current crossing. Three strong crossings minimum.
+
 ## v1.4 "Full Crossing" — May 2026
 
 ### Narrative Completion

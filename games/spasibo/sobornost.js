@@ -185,6 +185,8 @@ function setObjectDescriptionFunction(fn) { _registries.objectDescriptionFn = fn
 
 function registerRollModifier(statKey, condition, bonusCallback) { _registries.rollModifiers.push({ statKey, condition, bonusCallback }); }
 function setAvailableModes(modeArray)       { _registries.availableModes = modeArray; }
+function setModeDescriptions(descs)          { _registries.modeDescriptions = descs || {}; }
+function getModeDescription(id)              { return (_registries.modeDescriptions||{})[id] || null; }
 function registerScenePool(poolId, entries) { _registries.scenePools[poolId] = entries; }
 function addToScenePool(poolId, entry) {
   if (!_registries.scenePools[poolId]) _registries.scenePools[poolId] = [];
@@ -220,7 +222,7 @@ function _flushToast() {
   const t = document.createElement('div');
   t.className = 'toast ' + (type || 'note');
   t.textContent = msg; document.body.appendChild(t);
-  setTimeout(() => { if (t.parentNode) t.remove(); _flushToast(); }, 2600);
+  setTimeout(() => { if (t.parentNode) t.remove(); _flushToast(); }, 3500);
 }
 
 function hasFlag(f) { return G.flags.has(f); }
@@ -523,6 +525,23 @@ function applyAutoAlignment(tags) {
   }
 }
 
+function progressSounding(soundingId, delta) {
+  // Advance a sounding by a specific amount — called when player acts in alignment
+  const entry = G.soundings.taken.find(s => s.id === soundingId);
+  if (!entry) return;
+  const old = entry.progress;
+  entry.progress = Math.min(Math.max(entry.progress + delta, 0), SOUNDING_THRESHOLD);
+  if (entry.progress >= SOUNDING_THRESHOLD && old < SOUNDING_THRESHOLD) settleSounding(soundingId);
+  else if (entry.progress !== old) {
+    // Toast only on meaningful milestones
+    const half = Math.floor(SOUNDING_THRESHOLD/2);
+    const snd = _registries.soundings[soundingId];
+    if (old < half && entry.progress >= half) showToast((snd?snd.name:soundingId)+' — deepening.','sounding');
+    emit('soundingProgress',{soundingId,progress:entry.progress,delta});
+  }
+  scheduleRender();
+}
+
 function takeSounding(id) {
   if (G.soundings.taken.some(t => t.id === id) || G.soundings.settled.includes(id)) return;
   if (soundingSlotsFull()) { G.soundingPending = id; G.panelOpen = 'breviary'; scheduleRender(); return; }
@@ -795,18 +814,36 @@ function _drawPorthole() {
   hg.addColorStop(0.5,`rgba(${hR},${hG},${hB},${hAlpha.toFixed(3)})`);
   hg.addColorStop(1,`rgba(${hR},${hG},${hB},0)`);
   ctx.fillStyle=hg; ctx.fillRect(x-r,horizY-r*.08,r*2,r*.16);
-  // Wave lines
-  const wAlpha = mood==='uncanny'?0.55:mood==='tense'?0.45:0.35;
-  const wR=gi>0?Math.round(lerpN(60,120,gi)):50;
-  const wG=gi>0?Math.round(lerpN(100,140,gi)):100;
-  const wB=gi>0?Math.round(lerpN(130,90,gi)):140;
-  ctx.strokeStyle=`rgba(${wR},${wG},${wB},${wAlpha})`; ctx.lineWidth=0.9;
-  for (let i=0;i<7;i++) {
-    const wy=horizY+r*.14+i*r*.1+Math.sin(T*.5+i*.9)*r*.025;
-    const amp=r*.03*(1-i/10);
-    ctx.beginPath(); ctx.moveTo(x-r*.9,wy);
-    for(let xi=-r*.9;xi<=r*.9;xi+=4) ctx.lineTo(x+xi,wy+Math.sin(T*0.7+xi*.04+i*.5)*amp);
+  // Wave lines — slowly animated with phase offset per wave
+  const wAlpha = mood==='uncanny'?0.55:mood==='tense'?0.42:mood==='revelation'?0.28:0.35;
+  const wR=gi>0?Math.round(lerpN(50,100,gi)):45;
+  const wG=gi>0?Math.round(lerpN(100,140,gi)):90;
+  const wB=gi>0?Math.round(lerpN(130,80,gi)):130;
+  for (let i=0;i<8;i++) {
+    // Each wave has its own speed and phase
+    const speed = 0.18 + i * 0.06;
+    const phase = i * 1.1;
+    const wy = horizY + r*0.1 + i*r*0.09 + Math.sin(T*0.3 + phase)*r*0.018;
+    const amp = r * 0.028 * (1 - i*0.08);
+    // Wave opacity fades deeper
+    const wop = wAlpha * (1 - i*0.09);
+    ctx.strokeStyle=`rgba(${wR},${wG},${wB},${wop.toFixed(3)})`; 
+    ctx.lineWidth = i < 2 ? 1.2 : 0.8;
+    ctx.beginPath(); ctx.moveTo(x-r*.88, wy);
+    for(let xi=-r*.88; xi<=r*.88; xi+=3) {
+      const localAmp = amp * (1 - Math.abs(xi)/(r*.88)*0.3);
+      ctx.lineTo(x+xi, wy + Math.sin(T*speed + xi*0.038 + phase)*localAmp);
+    }
     ctx.stroke();
+  }
+  // Surface shimmer — tiny bright crests at high theosis
+  if(gi > 0.2) {
+    ctx.fillStyle=`rgba(${Math.round(lerpN(180,220,gi))},${Math.round(lerpN(200,220,gi))},${Math.round(lerpN(210,200,gi))},${(gi*0.06).toFixed(3)})`;
+    for(let i=0;i<6;i++) {
+      const cx2 = x + Math.sin(T*0.4+i*1.7)*r*0.35;
+      const cy2 = horizY + r*0.08 + i*r*0.06 + Math.sin(T*0.5+i)*r*0.02;
+      ctx.beginPath(); ctx.arc(cx2, cy2, 1.5+gi, 0, Math.PI*2); ctx.fill();
+    }
   }
   // Rain when tense
   if(mood==='tense') {
@@ -1010,7 +1047,7 @@ function saveGameSlot(slotId) {
     };
     try { localStorage.setItem(SAVE_KEY_PREFIX + slotId, JSON.stringify(state)); } catch(e) { console.warn('Save write failed:', e); showToast('Save failed — storage full?', 'warning'); return; }
     saveJournal(slotId);
-    showToast(`Saved to slot ${slotId}`, 'note');
+    if(slotId!=='legacy') showToast('Saved.', 'note');
     emit('saveSlot', slotId);
   } catch (e) { console.warn('Save failed:', e); }
 }
@@ -1340,7 +1377,7 @@ function navigate(id) {
   G._mortificationSpent   = false;
   G._dialogue             = null;
   G._coverChallenge       = null;
-  tickSoundings();
+  // tickSoundings removed from navigate — progress only via progressSounding()
   _captureSnapshot();
   tickDelayedConsequences();
   window.scrollTo(0, 0);
@@ -1972,7 +2009,14 @@ function renderMapPanel(){
   let s='';for(const[id,d]of Object.entries(_registries.mapNodes)){s+=`${d.visited?'\u25c9':'\u25cb'} ${id}\n`;if(d.connections&&d.connections.length)s+=`  \u2514\u2500 connects to: ${d.connections.join(', ')}\n`;}
   return`<pre style="font-size:.7rem;font-family:monospace">${s}</pre>`;
 }
-function markMapNodeVisited(id){if(_registries.mapNodes[id])_registries.mapNodes[id].visited=true;}
+function markMapNodeVisited(id){if(_registries.mapNodes[id]){_registries.mapNodes[id].visited=true;setFlag('visited_'+id);}}
+function isNodeVisited(id){return !!((_registries.mapNodes[id]&&_registries.mapNodes[id].visited)||G.flags.has('visited_'+id)||G.pastLifeFlags&&G.pastLifeFlags.has('visited_'+id));}
+function isNodeKnown(id){
+  // Known = visited this crossing OR visited in past life (Witness charism)
+  if(isNodeVisited(id)) return true;
+  if(G.charisms&&G.charisms.includes('witness')&&G.pastLifeFlags&&G.pastLifeFlags.has('visited_'+id)) return true;
+  return false;
+}
 
 // ============================================================
 // SECTION: ui/renderer.js
@@ -1998,7 +2042,6 @@ function renderTitle(root){
   const d=document.createElement('div');d.className='title-screen';
   d.innerHTML=`
     <div class="title-cyrillic">${window.GAME_TITLE||'GAME'}</div>
-    <div style="font-family:'GOST type B','Share Tech Mono',monospace;font-size:.7rem;color:var(--dim);letter-spacing:.3em;text-transform:uppercase;margin-bottom:.2rem">${window.GAME_SUBTITLE||''}</div>
     <div style="font-family:'GOST type B','Share Tech Mono',monospace;font-size:.66rem;color:var(--amber-dim);letter-spacing:.22em;margin-bottom:${isDemo?'1.2':'2'}rem">${window.GAME_MOTTO||'Thank You'}</div>
     ${isDemo?'<div style="font-size:.8rem;color:var(--amber);border:1px solid var(--amber-dim);padding:.5rem 1.2rem;margin-bottom:2.5rem">DEMO VERSION \u2014 Act One Only</div>':''}
     <pre class="title-ship-art" style="font-family:'GOST type B','Share Tech Mono',monospace;font-size:.62rem;color:var(--cold-dim);white-space:pre;line-height:1.25;margin-bottom:2.5rem;text-align:center;opacity:0.7">
@@ -2300,7 +2343,7 @@ function renderGame(root){
         if(ch.give_item){const l=document.createElement('span');l.className='item-label';l.textContent='+ '+ch.give_item;btn.appendChild(l);}
         if(ch.take_item){const l=document.createElement('span');l.className='item-label';l.textContent='- '+ch.take_item;btn.appendChild(l);}
         if(ch.advance_time){const l=document.createElement('span');l.className='time-label';l.textContent=`\u23f1 +${ch.advance_time}h`;btn.appendChild(l);}
-        if(ch.mod_reputation){const l=document.createElement('span');l.className='reputation-label';l.textContent=Object.entries(ch.mod_reputation).map(([id,d])=>`${id} ${d>0?'+'+d:d}`).join(', ');btn.appendChild(l);}
+        // reputation changes are silent — tracked in observations panel
         if(ch.set_quest_state){const l=document.createElement('span');l.className='quest-label';l.textContent=Object.entries(ch.set_quest_state).map(([id,s])=>`${id}\u2192${s}`).join(', ');btn.appendChild(l);}
         if(ch.spend_composure){const l=document.createElement('span');l.className='composure-label';l.textContent=`\u2212${ch.spend_composure} composure`;btn.appendChild(l);}
         btn.onclick=(ch.roll&&typeof ch.roll==='object')?()=>startRoll(ch):()=>applyChoice(ch);
@@ -2344,7 +2387,8 @@ function _buildHeader(scene){
   hdr.appendChild(lb);
   const sbarDoubt = G.stats.doubt || 0;
   const sb=document.createElement('div');sb.className='sbar'+(sbarDoubt>=7?' sbar-jitter':'');
-  Object.entries(G.stats).forEach(([k,v])=>{const d=document.createElement('div');d.className='stat';d.innerHTML=k+' <span class="stat-val">'+v+'</span>'+(_registries.statTips[k]?'<span class="stat-tip">'+_registries.statTips[k]+'</span>':'');sb.appendChild(d);});
+  const _statLabels={vigilance:'bearing',composure:'stillness',communion:'solidarity',doubt:'static'};
+  Object.entries(G.stats).forEach(([k,v])=>{const d=document.createElement('div');d.className='stat';const lbl=_statLabels[k]||k;d.innerHTML=lbl+' <span class="stat-val">'+v+'</span>'+(_registries.statTips[k]?'<span class="stat-tip">'+_registries.statTips[k]+'</span>':'');sb.appendChild(d);});
   if(G.theosis>32){const td=document.createElement('div');td.className='stat stat-theosis';const tier=G.theosis>65?'\u041a\u041a\u0410':String(G.theosis);td.innerHTML='<span class="stat-val" style="color:var(--gold)">'+tier+'</span><span class="stat-tip">theosis</span>';sb.appendChild(td);}
   // Deviation compass — shown when magneticDeviation > 0.2
   if(G.magneticDeviation>0.2){
@@ -2741,24 +2785,51 @@ function _renderMapPanelSide(root) {
     const empty = document.createElement('p'); empty.style.cssText = 'color:var(--dim);font-style:italic;font-size:.84rem;';
     empty.textContent = 'The ship is still taking shape.'; body.appendChild(empty);
   } else {
-    const list = document.createElement('div'); list.className = 'map-grid';
     const nodeNames = { cabin:'Cabin',main_deck:'Main Deck',foredeck:'Foredeck',bridge:'Bridge',mess:'Mess Hall',galley:'Galley',chart_room:'Chart Room',captain_quarters:"Captain's Quarters",hold_access:'Hold Access',hold:'Hold',cargo_bay:'Cargo Bay',instrument_room:'Instrument Room',aft:'Aft Compartment' };
-    Object.entries(nodes).forEach(([id, node]) => {
-      const required = node.theosisRequired !== undefined ? node.theosisRequired : 0;
-      if (G.theosis < required) return;
-      const isCurrent = currentNode === id;
-      const wasVisited = G.flags && G.flags.has('visited_' + (sceneMap[id] || id));
-      const row = document.createElement('div');
-      row.className = 'map-node' + (isCurrent ? ' current' : wasVisited ? ' visited' : '');
-      const dot = document.createElement('div'); dot.className = 'map-node-dot';
-      const label = document.createElement('span'); label.textContent = nodeNames[id] || id.replace(/_/g,' ');
-      row.appendChild(dot); row.appendChild(label);
-      row.onclick = () => { if (!isCurrent) { openPanel(null); navigate(sceneMap[id] || id); } };
-      list.appendChild(row);
+    
+    // Map shows only what you have been to or remember
+    // Accessible-but-unvisited locations are NOT shown (discover by exploring)
+    const visited=[], knownRoute=[], hiddenCount=[0];
+    Object.entries(nodes).forEach(([id,node])=>{
+      const req=node.theosisRequired||0;
+      if(G.theosis<req){hiddenCount[0]++;return;}
+      const isCur=currentNode===id;
+      const wasVisited=G.flags&&G.flags.has('visited_'+id);
+      const isPastLife=G.charisms&&G.charisms.includes('witness')&&G.pastLifeFlags&&G.pastLifeFlags.has('visited_'+id);
+      if(isCur||wasVisited) visited.push({id,isCur,wasVisited});
+      else if(isPastLife) knownRoute.push(id);
+      // If not visited and not past-life: don't show — explore to discover
     });
-    body.appendChild(list);
-    const hidden = Object.values(nodes).filter(n => G.theosis < (n.theosisRequired || 0)).length;
-    if (hidden > 0) { const hint = document.createElement('p'); hint.className = 'map-hint'; hint.textContent = `${hidden} location${hidden>1?'s':''} not yet visible.`; body.appendChild(hint); }
+
+    const makeNode=(id,cls,isCur)=>{
+      const row=document.createElement('div');row.className='map-node'+cls+(isCur?' current':'');
+      const dot=document.createElement('div');dot.className='map-node-dot';
+      const label=document.createElement('span');label.textContent=nodeNames[id]||id.replace(/_/g,' ');
+      row.appendChild(dot);row.appendChild(label);
+      if(isCur)row.classList.add('current');
+      row.onclick=()=>{if(!isCur){openPanel(null);navigate(sceneMap[id]||id);}};
+      return row;
+    };
+
+    if(visited.length){
+      const sec=document.createElement('div');sec.className='panel-section';sec.textContent='this crossing';body.appendChild(sec);
+      const list=document.createElement('div');list.className='map-grid';
+      visited.forEach(({id,isCur})=>list.appendChild(makeNode(id,G.flags.has('visited_'+id)?' visited':'',isCur)));
+      body.appendChild(list);
+    }
+    if(knownRoute.length){
+      const sec=document.createElement('div');sec.className='panel-section';sec.style.marginTop='.9rem';sec.textContent='remembered from before';body.appendChild(sec);
+      const list=document.createElement('div');list.className='map-grid';
+      knownRoute.forEach(id=>{
+        const row=makeNode(id,' past-life',false);
+        row.title='Known from a previous crossing';list.appendChild(row);
+      });
+      body.appendChild(list);
+    }
+    const hc=hiddenCount[0];
+    if(hc>0){
+      const hint=document.createElement('p');hint.className='map-hint';hint.textContent=`${hc} location${hc>1?'s':''} not yet accessible.`;body.appendChild(hint);
+    }
   }
 
   panel.appendChild(body); overlay.appendChild(panel); root.appendChild(overlay);
@@ -2780,13 +2851,13 @@ window.SOBORNOST={
   registerCodexEntry, unlockCodexEntry, isCodexUnlocked, checkCodexUnlocks,
   registerAmbientEvent, unregisterAmbientEvent,
   registerCharisms, registerSounding, registerNote, registerArt, registerGlossaryEntry,
-  registerStatTip, registerRollModifier, setAvailableModes,
+  registerStatTip, registerRollModifier, setAvailableModes, setModeDescriptions, getModeDescription,
   setIconWordFunction, setHarbourWordFunction, setShipWordFunction, setObjectDescriptionFunction,
   registerScenePool, addToScenePool, registerRitual, registerTranslation,
   registerPostEventShift, registerPastLifeLine, registerMapNode, registerSfx,
   registerItem, registerAtmosModifier, setTutorialContent,
   registerTheosisTagValue, setTheosisTiers, incrementTheosis, flashTheosisLight,
-  setMagneticDeviation, getMagneticDeviation,
+  setMagneticDeviation, getMagneticDeviation, progressSounding,
   registerNameMapping, setLiturgicalHour,
   addCompanion, removeCompanion, hasCompanion, getCompanion, modCompanionStat, setCompanionCharism,
   learn, comeToBelieve, contradict, knows, believes,

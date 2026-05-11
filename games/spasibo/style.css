@@ -895,3 +895,38 @@ body { overflow-x: hidden; max-width: 100vw; }
 
 /* Sounding take button */
 .sounding-card .btn { min-height: 44px; width: 100%; justify-content: center; }
+
+/* ── v1.5 additions ──────────────────────────────────────────── */
+
+/* Breviary pulse when sounding available */
+@keyframes pulse-gentle {
+  0%   { opacity: 0.75; text-shadow: 0 0 0 var(--amber-dim); }
+  55%  { opacity: 1;    text-shadow: 0 0 4px var(--amber-dim); }
+  100% { opacity: 0.75; text-shadow: 0 0 0 var(--amber-dim); }
+}
+#bottom-nav button.has-available {
+  color: var(--amber);
+  animation: pulse-gentle 2.2s ease-in-out infinite;
+}
+
+/* Map: past-life (Witness charism) nodes */
+.map-node.past-life {
+  color: var(--cold-dim);
+  border-color: var(--border);
+  border-style: dashed;
+}
+.map-node.past-life .map-node-dot { background: var(--cold-dim); }
+.map-node.past-life:hover { border-color: var(--cold-dim); color: var(--cold); border-style: solid; }
+
+/* Kenosis choice — distinctive */
+.choice.choice-kenosis {
+  border-color: var(--gold-dim);
+  color: var(--gold-dim);
+  font-style: italic;
+}
+
+/* Real Zarya epilogue — slightly different feel */
+#zarya_real_history .sp {
+  font-size: .96rem;
+  color: var(--fg-dim);
+}
