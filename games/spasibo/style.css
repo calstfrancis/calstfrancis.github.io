@@ -930,3 +930,56 @@ body { overflow-x: hidden; max-width: 100vw; }
   font-size: .96rem;
   color: var(--fg-dim);
 }
+
+/* ── Ship state body classes ──────────────────────────────────── */
+body.ship-paranoid .game-header { border-bottom-color: #2a2018; }
+body.ship-paranoid .location-bar { letter-spacing: .14em; }
+body.ship-paranoid .sp { color: var(--fg-dim); }
+body.ship-paranoid .choice { color: var(--fg-dim); }
+body.ship-paranoid .choice:hover { color: var(--fg); }
+
+body.ship-exhausted .sp { line-height: 2.0; }
+body.ship-exhausted .game-body { padding-top: 2.2rem; }
+body.ship-exhausted .location-bar { opacity: 0.8; }
+
+body.ship-low-morale .location-bar { color: var(--dim); }
+body.ship-low-morale .cbar { opacity: 0.7; }
+
+/* ── NPC contradiction scenes — slightly different text color ──── */
+.alexei_doubt .sp,
+.alexei_doubt_response .sp { color: var(--cold-dim); }
+
+/* Rumor ambient events — slightly different styling */
+.sp.sp-ambient.rumor { 
+  border-left: 2px solid var(--amber-dim); 
+  padding-left: .75rem;
+  color: var(--amber-dim);
+}
+
+/* ── Calendar panel ──────────────────────────────────────────── */
+.calendar-hour {
+  padding: .5rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.calendar-hour:last-child { border-bottom: none; }
+.calendar-hour.current {
+  background: var(--cold-faint);
+  padding: .5rem .6rem;
+  margin: 0 -.6rem;
+  border-left: 2px solid var(--cold-dim);
+  border-bottom-color: var(--border-mid);
+}
+.calendar-hour-name {
+  font-family: var(--font-display);
+  font-size: .76rem; color: var(--fg);
+  letter-spacing: .06em; margin-bottom: .18rem;
+}
+.calendar-hour.current .calendar-hour-name { color: var(--cold); }
+.calendar-hour-desc { font-size: .74rem; color: var(--dim); line-height: 1.65; font-style: italic; }
+
+/* ── Pavel riddle — subtle visual marker ─────────────────────── */
+.pavel_revelation .sp { color: var(--cold); }
+
+/* ── Solidarity ending ───────────────────────────────────────── */
+.ending_solidarity .sp { color: var(--fg); }
+.solidarity_morning .location-bar { color: var(--gold); }

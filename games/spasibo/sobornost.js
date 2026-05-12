@@ -1,6 +1,6 @@
 // ============================================================
 // SOBORNOST ENGINE — sobornost.js
-// Single-file build. v3.3.1
+// Single-file build. v3.3.2
 // Section order (dependency graph):
 //   debug → events → state → schedule → registries →
 //   mechanics → conditions → soundings → theosis →
@@ -525,6 +525,18 @@ function applyAutoAlignment(tags) {
   }
 }
 
+// Ship state helpers
+function getShipState(key) { return (G.shipState||{})[key]||0; }
+function modShipState(key, delta) {
+  if (!G.shipState) G.shipState={morale:5,paranoia:0,exhaustion:0,saturation:0};
+  G.shipState[key] = Math.max(0, Math.min(10, (G.shipState[key]||0)+delta));
+  // Apply body classes for paranoia and exhaustion
+  document.body.classList.toggle('ship-paranoid',  G.shipState.paranoia >= 4);
+  document.body.classList.toggle('ship-exhausted', G.shipState.exhaustion >= 5);
+  document.body.classList.toggle('ship-low-morale',G.shipState.morale <= 3);
+  emit('shipStateChanged', { key, value: G.shipState[key] });
+}
+
 function progressSounding(soundingId, delta) {
   // Advance a sounding by a specific amount — called when player acts in alignment
   const entry = G.soundings.taken.find(s => s.id === soundingId);
@@ -1044,6 +1056,7 @@ function saveGameSlot(slotId) {
       ambientTriggered: [...G.ambientTriggered],
       magneticDeviation: G.magneticDeviation || 0,
       worldState: G.worldState || { shipStability: 5, sanctity: 0, socialTrust: 5 },
+      shipState: G.shipState || { morale: 5, paranoia: 0, exhaustion: 0, saturation: 0 },
     };
     try { localStorage.setItem(SAVE_KEY_PREFIX + slotId, JSON.stringify(state)); } catch(e) { console.warn('Save write failed:', e); showToast('Save failed — storage full?', 'warning'); return; }
     saveJournal(slotId);
@@ -1095,6 +1108,7 @@ function loadGameSlot(slotId) {
     G.ambientTriggered = new Set(s.ambientTriggered || []);
     G.magneticDeviation = s.magneticDeviation !== undefined ? s.magneticDeviation : 0;
     G.worldState = s.worldState || { shipStability: 5, sanctity: 0, socialTrust: 5 };
+    G.shipState  = s.shipState  || { morale: 5, paranoia: 0, exhaustion: 0, saturation: 0 };
     loadJournal(slotId);
     refreshAtmosMods();
     scheduleRender();
@@ -1382,6 +1396,12 @@ function navigate(id) {
   tickDelayedConsequences();
   window.scrollTo(0, 0);
   scheduleRender();
+  // Re-apply persistent UI classes from ship state
+  if(G.shipState){
+    document.body.classList.toggle('ship-paranoid',  (G.shipState.paranoia||0)>=4);
+    document.body.classList.toggle('ship-exhausted', (G.shipState.exhaustion||0)>=5);
+    document.body.classList.toggle('ship-low-morale',(G.shipState.morale||5)<=3);
+  }
   emit('sceneChanged', id);
 }
 
@@ -2372,6 +2392,7 @@ function renderGame(root){
   if(G.panelOpen==='breviary') _renderBreviaryPanel(root);
   if(G.panelOpen==='glossary') _renderGlossaryPanel(root);
   if(G.panelOpen==='map')      _renderMapPanelSide(root);
+  if(G.panelOpen==='calendar') _renderCalendarPanel(root);
   if(G.panelOpen==='journal')  renderJournalPanel(root,openPanel);
   if(G.panelOpen==='log')      renderEventLogPanel(root,openPanel);
   if(G.panelOpen==='codex')    renderCodexPanel(root,openPanel);
@@ -2441,14 +2462,19 @@ function _appendBottomNav(root){
   bnav.style.cssText='position:fixed;bottom:0;left:0;width:100%;z-index:100;display:flex;justify-content:center;background:rgba(6,8,12,0.96);border-top:1px solid var(--border)';
   const codexCount=getUnlockedCodex().length;
   const doubt = G.stats.doubt || 0;
-  const flicker = doubt >= 7 ? 0.4 : doubt >= 5 ? 0.2 : 0;
+  const dev = G.magneticDeviation || 0;
+  // Flicker from doubt OR from extreme magnetic deviation (static/interference)
+  const flickerDoubt = doubt >= 7 ? 0.4 : doubt >= 5 ? 0.2 : 0;
+  const flickerDev   = dev >= 0.8 ? 0.5 : dev >= 0.65 ? 0.25 : 0;
+  const flicker = Math.max(flickerDoubt, flickerDev);
   const fl = (en, ru) => (flicker > 0 && Math.random() < flicker) ? ru : en;
   const navItems=[
-    {label:fl('observations','наблюдения'),fn:()=>openPanel('notes'),   title:'What has been noticed this crossing'},
-    {label:fl('status','статус'),          fn:()=>openPanel('status'),  title:'Stats, cover, charisms, inventory'},
+    {label:fl('observations','наблюдения'),fn:()=>openPanel('notes'),     title:'What has been noticed this crossing'},
+    {label:fl('status','статус'),          fn:()=>openPanel('status'),    title:'Stats, cover, charisms, inventory'},
     {label:'breviary'+(G.soundings.available.length?' \u2691':''),fn:()=>openPanel('breviary'),cls:G.soundings.available.length?' has-available':'', title:'Soundings — moments of contemplation'},
-    {label:fl('codex','кодекс'),           fn:()=>openPanel('glossary'),title:'What has been learned about the ship'},
-    {label:fl('map','карта'),              fn:()=>openPanel('map'),     title:'Where things are'},
+    {label:fl('codex','кодекс'),           fn:()=>openPanel('glossary'),  title:'What has been learned about the ship'},
+    {label:fl('calendar','календарь'),     fn:()=>openPanel('calendar'),  title:'The crossing — day and liturgical hour'},
+    {label:fl('map','карта'),              fn:()=>openPanel('map'),       title:'Where things are'},
   ];
   navItems.forEach(({label,fn,cls='',title=''})=>{
     const b=document.createElement('button');
@@ -2753,6 +2779,55 @@ function _renderGlossaryPanel(root) {
   panel.appendChild(body); overlay.appendChild(panel); root.appendChild(overlay);
 }
 
+
+function _renderCalendarPanel(root) {
+  const overlay = document.createElement('div'); overlay.className = 'panel-overlay';
+  overlay.onclick = (e) => { if (e.target === overlay) openPanel(null); };
+  const panel = document.createElement('div'); panel.className = 'panel';
+
+  const hdr = document.createElement('div'); hdr.className = 'panel-header';
+  const t = document.createElement('div'); t.className = 'panel-title'; t.textContent = 'the crossing';
+  const x = document.createElement('button'); x.className = 'panel-close'; x.textContent = '✕'; x.onclick = () => openPanel(null);
+  hdr.appendChild(t); hdr.appendChild(x); panel.appendChild(hdr);
+
+  const body = document.createElement('div'); body.className = 'panel-body';
+  
+  // Day indicator
+  const dayS = document.createElement('div'); dayS.className = 'panel-section'; dayS.textContent = `day ${G.time.day} of ${G.time.maxDays}`; body.appendChild(dayS);
+
+  // Hours
+  const hourDescs = [
+    { name:'Lauds',    mood:'dawn',          desc:'The first light. The instruments are quieter. NPCs are honest in the way people are honest when they are not fully awake yet.' },
+    { name:'Prime',    mood:'early morning', desc:'The ship at work. Maintenance, measurements, small talk. The day is still forming.' },
+    { name:'Terce',    mood:'mid-morning',   desc:'The anomaly tends to be stable here. Good time for the chart room and the hold.' },
+    { name:'Sext',     mood:'noon',          desc:'Tension rises with the light. Cover challenges are more likely. Othis is most alert.' },
+    { name:'None',     mood:'afternoon',     desc:'The strange hour. The anomaly sometimes spikes. Oblong is most present. NPCs are tired and less guarded.' },
+    { name:'Vespers',  mood:'evening',       desc:'Candour. The time of hardest conversations. Miguel tends to speak. Lena brings food no one asked for.' },
+    { name:'Compline', mood:'night',         desc:'The anomaly intensifies. The night office. Alexei cannot sleep. This is when the radio reaches furthest.' },
+  ];
+
+  hourDescs.forEach((h, i) => {
+    const isCurrent = i === G.liturgicalHour;
+    const row = document.createElement('div'); 
+    row.className = 'calendar-hour' + (isCurrent ? ' current' : '');
+    const nameLine = document.createElement('div'); nameLine.className = 'calendar-hour-name';
+    nameLine.textContent = h.name + (isCurrent ? ' ◂' : '') + '  ·  ' + h.mood;
+    const desc = document.createElement('div'); desc.className = 'calendar-hour-desc';
+    desc.textContent = h.desc;
+    row.appendChild(nameLine); row.appendChild(desc); body.appendChild(row);
+  });
+
+  // Theosis tier indicator
+  const tier = G.theosis <= 32 ? 'The Dawn — Asleep' : G.theosis <= 65 ? 'Zarya — Waking' : 'Заря — Illumined';
+  const tS = document.createElement('div'); tS.className = 'panel-section'; tS.style.marginTop='1rem'; tS.textContent = 'state'; body.appendChild(tS);
+  const tRow = document.createElement('div'); tRow.className = 'calendar-hour';
+  const tLine = document.createElement('div'); tLine.className = 'calendar-hour-name'; tLine.textContent = tier;
+  if (G.theosis > 32) tLine.style.color = G.theosis > 65 ? 'var(--gold)' : 'var(--amber)';
+  tRow.appendChild(tLine); body.appendChild(tRow);
+
+  panel.appendChild(body); overlay.appendChild(panel); root.appendChild(overlay);
+}
+
 function _renderMapPanelSide(root) {
   const overlay = document.createElement('div'); overlay.className = 'panel-overlay';
   overlay.onclick = (e) => { if (e.target === overlay) openPanel(null); };
@@ -2857,7 +2932,7 @@ window.SOBORNOST={
   registerPostEventShift, registerPastLifeLine, registerMapNode, registerSfx,
   registerItem, registerAtmosModifier, setTutorialContent,
   registerTheosisTagValue, setTheosisTiers, incrementTheosis, flashTheosisLight,
-  setMagneticDeviation, getMagneticDeviation, progressSounding,
+  setMagneticDeviation, getMagneticDeviation, progressSounding, getShipState, modShipState,
   registerNameMapping, setLiturgicalHour,
   addCompanion, removeCompanion, hasCompanion, getCompanion, modCompanionStat, setCompanionCharism,
   learn, comeToBelieve, contradict, knows, believes,
