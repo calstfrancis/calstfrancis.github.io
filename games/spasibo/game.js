@@ -3586,7 +3586,7 @@ Addendum: the calico cat has been spending significant time in the hold. She app
       S.showToast('A record was kept.', 'theosis');
     },
     choices: [
-      { text: 'Begin a new crossing.', next: '__new_play__' },
+      { text: 'Begin a new crossing.', next: 'crossing_record' },
     ],
   },
   // ── PAVEL'S RIDDLE ───────────────────────────────────────────────
@@ -4817,6 +4817,31 @@ So, eventually, do you.`,
   },
 
 
+
+  // ── CROSSING RECORD ────────────────────────────────────────────
+  // Dénouement screen between ending and new crossing.
+  // Rendered by engine's renderCrossingRecord() function.
+
+  crossing_record: {
+    id: 'crossing_record', location: '', mood: 'neutral',
+    text: '',
+    onEnter: () => {
+      // Apply ending-specific body class for record title colour
+      const endings = {
+        'ending_erasure_reached':     'ending-erasure',
+        'ending_witness_reached':     'ending-witness',
+        'ending_restoration_reached': 'ending-restoration',
+        'ending_solidarity_reached':  'ending-solidarity',
+        'ending_the_knowing_reached': 'ending-knowing',
+      };
+      for (const [flag, cls] of Object.entries(endings)) {
+        if (S.hasFlag(flag)) { document.body.classList.add(cls); break; }
+      }
+    },
+    _renderOverride: (root) => { S.renderCrossingRecord(root); },
+    choices: [],
+  },
+
   // ── SOLIDARITY ENDING ────────────────────────────────────────────
 
   ending_approach_solidarity: {
@@ -4909,7 +4934,7 @@ But the ship is Заря.
 And she knew.`,
     onEnter: () => { S.flashTheosisLight(0.9, 8000); },
     choices: [
-      { text: 'Begin a new crossing.', next: '__new_play__' },
+      { text: 'Begin a new crossing.', next: 'crossing_record' },
     ],
   },
 
@@ -7078,7 +7103,7 @@ The coffee Lena makes after the service is better than the coffee she makes at o
       S.showToast('Erasure.', 'warning');
     },
     choices: [
-      { text: 'Begin a new crossing.', next: '__new_play__' },
+      { text: 'Begin a new crossing.', next: 'crossing_record' },
     ],
   },
 
@@ -7112,7 +7137,7 @@ The coffee Lena makes after the service is better than the coffee she makes at o
       S.showToast('Witness.', 'note');
     },
     choices: [
-      { text: 'Begin a new crossing.', next: '__new_play__' },
+      { text: 'Begin a new crossing.', next: 'crossing_record' },
     ],
   },
 
@@ -7231,7 +7256,7 @@ The research she conducted contributed to every major atlas of Earth's magnetic 
 
 Her name means dawn.`,
     choices: [
-      { text: 'Begin a new crossing.', next: '__new_play__' },
+      { text: 'Begin a new crossing.', next: 'crossing_record' },
     ],
   },
 
@@ -7276,7 +7301,7 @@ You understand the expression now.
       S.flashTheosisLight(1.0, 8000);
     },
     choices: [
-      { text: 'Begin a new crossing.', next: '__new_play__' },
+      { text: 'Begin a new crossing.', next: 'crossing_record' },
     ],
   },
 

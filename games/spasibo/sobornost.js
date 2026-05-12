@@ -2284,7 +2284,7 @@ function renderTitle(root){
     </div>
     <div style="font-family:'GOST type B','Share Tech Mono',monospace;font-size:.66rem;color:var(--amber-dim);letter-spacing:.22em;margin-bottom:${isDemo?'1.2':'2'}rem">${window.GAME_MOTTO||'Thank You'}</div>
     ${isDemo?'<div style="font-size:.8rem;color:var(--amber);border:1px solid var(--amber-dim);padding:.5rem 1.2rem;margin-bottom:2.5rem">DEMO VERSION \u2014 Act One Only</div>':''}
-    <pre class="title-ship-art" style="font-family:'GOST type B','Share Tech Mono',monospace;font-size:.62rem;color:var(--cold-dim);white-space:pre;line-height:1.25;margin-bottom:2.5rem;text-align:center;opacity:0.7">
+    <pre class="title-ship-art">
       |    |    |
      )_)  )_)  )_)
     )___))___))___)\\
@@ -2525,6 +2525,14 @@ function renderGame(root){
   if(firstVisit){setFlag(visitKey);if(scene.on_enter){if(scene.on_enter.note)addNote(scene.on_enter.note);if(scene.on_enter.flag)setFlag(scene.on_enter.flag);if(scene.on_enter.thought)offerSounding(scene.on_enter.thought);}
   // Support arbitrary onEnter function — first visit only
   if(typeof scene.onEnter === 'function') { try { scene.onEnter(); } catch(e) { console.error('[SOBORNOST] onEnter error in scene', G.scene, e); } }
+  }
+  // Check for custom render override (e.g. crossing_record screen)
+  if (scene && typeof scene._renderOverride === 'function') {
+    // Fire onEnter for this scene (normally fires in main render path)
+    const _ovKey='_visited_'+G.scene;
+    if(!G[_ovKey]){G[_ovKey]=true;if(typeof scene.onEnter==='function'){try{scene.onEnter();}catch(e){console.error(e);}}}
+    scene._renderOverride(root);
+    return;
   }
   const wrap=document.createElement('div');wrap.className='game';
   const uiOp=getUiOpacity();if(uiOp<1)wrap.style.opacity=uiOp;
@@ -3127,8 +3135,10 @@ function _renderMapPanelSide(root) {
       // If not visited and not past-life: don't show — explore to discover
     });
 
+    const _hubNodes=new Set(['cabin','main_deck','bridge','mess','galley']);
     const makeNode=(id,cls,isCur)=>{
-      const row=document.createElement('div');row.className='map-node'+cls+(isCur?' current':'');
+      const hubCls=_hubNodes.has(id)?' hub-node':'';
+      const row=document.createElement('div');row.className='map-node'+hubCls+cls+(isCur?' current':'');
       const dot=document.createElement('div');dot.className='map-node-dot';
       const label=document.createElement('span');label.textContent=nodeNames[id]||id.replace(/_/g,' ');
       row.appendChild(dot);row.appendChild(label);
@@ -3163,6 +3173,110 @@ function _renderMapPanelSide(root) {
 
 loadMetaUnlocks();
 initBuiltinSfx();
+
+function renderCrossingRecord(root) {
+  // Called before __new_play__ — shows a dénouement screen
+  const screen = document.createElement('div');
+  screen.className = 'crossing-record';
+
+  // Ending title
+  const endingNames = {
+    ending_erasure_reached:     ['ERASURE',     'The archive is gone.'],
+    ending_witness_reached:     ['WITNESS',     'The archive is hidden.'],
+    ending_restoration_reached: ['RESTORATION', 'The record goes into the world.'],
+    ending_solidarity_reached:  ['SOLIDARITY',  'The ship acted as one body.'],
+    ending_the_knowing_reached: ['THE KNOWING', 'You have been here before.'],
+  };
+  let endingTitle = 'THE CROSSING', endingDesc = '';
+  for (const [flag, [title, desc]] of Object.entries(endingNames)) {
+    if (G.flags.has(flag)) { endingTitle = title; endingDesc = desc; break; }
+  }
+
+  const titleEl = document.createElement('div');
+  titleEl.className = 'cr-ending-title';
+  titleEl.textContent = endingTitle;
+  screen.appendChild(titleEl);
+
+  if (endingDesc) {
+    const descEl = document.createElement('div');
+    descEl.className = 'cr-ending-desc';
+    descEl.textContent = endingDesc;
+    screen.appendChild(descEl);
+  }
+
+  // Divider
+  const div1 = document.createElement('div'); div1.className = 'cr-divider'; screen.appendChild(div1);
+
+  // Settled soundings
+  if (G.soundings.settled && G.soundings.settled.length > 0) {
+    const sec = document.createElement('div'); sec.className = 'cr-section'; sec.textContent = 'Settled this crossing'; screen.appendChild(sec);
+    for (const s of G.soundings.settled) {
+      const snd = _registries.soundings[s.id];
+      const row = document.createElement('div'); row.className = 'cr-row';
+      row.textContent = (snd && snd.name) ? snd.name : s.id;
+      screen.appendChild(row);
+    }
+  }
+
+  // NPC memories — surface 2–3 most significant
+  if (G.npcStance) {
+    const memories = [];
+    for (const [npc, stance] of Object.entries(G.npcStance)) {
+      if (stance.memories && stance.memories.length) {
+        // Take the last (most recent) memory per NPC
+        const m = stance.memories[stance.memories.length - 1];
+        if (m && m.text) memories.push({ npc, text: m.text });
+      }
+    }
+    if (memories.length > 0) {
+      const div2 = document.createElement('div'); div2.className = 'cr-divider'; screen.appendChild(div2);
+      const sec2 = document.createElement('div'); sec2.className = 'cr-section'; sec2.textContent = 'What the ship remembers'; screen.appendChild(sec2);
+      for (const { npc, text } of memories.slice(0, 3)) {
+        const row = document.createElement('div'); row.className = 'cr-memory';
+        const npcSpan = document.createElement('span'); npcSpan.className = 'cr-memory-npc';
+        npcSpan.textContent = npc.charAt(0).toUpperCase() + npc.slice(1);
+        const textSpan = document.createElement('span'); textSpan.textContent = ' — ' + text;
+        row.appendChild(npcSpan); row.appendChild(textSpan);
+        screen.appendChild(row);
+      }
+    }
+  }
+
+  // Theosis and crossing tax
+  const div3 = document.createElement('div'); div3.className = 'cr-divider'; screen.appendChild(div3);
+  const t = G.theosis || 0;
+  const tax = Math.min(15, Math.max(0, t - 5));
+  const carried = Math.max(5, Math.min(85, t - tax));
+  const tierNames = ['Asleep', 'Waking', 'Illumined'];
+  const tierName = t >= 66 ? tierNames[2] : t >= 33 ? tierNames[1] : tierNames[0];
+  const theoSec = document.createElement('div'); theoSec.className = 'cr-section'; theoSec.textContent = 'Theosis'; screen.appendChild(theoSec);
+  const theoRow = document.createElement('div'); theoRow.className = 'cr-theosis';
+  theoRow.innerHTML = `<span class="cr-theosis-val">${t}</span> <span class="cr-theosis-tier">${tierName}</span>`;
+  screen.appendChild(theoRow);
+  const taxRow = document.createElement('div'); taxRow.className = 'cr-tax';
+  taxRow.textContent = `The body forgets ${tax}. You carry ${carried} into the next crossing.`;
+  screen.appendChild(taxRow);
+
+  // Meta marks — which endings reached
+  const metaEndings = ['reached_erasure','reached_witness','reached_restoration','reached_solidarity','reached_the_knowing'];
+  const metaLabels = { reached_erasure:'✦', reached_witness:'✦✦', reached_restoration:'✦✦✦', reached_solidarity:'✦✦✦✦', reached_the_knowing:'✦✦✦✦✦' };
+  const reached = metaEndings.filter(m => hasMeta(m));
+  if (reached.length > 0) {
+    const metaEl = document.createElement('div'); metaEl.className = 'cr-meta';
+    metaEl.textContent = reached.map(m => metaLabels[m]).join('  ');
+    screen.appendChild(metaEl);
+  }
+
+  // Continue button
+  const div4 = document.createElement('div'); div4.className = 'cr-divider'; screen.appendChild(div4);
+  const btn = document.createElement('button');
+  btn.className = 'btn cr-btn';
+  btn.textContent = G.playCount > 0 ? 'Begin a new crossing.' : 'Begin.';
+  btn.onclick = () => newPlay();
+  screen.appendChild(btn);
+
+  root.appendChild(screen);
+}
 
 window.SOBORNOST={
   VERSION, G, render, setDebug, undo, redo,
