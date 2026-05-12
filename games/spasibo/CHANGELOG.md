@@ -1,3 +1,43 @@
+## v2.3 "Brass and Cold Light" — May 2026
+
+### Visual Overhaul — 10 improvements
+
+**1. Reading column**
+`--max` reduced from 660px to 640px. Asymmetric padding: 2.2rem left, 1.4rem right. The text sits slightly left of centre, creating intentional white space on the right that lets the porthole canvas breathe through.
+
+**2. Choice visual hierarchy**
+Navigation choices (`Go to the main deck`) use a `·` prefix, 1px border, and `var(--fg-dim)` colour. On hover: `—` prefix, 2px cold border, full `var(--fg)`. Consequential choices (`.choice-vespers`, `.choice-cold`, `.choice-charism`) use 2px border and full colour at rest — they look heavier because they are.
+
+**3. Location bar**
+Now `.8rem` (up from `.72rem`) and the dominant visual element in the header. The liturgical hour is rendered as a subordinate `<span class="loc-hour">` at `.58rem` in `var(--dim)` — same data, clearly different weight. The engine now creates two separate elements rather than concatenating a single text string.
+
+**4. Header breathing room**
+Padding increased to `.9rem 1.4rem .65rem`. Gap between location and stat bar increased to `.55rem`. A `border-top: 1px solid var(--border)` separates the stat bar from the location line — ambient information visually below navigational information. Stat labels switched from uppercase to lowercase and from `var(--dim)` to `var(--cold-dim)` — they read as annotations rather than labels.
+
+**5. Sounding cards**
+Completely redesigned. Left-border treatment (`border-left: 3px solid`) instead of full box border — the Breviary now feels like a manuscript margin rather than a list of UI components. Taken soundings: cold-dim border. Settled soundings: cold border + cold-faint background + "settled" micro-label above the name. Sounding text separated from name by a subtle rule. The codex uses full box borders throughout — the two panels no longer look identical.
+
+**6. Dialogue beat differentiation**
+Speaker name gets a `::after` rule — a horizontal line extends from the name to the right edge of the NPC dialogue box, like a table rule in a ship's log. Narration beats are `.88rem` italics in `var(--dim)` with no border treatment — clearly distinct from spoken dialogue. "Continue" advance button uses `↓` instead of `—` and is dimmer than other choices.
+
+**7. Title screen**
+"СПАСИБО" now sits inside `.title-plate` — a container with heavy top and bottom borders (`3px solid rgba(138,104,56,0.6)`) and side decoration (`·  ·  ·` in each corner via `::before`/`::after`). The name looks like a ship's name plate in brass. Tier-responsive: Asleep = `var(--fg)`, Waking = `var(--cold)` with blue glow, Illumined = `var(--gold)` with gold radiance. Meta-unlock marks (✦ through ✦✦✦✦✦) positioned below the plate.
+
+**8. Porthole gold — steeper curve**
+Previous curve: 0 at Asleep, 0.6 at Illumined (flat). New curve:
+- Asleep (< 33): 0
+- Waking (33–65): 0.10 → 0.40 (slow rise)  
+- Illumined (66–84): 0.60 → 0.90 (steeper)
+- Rememberer (≥ 85): 0.92 (near-maximum)
+
+Ring glow halo added: at `gi > 0.5`, canvas shadow blur fires as `r * gi * 0.4`. At Illumined tier the porthole ring visibly radiates. CSS `drop-shadow` by tier adds a second layer: Waking = subtle 6px, Illumined = 16px gold radiance.
+
+**9. Bottom nav — active state**
+`border-top: 2px solid transparent` slot on all buttons. Active panel: `border-top-color: var(--cold-dim)` + cold background. Breviary with available soundings: amber top border. Each button has a `data-panel` attribute for CSS targeting. `map` and `log` buttons at 70% opacity (rarely needed) — hover restores to full. Engine now tracks `G.panelOpen` against panel IDs and applies `.panel-active` class on render.
+
+**10. Cover challenge dice — logbook notation**
+Previous: `[4]+[3]=7+5=12 — SUCCESS`. New: two square `.die` elements side by side, then `Background · total 12 · holds` in `.72rem` uppercase — reads like a ship's log entry rather than a TTRPG roll. Result border changes colour by outcome (cold for success, amber for partial, rust for failure). Engine `resolveCoverChallenge` now passes field name through to the result display.
+
 ## v2.2 "The Field Answers" — May 2026
 
 ### All Ten Group-1 Engine Systems Now Active

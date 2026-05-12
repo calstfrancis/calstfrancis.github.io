@@ -764,9 +764,10 @@ function refreshAtmosMods() {
   atmosMods.fogMult=1.0; atmosMods.lampWarm=0; atmosMods.lampFlicker=true; atmosMods.soboWarm=false;
   for (const mod of _atmosModifiers) if (s.includes(mod.soundingId)) mod.effectFn(atmosMods, _registries.soundings[mod.soundingId]);
   const t = G.theosis||0;
-  if (t>=71) atmosMods.goldIntensity=0.6;
-  else if (t>=33) atmosMods.goldIntensity=0.2+(t-33)/38*0.4;
-  else atmosMods.goldIntensity=0;
+  if (t>=85)      atmosMods.goldIntensity=0.92;
+  else if (t>=66) atmosMods.goldIntensity=0.60+(t-66)/19*0.30;
+  else if (t>=33) atmosMods.goldIntensity=0.10+(t-33)/33*0.30;
+  else            atmosMods.goldIntensity=0;
   atmosMods.goldGlow=atmosMods.goldIntensity>0;
 }
 
@@ -813,8 +814,18 @@ function _drawPorthole() {
   const gi=atmosMods.goldIntensity;
   // Outer brass ring — thick and visible
   const brassR = gi>0 ? `rgba(${Math.round(lerpN(100,180,gi))},${Math.round(lerpN(80,140,gi))},${Math.round(lerpN(40,60,gi))},0.9)` : 'rgba(95,78,42,0.88)';
-  ctx.strokeStyle=brassR; ctx.lineWidth=r*.22;
-  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.stroke();
+  // Outer glow halo at high goldIntensity
+  if(gi>0.5){
+    ctx.save();
+    ctx.shadowColor=`rgba(212,175,55,${(gi-0.5)*0.9})`;
+    ctx.shadowBlur=r*(gi*0.4);
+    ctx.strokeStyle=brassR; ctx.lineWidth=r*.22;
+    ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.stroke();
+    ctx.restore();
+  } else {
+    ctx.strokeStyle=brassR; ctx.lineWidth=r*.22;
+    ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.stroke();
+  }
   // Bolts around ring
   ctx.fillStyle=gi>0?`rgba(160,130,60,0.95)`:'rgba(80,65,35,0.9)';
   for (let i=0;i<8;i++) { const a=(i/8)*Math.PI*2; ctx.beginPath(); ctx.arc(x+Math.cos(a)*(r+r*.06),y+Math.sin(a)*(r+r*.06),r*.052,0,Math.PI*2); ctx.fill(); }
@@ -1780,12 +1791,14 @@ function renderCoverChallengeOverlay(root,processTextFn) {
     diceRow.innerHTML = `<span class="die">${result.d1}</span><span class="die">${result.d2}</span> + ${result.statValue} = ${result.total}`;
     box.appendChild(diceRow);
     // Outcome narrative
-    const outcomeText = {
-      success: 'The cover holds.',
-      partial: 'It holds — barely. Something was given.',
-      failure: 'The question lands. The cover has shifted.',
+    // Logbook notation: "bearing · total 14 · holds"
+    const outcomeLabels = {
+      success: 'holds',
+      partial:  'holds — at cost',
+      failure:  'does not hold',
     };
-    res.textContent = outcomeText[result.outcome] || result.outcome.toUpperCase();
+    const fieldLabel = field ? (field.charAt(0).toUpperCase()+field.slice(1)) : 'Cover';
+    res.textContent = `${fieldLabel} · total ${result.total} · ${outcomeLabels[result.outcome]||result.outcome}`;
     if (result.charismNote) { const cn=document.createElement('div');cn.className='challenge-charism';cn.textContent=result.charismNote;box.appendChild(cn); }
     box.appendChild(res);
     const cont=document.createElement('button');cont.className='btn';cont.style.cssText='margin-top:1rem;width:100%';
@@ -2254,7 +2267,9 @@ function renderTitle(root){
   const replay=G.playCount>0,hasSave=!!localStorage.getItem(SAVE_KEY_PREFIX+'legacy'),isDemo=typeof IS_DEMO!=='undefined'&&IS_DEMO;
   const d=document.createElement('div');d.className='title-screen';
   d.innerHTML=`
-    <div class="title-cyrillic">${window.GAME_TITLE||'GAME'}</div>
+    <div class="title-plate">
+    <div class="title-cyrillic">${window.GAME_TITLE||'СПАСИБО'}</div>
+    </div>
     <div style="font-family:'GOST type B','Share Tech Mono',monospace;font-size:.66rem;color:var(--amber-dim);letter-spacing:.22em;margin-bottom:${isDemo?'1.2':'2'}rem">${window.GAME_MOTTO||'Thank You'}</div>
     ${isDemo?'<div style="font-size:.8rem;color:var(--amber);border:1px solid var(--amber-dim);padding:.5rem 1.2rem;margin-bottom:2.5rem">DEMO VERSION \u2014 Act One Only</div>':''}
     <pre class="title-ship-art" style="font-family:'GOST type B','Share Tech Mono',monospace;font-size:.62rem;color:var(--cold-dim);white-space:pre;line-height:1.25;margin-bottom:2.5rem;text-align:center;opacity:0.7">
@@ -2596,8 +2611,9 @@ function _buildHeader(scene){
   const si=document.createElement('div');si.className='save-indicator';si.textContent='\u25e6 autosaved';si.style.display='none';hdr.appendChild(si);
   const moodCls=scene.mood==='uncanny'?' uncanny':scene.mood==='revelation'?' revelation':'';
   const lb=document.createElement('div');lb.className='location-bar'+moodCls;
+  const locSpan=document.createElement('span'); locSpan.textContent=scene.location||''; lb.appendChild(locSpan);
   const hourName = LITURGICAL_HOURS[G.liturgicalHour]?.name;
-  lb.textContent = hourName ? `${scene.location}  ·  ${hourName}` : scene.location;
+  if(hourName){ const hs=document.createElement('span'); hs.className='loc-hour'; hs.textContent=hourName; lb.appendChild(hs); }
   hdr.appendChild(lb);
   const sbarDoubt = G.stats.doubt || 0;
   const sb=document.createElement('div');sb.className='sbar'+(sbarDoubt>=7?' sbar-jitter':'');
@@ -2669,10 +2685,15 @@ function _appendBottomNav(root){
     {label:fl('calendar','календарь'),     fn:()=>openPanel('calendar'),  title:'The crossing — day and liturgical hour'},
     {label:fl('map','карта'),              fn:()=>openPanel('map'),       title:'Where things are'},
   ];
-  navItems.forEach(({label,fn,cls='',title=''})=>{
+  const _navPanelIds=['notes','status','breviary','glossary','calendar','map'];
+  navItems.forEach(({label,fn,cls='',title=''},_ni)=>{
     const b=document.createElement('button');
-    b.style.cssText="flex:1;background:none;border:none;border-right:1px solid var(--border);font-family:'GOST type B','Share Tech Mono','Courier Prime',monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;padding:.65rem .2rem;cursor:pointer;color:var(--dim)";
-    b.className=cls;b.textContent=label;b.onclick=fn;if(title)b.title=title;bnav.appendChild(b);
+    b.style.cssText="flex:1;background:none;border:none;border-right:1px solid var(--border);font-family:'GOST type B','Share Tech Mono','Courier Prime',monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;padding:.72rem .2rem .58rem;cursor:pointer;color:var(--dim);border-top:2px solid transparent;position:relative;";
+    const _pid=_navPanelIds[_ni]||'';
+    if(_pid)b.setAttribute('data-panel',_pid);
+    let _cls=cls||'';
+    if(G.panelOpen===_pid&&_pid) _cls+=(_cls?' ':'')+' panel-active';
+    b.className=_cls;b.textContent=label;b.onclick=fn;if(title)b.title=title;bnav.appendChild(b);
   });
   root.appendChild(bnav);
 }
@@ -3047,6 +3068,20 @@ function _renderMapPanelSide(root) {
     main_deck_hub:'main_deck',act_two_begin:'main_deck',
   };
   const sceneMap = {cabin:'cabin_wake',main_deck:'main_deck_hub',foredeck:'foredeck_first',bridge:'bridge_hub',mess:'mess_hub',galley:'galley_hub',chart_room:'chart_room_first',captain_quarters:'bridge_hub',hold_access:'hold_first',hold:'hold_first',cargo_bay:'hold_first',instrument_room:'instrument_room_first',aft:'instrument_room_first'};
+  // Reverse map: scene ID → node ID (one scene can map to multiple nodes)
+  const reverseSceneMap = {};
+  for(const [nodeId, sceneId] of Object.entries(sceneMap)) reverseSceneMap[sceneId] = nodeId;
+  // A node is visited if: its own visited_ flag is set, OR the scene it maps to has been visited
+  const isVisited = (nodeId) => {
+    if(G.flags && G.flags.has('visited_'+nodeId)) return true;
+    const scId = sceneMap[nodeId];
+    if(scId && G.flags && G.flags.has('visited_'+scId)) return true;
+    // Also check all scenes that map to this node
+    for(const [nid, sid] of Object.entries(sceneMap)) {
+      if(nid === nodeId && G.flags && G.flags.has('visited_'+sid)) return true;
+    }
+    return false;
+  };
   const currentNode = sceneToNode[G.scene] || null;
 
   if (!nodes || Object.keys(nodes).length === 0) {
@@ -3062,8 +3097,9 @@ function _renderMapPanelSide(root) {
       const req=node.theosisRequired||0;
       if(G.theosis<req){hiddenCount[0]++;return;}
       const isCur=currentNode===id;
-      const wasVisited=G.flags&&G.flags.has('visited_'+id);
-      const isPastLife=G.charisms&&G.charisms.includes('witness')&&G.pastLifeFlags&&G.pastLifeFlags.has('visited_'+id);
+      const wasVisited = isVisited(id);
+      const scId = sceneMap[id];
+      const isPastLife=G.charisms&&G.charisms.includes('witness')&&G.pastLifeFlags&&(G.pastLifeFlags.has('visited_'+id)||(scId&&G.pastLifeFlags.has('visited_'+scId)));
       if(isCur||wasVisited) visited.push({id,isCur,wasVisited});
       else if(isPastLife) knownRoute.push(id);
       // If not visited and not past-life: don't show — explore to discover
@@ -3082,7 +3118,7 @@ function _renderMapPanelSide(root) {
     if(visited.length){
       const sec=document.createElement('div');sec.className='panel-section';sec.textContent='this crossing';body.appendChild(sec);
       const list=document.createElement('div');list.className='map-grid';
-      visited.forEach(({id,isCur})=>list.appendChild(makeNode(id,G.flags.has('visited_'+id)?' visited':'',isCur)));
+      visited.forEach(({id,isCur,wasVisited})=>list.appendChild(makeNode(id,wasVisited&&!isCur?' visited':'',isCur)));
       body.appendChild(list);
     }
     if(knownRoute.length){
