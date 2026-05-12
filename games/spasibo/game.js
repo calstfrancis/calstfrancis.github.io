@@ -923,6 +923,7 @@ Then, without transition:
         next:      'pavel_denomination_response',
         set_cover: { key: 'denomination', value: 'Non-denominational' },
         set_flag:  'cover_denomination_none',
+        condition: { type: 'not', condition: { type: 'flag', id: 'toast_cover_denomination' } },
       },
     ],
   },
@@ -1130,9 +1131,13 @@ She stops.
 — You should see the hold. If you haven't.`,
     onEnter: () => { S.modReputation('lena', 1); S.setFlag('lena_hold_mentioned'); },
     choices: [
-      { text: '"What\'s in the hold?"',                        next: 'lena_hold'    },
-      { text: '"What do you mean, doing what she was built for?"', next: 'lena_reasons' },
-      { text: 'Go to the hold.',                                next: 'hold_first'   },
+      { text: '"What\'s in the hold?"', next: 'lena_hold',
+        condition: { type: 'not', condition: { type: 'flag', id: 'lena_archive_revealed' } } },
+      { text: '"What do you mean, doing what she was built for?"', next: 'lena_reasons',
+        condition: { type: 'not', condition: { type: 'flag', id: 'lena_reasons_heard' } } },
+      { text: 'Go to the hold.', next: 'hold_first',
+        condition: { type: 'flag', id: 'lena_archive_revealed' } },
+      { text: 'Go to the main deck.', next: 'main_deck_hub' },
     ],
   },
 
@@ -1172,6 +1177,7 @@ She goes back to cooking. The conversation is over. This is not hostility. It is
 
   lena_reasons: {
     id: 'lena_reasons', location: 'Galley', mood: 'neutral',
+    onEnter: () => { S.setFlag('lena_reasons_heard'); },
     text: `She is quiet long enough that you think the answer isn't coming.
 
 — She was built to find things. Things that are there but hidden. The anomalies. The irregularities. She was built to be transparent enough that the hidden things could show through. Twenty-two years ago, that was still what she was for.
@@ -1400,9 +1406,17 @@ Freezer Beef shifts from the top of the stack to beside your feet. This is proba
 
 The box nearest you is labelled: *1972, Atlantic crossing, photographs, southern route.*`,
     choices: [
-      { text: 'Open the 1972 box.',                        next: 'hold_1972_box'                        },
-      { text: 'Don\'t open anything. Just bear witness.',  next: 'hold_witness', theosis: 3             },
-      { text: 'Go back up.',                               next: 'main_deck_hub'                        },
+      { text: 'Open the 1972 box.',                next: 'hold_1972_box',
+        condition: { type: 'not', condition: { type: 'flag', id: 'box_1972_opened' } } },
+      { text: 'Stand with it. Just bear witness.', next: 'hold_witness', theosis: 3,
+        condition: { type: 'not', condition: { type: 'flag', id: 'hold_witnessed' } } },
+      { text: 'Bless the archive.',                next: 'hold_bless_archive',
+        condition: { type: 'and', conditions: [
+          { type: 'flag', id: 'sunday_service_led' },
+          { type: 'not', condition: { type: 'flag', id: 'archive_blessed' } }
+        ]}},
+      { text: 'Return to the hold entrance.',      next: 'hold_first' },
+      { text: 'Go back up.',                       next: 'main_deck_hub' },
     ],
   },
 
@@ -1499,14 +1513,17 @@ You stand in the hold for a long time with this photograph.`,
       S.incrementTheosis(3);
       S.applyEffect({ communion: 1 });
       S.setFlag('hold_micha_photo');
+      S.setFlag('box_1972_opened');
       S.modReputation('miguel', 2);
       S.showToast('Something is found.', 'theosis');
     },
     choices: [
-      { text: 'Put it back carefully. Go find Miguel.',  next: 'miguel_photo_return' },
-      { text: 'Keep the photograph.',                    next: 'hold_first', set_flag: 'photo_kept', give_item: 'zarya_photograph' },
-      { text: 'Look at the other boxes.',                next: 'hold_boxes'           },
-      { text: 'Put it back. Go up.',                     next: 'main_deck_hub'       },
+      { text: 'Put it back carefully. Go find Miguel.',  next: 'miguel_photo_return',
+        condition: { type: 'not', condition: { type: 'flag', id: 'photo_kept' } } },
+      { text: 'Keep the photograph.',                    next: 'hold_first', set_flag: 'photo_kept', give_item: 'zarya_photograph',
+        condition: { type: 'not', condition: { type: 'flag', id: 'photo_kept' } } },
+      { text: 'Look at the other boxes.',                next: 'hold_boxes' },
+      { text: 'Go up.',                                  next: 'main_deck_hub' },
     ],
   },
 
@@ -2417,10 +2434,12 @@ The ship moves. The instruments sing.`,
       S.showToast('Something is found.', 'theosis');
     },
     choices: [
-      { text: 'Put a hand on her shoulder. Say nothing.',          next: 'anomaly_nadia_solidarity', theosis: 3, communion: 1 },
-      { text: '"Have you told Alexei?"',                            next: 'anomaly_alexei_theory' },
-      { text: 'Go find the radio. Now.',                            next: 'radio_discovery', requires_flag: 'radio_existence_known' },
-      { text: 'Go to the hold.',                                    next: 'anomaly_peak_hold' },
+      { text: 'Put a hand on her shoulder. Say nothing.',  next: 'anomaly_nadia_solidarity', theosis: 3, communion: 1,
+        condition: { type: 'not', condition: { type: 'flag', id: 'nadia_solidarity_act' } } },
+      { text: '"Have you told Alexei?"',                   next: 'anomaly_alexei_theory',
+        condition: { type: 'not', condition: { type: 'flag', id: 'nadia_solidarity_act' } } },
+      { text: 'Go find the radio.',                        next: 'radio_discovery', requires_flag: 'radio_existence_known' },
+      { text: 'Go to the hold.',                           next: 'anomaly_peak_hold' },
     ],
   },
 
@@ -2541,9 +2560,12 @@ He looks at you.
 
 Something in the foredeck, the spray, the fact that it is 2am and the anomaly is at maximum — something in all of this makes the usual answers feel inadequate.`,
     choices: [
-      { text: '"Preserve the record. Whatever it takes."',   next: 'act_two_resolve', set_flag: 'mission_refused'  },
-      { text: '"Going to find the radio."',              next: 'radio_discovery', requires_flag: 'radio_existence_known', set_flag: 'mission_refused' },
-      { text: '"Not yet."',                         next: 'act_two_still_deciding'                          },
+      { text: '"Preserve the record. Whatever it takes."', next: 'act_two_resolve', set_flag: 'mission_refused',
+        condition: { type: 'not', condition: { type: 'flag', id: 'mission_accepted' } } },
+      { text: '"Going to find the radio."',           next: 'radio_discovery', requires_flag: 'radio_existence_known', set_flag: 'mission_refused',
+        condition: { type: 'not', condition: { type: 'flag', id: 'mission_accepted' } } },
+      { text: '"Not yet."',                      next: 'act_two_still_deciding',
+        condition: { type: 'not', condition: { type: 'flag', id: 'mission_refused' } } },
     ],
   },
 
@@ -2788,9 +2810,12 @@ He is looking at you with the complete attention of someone who has decided that
 — The mission is simple. He says. — I don't know why it has become complicated.`,
     onEnter: () => { S.applyEffect({ vigilance: -1, doubt: 2 }); S.setFlag('othis_confrontation_happened'); },
     choices: [
-      { text: 'Stay in cover. Deny everything.',                              next: 'othis_deny',        vigilance: 1 },
-      { text: 'Drop cover. Tell him directly.',                               next: 'othis_direct',      communion: 1 },
-      { text: '"The mission has become complicated because it should be."',   next: 'othis_confronted'               },
+      { text: 'Stay in cover. Deny everything.',                              next: 'othis_deny',        vigilance: 1,
+        condition: { type: 'not', condition: { type: 'flag', id: 'othis_confrontation_ended' } } },
+      { text: 'Drop cover. Tell him directly.',                               next: 'othis_direct',      communion: 1,
+        condition: { type: 'not', condition: { type: 'flag', id: 'othis_confrontation_ended' } } },
+      { text: '"The mission has become complicated because it should be."',   next: 'othis_confronted',
+        condition: { type: 'not', condition: { type: 'flag', id: 'othis_confrontation_ended' } } },
     ],
   },
 
@@ -3698,18 +3723,19 @@ You hold the receiver.`,
     choices: [
       {
         text: '"The crossing is proceeding. Everything is in order."',
-        next: 'landstorm_lie',
-        vigilance: 1,
+        next: 'landstorm_lie', vigilance: 1,
+        condition: { type: 'not', condition: { type: 'flag', id: 'landstorm_called' } },
       },
       {
         text: '"I need more time to assess the situation."',
         next: 'landstorm_delay',
+        condition: { type: 'not', condition: { type: 'flag', id: 'landstorm_called' } },
       },
       {
         text: 'Set the receiver down without answering.',
-        next: 'landstorm_silence',
-        theosis: 3,
+        next: 'landstorm_silence', theosis: 3,
         requires_flag: 'mission_reality_known',
+        condition: { type: 'not', condition: { type: 'flag', id: 'landstorm_called' } },
       },
     ],
   },
@@ -3893,6 +3919,7 @@ She means this. The warmth in her voice when she says *helped* is the first unst
         text: '"Then let me help."',
         next: 'kylie_alliance',
         requires_flag: 'mission_reality_known',
+        condition: { type: 'not', condition: { type: 'flag', id: 'kylie_in_alliance' } },
       },
       {
         text: '"I understand."',
@@ -4023,14 +4050,13 @@ He looks at you.
       },
       {
         text: "'I do not know. But the question is correct.'",
-        next: 'alexei_honest_answer',
-        theosis: 2,
+        next: 'alexei_honest_answer', theosis: 2,
+        condition: { type: 'not', condition: { type: 'flag', id: 'alexei_emergency_talked' } },
       },
       {
         text: 'Sit with him. No answer yet.',
-        next: 'alexei_sit_together',
-        theosis: 3,
-        composure: 1,
+        next: 'alexei_sit_together', theosis: 3, composure: 1,
+        condition: { type: 'not', condition: { type: 'flag', id: 'alexei_emergency_talked' } },
       },
     ],
   },
