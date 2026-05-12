@@ -1,3 +1,35 @@
+## v1.8 "Soundings" — May 2026
+
+### Pavel ASCII Art Fix
+Pavel's portrait label was displaying "Павел" (Cyrillic) from the opening scene. The static art string now reads "Pavel" in Latin. The name mapping system (earlyCyrillic) handles the transition to Павел at Waking tier (theosis > 32) in prose — the portrait label is not subject to name mapping and should start in Latin.
+
+### Ten New Scenes
+
+**1. Compline Confession (`compline_connie`, `compline_connie_stay`, `compline_connie_speak`)** — Connie Frank, late night, door open. She tells you about a seventeen-year-old patient in Montréal she could not fix on the second Thursday. Seven years on ships because the sea kills you for comprehensible reasons. She watched you stay with Alexei without fixing anything and understands that is what she has not been able to do. Only available at Compline hour if `connie_saw_chaplain` is set. Two paths: stay in silence until she sleeps, or say something true in return. The second path requires the player to offer something. Both advance `sounding_forgiveness`.
+
+**2. Anomaly Returns Signal (`anomaly_returns_signal`, `anomaly_signal_readout`, `anomaly_signal_pattern`)** — Alexei calls at 3am. Fourteen minutes after the transmission ended, the deviation curve spiked in return. The same carrier frequency, going the other direction. He draws the return pattern by hand: it responds specifically to the names, the photographs Nadia described, the coordinates of this position. As if confirming: *yes, here. I am here. I have been here.* Thirty years the ship measured it. Now it measures back. Only available after `archive_transmitted` + theosis ≥ 66. Highest single theosis grant in the game (+10 on entry).
+
+**3. Oblong Vassilithune Departure (`oblong_departure`)** — He is not at the corner table. The chair is pushed in. The carafe is gone. Lena, when asked, cannot retrieve the memory of him at all, which is consistent with having no memory of him arriving. The corner table is empty. No evidence except your memory, which you trust, and the effect of what he said, which you can still feel. Available at Act Three if met.
+
+**4. Nadia 1978 Discovery (`nadia_1978_discovery`, `nadia_1978_knew`, `nadia_1978_error`, `nadia_1978_sit`)** — Nadia on the hold floor with a 1978 binder. Measurements at a position four nautical miles from current location with no catalogued anomaly — either position error (unlikely at this magnitude) or a deliberate decision not to catalogue. *The absence is also a record. The gap is evidence.* Three paths: agree they knew (Nadia concludes they are transmitting it anyway), suggest error (she notes both possibilities unconvinced), or sit with her and the binder (Freezer Beef arrives, Nadia's hand finds the cat). Available when `hold_visited` + `act_two_begun`.
+
+**5. Liturgical Pressure — Deadline Mechanics** — When the player directly refuses Landstorm on the second call (`landstorm_second_refuse`), `setDeadline('othis_deadline', day, 6, 'othis_acts')` fires. If Othis has not been confronted before Compline, `othis_acts` triggers automatically: Othis at the hold with the key, having received instructions, the window closed. The institutional clock now runs. `othis_acts` also accessible from Act Two hub when `landstorm_knows_refused` is set.
+
+**6. Pavel Past Story (`pavel_past_story`, `pavel_past_paper`)** — Pavel tells a specific story from before the ship. A student named seventeen. A question: *if the official account is false and you know it is false and you teach it anyway, what are you doing?* He gave the evasive answer. The student left a piece of paper on his desk the next day with the honest version. The prison was later. The paper was first. Second scene reveals what the paper said: *which do you want to have been the kind of person who chose?* Pavel identifies the crossing tax period — the fifteen points — as the cost of not yet having decided. Routes to `act_two_resolve` if Act Three has begun.
+
+**7. Crossing Tax as Lived Experience (`crossing_tax_lived`)** — On second+ crossing, `newPlay()` now sets initial scene to `crossing_tax_lived` instead of `cabin_wake`. The player wakes knowing they have been here before: the shape of the porthole known by the body, something slightly smaller than they left it (fifteen points, the body's portion), and what remains. The ship's name in Cyrillic *in some part of your thinking that is not quite language.* The letter is on the desk. The crossing begins.
+
+**8. Cover Identity Crisis (`cover_identity_crisis`, `cover_crisis_stay`)** — During anomaly peak at theosis ≥ 45, available from Act Two hub. The player cannot remember which things they believe and which things they were told to say. Denomination, posting, left-behind — which part was real? Freezer Beef places a paw on the knee. The cover is not gone — it is transparent. The thing it was covering is: a chaplain. Not performing one. Being one. Doubt −4, theosis +9. The crisis the system describes but the narrative had not yet dramatised.
+
+**9. Sunday Service Congregation (`sunday_congregation`, `sunday_congregation_stay`)** — After `sunday_service_led`, available from Act Two hub. The vignette of who stayed: Lena refilling tea and making eye contact once. Alexei with his question that is also not his question. Nadia crying in the good way. Miguel at the back, which he never does — his nod when he sees you notice him means something specific about the crossing being what it should be. Staying adds `sounding_sobornost` offer and raises socialTrust by 3.
+
+**10. Stink Patrol Favour (`stink_patrol_favour`)** — Below the forward hold, past the hold, to the hatch that is not on the schematic. You knock. Warm hands. You explain what you need: a location for the archive that doesn't exist on any manifest Othis knows about. A pause. The hands return with a paper in 1952 measurements. You fold it carefully. You do not know what you have done in exchange, but it has the quality of being exactly proportionate. Available when `stink_patrol_hands_known` + communion ≥ 6 + `mission_refused`. Sets `archive_hidden_location` flag.
+
+### Engine Changes
+- `newPlay()` now sets initial scene to `crossing_tax_lived` on second+ crossing.
+- `setDeadline` now used actively: Landstorm second-call refusal sets a deadline that fires `othis_acts` at liturgical hour 6 if Othis not confronted.
+- Scene count: 228 defined, 0 missing references.
+
 ## v1.7 "Act Three" — May 2026
 
 ### Act Three: Now Exists
