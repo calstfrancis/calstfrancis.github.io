@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────
-// SPASIBO 1.5.1 — game.js
+// SPASIBO — game.js
 // A SOBORNOST Engine Production
 // ─────────────────────────────────────────────────────────────────
 
@@ -29,7 +29,7 @@ S.registerStatTip('composure', 'stillness — pastoral presence');
 S.registerStatTip('communion', 'solidarity — what you have given');
 S.registerStatTip('doubt',     'static — rises with cover strain');
 
-S.registerNameMapping('Pavel',  'Pavel',   'Павел',   'Павел');
+S.registerNameMapping('Pavel',  'Павел',   'Павел',   'Павел', true); // Cyrillic from Waking tier
 S.registerNameMapping('Miguel', 'Misha',   'Mikhail', 'Михаил');
 S.registerNameMapping('Lena',   'Lena',    'Elena',   'Елена');
 S.registerNameMapping('Alexei', 'Alyosha', 'Alexei',  'Алексей');
@@ -87,101 +87,118 @@ S.registerArt('ship_title', [
 ].join('\n'));
 
 S.registerArt('portrait_pavel', [
-  '  .--------.',
-  ' /  ~   ~  \\',
-  '|     ^     |',
-  '|  \\ ___ / |',
-  ' \\  ___  / ',
-  '  |  P A V E L  |',
+  '    .  * .  .    ',
+  '  .  . ___ .  .  ',
+  '   ( o   o )     ',
+  '    |  ω  |      ',
+  '    | ~~~ |      ',
+  '   /|_____|\\     ',
+  '    Павел         ',
 ].join('\n'));
 
 S.registerArt('portrait_miguel', [
-  '  .--------.',
-  ' /  —   —  \\',
-  '|     .     |',
-  '|  \\ ___ / |',
-  ' \\  ___  / ',
-  '  |  MIGUEL  |',
+  '   ___________   ',
+  '  |  _______  |  ',
+  '  | | . . | | |  ',
+  '  | |  ═  | | |  ',
+  '  | |_____| | |  ',
+  '  |___________|  ',
+  '     Miguel       ',
 ].join('\n'));
 
 S.registerArt('portrait_lena', [
-  '  .--------.',
-  ' /  .   .  \\',
-  '|     -     |',
-  '|  \\ ___ / |',
-  ' \\  ___  / ',
-  '  |   LENA   |',
+  '   .·:·:·:·:.    ',
+  '  ( ·  ,  · )    ',
+  '  |   ___   |    ',
+  '   \\  \_/  /     ',
+  '    \\____/      ',
+  '   ( steam  )    ',
+  '      Lena        ',
 ].join('\n'));
 
 S.registerArt('portrait_alexei', [
-  '  .--------.',
-  ' /  o   o  \\',
-  '|     .     |',
-  '|  \\ — / |',
-  ' \\  ___  / ',
-  '  |  ALEXEI  |',
+  '  ┌───────────┐  ',
+  '  │ ∿∿ · ∿∿  │  ',
+  '  │  (o   o) │  ',
+  '  │    ___   │  ',
+  '  │  ─────  │  ',
+  '  └───────────┘  ',
+  '     Alexei       ',
 ].join('\n'));
 
 S.registerArt('portrait_nadia', [
-  '  .--------.',
-  ' /  *   *  \\',
-  '|     ^     |',
-  '|  \\ ___ / |',
-  ' \\  ___  / ',
-  '  |   NADIA  |',
+  '   * . * . * .   ',
+  '    ___________  ',
+  '   / * .   . \\  ',
+  '  |  ^       |  ',
+  '  |   \_____/ |  ',
+  '   \\__________/ ',
+  '      Nadia       ',
 ].join('\n'));
 
 S.registerArt('portrait_kylie', [
-  '  .--------.',
-  ' /  >   <  \\',
-  '|     .     |',
-  '|  \\ ___ / |',
-  ' \\  ___  / ',
-  '  |   KYLIE  |',
+  '   [  ■  ■  ■ ]  ',
+  '  ┌─────────────┐ ',
+  '  │ ▷      ◁  │ ',
+  '  │   ─────   │ ',
+  '  │  ◈  ◈   │ ',
+  '  └─────────────┘ ',
+  '      Kylie        ',
 ].join('\n'));
 
 S.registerArt('portrait_connie', [
-  '  .--------.',
-  ' /  —   —  \\',
-  '|     .     |',
-  '|  \\ ___ / |',
-  ' \\  ___  / ',
-  '  |  CONNIE  |',
+  '   ╔═══════════╗  ',
+  '   ║  ·     ·  ║  ',
+  '   ║    ───    ║  ',
+  '   ║  \_____/  ║  ',
+  '   ╚═══════════╝  ',
+  '   ╟ M  ·  D  ╢  ',
+  '      Connie       ',
 ].join('\n'));
 
 S.registerArt('portrait_othis', [
-  '  .--------.',
-  ' /  |   |  \\',
-  '|     —     |',
-  '|  \\     / |',
-  ' \\  ___  / ',
-  '  |  OTHIS   |',
+  '  ┌─────────────┐  ',
+  '  │ ▌  ·   · ▐ │  ',
+  '  │     ═     │  ',
+  '  │  |     |  │  ',
+  '  │  |_____|  │  ',
+  '  └─────────────┘  ',
+  '      Othis         ',
 ].join('\n'));
 
 // ─────────────────────────────────────────────────────────────────
 
 // Haircut: black Tiffany Chardonnay, self-possessed
 S.registerArt('portrait_haircut', [
-  '    /\\ _ /\\    ',
-  '   (  o o  )   ',
-  '   =( Y )=     ',
-  '   ) ( ) (     ',
-  '  (_)-(_)-(_)  ',
-  '               ',
-  '  H A I R C U T',
-  ' [black tiffany]',
+  '  ▓▓▓▓▓▓▓▓▓▓▓▓  ',
+  '  ▓ ▓         ▓  ',
+  '  ▓  ●     ●  ▓  ',
+  '  ▓     ▲     ▓  ',
+  '  ▓   ─────   ▓  ',
+  '  ▓▓▓▓▓▓▓▓▓▓▓▓  ',
+  '   HAIRCUT [♀]   ',
 ].join('\n'));
 
 // Freezer Beef: small calico, salamander-headed
 S.registerArt('portrait_freezer_beef', [
-  '  /\\    /\\    ',
-  ' ( o)----(.\\   ',
-  ' /____________\ ',
-  '|  .  .  .    |',
-  ' \\_____________/',
+  ' ░░░▒░ ░▒░░░░   ',
+  ' ░ ●══════● ░   ',
+  ' ░░  flat  ░░   ',
+  ' ░ (calico) ░   ',
+  ' ░░░░░░░░░░░░   ',
   '               ',
-  ' FREEZER  BEEF ',
-  '   [calico]    ',
+  ' FREEZER BEEF [♀]',
+].join('\n'));
+
+
+S.registerArt('portrait_oblong', [
+  '   · · · · · ·   ',
+  '  ╔═══════════╗  ',
+  '  ║  ?     ?  ║  ',
+  '  ║    ···    ║  ',
+  '  ║  ·     ·  ║  ',
+  '  ╚═══════════╝  ',
+  '     Oblong       ',
 ].join('\n'));
 
 // ─────────────────────────────────────────────────────────────────
@@ -936,23 +953,33 @@ Then, without transition:
     onEnter: () => { S.incrementTheosis(3); S.setFlag('pavel_ferromagnetic_heard'); },
     choices: [
       {
-        text:      '"United Church. Though I borrow widely."',
-        next:      'pavel_denomination_response',
-        set_cover: { key: 'denomination', value: 'United Church' },
-        set_flag:  'cover_denomination_united',
-        theosis:   1,
-      },
-      {
-        text:      '"Roman Catholic. On sabbatical from it, if I\'m honest."',
+        text:      '"Roman Catholic. Working with the tradition rather than against it."',
         next:      'pavel_denomination_response',
         set_cover: { key: 'denomination', value: 'Roman Catholic' },
         set_flag:  'cover_denomination_catholic',
+        condition: { type: 'not', condition: { type: 'flag', id: 'toast_cover_denomination' } },
       },
       {
-        text:      '"Non-denominational. I follow what works."',
+        text:      '"Orthodox. Though the jurisdiction is complicated."',
         next:      'pavel_denomination_response',
-        set_cover: { key: 'denomination', value: 'Non-denominational' },
-        set_flag:  'cover_denomination_none',
+        set_cover: { key: 'denomination', value: 'Orthodox' },
+        set_flag:  'cover_denomination_orthodox',
+        theosis:   2,
+        condition: { type: 'not', condition: { type: 'flag', id: 'toast_cover_denomination' } },
+      },
+      {
+        text:      '"Protestant. Reformed. Calvinist roots, mostly shed."',
+        next:      'pavel_denomination_response',
+        set_cover: { key: 'denomination', value: 'Protestant' },
+        set_flag:  'cover_denomination_protestant',
+        condition: { type: 'not', condition: { type: 'flag', id: 'toast_cover_denomination' } },
+      },
+      {
+        text:      '"Ecumenical. The boundaries stopped mattering."',
+        next:      'pavel_denomination_response',
+        set_cover: { key: 'denomination', value: 'Ecumenical' },
+        set_flag:  'cover_denomination_ecumenical',
+        theosis:   1,
         condition: { type: 'not', condition: { type: 'flag', id: 'toast_cover_denomination' } },
       },
     ],
@@ -966,13 +993,24 @@ Then, without transition:
         S.showToast('Cover: denomination established.', 'note');
       }
     },
-    text: `He nods as though this confirms something.
-
-— Good. The tradition matters less than whether you've actually thought about it. Most people haven't. You have. I can tell because you answered without checking whether it was the right answer.
-
-He picks up a piece of rope from the deck. He doesn't do anything with it.
-
-— I'd like to walk with you, he says. — This crossing specifically. I think it's going to need a witness.`,
+    get text() {
+      const isOrthodox = S.hasFlag('cover_denomination_orthodox');
+      const isCatholic = S.hasFlag('cover_denomination_catholic');
+      const isEcumenical = S.hasFlag('cover_denomination_ecumenical');
+      
+      let pavelsResponse = '';
+      if (isOrthodox) {
+        pavelsResponse = `— Orthodox. He repeats this with something that is not quite recognition. — The hesychasts. Theosis as actual participation. Gregory Palamas.\n\nHe picks up a piece of rope. He does not do anything with it.\n\n— Then you already know what I'm talking about. He says. — More or less. The ship version.`;
+      } else if (isCatholic) {
+        pavelsResponse = `— Roman Catholic. He nods slowly. — You have a tradition that has spent a very long time arguing with itself about whether matter is sacred. That argument is useful on this ship.\n\nHe picks up a piece of rope. He does not do anything with it.`;
+      } else if (isEcumenical) {
+        pavelsResponse = `— Ecumenical. He looks at you with something like approval. — The boundaries stopped mattering. That is either exhaustion or wisdom. On a ship like this one, it is wisdom.\n\nHe picks up a piece of rope. He does not do anything with it.`;
+      } else {
+        pavelsResponse = `— Reformed. He says. — Calvin had a theory about election that was, structurally, very interesting. He was wrong about most of the conclusions, but the structure was sound.\n\nHe picks up a piece of rope. He does not do anything with it.`;
+      }
+      
+      return pavelsResponse + `\n\n— I'd like to walk with you. he says. — This crossing specifically. I think it's going to need a witness.`;
+    },
     choices: [
       { text: '"Then stay close."',                          next: 'pavel_joined', add_companion: { id: 'pavel', name: 'Pavel', charisms: ['overflow'] } },
       { text: '"We\'ll see how it goes."',                   next: 'main_deck_hub' },
@@ -1059,23 +1097,34 @@ He looks at the horizon.
 — What tradition are you working from?`,
     choices: [
       {
-        text:      '"United Church. Though I borrow widely."',
-        next:      'pavel_denomination_response',
-        set_cover: { key: 'denomination', value: 'United Church' },
-        set_flag:  'cover_denomination_united',
-        theosis:   1,
-      },
-      {
-        text:      '"Roman Catholic. On sabbatical from it."',
+        text:      '"Roman Catholic. Working with the tradition rather than against it."',
         next:      'pavel_denomination_response',
         set_cover: { key: 'denomination', value: 'Roman Catholic' },
         set_flag:  'cover_denomination_catholic',
+        condition: { type: 'not', condition: { type: 'flag', id: 'toast_cover_denomination' } },
       },
       {
-        text:      '"Non-denominational. I follow what works."',
+        text:      '"Orthodox. Though the jurisdiction is complicated."',
         next:      'pavel_denomination_response',
-        set_cover: { key: 'denomination', value: 'Non-denominational' },
-        set_flag:  'cover_denomination_none',
+        set_cover: { key: 'denomination', value: 'Orthodox' },
+        set_flag:  'cover_denomination_orthodox',
+        theosis:   2,
+        condition: { type: 'not', condition: { type: 'flag', id: 'toast_cover_denomination' } },
+      },
+      {
+        text:      '"Protestant. Reformed. Calvinist roots, mostly shed."',
+        next:      'pavel_denomination_response',
+        set_cover: { key: 'denomination', value: 'Protestant' },
+        set_flag:  'cover_denomination_protestant',
+        condition: { type: 'not', condition: { type: 'flag', id: 'toast_cover_denomination' } },
+      },
+      {
+        text:      '"Ecumenical. The boundaries stopped mattering."',
+        next:      'pavel_denomination_response',
+        set_cover: { key: 'denomination', value: 'Ecumenical' },
+        set_flag:  'cover_denomination_ecumenical',
+        theosis:   1,
+        condition: { type: 'not', condition: { type: 'flag', id: 'toast_cover_denomination' } },
       },
     ],
   },
@@ -1226,13 +1275,19 @@ She doesn't say what the something is.`,
 
   galley_hub: {
     id: 'galley_hub', location: 'Galley', mood: 'neutral',
-    text: `Lena is here. She is almost always here, or the galley is in the state of someone who has just left and is about to return.
-
-She hands you something without being asked.`,
+    get text() {
+      const parts = ['Lena is here. She is almost always here, or the galley is in the state of someone who has just left and is about to return.'];
+      if (S.hasFlag('maintenance_bilge')) parts.push('She hands you something without being asked. Today it is better than yesterday. She has noticed the bilge was checked.');
+      else parts.push('She hands you something without being asked.');
+      if (S.hasFlag('hold_bless_archive')) parts.push('She is quieter than usual. Not worried. Something has settled.');
+      if (S.hasFlag('stink_patrol_hands_known')) parts.push('The small arrangement near the oven — it has been there since you spoke with her about the Stink Patrol. She does not look at it directly.');
+      return parts.join('\n\n');
+    },
     choices: [
-      { text: 'Ask about the archive.',  next: 'lena_hold',    condition: { type: 'not', condition: { type: 'flag', id: 'lena_archive_revealed' } } },
-      { text: 'Sit in silence.',         next: 'lena_silence'                                                                                        },
-      { text: 'Go to the main deck.',    next: 'main_deck_hub'                                                                                       },
+      { text: 'Ask about the archive.',         next: 'lena_hold',         condition: { type: 'not', condition: { type: 'flag', id: 'lena_archive_revealed' } } },
+      { text: 'She is looking at something.',   next: 'photo_crossreference', condition: { type: 'and', conditions: [{ type: 'flag', id: 'volkov_photo_found' }, { type: 'flag', id: 'hold_micha_photo' }, { type: 'not', condition: { type: 'flag', id: 'photos_crossreferenced' } }] } },
+      { text: 'Sit in silence.',                next: 'lena_silence' },
+      { text: 'Go to the main deck.',           next: 'main_deck_hub' },
     ],
   },
 
@@ -3429,31 +3484,44 @@ And she knew.`,
     ],
   },
 
-  // ── DAY THREE CONVERGENCE ────────────────────────────────────────
-  // act_two_resolve is the point where the crossing converges.
-  // It reads your state and routes to the appropriate end-sequence.
-  // The player does not select an ending here. What you did determines
-  // what happens. The scene text reflects what theosis tier you are at.
+  // ─────────────────────────────────────────────────────────────────
+  // ACT THREE — THE LAST HOURS
+  // Day Three. The anomaly at its peak.
+  // The threads converge. The remaining scenes play out.
+  // act_two_resolve is now the Act Three hub.
+  // ─────────────────────────────────────────────────────────────────
 
   act_two_resolve: {
-    id: 'act_two_resolve', location: 'The Crossing', mood: 'revelation',
-    text: `Day Three.
-
-The anomaly is at its peak. The instruments are reading something they have never read. Nadia is crying in the good way. Alexei is using words that are not scientific words. Miguel has his hand on the wheel and his face turned toward the bow.
-
-The ship holds its course.
-
-The crossing is ending.`,
+    id: 'act_two_resolve', location: 'Day Three — The Crossing', mood: 'revelation',
+    hub: true,
+    get text() {
+      const t = S.G.theosis;
+      if (t >= 66) {
+        return `The ship is Заря.\n\nThis has always been true. Today it is the truth that matters.\n\nThe anomaly is at its peak. Below the hull: something enormous that has been waiting for thirty years of measurement to return with its record.\n\nThe last hours.`;
+      } else if (t >= 33) {
+        return `Day Three.\n\nThe anomaly is at its maximum. The instruments are reading something they have never read. The ship holds her course.\n\nThe threads of the crossing are converging.\n\nThe last hours.`;
+      } else {
+        return `Day Three. The anomaly is at its peak.\n\nThe crossing is ending. Something has to happen before it does.\n\nThe last hours.`;
+      }
+    },
     onEnter: () => {
-      S.incrementTheosis(4);
+      S.incrementTheosis(3);
       S.setFlag('act_three_begun');
       S.unlockCodexEntry('codex_zarya_history');
       S.unlockCodexEntry('codex_solidarity');
-      // Route to the appropriate end-sequence based on state
-      // (checkEndings will fire on the next scene transition)
+      S.setLiturgicalHour(6); // Compline — the night office
+      S.checkEndings();
     },
     choices: [
-      { text: 'Continue.', next: 'day_three_landing' },
+      { text: 'Pavel is at the bow.',                         next: 'pavel_before_convergence',  condition: { type: 'not', condition: { type: 'flag', id: 'pavel_convergence_told' } } },
+      { text: 'Lena is in the galley.',                       next: 'lena_direct',               condition: { type: 'and', conditions: [{ type: 'flag', id: 'lena_archive_revealed' }, { type: 'not', condition: { type: 'flag', id: 'lena_direct_asked' } }] } },
+      { text: 'Alexei has the radio.',                        next: 'radio_what_to_transmit',    condition: { type: 'and', conditions: [{ type: 'flag', id: 'radio_found' }, { type: 'not', condition: { type: 'flag', id: 'transmitted_all' } }, { type: 'not', condition: { type: 'flag', id: 'transmitted_names_first' } }] } },
+      { text: 'Find the radio.',                              next: 'radio_lore',                condition: { type: 'and', conditions: [{ type: 'flag', id: 'mission_refused' }, { type: 'not', condition: { type: 'flag', id: 'radio_found' } }] } },
+      { text: 'Go to the hold. Sit with the archive.',        next: 'anomaly_peak_hold',         condition: { type: 'not', condition: { type: 'flag', id: 'hold_anomaly_sat' } } },
+      { text: 'The anomaly.',                                  next: 'anomaly_peak',              condition: { type: 'not', condition: { type: 'flag', id: 'anomaly_peak_occurred' } } },
+      { text: 'The instrument room.',                          next: 'anomaly_responds',          condition: { type: 'and', conditions: [{ type: 'flag', id: 'anomaly_peak_occurred' }, { type: 'not', condition: { type: 'flag', id: 'anomaly_responds_seen' } }] } },
+      { text: 'The confrontation.',                            next: 'othis_confrontation',       condition: { type: 'and', conditions: [{ type: 'flag', id: 'mission_refused' }, { type: 'not', condition: { type: 'flag', id: 'othis_confrontation_happened' } }] } },
+      { text: '— The crossing ends.',                          next: 'day_three_landing' },
     ],
   },
 
@@ -3860,7 +3928,7 @@ He does not explain what is good. He does not need to.`,
   // He is present. No one is quite sure how long he has been present.
 
   oblong_first: {
-    id: 'oblong_first', location: 'Mess Hall', mood: 'uncanny',
+    id: 'oblong_first', location: 'Mess Hall', mood: 'uncanny', art: 'portrait_oblong',
     text: `He is at the corner table. He has been at the corner table. The distinction between these two statements is not clear.
 
 He is a large man arranged with great care. His suit belongs to a decade that cannot be precisely named. He is eating something Lena apparently prepared for him, though Lena, when you ask later, will say she has no recollection of doing so.
@@ -4565,6 +4633,569 @@ She goes back to her own cabin. The corridor is quiet. The instruments in Alexei
   },
 
 
+
+  // ── SUGGESTION 2: ANOMALY RESPONDS ──────────────────────────────
+
+  anomaly_responds: {
+    id: 'anomaly_responds', location: 'Instrument Room', mood: 'revelation',
+    art: 'portrait_alexei',
+    text: `Alexei is at the instruments when you come in.
+
+He is not writing. He is standing very still with his hands at his sides looking at a readout that he has not explained to you yet.
+
+— Come here. He says.
+
+The readout shows the deviation over the last six hours plotted as a curve. You can read this. The curve drops, peaks, drops, peaks — a rhythm.
+
+— This started two hours after the Sunday service. He says. — And again after you were in the hold.
+
+He points to two marked positions on the timeline.
+
+— The anomaly is responding to something we are doing. He says this with the precision of a scientist who has checked the statement three times. — The deviation pattern correlates with — He pauses. — With acts of witness. Presence. The service. The sitting.
+
+He looks at you.
+
+— I am not drawing a theological conclusion. He says. — I am reporting what the instruments show.
+
+He turns back to the readout.
+
+— The instruments show the anomaly is receiving us.`,
+    onEnter: () => {
+      S.incrementTheosis(7);
+      S.setFlag('anomaly_responds_seen');
+      S.modReputation('alexei', 3);
+      S.modStance('alexei', 'trust', 2);
+      S.modShipState('saturation', 2);
+      S.unlockCodexEntry('codex_magnetic_anomaly');
+      S.showToast('The anomaly is receiving.', 'theosis');
+    },
+    condition: { type: 'and', conditions: [
+      { type: 'flag', id: 'anomaly_peak_occurred' },
+      { type: 'or', conditions: [
+        { type: 'flag', id: 'sunday_service_led' },
+        { type: 'flag', id: 'hold_sat' },
+        { type: 'flag', id: 'hold_bless_archive' },
+      ]},
+      { type: 'not', condition: { type: 'flag', id: 'anomaly_responds_seen' } },
+    ]},
+    choices: [
+      { text: '"What is it responding to?"',               next: 'anomaly_responds_what', theosis: 3 },
+      { text: 'Look at the readout with him. Say nothing.', next: 'anomaly_responds_silence', theosis: 4, composure: 1 },
+    ],
+  },
+
+  anomaly_responds_what: {
+    id: 'anomaly_responds_what', location: 'Instrument Room', mood: 'revelation',
+    text: `— That is the theological conclusion I am declining to draw. He says. — What I can say is: the correlation is with specific types of attention. Sustained, non-instrumental attention.
+
+He pauses.
+
+— Worship, one might say. If one were drawing theological conclusions.
+
+He turns off the readout display and turns it back on. The curve is still there.
+
+— The ship was built to attend to the field without distorting it. He says. — Perhaps that is what we have been doing. Perhaps the anomaly recognises the quality of attention.
+
+He picks up his pencil.
+
+— Or it is a coincidence. He says. — I note both possibilities.
+
+He writes something. He underlines it twice.`,
+    onEnter: () => { S.incrementTheosis(5); S.modReputation('alexei', 2); },
+    choices: [
+      { text: 'Go to the main deck.', next: 'main_deck_hub' },
+    ],
+  },
+
+  anomaly_responds_silence: {
+    id: 'anomaly_responds_silence', location: 'Instrument Room', mood: 'revelation',
+    text: `You stand with him and look at the readout.
+
+The curve. The two peaks. The hours they correspond to.
+
+After a while Alexei says: — I have been a scientist for twenty-three years. He says. — In that time I have measured what is actually there. I have always believed that what is actually there is what matters.
+
+He looks at the curve.
+
+— What is actually there. He says again. As if deciding something.
+
+He does not say what he has decided. He goes back to writing. But when you leave, he is smiling very slightly at the readout, which is not a thing scientists usually do at data.`,
+    onEnter: () => { S.incrementTheosis(7); S.modReputation('alexei', 3); S.applyEffect({ composure: 2 }); S.offerSounding('sounding_sobornost'); },
+    choices: [
+      { text: 'Go to the main deck.', next: 'main_deck_hub' },
+    ],
+  },
+
+  // ── SUGGESTION 3: LANDSTORM SECOND AND THIRD CALL ────────────────
+
+  landstorm_second_call: {
+    id: 'landstorm_second_call', location: 'Instrument Room', mood: 'tense',
+    text: `The standard radio again.
+
+This time there is no preamble.
+
+— Status. He says.
+
+One word. The word has the quality of a document reference rather than a question.
+
+You hold the receiver. You have already decided something. The only question is how you communicate it.`,
+    onEnter: () => {
+      S.setFlag('landstorm_second_called');
+      S.applyEffect({ doubt: 2, vigilance: 1 });
+      S.modShipState('paranoia', 2);
+      S.showToast('Landstorm again.', 'warning');
+    },
+    choices: [
+      {
+        text: 'Maintain cover. Everything is proceeding.',
+        next: 'landstorm_second_lie',
+        condition: { type: 'not', condition: { type: 'flag', id: 'mission_refused' } },
+      },
+      {
+        text: 'Set the receiver down again. Let the anomaly have it.',
+        next: 'landstorm_second_silence',
+        theosis: 2,
+      },
+      {
+        text: '"The situation has changed. I am no longer able to complete the mission."',
+        next: 'landstorm_second_refuse',
+        requires_flag: 'mission_refused',
+      },
+    ],
+  },
+
+  landstorm_second_lie: {
+    id: 'landstorm_second_lie', location: 'Instrument Room', mood: 'tense',
+    text: `— Confirmed. He says immediately. He is keeping the calls short.
+
+— Estimated completion?
+
+You give him a time. It is not a real time. It sounds like a real time.
+
+— Good. He says. And the line goes quiet.
+
+The lie was clean. That is worse than if it had not been clean.`,
+    onEnter: () => { S.applyEffect({ doubt: 3 }); S.degradeCover(1); S.modShipState('paranoia', 1); },
+    choices: [
+      { text: 'Go to the main deck.', next: 'main_deck_hub' },
+    ],
+  },
+
+  landstorm_second_silence: {
+    id: 'landstorm_second_silence', location: 'Instrument Room', mood: 'uncanny',
+    text: `You set the receiver down.
+
+The static.
+
+The anomaly is at its current level, which is high enough that the standard frequencies are genuinely unreliable. It is possible he lost the call again. It is possible he did not.
+
+Alexei appears in the doorway — he hears everything on these frequencies from his instruments.
+
+He looks at the receiver.
+
+— He will try once more. He says, as if he knows. — Then he will call Othis.`,
+    onEnter: () => { S.incrementTheosis(3); S.applyEffect({ composure: 1 }); S.setFlag('landstorm_knows_something'); },
+    choices: [
+      { text: 'Find Othis before Landstorm does.', next: 'othis_confrontation', condition: { type: 'not', condition: { type: 'flag', id: 'othis_confrontation_happened' } } },
+      { text: 'Find the radio. The other one.',     next: 'radio_discovery', condition: { type: 'not', condition: { type: 'flag', id: 'radio_found' } } },
+      { text: 'Go to the main deck.',               next: 'main_deck_hub' },
+    ],
+  },
+
+  landstorm_second_refuse: {
+    id: 'landstorm_second_refuse', location: 'Instrument Room', mood: 'tense',
+    text: `A very long silence.
+
+— Say that again.
+
+— The situation has changed. There are factors I was not briefed on. I am not able to complete the mission as specified.
+
+Another silence.
+
+— You were briefed. He says.
+
+— Yes.
+
+— Then you understand what this means.
+
+— Yes.
+
+The line goes quiet. Not disconnected — quiet. He is thinking, or making notes, or doing something that involves the kind of quiet that precedes consequence.
+
+— I will be in contact with the vessel directly. He says.
+
+He disconnects.
+
+He means Othis. He means Othis will receive instructions you cannot intercept.
+
+The clock has started.`,
+    onEnter: () => {
+      S.setFlag('landstorm_knows_refused');
+      S.setFlag('mission_refused');
+      S.applyEffect({ vigilance: 2 });
+      S.modShipState('paranoia', 3);
+      S.degradeCover(3);
+      S.showToast('Landstorm knows.', 'warning');
+    },
+    choices: [
+      { text: 'Find Othis. Now.',             next: 'othis_confrontation', condition: { type: 'not', condition: { type: 'flag', id: 'othis_confrontation_happened' } } },
+      { text: 'Find Miguel.',                  next: 'act_two_miguel' },
+      { text: 'Find the radio.',               next: 'radio_discovery', condition: { type: 'not', condition: { type: 'flag', id: 'radio_found' } } },
+    ],
+  },
+
+  // ── SUGGESTION 5: LENA'S DIRECT SCENE ────────────────────────────
+
+  lena_direct: {
+    id: 'lena_direct', location: 'Galley — Night', mood: 'uncanny',
+    art: 'portrait_lena',
+    text: `She is cleaning something that does not need cleaning.
+
+You come in. She does not stop.
+
+After a while she says, not looking up:
+
+— Twenty-two years on this ship. She says. — I have been through four captains, two refits, one fire in the galley, and three crossings where people died who should not have died.
+
+She cleans the thing.
+
+— I have never asked anyone what they intended to do. She says. — I have cooked and I have been here and I have known what the ship needed and let the ship do what ships do.
+
+She stops.
+
+She looks at you. Directly. For the first time in this conversation.
+
+— But I am asking you. She says. — What are you going to do with the archive.
+
+It is the first direct question she has ever asked you.`,
+    onEnter: () => {
+      S.setFlag('lena_direct_asked');
+      S.modReputation('lena', 3);
+      S.modStance('lena', 'trust', 3);
+      S.incrementTheosis(4);
+    },
+    condition: { type: 'and', conditions: [
+      { type: 'flag', id: 'lena_archive_revealed' },
+      { type: 'flag', id: 'act_two_begun' },
+      { type: 'not', condition: { type: 'flag', id: 'lena_direct_asked' } },
+    ]},
+    choices: [
+      {
+        text: '"I am not going to destroy it."',
+        next: 'lena_direct_response', set_flag: 'mission_refused',
+        condition: { type: 'not', condition: { type: 'flag', id: 'mission_accepted' } },
+      },
+      {
+        text: '"I am not sure yet."',
+        next: 'lena_direct_unsure',
+      },
+      {
+        text: '"I am going to transmit it."',
+        next: 'lena_direct_transmit',
+        requires_flag: 'radio_existence_known',
+      },
+    ],
+  },
+
+  lena_direct_response: {
+    id: 'lena_direct_response', location: 'Galley — Night', mood: 'neutral',
+    text: `She holds the look for a long moment.
+
+Then she nods. Once. The way she hands you coffee — matter-of-fact, as if this was always going to be the answer and she just needed to hear it said.
+
+She goes back to cleaning.
+
+— Good. She says.
+
+She does not say more. She does not ask how or when. She does not offer help. She does not need to.
+
+The help is already there. It has been there for twenty-two years.
+
+The ship knows.`,
+    onEnter: () => {
+      S.incrementTheosis(6);
+      S.modReputation('lena', 4);
+      S.modStance('lena', 'solidarity', 3);
+      S.modShipState('morale', 2);
+      if (S.G.worldState) S.G.worldState.socialTrust = Math.min(10, (S.G.worldState.socialTrust || 5) + 2);
+      S.showToast('Good.', 'note');
+    },
+    choices: [
+      { text: 'Go to the main deck.', next: 'main_deck_hub' },
+    ],
+  },
+
+  lena_direct_unsure: {
+    id: 'lena_direct_unsure', location: 'Galley — Night', mood: 'neutral',
+    text: `She looks at you for a moment.
+
+She turns back to what she is cleaning.
+
+— Come back when you know. She says.
+
+That is all.`,
+    choices: [
+      { text: 'Go to the main deck.', next: 'main_deck_hub' },
+    ],
+  },
+
+  lena_direct_transmit: {
+    id: 'lena_direct_transmit', location: 'Galley — Night', mood: 'revelation',
+    text: `She stops.
+
+She is still for a moment.
+
+— Yes. She says. — That is the right word for it.
+
+She sets down the cloth. She looks at her hands.
+
+— Volkov used to say: the ship was built to give what it found to the world. He said this about the measurements. He was right about the measurements. He was also right about more than the measurements.
+
+She looks at you.
+
+— I will make sure the mess hall is empty at midnight. She says. — Whatever noise a radio makes.
+
+She goes back to cooking. The conversation is over. She has already done what needed to be done.`,
+    onEnter: () => {
+      S.incrementTheosis(8);
+      S.modReputation('lena', 5);
+      S.modStance('lena', 'solidarity', 4);
+      S.setFlag('lena_knows_transmission');
+      S.modShipState('morale', 2);
+      if (S.G.worldState) S.G.worldState.socialTrust = Math.min(10, (S.G.worldState.socialTrust || 5) + 3);
+      S.showToast('The mess hall will be empty.', 'note');
+    },
+    choices: [
+      { text: 'Go find the radio.', next: 'radio_discovery', condition: { type: 'not', condition: { type: 'flag', id: 'radio_found' } } },
+      { text: 'Go to the main deck.', next: 'main_deck_hub' },
+    ],
+  },
+
+  // ── SUGGESTION 6: PAVEL BEFORE CONVERGENCE ───────────────────────
+
+  pavel_before_convergence: {
+    id: 'pavel_before_convergence', location: 'Foredeck — Day Three', mood: 'revelation',
+    text: `He is at the bow. He is always at the bow at the significant moments.
+
+You stand beside him. It is Day Three.
+
+— When I said you were close. He says, without preamble. — I meant close to what the crossing is actually for.
+
+He looks at the water.
+
+— The crossings are not tests. He says. — I want to be clear about that. There is no passing or failing. They are more like — He thinks. — A shore that gets slightly less far away each time. You can see it now, I think.
+
+He looks at you.
+
+— What happens when you reach the shore. He says, — is that the ship becomes Заря not just in name but in fact. What she actually is, permanently, regardless of what the documents say.
+
+He looks at the bow.
+
+— That is what the archive transmission does. He says. — It names her correctly into the world. And what is correctly named is correctly real.
+
+He is quiet for a moment.
+
+— This crossing is the one. He says. He says it the way someone confirms an appointment. — Whether through you alone, or the crew, or some combination the ship has arranged. This is the crossing.
+
+He does not say what that costs.`,
+    onEnter: () => {
+      S.incrementTheosis(8);
+      S.setFlag('pavel_convergence_told');
+      S.modStance('pavel', 'trust', 3);
+      S.applyEffect({ composure: 2 });
+      S.flashTheosisLight(0.5, 4000);
+    },
+    condition: { type: 'and', conditions: [
+      { type: 'flag', id: 'act_three_begun' },
+      { type: 'not', condition: { type: 'flag', id: 'pavel_convergence_told' } },
+    ]},
+    choices: [
+      { text: '"What does it cost?"',        next: 'pavel_convergence_cost', theosis: 2 },
+      { text: 'Stand with him. No questions.', next: 'foredeck_standing', theosis: 3, composure: 1 },
+    ],
+  },
+
+  pavel_convergence_cost: {
+    id: 'pavel_convergence_cost', location: 'Foredeck — Day Three', mood: 'revelation',
+    text: `He is quiet for a long time.
+
+— You. He says. — What you are performing becomes what you are. The chaplain becomes real. The cover cannot be recovered after that.
+
+He looks at the bow.
+
+— That is the crossing tax that doesn't appear in the numbers. He says. — The theosis you carry forward, minus fifteen, is the body's portion. The rest —
+
+He pauses.
+
+— The rest is what the crossing made.
+
+He looks at you with something that is, in its way, kindness.
+
+— You have already paid most of it. He says. — I think you know that.
+
+He returns to the water.
+
+The crossing is ending.`,
+    onEnter: () => { S.incrementTheosis(6); S.applyEffect({ composure: 2, communion: 1 }); },
+    choices: [
+      { text: 'Go. Do what needs doing.', next: 'act_two_resolve' },
+    ],
+  },
+
+  // ── SUGGESTION 8: PHOTO CROSS-REFERENCE ──────────────────────────
+
+  photo_crossreference: {
+    id: 'photo_crossreference', location: 'Galley', mood: 'neutral',
+    text: `Lena is looking at something on the counter.
+
+You see it before she looks up: the Volkov photograph — the one with the initial В on the back — and beside it, the 1972 photograph of Micha at the anomaly.
+
+She must have placed them together.
+
+She looks up.
+
+— He is in both. She says.
+
+You look.
+
+She is right. The man in the background of the 1972 photograph — the one at the stove, at the line, at the stern — is the same man as in the Volkov photograph. The same posture. The same way of belonging completely to a place.
+
+— Volkov sailed in 1972. She says. — I always knew. I did not know he was in the photographs until you found them.
+
+She looks at both photographs.
+
+— She remembers everyone who sailed on her. She says. She means the ship. — Even the ones whose names were not kept.
+
+She slides both photographs toward you.
+
+— They should stay together.`,
+    onEnter: () => {
+      S.incrementTheosis(7);
+      S.modReputation('lena', 4);
+      S.modStance('lena', 'trust', 2);
+      S.setFlag('photos_crossreferenced');
+      S.setFlag('volkov_identified');
+      S.addItem('both_photographs');
+      S.applyEffect({ communion: 2 });
+      S.showToast('The photographs belong together.', 'theosis');
+    },
+    condition: { type: 'and', conditions: [
+      { type: 'flag', id: 'volkov_photo_found' },
+      { type: 'flag', id: 'hold_micha_photo' },
+      { type: 'not', condition: { type: 'flag', id: 'photos_crossreferenced' } },
+    ]},
+    choices: [
+      { text: 'Keep them together.',  next: 'galley_hub' },
+    ],
+  },
+
+  // ── SUGGESTION 9: COVER DEGRADATION VISIBLE IN NPC BEHAVIOUR ─────
+
+  othis_post_degradation: {
+    id: 'othis_post_degradation', location: 'Corridor', mood: 'tense',
+    text: `Othis passes you in the corridor.
+
+He does not say anything.
+
+He has been saying something, however briefly, every time you have passed him on this ship. Even at his most guarded: a professional acknowledgment. A brief clipboard reference.
+
+Not this time.
+
+He walks past. He looks at the manifest in his hand. He keeps walking.
+
+The change in his manner is precise and without anger. It is the manner of someone who has been given new information and is processing it procedurally.
+
+He knows something. He has been told something, or has concluded something. The only question is what he does with it.`,
+    onEnter: () => {
+      S.applyEffect({ vigilance: 2, doubt: 1 });
+      S.setFlag('othis_knows_something');
+      S.modShipState('paranoia', 2);
+    },
+    condition: { type: 'and', conditions: [
+      { type: 'stat', stat: 'coverIntegrity', max: 2 },
+      { type: 'flag', id: 'mission_orders_read' },
+      { type: 'not', condition: { type: 'flag', id: 'othis_confrontation_happened' } },
+      { type: 'not', condition: { type: 'flag', id: 'othis_knows_something' } },
+    ]},
+    choices: [
+      { text: 'Follow him.',          next: 'othis_confrontation' },
+      { text: 'Let him process it.',  next: 'main_deck_hub', vigilance: 1 },
+    ],
+  },
+
+  kylie_after_degradation: {
+    id: 'kylie_after_degradation', location: 'Mess Hall', mood: 'tense',
+    text: `Kylie does not open her notebook when you sit down.
+
+This is notable.
+
+— Your cover. She says. — Is gone.
+
+Not a question.
+
+— I know. You say.
+
+She looks at you. The professional warmth is not quite gone — it has changed register. It has become something else. More direct.
+
+— Good. She says. — It was slowing you down.
+
+She opens the notebook.
+
+— Tell me what you need from me.`,
+    onEnter: () => {
+      S.setFlag('kylie_cover_gone_acknowledged');
+      S.modReputation('kylie', 3);
+      S.modStance('kylie', 'solidarity', 2);
+    },
+    condition: { type: 'and', conditions: [
+      { type: 'stat', stat: 'coverIntegrity', max: 1 },
+      { type: 'flag', id: 'met_kylie' },
+      { type: 'not', condition: { type: 'flag', id: 'kylie_in_alliance' } },
+      { type: 'not', condition: { type: 'flag', id: 'kylie_cover_gone_acknowledged' } },
+    ]},
+    choices: [
+      { text: '"Help me transmit the archive."', next: 'kylie_alliance', requires_flag: 'radio_existence_known' },
+      { text: '"Record everything you have."',   next: 'kylie_alliance' },
+    ],
+  },
+
+  // ── SUGGESTION 10: SOLIDARITY SIGNAL ─────────────────────────────
+
+  solidarity_signal: {
+    id: 'solidarity_signal', location: 'Hold Access', mood: 'neutral',
+    text: `You come down the companionway and stop.
+
+Someone has moved the boxes.
+
+Not all of them — the archive is still in the hold. But the largest boxes, the ones marked with the earliest years, have been shifted away from the access hatch. Not hidden. Moved to the back wall. As if making room.
+
+Freezer Beef is on top of the tallest one. She is looking at the new arrangement with the expression of someone who has confirmed a thesis.
+
+Nobody did this with you. Nobody asked. Someone looked at the hold, understood what needed to happen, and did the first part of it.
+
+You don't know who. It doesn't matter.
+
+The ship knows who is on her.`,
+    onEnter: () => {
+      S.incrementTheosis(6);
+      S.applyEffect({ communion: 2 });
+      S.setFlag('solidarity_signal_seen');
+      S.modShipState('morale', 2);
+      if (S.G.worldState) S.G.worldState.socialTrust = Math.min(10, (S.G.worldState.socialTrust || 5) + 2);
+      S.showToast('Someone acted without being asked.', 'theosis');
+    },
+    condition: { type: 'and', conditions: [
+      { type: 'stat', stat: 'communion', min: 5 },
+      { type: 'flag', id: 'hold_visited' },
+      { type: 'flag', id: 'act_two_begun' },
+      { type: 'not', condition: { type: 'flag', id: 'solidarity_signal_seen' } },
+    ]},
+    choices: [
+      { text: 'Continue into the hold.', next: 'hold_first' },
+      { text: 'Go find the people who might have done this.', next: 'main_deck_hub', theosis: 2 },
+    ],
+  },
+
   // ── MUNDANE TEXTURE ─────────────────────────────────────────────
 
   mess_ordinary: {
@@ -5199,7 +5830,13 @@ From here you can go anywhere on the ship.`,
 
   bridge_hub: {
     id: 'bridge_hub', location: 'Bridge', mood: 'neutral', art: 'portrait_haircut',
-    text: `Miguel is at the wheel, or near it. Haircut is on the chart table, sitting on a weather report.`,
+    get text() {
+      const parts = ['Miguel is at the wheel, or near it. Haircut is on the chart table, sitting on a weather report.'];
+      if (S.hasFlag('maintenance_brass')) parts.push('The forward cleats are polished. Miguel noticed.');
+      if (S.hasFlag('volkov_photo_found') && S.hasFlag('miguel_photo_return')) parts.push('He has not mentioned the photograph again. Neither have you. It is in the air between you like a settled thing.');
+      if (S.hasFlag('mission_refused') && !S.hasFlag('mission_accepted')) parts.push('He has his hand on the wheel the way someone holds something they have decided to keep.');
+      return parts.join('\n\n');
+    },
     choices: [
       { text: 'Talk to Miguel.',                  next: 'miguel_return'   },
       { text: 'Stand out. Take the air.',          next: 'bridge_air', composure: 1 },

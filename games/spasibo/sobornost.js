@@ -1,6 +1,6 @@
 // ============================================================
 // SOBORNOST ENGINE — sobornost.js
-// Single-file build. v3.3.2
+// Single-file build. v3.3.1
 // Section order (dependency graph):
 //   debug → events → state → schedule → registries →
 //   mechanics → conditions → soundings → theosis →
@@ -128,7 +128,14 @@ function scheduleRender() {
   if (_scheduled) return;
   if (!_renderFn) { console.warn('[SOBORNOST] scheduleRender() called before renderer registered'); return; }
   _scheduled = true;
-  queueMicrotask(() => { _scheduled = false; _renderFn(); window.scrollTo({ top: 0, behavior: 'instant' }); });
+  queueMicrotask(() => {
+    _scheduled = false; _renderFn();
+    // Scroll after paint so new DOM is actually in place
+    requestAnimationFrame(() => {
+      window.scrollTo(0, 0);
+      document.getElementById('root')?.scrollTo?.(0, 0);
+    });
+  });
 }
 
 
@@ -430,7 +437,15 @@ function evaluateCondition(cond) {
   if (Array.isArray(cond)) return cond.every(c => evaluateCondition(c));
   switch (cond.type) {
     case 'flag':            return hasFlag(cond.id) === (cond.state !== false);
-    case 'stat':            return (G.stats[cond.name] || 0) >= (cond.min || 0);
+    case 'stat': {
+      // Support both G.stats and special values like coverIntegrity
+      let val = 0;
+      if (cond.stat === 'coverIntegrity' || cond.name === 'coverIntegrity') val = G.coverIntegrity !== undefined ? G.coverIntegrity : 5;
+      else val = G.stats[cond.stat||cond.name] || 0;
+      const minOk = cond.min === undefined || val >= cond.min;
+      const maxOk = cond.max === undefined || val <= cond.max;
+      return minOk && maxOk;
+    }
     case 'charism':         return G.charisms.includes(cond.id);
     case 'item':            return hasItem(cond.id);
     case 'playcount':       return G.playCount >= (cond.min || 0);
@@ -682,17 +697,21 @@ function flashTheosisLight(intensity = 1.0, duration = 2000) {
 }
 
 const _nameMappings = {};
-function registerNameMapping(original, tier1, tier2, cyrillic) { _nameMappings[original] = { tier1, tier2, cyrillic }; }
+function registerNameMapping(original, tier1, tier2, cyrillic, earlyCyrillic) { _nameMappings[original] = { tier1, tier2, cyrillic, earlyCyrillic: !!earlyCyrillic }; }
 function _escapeRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 function applyNameMapping(text) {
   if (!text) return text;
   const tier = getCurrentTier(); let result = text;
   for (const [original, mapping] of Object.entries(_nameMappings)) {
     let replacement = original;
-    if      (tier.max <= 32)  replacement = original;
-    else if (tier.max <= 65)  replacement = mapping.tier1  || original;
-    else if (tier.max <= 100) replacement = mapping.tier2  || mapping.tier1 || original;
-    if (mapping.cyrillic && tier.max >= 66) replacement = mapping.cyrillic;
+    const earlyC = mapping.earlyCyrillic; // flag for names that go Cyrillic at tier 2
+    if (tier.max <= 32) {
+      replacement = original;
+    } else if (tier.max <= 65) {
+      replacement = (earlyC && mapping.cyrillic) ? mapping.cyrillic : (mapping.tier1 || original);
+    } else {
+      replacement = mapping.cyrillic || mapping.tier2 || mapping.tier1 || original;
+    }
     if (replacement !== original) result = result.replace(new RegExp(_escapeRe(original), 'g'), replacement);
   }
   return result;
@@ -1394,7 +1413,6 @@ function navigate(id) {
   // tickSoundings removed from navigate — progress only via progressSounding()
   _captureSnapshot();
   tickDelayedConsequences();
-  window.scrollTo(0, 0);
   scheduleRender();
   // Re-apply persistent UI classes from ship state
   if(G.shipState){

@@ -1,3 +1,37 @@
+## v1.7 "Act Three" — May 2026
+
+### Act Three: Now Exists
+
+`act_two_resolve` is no longer a single-scene convergence point — it is a proper Act Three hub labelled "Day Three — The Crossing." Text varies by theosis tier. Liturgical hour advances to Compline. Available scenes depend on what you have and haven't done. The hub presents: Pavel at the bow, Lena's direct question, the radio, the hold, the anomaly, the confrontation, and the ending. The final hours are navigable rather than automatic.
+
+### Ten Improvements Implemented
+
+**1. NPC dialogue references specific player actions** — `bridge_hub` and `galley_hub` now read `get text()` with conditional paragraphs. Miguel's wheel posture is described differently if you refused the mission. The polished cleats are noted. The photograph is in the air between you. Lena's small arrangement near the oven is there if you heard about the Stink Patrol.
+
+**2. The anomaly responds** — `anomaly_responds` (new scene, instrument room, Act Two/Three): Alexei shows you a readout. The deviation curve has two peaks. Both correspond precisely to acts of witness — the Sunday service, the sitting in the hold. He is reporting what the instruments show. He is not drawing a theological conclusion. He is smiling at the data when you leave.
+
+**3. Landstorm second call** — `landstorm_second_call`, `landstorm_second_lie`, `landstorm_second_silence`, `landstorm_second_refuse` (four new scenes). After the first call, Landstorm calls again with one word: *Status.* Three paths: maintain cover (doubt +3, cover degrades), set the receiver down again (theosis +3), or tell him directly that the mission cannot be completed (cover blown, paranoia +3, clock starts). After direct refusal: *I will be in contact with the vessel directly.* He means Othis.
+
+**4. Day structure** — Act Three begins at Compline (hour 6). The liturgical calendar now has a clear Day Three character. The hub text reflects this. Liturgical hours advance probabilistically through scenes, so the crossing has a genuine rhythm from Lauds to Compline.
+
+**5. Lena's direct scene** — `lena_direct`, `lena_direct_response`, `lena_direct_unsure`, `lena_direct_transmit` (four new scenes). For the first time, Lena asks you something directly: *What are you going to do with the archive.* Three paths. If you say "transmit": *I will make sure the mess hall is empty at midnight. Whatever noise a radio makes.* She goes back to cooking. She has already done what needed to be done. Her entire prior restraint makes this scene land.
+
+**6. Pavel before convergence** — `pavel_before_convergence`, `pavel_convergence_cost` (two new scenes, Act Three). Pavel explains what "close enough" means: *The chaplain becomes real. The cover cannot be recovered after that.* He confirms this crossing is the one. If you ask what it costs: *You. What you are performing becomes what you are.* Then he points you toward the ending. *Go. Do what needs doing.*
+
+**7. Sound design differentiation** — liturgical hour body classes (`hour-matins` through `hour-compline`) now modify filter cutoff and reverb. Compline increments magnetic deviation. The engine's mood audio system applies different filter profiles per liturgical hour. The sea sounds change character as the crossing progresses.
+
+**8. Photo cross-reference** — `photo_crossreference` (new scene, galley hub). Lena has placed both photographs side by side — the Volkov portrait and the 1972 anomaly photograph. The man at the stove, at the line, at the stern is the same man. Volkov sailed in 1972. She always knew. She did not know he was in the photographs until you found them. She slides them both toward you. They should stay together. Item `both_photographs` added to inventory.
+
+**9. Cover degradation visible in NPC behaviour** — `othis_post_degradation` (Othis walks past without speaking — the professional acknowledgment is gone), `kylie_after_degradation` (Kylie stops pretending not to know — her cover is gone, so is yours, *it was slowing you down*). Both triggered by `coverIntegrity <= 2` and appropriate flags. Engine condition evaluator patched to support `coverIntegrity` as a named stat condition with `max` field.
+
+**10. Solidarity signal** — `solidarity_signal` (new scene, hold access). When communion reaches 5, the hold access shows that someone has moved the boxes — not hidden them, shifted them to make room. Nobody did this with you. Nobody asked. The ship knows who is on her. This is the in-world signal that collective action is possible before the player has to discover it mechanically. Freezer Beef is on top of the tallest box confirming a thesis.
+
+### Engine Changes
+- `stat` condition evaluator: now supports `coverIntegrity` as a named value, and `max` field for upper-bound checks.
+- `registerNameMapping` now accepts `earlyCyrillic` boolean for names that shift to Cyrillic at Waking tier (theosis > 32) rather than Illumined.
+- Pavel registered with `earlyCyrillic: true`.
+- `setLiturgicalHour(6)` called at Act Three entry.
+
 ## v1.5 "Бриз" — May 2026
 
 ### Critical Fixes
