@@ -1844,10 +1844,22 @@ function renderDialogue(root,processTextFn) {
     beat.choices.forEach(dc=>{const btn=document.createElement('button');btn.className='choice dialogue-choice';btn.textContent=processTextFn?processTextFn(dc.text):dc.text;btn.onclick=()=>selectDialogueChoice(dc);cd.appendChild(btn);});
     wrap.appendChild(cd);
   }else if(beat.speaker){
-    _renderNpcBeat(wrap,beat.speaker,beat.text,processTextFn);wrap.appendChild(_continueBtn(()=>advanceDialogue()));
+    // NPC speech: render this beat and stop — one exchange per advance
+    _renderNpcBeat(wrap,beat.speaker,beat.text,processTextFn);
+    wrap.appendChild(_continueBtn(()=>advanceDialogue()));
   }else if(beat.text){
-    const p=document.createElement('p');p.className='sp dialogue-narration';p.innerHTML=processTextFn?processTextFn(beat.text):beat.text;
-    wrap.appendChild(p);wrap.appendChild(_continueBtn(()=>advanceDialogue()));
+    // Narration beat: batch ALL consecutive narration beats into one render
+    // Only stop when we hit a speaker beat, choices, or end of dialogue
+    let i=beatIndex;
+    while(i<beats.length && beats[i] && !beats[i].speaker && !beats[i].choices && beats[i].text){
+      const p=document.createElement('p');p.className='sp dialogue-narration';
+      p.innerHTML=processTextFn?processTextFn(beats[i].text):beats[i].text;
+      wrap.appendChild(p);
+      i++;
+    }
+    // Advance the beat index to where we stopped
+    G._dialogue.beatIndex=i-1; // advanceDialogue will +1 from here
+    wrap.appendChild(_continueBtn(()=>advanceDialogue()));
   }else{advanceDialogue();return;}
   root.appendChild(wrap);
 }
@@ -3067,7 +3079,17 @@ function _renderMapPanelSide(root) {
     instrument_room_first:'instrument_room',instrument_shimmer:'instrument_room',alexei_cabinet:'instrument_room',
     main_deck_hub:'main_deck',act_two_begin:'main_deck',
   };
-  const sceneMap = {cabin:'cabin_wake',main_deck:'main_deck_hub',foredeck:'foredeck_first',bridge:'bridge_hub',mess:'mess_hub',galley:'galley_hub',chart_room:'chart_room_first',captain_quarters:'bridge_hub',hold_access:'hold_first',hold:'hold_first',cargo_bay:'hold_first',instrument_room:'instrument_room_first',aft:'instrument_room_first'};
+  // sceneMap: map node → scene to navigate to from map
+  // First-visit scenes (foredeck_first, chart_room_first etc.) are only used on first visit.
+  // After that, use the return/hub scene — detected by whether visited flag is set.
+  const _baseSceneMap = {cabin:'cabin_wake',main_deck:'main_deck_hub',foredeck:'foredeck_first',bridge:'bridge_hub',mess:'mess_hub',galley:'galley_hub',chart_room:'chart_room_first',captain_quarters:'bridge_hub',hold_access:'hold_first',hold:'hold_first',cargo_bay:'hold_first',instrument_room:'instrument_room_first',aft:'instrument_room_first'};
+  const _returnSceneMap = {cabin:'cabin_porthole_stay',foredeck:'foredeck_standing',chart_room:'chart_room_first',hold_access:'hold_first',hold:'hold_boxes',instrument_room:'instrument_shimmer'};
+  const sceneMap = {};
+  for(const [nodeId, firstScene] of Object.entries(_baseSceneMap)){
+    const alreadyVisited = isVisited(nodeId);
+    const returnScene = _returnSceneMap[nodeId];
+    sceneMap[nodeId] = (alreadyVisited && returnScene) ? returnScene : firstScene;
+  }
   // Reverse map: scene ID → node ID (one scene can map to multiple nodes)
   const reverseSceneMap = {};
   for(const [nodeId, sceneId] of Object.entries(sceneMap)) reverseSceneMap[sceneId] = nodeId;
