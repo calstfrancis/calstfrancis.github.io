@@ -265,6 +265,7 @@ S.registerMapNode('aft',             { connections: ['instrument_room'],        
 
 S.registerSounding('sounding_crossing', {
   id:   'sounding_crossing',
+  alignmentTags: ['stillness', 'presence', 'silence', 'crossing'],
   name: 'On the nature of a crossing',
   text: 'What is left behind is not lost. What is ahead has not been found. Between them: this. The water. The cold. The sound of sails adjusting to wind you cannot see.',
   theosis: 3,
@@ -273,6 +274,7 @@ S.registerSounding('sounding_crossing', {
 
 S.registerSounding('sounding_forgiveness', {
   id:   'sounding_forgiveness',
+  alignmentTags: ['pastoral', 'forgiveness', 'presence', 'witness'],
   name: 'On forgiveness at sea',
   text: 'There is something about open water that makes the ledger seem less important. Not wrong. Less important. You are very far from anyone you have harmed. The horizon does not know your name.',
   theosis: 4,
@@ -281,22 +283,199 @@ S.registerSounding('sounding_forgiveness', {
 
 S.registerSounding('sounding_history', {
   id:   'sounding_history',
+  alignmentTags: ['history', 'archive', 'witness', 'memory'],
   name: 'On what a ship carries',
   text: 'The wood remembers the trees. The brass remembers the ore. What does water remember? Everything that has passed through it. Which means you too are being remembered, right now, by something that does not keep records in any language you speak.',
   theosis: 7,
   stat: 'composure', statDelta: 1,
 });
 
+// ─────────────────────────────────────────────────────────────────
+// ITEMS — registered with names, descriptions, held effects
+// ─────────────────────────────────────────────────────────────────
+
+S.registerItem('zarya_photograph', {
+  name: 'Photograph — Zarya at the anomaly, 1972',
+  desc: 'A photograph taken at the anomaly position. Someone in the background — at the stove, at the line, at the stern — looks directly at the camera. The pencilled initial on the back is В.',
+  effectWhileHeld: { communion: 1 },
+});
+
+S.registerItem('volkov_photograph', {
+  name: 'Photograph — Volkov, undated',
+  desc: 'A portrait. He has the expression of someone who has decided the record should include him. Lena found him once looking through the archive boxes. He put one photograph in his pocket. She never asked which one.',
+  effectWhileHeld: { composure: 1 },
+});
+
+S.registerItem('both_photographs', {
+  name: 'Photographs — Zarya 1972 and Volkov, together',
+  desc: 'The same man. The cook who sailed in 1972 and the cook Lena knew. The ship remembers everyone who sailed on her, even the ones whose names were not kept. They belong together.',
+  effectWhileHeld: { communion: 2, composure: 1 },
+});
+
+S.registerItem('stink_patrol_paper', {
+  name: 'A position — in 1952 measurements',
+  desc: 'A piece of paper with a location described in the original construction measurements of the ship. A space that exists below the level of any manifest Othis knows about. Warm hands delivered it.',
+  effectWhileHeld: { vigilance: 1 },
+});
+
+
+// ─────────────────────────────────────────────────────────────────
+// QUEST STATES — named multi-step progressions
+// ─────────────────────────────────────────────────────────────────
+
+// Pavel riddle chain — 3 scenes across foredeck/hold/mess
+S.on('flagSet', (flag) => {
+  if (flag === 'pavel_riddle_one')     S.setQuestState('quest_pavel_riddle', 'started');
+  if (flag === 'pavel_riddle_two')     S.setQuestState('quest_pavel_riddle', 'midway');
+  if (flag === 'pavel_revelation_seen') S.setQuestState('quest_pavel_riddle', 'completed');
+  if (flag === 'radio_found')           S.setQuestState('quest_radio_assembly', 'found');
+  if (flag === 'radio_team_assembled')  S.setQuestState('quest_radio_assembly', 'assembled');
+  if (flag === 'archive_transmitted')   S.setQuestState('quest_radio_assembly', 'completed');
+  if (flag === 'solidarity_signal_seen') S.setQuestState('quest_solidarity', 'signal_received');
+  if (flag === 'solidarity_ending_achieved') S.setQuestState('quest_solidarity', 'completed');
+});
+
+// Use isQuestCompleted in conditions throughout game
+
+// ─────────────────────────────────────────────────────────────────
+// NOTES — player-collected observations (shown in notes panel)
+// ─────────────────────────────────────────────────────────────────
+
+S.registerNote('zarya_name',      'The ship has an older name. Заря. It means dawn. The current documentation uses a different name.');
+S.registerNote('volkov_photo',    'A photograph from 1972: a young man at the anomaly position. Initial on the back: В. The same man who was the cook before Lena.');
+S.registerNote('nadia_1978',      'A 1978 measurement binder — position four nautical miles from current location, significant readings, no catalogue entry. The gap is evidence.');
+S.registerNote('stink_patrol',    'Below the forward hold: a level of the ship not on the schematic. Warm hands through a hatch. They have been aboard as long as Lena. Possibly longer.');
+S.registerNote('anomaly_note',    'The anomaly is responding to something we are doing. Specific types of attention. Sustained, non-instrumental attention. The instruments show this.');
+S.registerNote('archive_note',    'Thirty years of geomagnetic measurement. Five countries. Every scientist who sailed on this ship. Decisions were made about what not to catalogue.');
+S.registerNote('oblong_note',     'A passenger named Oblong Vassilithune. He knew the crossing had a specific purpose. He is no longer at the corner table. Lena has no memory of him.');
+S.registerNote('anomaly_return',  'After the transmission: the field returned the signal. The anomaly answered. It responded specifically to the names, the photographs, this position.');
+
+// Wire notes to be added when relevant flags set
+S.on('flagSet', (flag) => {
+  const noteMap = {
+    'zarya_log_read':          'zarya_name',
+    'volkov_photo_found':      'volkov_photo',
+    'nadia_1978_found':        'nadia_1978',
+    'stink_patrol_hands_known':'stink_patrol',
+    'anomaly_responds_seen':   'anomaly_note',
+    'archive_discovered':      'archive_note',
+    'oblong_departed':         'oblong_note',
+    'anomaly_signal_returned': 'anomaly_return',
+  };
+  if (noteMap[flag]) S.addNote(noteMap[flag]);
+});
+
+// ─────────────────────────────────────────────────────────────────
+// ATMOS MODIFIERS — settled soundings change the porthole visuals
+// ─────────────────────────────────────────────────────────────────
+
+// sounding_crossing settled: fog thins, lamp warms slightly
+S.registerAtmosModifier('sounding_crossing', (mods) => {
+  mods.fogMult   = Math.max(0.4, mods.fogMult - 0.3);
+  mods.lampWarm  = Math.max(mods.lampWarm, 1);
+  mods.lampFlicker = false;
+});
+
+// sounding_solidarity settled: sobornost warm glow activates on ring
+S.registerAtmosModifier('sounding_solidarity', (mods) => {
+  mods.soboWarm  = true;
+  mods.fogMult   = Math.max(0.5, mods.fogMult - 0.2);
+  mods.lampWarm  = Math.max(mods.lampWarm, 2);
+});
+
+// sounding_history settled: lamp steadies, fog clears more
+S.registerAtmosModifier('sounding_history', (mods) => {
+  mods.fogMult   = Math.max(0.3, mods.fogMult - 0.4);
+  mods.lampWarm  = Math.max(mods.lampWarm, 1);
+  mods.lampFlicker = false;
+});
+
+// sounding_forgiveness settled: lamp stops flickering entirely, warmest light
+S.registerAtmosModifier('sounding_forgiveness', (mods) => {
+  mods.lampWarm  = Math.max(mods.lampWarm, 3);
+  mods.lampFlicker = false;
+  mods.fogMult   = Math.max(0.3, mods.fogMult - 0.2);
+});
+
+// sounding_sobornost settled: full gold ring, fog nearly gone, deep lamp warmth
+S.registerAtmosModifier('sounding_sobornost', (mods) => {
+  mods.soboWarm  = true;
+  mods.fogMult   = Math.max(0.2, mods.fogMult - 0.5);
+  mods.lampWarm  = Math.max(mods.lampWarm, 3);
+  mods.lampFlicker = false;
+  mods.goldIntensity = Math.max(mods.goldIntensity || 0, 0.7);
+});
+
 S.registerSounding('sounding_sobornost', {
   id:   'sounding_sobornost',
+  alignmentTags: ['solidarity', 'sobornost', 'crossing', 'memory', 'witness'],
   name: 'On conciliarity',
   text: 'The ship was built to measure without interfering. Many instruments, many hands across thirty years, many countries. One field. The old word is sobornost — conciliarity, the unity of a council, many voices in which no voice is erased. Not consensus. Something more demanding than consensus: full presence of all, without any being dissolved into the whole.',
   theosis: 8,
   stat: 'communion', statDelta: 2,
 });
 
+
+// ─────────────────────────────────────────────────────────────────
+// POST-EVENT TEXT SHIFTS
+// These alter recurring scene text after specific flags fire.
+// Registered here; applied automatically by processText().
+// ─────────────────────────────────────────────────────────────────
+
+// After Sunday service: mess hall feels different
+S.registerPostEventShift('sunday_service_led', [
+  { pattern: 'The mess hall. The social centre of the ship. The coffee urn is warm. Someone is usually here.',
+    replacement: 'The mess hall. It is different since Sunday. The coffee urn is warm. The room holds something.' },
+]);
+
+// After archive transmitted: hold text shifts
+S.registerPostEventShift('archive_transmitted', [
+  { pattern: 'thirty years of geomagnetic measurement',
+    replacement: 'thirty years of geomagnetic measurement — now in the world' },
+  { pattern: 'The archive is in its boxes.',
+    replacement: 'The archive was in its boxes. What it found is no longer only here.' },
+]);
+
+// After mission refused: bridge hub text shifts
+S.registerPostEventShift('mission_refused', [
+  { pattern: 'Miguel is at the wheel, or near it.',
+    replacement: 'Miguel is at the wheel. He has been here since the decision.' },
+]);
+
+// After hold blessed: hold entrance text shifts
+S.registerPostEventShift('archive_blessed', [
+  { pattern: 'Freezer Beef is on her box.',
+    replacement: 'Freezer Beef is on the box you blessed. She has not moved from it.' },
+]);
+
+// After Lena's direct scene: galley shifts
+S.registerPostEventShift('lena_direct_asked', [
+  { pattern: 'She hands you something without being asked.',
+    replacement: 'She hands you something without being asked. She has asked her question and you have answered it. The galley is the same galley.' },
+]);
+
+// After cover crisis resolved: cabin text shifts
+S.registerPostEventShift('cover_crisis_resolved', [
+  { pattern: 'The letter is on the desk.',
+    replacement: 'The letter is on the desk. It seems less urgent than before.' },
+]);
+
+// After Compline confession with Connie: corridor text shifts
+S.registerPostEventShift('compline_connie_seen', [
+  { pattern: 'The corridor is quiet.',
+    replacement: "The corridor is quiet. Connie's door is closed now." },
+]);
+
+// After Pavel past story: foredeck hub text shifts
+S.registerPostEventShift('pavel_past_told', [
+  { pattern: 'He knew you were there.',
+    replacement: 'He knew you were there. He has told you about the paper.' },
+]);
+
+
 S.registerSounding('sounding_solidarity', {
   id:   'sounding_solidarity',
+  alignmentTags: ['solidarity', 'presence', 'pastoral', 'witness', 'suffering'],
   name: 'On the body of suffering',
   text: 'You did not invent this hunger. You did not invent this cold. Neither did the person next to you. Suffering isolates. But there is another kind — the kind that, when you stop pretending it is only yours, makes you suddenly aware of how many are in the water with you.',
   theosis: 10,
@@ -379,6 +558,7 @@ S.registerCodexEntry('codex_the_dawn', {
 S.registerCodexEntry('codex_theosis', {
   title:    'Theosis',
   category: 'Theology',
+  unlockCondition: { type: 'theosis', min: 33 },
   content:  "Participation in the divine energies. Not the divine essence — that remains unknowable. Gregory Palamas held this distinction carefully, and it cost him considerable trouble. The energies are not a metaphor. They can be approached. They may already be approaching.",
 });
 
@@ -391,12 +571,14 @@ S.registerCodexEntry('codex_pavel', {
 // Mid-tier entries — unlocked at higher theosis
 S.registerCodexEntry('codex_the_archive', {
   title:    'The Archive',
+  unlockCondition: { type: 'flag', id: 'archive_discovered' },
   category: 'The Crossing',
   content:  "The hold contains archival material from the ship's scientific history. Binders. Photographs. Chart copies. Thirty years of geomagnetic measurement across the world's oceans. It is labelled: pending disposal.",
 });
 
 S.registerCodexEntry('codex_the_mission', {
   title:    'The Mission',
+  unlockCondition: { type: 'flag', id: 'mission_reality_known' },
   category: 'The Crossing',
   content:  "You were sent on this crossing for a purpose. The sealed envelope made it explicit. The archive is to be destroyed. Evidence of something is to be made inconvenient.",
 });
@@ -404,12 +586,14 @@ S.registerCodexEntry('codex_the_mission', {
 // High-tier entries — visible only near the end, heavily guarded
 S.registerCodexEntry('codex_zarya_history', {
   title:    'Zarya',
+  unlockCondition: { type: 'flag', id: 'zarya_log_read' },
   category: 'The Ship',
   content:  "Built in Finland, 1952. She measured the Earth's magnetic field across all its oceans for thirty years. She was sold after the Union ended. She was burned for scrap. What she found in those thirty years — the anomalies, the unmapped mountains, the corrections to the charts sailors use — is in the boxes in the hold.",
 });
 
 S.registerCodexEntry('codex_solidarity', {
   title:    'Solidarity',
+  unlockCondition: { type: 'stat', stat: 'communion', min: 5 },
   category: 'Theology',
   content:  "Dorothy Soelle: suffering isolates. But there is another kind — the kind that, when you stop pretending it is only yours, reveals how many are in the water with you. The act of standing with another does not fix what is wrong. It changes what wrong means.",
 });
@@ -608,9 +792,160 @@ S.registerEnding({
 // SCENES
 // ─────────────────────────────────────────────────────────────────
 
+
+
+// ─────────────────────────────────────────────────────────────────
+// ROLL MODIFIERS — charism bonuses on specific roll types
+// ─────────────────────────────────────────────────────────────────
+
+// The Fool: on failure, 30% chance the result upgrades to partial
+S.registerRollModifier('composure',
+  (statKey, options, G) => G.charisms && G.charisms.includes('fool') && options.isCoverChallenge,
+  (statKey, options, G) => 1  // +1 to roll effectively
+);
+
+// The Confessor: social rolls get advantage (already handled in UI, but add stat bonus)
+S.registerRollModifier('composure',
+  (statKey, options, G) => G.charisms && G.charisms.includes('confessor') && options.isSocialRoll,
+  (statKey, options, G) => 2  // +2 to composure-based social rolls
+);
+
+// The Healer: medical/pastoral rolls get bonus
+S.registerRollModifier('composure',
+  (statKey, options, G) => G.charisms && G.charisms.includes('healer') && options.isPastoralRoll,
+  (statKey, options, G) => 2
+);
+
+// High theosis: all rolls get small bonus
+S.registerRollModifier('composure',
+  (statKey, options, G) => (G.theosis || 0) >= 66,
+  (statKey, options, G) => 1
+);
+
+// Pavel companion: trust stat adds to social rolls
+S.registerRollModifier('composure',
+  (statKey, options, G) => {
+    if (!G.companions) return false;
+    const p = G.companions.find(c => c.id === 'pavel');
+    return !!(p && (p.stats?.trust || 0) >= 3 && options.isSocialRoll);
+  },
+  (statKey, options, G) => 1
+);
+
+
+
+// ─────────────────────────────────────────────────────────────────
+// SCENE POOLS — ambient variety for recurring hubs
+// navigateToPool() picks by weight, respecting conditions
+// ─────────────────────────────────────────────────────────────────
+
+S.registerScenePool('pool_main_deck_ambient', [
+  { sceneId: 'main_deck_haircut',  weight: 2,
+    condition: { type: 'not', condition: { type: 'flag', id: 'main_deck_haircut_seen' } } },
+  { sceneId: 'main_deck_nadia_clouds', weight: 2,
+    condition: { type: 'flag', id: 'met_nadia' } },
+  { sceneId: 'main_deck_miguel_adjusts', weight: 2,
+    condition: { type: 'flag', id: 'met_miguel' } },
+  { sceneId: 'main_deck_anomaly_sky', weight: 3,
+    condition: { type: 'flag', id: 'anomaly_first_noticed' } },
+]);
+
+S.registerScenePool('pool_foredeck_ambient', [
+  { sceneId: 'foredeck_compass_reading', weight: 2,
+    condition: { type: 'flag', id: 'anomaly_first_noticed' } },
+  { sceneId: 'foredeck_cats_together', weight: 3,
+    condition: { type: 'flag', id: 'met_haircut' } },
+  { sceneId: 'foredeck_pavel_rope', weight: 2,
+    condition: { type: 'flag', id: 'met_pavel' } },
+]);
+
+S.registerScenePool('pool_hold_ambient', [
+  { sceneId: 'hold_freezer_beef_survey', weight: 3 },
+  { sceneId: 'hold_sounds_below',       weight: 2,
+    condition: { type: 'flag', id: 'stink_patrol_encountered' } },
+]);
+
+
+// ─────────────────────────────────────────────────────────────────
+// PROGRESS TRACKERS
+// ─────────────────────────────────────────────────────────────────
+
+// Pavel riddle chain: 3 steps
+S.registerProgressTracker('tracker_pavel_riddle', "Pavel's question", 3, (n) => {
+  if (n >= 3) S.showToast('Pavel is waiting in the mess hall.', 'note');
+});
+
+// Solidarity prerequisites: 5 conditions (communion, socialTrust, all crew met, refused)
+S.registerProgressTracker('tracker_solidarity', 'Solidarity', 5, (n) => {
+  if (n >= 5) S.showToast('Something is cohering.', 'theosis');
+});
+
+// Radio assembly: 3 steps (found, team assembled, transmission ready)
+S.registerProgressTracker('tracker_radio', 'The radio', 3, (n) => {
+  if (n >= 3) S.showToast('The radio is ready.', 'note');
+});
+
+
+// ─────────────────────────────────────────────────────────────────
+// PAST LIFE LINES
+// Applied on second+ crossings to alter specific scene text.
+// Pattern → replacement, silently, in specific scenes.
+// ─────────────────────────────────────────────────────────────────
+
+// foredeck_first: Pavel was already turned when you arrived
+S.registerPastLifeLine('foredeck_first',
+  'He knew you were there.',
+  'He was already turned toward you when you came up the steps.');
+
+// galley_first: Lena pours before you ask — she's done this before
+S.registerPastLifeLine('galley_first',
+  'She hands you something without being asked.',
+  'She pours the coffee before you reach the counter. She has done this before.');
+
+// cabin_wake → replaced by crossing_tax_lived in newPlay, but cabin_porthole_stay varies
+S.registerPastLifeLine('cabin_porthole_stay',
+  'The porthole. The sea.',
+  'The porthole. The sea. Both familiar now in a way that has no origin you can locate.');
+
+// hold_first: the boxes feel known
+S.registerPastLifeLine('hold_first',
+  'The hold smells of salt and old paper.',
+  'The hold smells of salt and old paper. The same as before. The same exactly.');
+
+// instrument_room_first: the shimmer was there last time too
+S.registerPastLifeLine('instrument_shimmer',
+  'The light coming through the porthole',
+  'The light coming through the porthole — you have seen this before, this exact quality');
+
+// bridge_hub: Miguel's posture is already known to you
+S.registerPastLifeLine('bridge_hub',
+  'Miguel is at the wheel, or near it.',
+  'Miguel is at the wheel. You know this is where he is. You knew before you came up.');
+
+
 S.registerScenes({
 
   // ── OPENING ──────────────────────────────────────────────────
+
+
+  pool_main_deck_ambient: {
+    id: 'pool_main_deck_ambient', location: 'Main Deck', mood: 'neutral',
+    text: '', // navigates immediately via onEnter
+    onEnter: () => { S.navigateToPool('pool_main_deck_ambient'); },
+    choices: [],
+  },
+  pool_foredeck_ambient: {
+    id: 'pool_foredeck_ambient', location: 'Foredeck', mood: 'neutral',
+    text: '',
+    onEnter: () => { S.navigateToPool('pool_foredeck_ambient'); },
+    choices: [],
+  },
+  pool_hold_ambient: {
+    id: 'pool_hold_ambient', location: 'Hold', mood: 'neutral',
+    text: '',
+    onEnter: () => { S.navigateToPool('pool_hold_ambient'); },
+    choices: [],
+  },
 
   cabin_wake: {
     id: 'cabin_wake', location: 'Cabin', mood: 'neutral', art: 'ship_zarya',
@@ -913,18 +1248,18 @@ This is a very precise answer to a question about a person.`,
 
   foredeck_first: {
     id: 'foredeck_first', location: 'Foredeck', mood: 'neutral', art: 'portrait_pavel',
-    text: `He is there. Facing the bow. Talking with the confidence of someone who has been interrupted many times and learned to simply continue.
-
-— —so the question is whether the absence of ferromagnetic material creates a kind of moral clarity, if you follow me, because if the instruments are right it's because the ship is built not to interfere, which raises the question of what it would mean for a human being to be similarly constructed—
-
-He turns around. He knew you were there.
-
-— Oh good. Genuine warmth. — You're the chaplain. I've been wanting to talk to you.
-
-His name, it turns out, is Pavel.`,
+    text: ``,
     onEnter: () => {
       S.setFlag('met_pavel');
       S.unlockCodexEntry('codex_pavel');
+      S.startDialogue([
+        { speaker: null, text: 'He is there. Facing the bow. Talking with the confidence of someone who has been interrupted many times and learned to simply continue.' },
+        { speaker: 'Pavel', text: '— so the question is whether the absence of ferromagnetic material creates a kind of moral clarity, if you follow me—' },
+        { speaker: 'Pavel', text: 'because if the instruments are right it is because the ship is built not to interfere, which raises the question of what it would mean for a human being to be similarly constructed—' },
+        { speaker: null, text: 'He turns around. He knew you were there.' },
+        { speaker: 'Pavel', text: 'Oh good. You are the chaplain. I have been wanting to talk to you.' },
+        { speaker: null, text: 'His name, it turns out, is Pavel.' },
+      ]);
     },
     choices: [
       { text: '"What were you talking about?"',                     next: 'pavel_ferromagnetic'   },
@@ -1160,7 +1495,7 @@ She looks at you. Just looks. Not waiting. Not examining. Just being in the same
 You drink the coffee.`,
     onEnter: () => { S.setFlag('met_lena'); },
     choices: [
-      { text: 'Say nothing. Let the room be the room.',           next: 'lena_silence', theosis: 2, composure: 1 },
+      { text: 'Say nothing. Let the room be the room.', next: 'lena_silence', theosis: 2, composure: 1, tags: ['stillness', 'presence', 'silence'] },
       { text: '"How long have you been on this ship?"',            next: 'lena_tenure'                           },
       { text: '"The coffee is extraordinary."',                    next: 'lena_coffee'                           },
     ],
@@ -1279,8 +1614,15 @@ She doesn't say what the something is.`,
       const parts = ['Lena is here. She is almost always here, or the galley is in the state of someone who has just left and is about to return.'];
       if (S.hasFlag('maintenance_bilge')) parts.push('She hands you something without being asked. Today it is better than yesterday. She has noticed the bilge was checked.');
       else parts.push('She hands you something without being asked.');
+      if (S.hasNpcMemory && S.hasNpcMemory('lena', 'sat in silence without asking')) {
+        parts.push('She does not comment on your presence. She already knows how to be in the same room as you.');
+      }
+      if (S.hasNpcMemory && S.hasNpcMemory('lena', 'stood with her at the sonar image')) {
+        // Nadia memory accidentally stored under lena — check lena's own memories
+      }
       if (S.hasFlag('hold_bless_archive')) parts.push('She is quieter than usual. Not worried. Something has settled.');
       if (S.hasFlag('stink_patrol_hands_known')) parts.push('The small arrangement near the oven — it has been there since you spoke with her about the Stink Patrol. She does not look at it directly.');
+      if (S.hasFlag('lena_direct_asked')) parts.push('She asked her question. You answered it. There is nothing more to establish between you.');
       return parts.join('\n\n');
     },
     choices: [
@@ -1525,7 +1867,7 @@ Something in you — not a thought, more like a shift of weight — moves from n
     choices: [
       { text: 'Go up. Find someone to talk to.',          next: 'main_deck_hub' },
       { text: 'Open the 1972 box.',                        next: 'hold_1972_box' },
-      { text: 'Offer a blessing. Quietly. For the record.', next: 'hold_bless_archive', theosis: 4, condition: { type: 'flag', id: 'sunday_service_led' } },
+      { text: 'Offer a blessing. Quietly. For the record.', tags: ['history', 'witness', 'memory'], next: 'hold_bless_archive', theosis: 4, condition: { type: 'flag', id: 'sunday_service_led' } },
     ],
   },
 
@@ -1686,8 +2028,15 @@ He looks at the horizon again.
 
 The ship moves under you both.`,
     onEnter: () => {
+      S.pushConsequence({
+        on_next_choice: false,
+        delay_scenes: 3,
+        flagsToSet: ['miguel_knows_refusal'],
+        effect: {},
+      });
       S.progressSounding('sounding_forgiveness', 2);
       S.setFlag('mission_refused');
+      S.updateProgressTracker('tracker_solidarity', 1);
       S.incrementTheosis(5);
       S.showToast('The crossing shifts.', 'theosis');
     },
@@ -1987,14 +2336,16 @@ She returns to her textbook.`,
   // Nadia
   nadia_first: {
     id: 'nadia_first', location: 'Mess Hall', mood: 'neutral', art: 'portrait_nadia',
-    text: `Nadia is younger than you expected. She has the focused distraction of someone whose mind is somewhere else and is trying to bring it back for social interaction.
-
-She smiles when she sees you. A real smile. Quick.
-
-— You're the chaplain. I'm glad. I didn't know we were getting one.
-
-Something about this — the plainness of it — surprises you.`,
-    onEnter: () => { S.setFlag('met_nadia'); },
+    text: ``,
+    onEnter: () => {
+      S.setFlag('met_nadia');
+      S.startDialogue([
+        { speaker: null, text: 'Nadia is younger than you expected. She has the focused distraction of someone whose mind is elsewhere and is trying to bring it back for social interaction.' },
+        { speaker: null, text: 'She smiles when she sees you. A real smile. Quick.' },
+        { speaker: 'Nadia', text: "You are the chaplain. I am glad. I did not know we were getting one." },
+        { speaker: null, text: 'She returns to her tablet. She is still smiling. She finds this genuinely interesting.' },
+      ]);
+    },
     choices: [
       { text: '"What are you working on?"',                    next: 'nadia_work'     },
       { text: '"Why are you glad?"',                           next: 'nadia_why_glad' },
@@ -2083,18 +2434,18 @@ She is asking for real.`,
   // Alexei
   alexei_first: {
     id: 'alexei_first', location: 'Mess Hall', mood: 'neutral', art: 'portrait_alexei',
-    text: `Alexei enters still holding a printout. Lena has already poured him a coffee that he has not noticed.
-
-He notices you instead.
-
-— Ah. The chaplain. Excellent. I have a theological question.
-
-He sits down with the urgency of someone who has been saving this.
-
-— How does one reconcile the concept of a field — a field of force, distributed through space, not localised, not a thing but a tendency — with a theology of presence? The magnetic field is not here or there. It is everywhere, but differently. More of it in some places than others. This seems like God to me.
-
-He waits.`,
-    onEnter: () => { S.setFlag('met_alexei'); },
+    text: ``,
+    onEnter: () => {
+      S.setFlag('met_alexei');
+      S.startDialogue([
+        { speaker: null, text: 'Alexei enters still holding a printout. Lena has already poured him coffee he has not noticed.' },
+        { speaker: null, text: 'He notices you instead.' },
+        { speaker: 'Alexei', text: 'Ah. The chaplain. Excellent. I have a theological question.' },
+        { speaker: null, text: 'He sits down with the urgency of someone who has been saving this.' },
+        { speaker: 'Alexei', text: 'How does one reconcile the concept of a field — distributed through space, not a thing but a tendency — with a theology of presence?' },
+        { speaker: 'Alexei', text: 'The magnetic field is everywhere — but more in some places than others. Is that a model for how presence works? Is that what you mean by God?' },
+      ]);
+    },
     choices: [
       { text: 'Engage seriously. Give him a real answer.',      next: 'alexei_theology' , theosis: 2 },
       { text: 'Ask about the anomaly first.',                   next: 'alexei_anomaly'               },
@@ -2493,6 +2844,7 @@ The bottom is four thousand metres down. The instruments are not supposed to rea
     onEnter: () => {
       S.setMagneticDeviation(0.85);
       S.setFlag('anomaly_peak_occurred');
+      S.playSfx('anomaly_drone');
       S.incrementTheosis(4);
       S.showToast('The anomaly peaks.', 'theosis');
     },
@@ -2789,6 +3141,7 @@ He pauses.
 — Also no one wanted to.`,
     onEnter: () => {
       S.setFlag('radio_found');
+      S.updateProgressTracker('tracker_radio', 1);
       S.setFlag('radio_existence_known');
       S.incrementTheosis(4);
       S.unlockCodexEntry('codex_the_dawn');
@@ -2921,8 +3274,11 @@ There are three of you and one radio built for high-deviation magnetic fields an
 
 This is the moment.`,
     onEnter: () => {
+      S.advanceTime(4);
+      S.playSfx('transmission');
       S.incrementTheosis(8);
       S.setFlag('radio_team_assembled');
+      S.updateProgressTracker('tracker_radio', 1);
       S.setFlag('archive_transmission_planned');
       S.setFlag('mission_refused');
       S.modReputation('alexei', 4);
@@ -3321,7 +3677,8 @@ Freezer Beef looks back.
 — Find me in the mess hall. He says. — Later. When you have thought about it more.
 
 He goes up. Freezer Beef watches him go with the expression of someone confirming a hypothesis.`,
-    onEnter: () => { S.setFlag('pavel_riddle_two_complete'); },
+    onEnter: () => { S.setFlag('pavel_riddle_two_complete');
+      S.updateProgressTracker('tracker_pavel_riddle', 1); },
     choices: [
       { text: 'Think about it.', next: 'main_deck_hub' },
     ],
@@ -3382,6 +3739,8 @@ He picks up his coffee again.
 He drinks. He does not say what happens when you are close enough.`,
     onEnter: () => {
       S.setFlag('pavel_revelation_seen');
+      S.updateProgressTracker('tracker_pavel_riddle', 1);
+      S.comeToBelieve('crossings_recurse');
       S.incrementTheosis(8);
       S.applyEffect({ composure: 2 });
       S.modStance('pavel', 'trust', 5);
@@ -3393,6 +3752,203 @@ He drinks. He does not say what happens when you are close enough.`,
     ],
   },
 
+
+
+  // ═══════════════════════════════════════════════════════════════
+  // COVER CHALLENGE OUTCOMES
+  // Routed to from dismissCoverChallenge based on field + result.
+  // Each field has a success, partial, and failure scene.
+  // ═══════════════════════════════════════════════════════════════
+
+  // ── BACKGROUND (Kylie) ──────────────────────────────────────────
+
+  cover_background_success: {
+    id: 'cover_background_success', location: 'Mess Hall', mood: 'neutral',
+    text: `Kylie writes something. She caps her pen.
+
+— Fine. She says. It carries the tone of someone who expected a different result and is recalibrating.
+
+She moves on. She is already thinking about the next question. The background field is behind you now, at least until she finds a reason to return to it.
+
+The cover held. The cost: she is still watching.`,
+    onEnter: () => { S.applyEffect({ vigilance: 1 }); S.modStance('kylie', 'suspicion', -1); },
+    choices: [{ text: 'Continue.', next: 'mess_hub' }],
+  },
+
+  cover_background_partial: {
+    id: 'cover_background_partial', location: 'Mess Hall', mood: 'tense',
+    text: `Kylie writes something slowly. She does not cap the pen.
+
+— Mmm. She says. It is a professional sound that means: *I am filing this and I will return to it.*
+
+She asks something else — a practical question, a deflection — and you answer it. But the background question is not resolved. It is deferred. The field is tender now.
+
+The cover held. The cost was composure. And she noticed the cost.`,
+    onEnter: () => { S.applyEffect({ composure: -1 }); S.modStance('kylie', 'suspicion', 1); },
+    choices: [{ text: 'Continue.', next: 'mess_hub' }],
+  },
+
+  cover_background_failure: {
+    id: 'cover_background_failure', location: 'Mess Hall', mood: 'tense',
+    text: `Kylie writes something quickly. The pen moves faster when she is interested.
+
+— That's an unusual combination. She says. Her tone is still pleasant. She has not changed her posture. None of this is reassuring.
+
+— We can come back to it. She says.
+
+She will.
+
+The background field is no longer secure. She has a thread now and she knows how to pull threads.`,
+    onEnter: () => {
+      S.degradeCover(1);
+      S.modStance('kylie', 'suspicion', 2);
+      S.showToast('Background field is under pressure.', 'warning');
+    },
+    choices: [{ text: 'Continue.', next: 'mess_hub' }],
+  },
+
+  // ── POSTING (Connie) ────────────────────────────────────────────
+
+  cover_posting_success: {
+    id: 'cover_posting_success', location: 'Mess Hall', mood: 'neutral',
+    text: `Connie nods.
+
+She has an MD and she was listening carefully, and the answer was sufficient. Not fully convincing — she has a clinical sense for what fully convincing sounds like and this did not quite reach it — but sufficient.
+
+She returns to her crossword.
+
+The posting field holds. She has not marked it as closed. She has marked it as sufficient for now.`,
+    onEnter: () => { S.modStance('connie', 'suspicion', -1); },
+    choices: [{ text: 'Continue.', next: 'mess_hub' }],
+  },
+
+  cover_posting_partial: {
+    id: 'cover_posting_partial', location: 'Mess Hall', mood: 'tense',
+    text: `Connie says: — Hm.
+
+She says it with the clinical neutrality of someone who is noting something in a chart they are not going to share.
+
+She moves on. She is professionally done with the question. But the *hm* is in the air and it cost something to put it there.
+
+You are slightly less composed than you were. That is the honest accounting.`,
+    onEnter: () => { S.applyEffect({ composure: -1 }); S.modStance('connie', 'suspicion', 1); },
+    choices: [{ text: 'Continue.', next: 'mess_hub' }],
+  },
+
+  cover_posting_failure: {
+    id: 'cover_posting_failure', location: 'Mess Hall', mood: 'tense',
+    text: `Connie sets down her pen.
+
+— The protocols you described. She says. — They changed in 2019.
+
+She picks up her pen.
+
+— I'm sure you have more current placements. She says. She is not sure of this. She is noting that she has noticed a specific thing.
+
+She does not pursue it further. She is a doctor on a ship. She keeps her mouth shut about things that are not her business. But she has seen something.
+
+The posting field is under pressure.`,
+    onEnter: () => {
+      S.degradeCover(1);
+      S.modStance('connie', 'suspicion', 2);
+      S.showToast('Connie noticed something.', 'warning');
+    },
+    choices: [{ text: 'Continue.', next: 'mess_hub' }],
+  },
+
+  // ── LEFT BEHIND (Connie/Kylie) ──────────────────────────────────
+
+  cover_left_success: {
+    id: 'cover_left_success', location: 'Mess Hall', mood: 'neutral',
+    text: `She does not push further.
+
+What you said was true enough — or true in the parts that mattered — and she could feel the truth in it even if the shape was not quite right.
+
+She moves on. The left-behind field holds, which means something different for this field than for the others. What you left behind is real. The cover for it might not be.`,
+    choices: [{ text: 'Continue.', next: 'mess_hub' }],
+  },
+
+  cover_left_partial: {
+    id: 'cover_left_partial', location: 'Mess Hall', mood: 'neutral',
+    text: `She tilts her head slightly. Something didn't quite land.
+
+— That makes sense. She says. It is the tone of someone for whom it makes sense as a statement and less sense as a complete account.
+
+She does not ask the follow-up. She should ask the follow-up. She has chosen not to.
+
+That choice cost you something. You can feel the composure it took to not-pursue.`,
+    onEnter: () => { S.applyEffect({ composure: -1 }); },
+    choices: [{ text: 'Continue.', next: 'mess_hub' }],
+  },
+
+  cover_left_failure: {
+    id: 'cover_left_failure', location: 'Mess Hall', mood: 'tense',
+    text: `There is a pause that lasts exactly one beat too long.
+
+She does not fill it. She is waiting to see if you will.
+
+You do not.
+
+— Right. She says, finally. And writes something. The kind of something that gets written when a person is noting that a question was not answered.
+
+The left-behind field is now the field that failed. That is the most personal failure. It cost more than composure.`,
+    onEnter: () => {
+      S.degradeCover(1);
+      S.applyEffect({ doubt: 2 });
+      S.showToast('Something real was exposed.', 'warning');
+    },
+    choices: [{ text: 'Continue.', next: 'mess_hub' }],
+  },
+
+  // ── CONNECTION (Othis) ──────────────────────────────────────────
+
+  cover_connection_success: {
+    id: 'cover_connection_success', location: 'Hold Access', mood: 'neutral',
+    text: `He makes a note on his clipboard. A brief one. He files it in whatever system he uses.
+
+— Fine. He says. He means it as a functional assessment rather than an approval.
+
+He returns to his work. The connection field holds. He has logged it as satisfactory.
+
+The cost: he now has a log entry. That entry will be accurate, which is worse than if it had been wrong.`,
+    onEnter: () => { S.modStance('othis', 'suspicion', -1); },
+    choices: [{ text: 'Continue.', next: 'main_deck_hub' }],
+  },
+
+  cover_connection_partial: {
+    id: 'cover_connection_partial', location: 'Hold Access', mood: 'tense',
+    text: `He writes something. He crosses something out. He writes it again differently.
+
+— Your contact. He says. — I may need to verify that later.
+
+He means it procedurally. He does not mean it as a threat. The procedural meaning is worse.
+
+The connection field is under observation. He has not raised it — he has scheduled it.`,
+    onEnter: () => { S.applyEffect({ composure: -1 }); S.modStance('othis', 'suspicion', 1); },
+    choices: [{ text: 'Continue.', next: 'main_deck_hub' }],
+  },
+
+  cover_connection_failure: {
+    id: 'cover_connection_failure', location: 'Hold Access', mood: 'tense',
+    text: `He looks up from the clipboard.
+
+— That name. He says. — Is not in the current directory.
+
+He writes something.
+
+— I will need to confirm independently. He says.
+
+He is not accusing you. He is being procedurally correct. The procedure is very bad for you.
+
+He continues down the corridor. The connection field has failed. He is filing a note. Landstorm will see the note.`,
+    onEnter: () => {
+      S.degradeCover(2);
+      S.modStance('othis', 'suspicion', 3);
+      S.modShipState('paranoia', 2);
+      S.showToast('Othis is filing a note.', 'warning');
+    },
+    choices: [{ text: 'Continue.', next: 'main_deck_hub' }],
+  },
 
   // ═══════════════════════════════════════════════════════════════
   // SUGGESTIONS 1-10 IMPLEMENTATION
@@ -3450,7 +4006,7 @@ She does not ask you anything. She has told you something instead. This is what 
       { type: 'not', condition: { type: 'flag', id: 'compline_connie_seen' } },
     ]},
     choices: [
-      { text: 'Stay for a while.',    next: 'compline_connie_stay', theosis: 3, composure: 1 },
+      { text: 'Stay for a while.', next: 'compline_connie_stay', theosis: 3, composure: 1, tags: ['pastoral', 'presence', 'forgiveness'] },
       { text: 'Say something true.',  next: 'compline_connie_speak' },
     ],
   },
@@ -3522,6 +4078,7 @@ What it says — what the return pattern means — is not something the instrume
     onEnter: () => {
       S.incrementTheosis(10);
       S.setFlag('anomaly_signal_returned');
+      S.comeToBelieve('anomaly_responds');
       S.modReputation('alexei', 4);
       S.modShipState('saturation', 3);
       S.flashTheosisLight(0.8, 6000);
@@ -3692,6 +4249,7 @@ It is not quite a question.`,
       S.incrementTheosis(5);
       S.modReputation('nadia', 3);
       S.setFlag('nadia_1978_gap_understood');
+      S.comeToBelieve('archive_suppressed');
       S.applyEffect({ communion: 2 });
     },
     choices: [{ text: 'Go to the main deck.', next: 'main_deck_hub' }],
@@ -3807,6 +4365,7 @@ He looks at you.
       S.incrementTheosis(7);
       S.setFlag('pavel_past_told');
       S.modStance('pavel', 'trust', 3);
+      S.modCompanionStat('pavel', 'trust', 3);
       S.modReputation('pavel', 4);
       S.applyEffect({ communion: 2 });
     },
@@ -3855,7 +4414,19 @@ He looks at you.
 
   crossing_tax_lived: {
     id: 'crossing_tax_lived', location: 'Cabin', mood: 'neutral',
-    text: `The ceiling is close and moving. The long slow roll.
+    get text() {
+      const lines = [];
+      lines.push('The ceiling is close and moving. The long slow roll.');
+      if (S.hasMeta && S.hasMeta('reached_restoration')) {
+        lines.push('You know what the transmission did. You carried that across.');
+      }
+      if (S.hasMeta && S.hasMeta('reached_the_knowing')) {
+        lines.push('You have been here enough times that the ship feels less like a place you are going and more like a place you are becoming.');
+      }
+      lines.push('This has happened before. You know this the way you know a room you grew up in.');
+      return lines.join('\n\n');
+    },
+    _unused_text_removed: `REMOVED.
 
 You are awake.
 
@@ -3913,6 +4484,7 @@ The anomaly continues.`,
     onEnter: () => {
       S.incrementTheosis(9);
       S.setFlag('cover_crisis_resolved');
+      S.comeToBelieve('chaplain_real');
       S.applyEffect({ doubt: -4, composure: 3 });
       S.modShipState('saturation', 2);
       S.showToast('The cover is transparent now.', 'theosis');
@@ -4056,6 +4628,7 @@ You do not know what you have done in exchange. You have the strong sense that y
       S.incrementTheosis(8);
       S.setFlag('stink_patrol_favour_received');
       S.setFlag('archive_hidden_location');
+      S.addItem('stink_patrol_paper');
       S.applyEffect({ communion: 2 });
       S.modShipState('saturation', 2);
       S.showToast('The Stink Patrol has helped.', 'note');
@@ -4070,6 +4643,177 @@ You do not know what you have done in exchange. You have the strong sense that y
       { text: 'Go move the archive.',  next: 'hold_first' },
       { text: 'Go to the main deck.', next: 'main_deck_hub' },
     ],
+  },
+
+
+
+  // ── SCENE POOL: MAIN DECK AMBIENT ────────────────────────────────
+
+  main_deck_haircut: {
+    id: 'main_deck_haircut', location: 'Main Deck', mood: 'neutral',
+    text: `Haircut is on the bowsprit.
+
+This is not unusual. What is unusual is that she is facing directly forward, into the wind, with the focus of something that has been given a task.
+
+She does not look at you when you come up.
+
+You stand at the rail. The sea. The compass somewhere below you, doing its best.
+
+After a while Haircut turns and walks back along the rail and sits beside you. She looks at the horizon. She looks at you. She looks at the horizon again.
+
+She has done her survey. Whatever she was checking for, she has checked.`,
+    onEnter: () => { S.setFlag('main_deck_haircut_seen'); S.incrementTheosis(2); },
+    choices: [{ text: 'Go to the main deck.', next: 'main_deck_hub' }],
+  },
+
+  main_deck_nadia_clouds: {
+    id: 'main_deck_nadia_clouds', location: 'Main Deck', mood: 'neutral',
+    art: 'portrait_nadia',
+    text: `Nadia is on the deck with her tablet and a cloud chart, looking up.
+
+— The cloud formation. She says, not looking at you. — It is not consistent with the weather pattern.
+
+She looks at the chart. She looks at the clouds.
+
+— The clouds above an anomaly sometimes behave differently. She says. — The field affects ionisation. The ionisation affects cloud formation. It is subtle but it is there.
+
+She shows you the cloud chart.
+
+— These clouds. She says. — They are very slightly wrong.
+
+She says it with the satisfaction of someone for whom *slightly wrong* is the most interesting category of observation.`,
+    onEnter: () => { S.modReputation('nadia', 1); S.incrementTheosis(2); },
+    choices: [{ text: 'Go to the main deck.', next: 'main_deck_hub' }],
+  },
+
+  main_deck_miguel_adjusts: {
+    id: 'main_deck_miguel_adjusts', location: 'Main Deck', mood: 'neutral',
+    text: `Miguel is adjusting a line that does not need adjusting.
+
+He adjusts it anyway, with the economy of someone who has found useful work in proximity to the thing he is actually thinking about.
+
+He does not speak. You stand nearby. The ship moves.
+
+After a while he says: — Good weather.
+
+It is. That is what he says about it.
+
+He finishes with the line. He looks at the bow. He goes back to the bridge.
+
+There was something in the pause before *good weather* that meant more than the weather.`,
+    onEnter: () => { S.modReputation('miguel', 1); S.incrementTheosis(1); },
+    choices: [{ text: 'Go to the main deck.', next: 'main_deck_hub' }],
+  },
+
+  main_deck_anomaly_sky: {
+    id: 'main_deck_anomaly_sky', location: 'Main Deck', mood: 'uncanny',
+    text: `The sky at the anomaly position is the same sky.
+
+You look at it anyway, knowing what is below.
+
+The water above the structure is the same water. The birds, when there are birds, do not circle differently. The surface gives nothing away.
+
+Four thousand metres down, something enormous that has been here long enough to have, possibly, opinions about being measured.
+
+Up here: the same sky.
+
+The gap between these two facts is where you have been living for three days.`,
+    onEnter: () => { S.incrementTheosis(4); S.applyEffect({ composure: 1 }); },
+    choices: [{ text: 'Go to the main deck.', next: 'main_deck_hub' }],
+  },
+
+  // ── SCENE POOL: FOREDECK AMBIENT ─────────────────────────────────
+
+  foredeck_compass_reading: {
+    id: 'foredeck_compass_reading', location: 'Foredeck', mood: 'uncanny',
+    text: `There is a compass mounted to the foredeck rail. A small one, for rough orientation.
+
+At this position, it is reading approximately twelve degrees east of true north.
+
+Twelve degrees. The ship was built so that her own construction does not add to the deviation. Everything she carries is chosen for non-magnetic properties. The deviation you are reading is purely from below — from the structure at four thousand metres.
+
+You hold the compass level. Twelve degrees. The needle wants to go home but home has moved.
+
+You understand something about the crossing that you did not have words for before.`,
+    onEnter: () => { S.incrementTheosis(5); S.applyEffect({ composure: 1 }); },
+    choices: [{ text: 'Go to the foredeck.', next: 'main_deck_hub' }],
+  },
+
+  foredeck_cats_together: {
+    id: 'foredeck_cats_together', location: 'Foredeck', mood: 'neutral',
+    text: `Haircut and Freezer Beef are both on the foredeck.
+
+This is unusual. They do not usually occupy the same space.
+
+They are not interacting. They are each doing their own thing — Haircut facing forward, Freezer Beef arranged in a square — but they have clearly agreed on the foredeck as a shared space for this hour.
+
+You sit between them.
+
+This seems correct to all three of you.
+
+The anomaly continues. The ship holds her course. The cats hold their positions. Whatever they are attending to, they attend to it with full seriousness.`,
+    onEnter: () => { S.incrementTheosis(3); S.applyEffect({ composure: 2 }); S.offerSounding('sounding_crossing'); },
+    choices: [{ text: 'Go to the foredeck.', next: 'main_deck_hub' }],
+  },
+
+  foredeck_pavel_rope: {
+    id: 'foredeck_pavel_rope', location: 'Foredeck', mood: 'neutral',
+    art: 'portrait_pavel',
+    text: `Pavel has a rope.
+
+He has been holding this rope, or a rope very like it, at various points during the crossing. He does not do anything with it. He holds it while he talks. He holds it while he is silent. He holds it now.
+
+You ask him about the rope.
+
+He looks at it as if he had not noticed it was there.
+
+— I don't know. He says. — I think I just like having something to hold.
+
+He looks at it for another moment.
+
+— In prison. He says. — I held whatever was available. A corner of a blanket, usually. It helps.
+
+He sets the rope down.
+
+— Thank you for asking. He says. He means it.`,
+    onEnter: () => { S.incrementTheosis(4); S.modReputation('pavel', 2); S.modStance('pavel', 'trust', 1); },
+    choices: [{ text: 'Go to the foredeck.', next: 'main_deck_hub' }],
+  },
+
+  // ── SCENE POOL: HOLD AMBIENT ──────────────────────────────────────
+
+  hold_freezer_beef_survey: {
+    id: 'hold_freezer_beef_survey', location: 'Hold', mood: 'neutral',
+    text: `Freezer Beef is doing a survey.
+
+She moves from box to box at a deliberate pace, sniffing or not sniffing, pausing or not pausing, concluding something about each one that she does not share.
+
+You watch.
+
+After she has covered the front half of the hold she sits in the centre and makes a sound that is not a meow exactly — more like a brief declaration.
+
+Then she returns to her box.
+
+The survey is complete. The archive is in satisfactory condition. Freezer Beef will file her report in the usual manner, which is to say she will not file it anywhere and the results will be known only to her.`,
+    onEnter: () => { S.incrementTheosis(3); S.applyEffect({ composure: 1 }); },
+    choices: [{ text: 'Go back up.', next: 'main_deck_hub' }],
+  },
+
+  hold_sounds_below: {
+    id: 'hold_sounds_below', location: 'Hold', mood: 'uncanny',
+    text: `There is a sound.
+
+Not from the archive boxes. From below. From the level of the ship that is not on the schematic.
+
+It is not a mechanical sound. It is the sound of people who are very competent at something, doing it. A rhythmic working. Steady. Below the ballast.
+
+You have heard this before, when you went to the hatch. But this time you are just standing in the hold and the sound comes up through the deck like: we are here. We are always here. The ship is stable because we are stable.
+
+Freezer Beef does not react. She finds this entirely expected.
+
+So, eventually, do you.`,
+    onEnter: () => { S.incrementTheosis(5); S.applyEffect({ composure: 1, communion: 1 }); },
+    choices: [{ text: 'Go back up.', next: 'main_deck_hub' }],
   },
 
 
@@ -4101,6 +4845,7 @@ Nobody argues with this.`,
     onEnter: () => {
       S.setFlag('mission_refused');
       S.setFlag('solidarity_ending_achieved');
+      S.comeToBelieve('sobornost_real');
       S.modShipState('morale', 3);
       S.modShipState('saturation', 2);
       S.flashTheosisLight(0.6, 5000);
@@ -4131,6 +4876,7 @@ Nobody argues with this.`,
     },
     onEnter: () => {
       S.setFlag('ending_solidarity_reached');
+      S.unlockMeta('reached_solidarity');
       S.addJournalEntry({ type: 'ending', text: 'Solidarity — the ship acted as one body.' });
       S.unlockCodexEntry('codex_solidarity');
       S.showToast('Solidarity.', 'theosis');
@@ -4296,6 +5042,7 @@ He has been there all night.`,
     onEnter: () => {
       S.setFlag('mission_refused');
       S.setFlag('archive_transmitted');
+      S.updateProgressTracker('tracker_radio', 1);
       S.flashTheosisLight(1.0, 6000);
       S.checkEndings();
     },
@@ -5190,7 +5937,7 @@ He looks at you.
       },
       {
         text: 'Sit with him. No answer yet.',
-        next: 'alexei_sit_together', theosis: 3, composure: 1,
+        next: 'alexei_sit_together', theosis: 3, composure: 1, tags: ['pastoral', 'solidarity', 'presence'],
         condition: { type: 'not', condition: { type: 'flag', id: 'alexei_emergency_talked' } },
       },
     ],
@@ -5227,6 +5974,7 @@ He lies back.
       S.applyEffect({ communion: 2 });
       if (S.G.worldState) S.G.worldState.sanctity = Math.min(10, S.G.worldState.sanctity + 2);
       S.setFlag('alexei_palamas_told');
+      S.comeToBelieve('energies_real');
     },
     choices: [
       { text: 'Stay until he sleeps.', next: 'alexei_sleeps', theosis: 2, composure: 1 },
@@ -5368,7 +6116,38 @@ He turns back to the readout.
     choices: [
       { text: '"What is it responding to?"',               next: 'anomaly_responds_what', theosis: 3 },
       { text: 'Look at the readout with him. Say nothing.', next: 'anomaly_responds_silence', theosis: 4, composure: 1 },
+      { text: '"Then it knows we are here."',              next: 'anomaly_responds_knows',
+        condition: { type: 'believes', id: 'energies_real' }, theosis: 5 },
     ],
+  },
+
+  anomaly_responds_knows: {
+    id: 'anomaly_responds_knows', location: 'Instrument Room', mood: 'revelation',
+    text: `Alexei looks at you.
+
+— Yes. He says. Very quietly.
+
+He looks at the readout.
+
+— That is the theological conclusion I was declining to draw. He says. — You just drew it.
+
+He writes it down. He writes: *it knows we are here.*
+
+He closes the notebook.
+
+— The energies. He says. — Participation in what is actually there. The field is participable. We have been participating in it for thirty years without knowing we were doing that.
+
+He opens the notebook again and underlines what he wrote.
+
+— Now we know. He says.`,
+    onEnter: () => {
+      S.incrementTheosis(8);
+      S.modReputation('alexei', 4);
+      S.comeToBelieve('anomaly_responds');
+      S.applyEffect({ composure: 2, communion: 2 });
+      S.flashTheosisLight(0.6, 4000);
+    },
+    choices: [{ text: 'Go to the main deck.', next: 'main_deck_hub' }],
   },
 
   anomaly_responds_what: {
@@ -5650,6 +6429,7 @@ She goes back to cooking. The conversation is over. She has already done what ne
       S.modReputation('lena', 5);
       S.modStance('lena', 'solidarity', 4);
       S.setFlag('lena_knows_transmission');
+      S.comeToBelieve('archive_matters');
       S.modShipState('morale', 2);
       if (S.G.worldState) S.G.worldState.socialTrust = Math.min(10, (S.G.worldState.socialTrust || 5) + 3);
       S.showToast('The mess hall will be empty.', 'note');
@@ -5691,6 +6471,7 @@ He does not say what that costs.`,
       S.incrementTheosis(8);
       S.setFlag('pavel_convergence_told');
       S.modStance('pavel', 'trust', 3);
+      S.modCompanionStat('pavel', 'trust', 3);
       S.applyEffect({ composure: 2 });
       S.flashTheosisLight(0.5, 4000);
     },
@@ -5763,6 +6544,7 @@ She slides both photographs toward you.
       S.modReputation('lena', 4);
       S.modStance('lena', 'trust', 2);
       S.setFlag('photos_crossreferenced');
+      S.comeToBelieve('ship_remembers');
       S.setFlag('volkov_identified');
       S.addItem('both_photographs');
       S.applyEffect({ communion: 2 });
@@ -6041,7 +6823,12 @@ He nods. He returns to the clipboard. The inventory, in his version, will be cor
 
   alexei_doubt: {
     id: 'alexei_doubt', location: 'Instrument Room', mood: 'uncanny',
-    text: `Alexei is standing at the porthole.
+    get text() {
+      let base = 'Alexei is standing at the porthole.';
+      if (S.hasNpcMemory && S.hasNpcMemory('alexei', 'Palamas — thirty years without knowing')) {
+        base = 'Alexei is standing at the porthole. He has been here since the Palamas conversation. Thinking.';
+      }
+      return base + `
 
 He has not turned when you come in. He is looking at the shimmer.
 
@@ -6059,7 +6846,9 @@ A pause.
 
 — Although. He says. And then stops. He turns back to the porthole.
 
-— Although, he says again. And does not finish.`,
+— Although, he says again. And does not finish.`;
+    },
+
     onEnter: () => {
       S.incrementTheosis(4);
       S.modStance('alexei', 'trust', 1);
@@ -6284,6 +7073,7 @@ The coffee Lena makes after the service is better than the coffee she makes at o
     },
     onEnter: () => {
       S.setFlag('ending_erasure_reached');
+      S.unlockMeta('reached_erasure');
       S.addJournalEntry({ type: 'ending', text: 'Erasure — the archive is gone.' });
       S.showToast('Erasure.', 'warning');
     },
@@ -6317,6 +7107,7 @@ The coffee Lena makes after the service is better than the coffee she makes at o
     },
     onEnter: () => {
       S.setFlag('ending_witness_reached');
+      S.unlockMeta('reached_witness');
       S.addJournalEntry({ type: 'ending', text: 'Witness — the archive is hidden.' });
       S.showToast('Witness.', 'note');
     },
@@ -6363,6 +7154,7 @@ The coffee Lena makes after the service is better than the coffee she makes at o
     },
     onEnter: () => {
       S.setFlag('ending_restoration_reached');
+      S.unlockMeta('reached_restoration');
       S.addJournalEntry({ type: 'ending', text: 'Restoration — the record goes into the world.' });
       S.unlockCodexEntry('codex_zarya_history');
       S.flashTheosisLight(1.0, 5000);
@@ -6522,8 +7314,17 @@ From here you can go anywhere on the ship.`,
     get text() {
       const parts = ['Miguel is at the wheel, or near it. Haircut is on the chart table, sitting on a weather report.'];
       if (S.hasFlag('maintenance_brass')) parts.push('The forward cleats are polished. Miguel noticed.');
-      if (S.hasFlag('volkov_photo_found') && S.hasFlag('miguel_photo_return')) parts.push('He has not mentioned the photograph again. Neither have you. It is in the air between you like a settled thing.');
-      if (S.hasFlag('mission_refused') && !S.hasFlag('mission_accepted')) parts.push('He has his hand on the wheel the way someone holds something they have decided to keep.');
+      if (S.hasNpcMemory && S.hasNpcMemory('miguel', 'found photograph and returned it')) {
+        parts.push('He has not mentioned the photograph again. Neither have you. It is in the air between you like a settled thing.');
+      } else if (S.hasFlag('volkov_photo_found') && S.hasFlag('miguel_photo_return')) {
+        parts.push('He has not mentioned the photograph again. Neither have you.');
+      }
+      if (S.hasNpcMemory && S.hasNpcMemory('miguel', 'told about the archive')) {
+        parts.push('He knows you have been in the archive. He has adjusted something in how he stands.');
+      }
+      if (S.hasFlag('mission_refused') && !S.hasFlag('mission_accepted')) {
+        parts.push('He has his hand on the wheel the way someone holds something they have decided to keep.');
+      }
       return parts.join('\n\n');
     },
     choices: [

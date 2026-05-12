@@ -447,6 +447,9 @@ function evaluateCondition(cond) {
       return minOk && maxOk;
     }
     case 'charism':         return G.charisms.includes(cond.id);
+    case 'believes':        return G.beliefs && G.beliefs.has(cond.id);
+    case 'knows':           return G.knowledge && G.knowledge.has(cond.id);
+    case 'not_believes':    return !G.beliefs || !G.beliefs.has(cond.id);
     case 'item':            return hasItem(cond.id);
     case 'playcount':       return G.playCount >= (cond.min || 0);
     case 'awareness':       return (G.awareness || 0) >= (cond.min || 0);
@@ -509,7 +512,7 @@ function settleSounding(soundingId) {
       G.soundings.settled.push(soundingId);
       const snd = _registries.soundings[soundingId];
       if (snd && snd.effect) applyEffect(snd.effect);
-      showToast(`${snd.name} — settled.`, 'theosis');
+      showToast(`${snd.name} — settled.`, 'theosis'); playSfx('sounding_settle');
       refreshAtmosMods(); emit('soundingSettled', soundingId);
     }
   }
@@ -605,7 +608,7 @@ function tickSoundings() {
     G.soundings.settled.push(id);
     const s = _registries.soundings[id];
     if (s && s.effect) applyEffect(s.effect);
-    showToast(s.name + ' — settled.', 'theosis');
+    showToast(s.name + ' — settled.', 'theosis'); playSfx('sounding_settle');
     refreshAtmosMods(); emit('soundingSettled', id);
   });
 }
@@ -662,7 +665,7 @@ function incrementTheosis(amount) {
   const newTier = G.theosis <= 32 ? 0 : G.theosis <= 65 ? 1 : 2;
   if (newTier > oldTier) {
     const tierMsg = ['Asleep', 'Waking', 'Illumined'];
-    setTimeout(() => showToast(tierMsg[newTier] + '.', 'theosis'), 500);
+    setTimeout(() => { showToast(tierMsg[newTier] + '.', 'theosis'); playSfx('theosis_moment'); }, 500);
   }
   refreshAtmosMods();
   checkJournalThresholds(G.theosis, oldValue);
@@ -673,6 +676,9 @@ function incrementTheosis(amount) {
 // Magnetic deviation: 0.0 = true north, 1.0 = maximum anomaly
 function setMagneticDeviation(val) {
   G.magneticDeviation = Math.max(0, Math.min(1, val));
+  // UI opacity fades slightly at high deviation (anomaly distortion)
+  const baseOpacity = 1 - (Math.max(0, val - 0.5) * 0.3);
+  setUiOpacity(Math.max(0.72, baseOpacity));
   emit('magneticDeviationChanged', G.magneticDeviation);
   // Apply diegetic CSS filter to game body
   const dev = G.magneticDeviation;
@@ -984,7 +990,82 @@ function playSfx(name,volume=0.5) {
   else if(name==='beep')_osc(660,'square',0.1,0.15);
   else console.warn(`SFX "${name}" not registered.`);
 }
-function initBuiltinSfx() {}
+function initBuiltinSfx() {
+  // Sounding settle: a warm, brief sine tone that fades — spiritual resolution
+  registerSfx('sounding_settle', (vol=0.4) => {
+    if (!_actx) return;
+    const g = _actx.createGain(); g.gain.setValueAtTime(0, _actx.currentTime);
+    g.gain.linearRampToValueAtTime(vol * 0.5, _actx.currentTime + 0.08);
+    g.gain.exponentialRampToValueAtTime(0.001, _actx.currentTime + 2.2);
+    g.connect(_gainNode);
+    // Fundamental + overtone for warmth
+    [220, 440, 660].forEach((freq, i) => {
+      const o = _actx.createOscillator();
+      o.type = 'sine'; o.frequency.value = freq;
+      const og = _actx.createGain(); og.gain.value = i === 0 ? 1 : 1/(i*3);
+      o.connect(og); og.connect(g); o.start(); o.stop(_actx.currentTime + 2.5);
+    });
+  });
+
+  // Cover fail: a brief descending dissonance — tension, something broken
+  registerSfx('cover_fail', (vol=0.3) => {
+    if (!_actx) return;
+    const g = _actx.createGain(); g.gain.setValueAtTime(vol * 0.4, _actx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, _actx.currentTime + 0.8);
+    g.connect(_gainNode);
+    [[340, 0], [290, 0.05], [240, 0.15]].forEach(([freq, delay]) => {
+      const o = _actx.createOscillator();
+      o.type = 'triangle'; o.frequency.value = freq;
+      const og = _actx.createGain(); og.gain.value = 0.6;
+      o.connect(og); og.connect(g);
+      o.start(_actx.currentTime + delay); o.stop(_actx.currentTime + delay + 0.6);
+    });
+  });
+
+  // Transmission: radio crackle — filtered noise bursts
+  registerSfx('transmission', (vol=0.5) => {
+    if (!_actx) return;
+    const dur = 1.8;
+    const buf = _actx.createBuffer(1, _actx.sampleRate * dur, _actx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (Math.random() > 0.85 ? 1 : 0.1);
+    const src = _actx.createBufferSource(); src.buffer = buf;
+    const band = _actx.createBiquadFilter(); band.type = 'bandpass';
+    band.frequency.value = 1800; band.Q.value = 3;
+    const g = _actx.createGain(); g.gain.setValueAtTime(vol * 0.6, _actx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, _actx.currentTime + dur);
+    src.connect(band); band.connect(g); g.connect(_gainNode); src.start();
+  });
+
+  // Anomaly drone: a very low, sustained presence — the field
+  registerSfx('anomaly_drone', (vol=0.2) => {
+    if (!_actx) return;
+    const g = _actx.createGain(); g.gain.setValueAtTime(0, _actx.currentTime);
+    g.gain.linearRampToValueAtTime(vol * 0.3, _actx.currentTime + 1.5);
+    g.gain.exponentialRampToValueAtTime(0.001, _actx.currentTime + 5);
+    g.connect(_gainNode);
+    [40, 47, 53].forEach(freq => {
+      const o = _actx.createOscillator(); o.type = 'sine'; o.frequency.value = freq;
+      const og = _actx.createGain(); og.gain.value = 0.5;
+      o.connect(og); og.connect(g); o.start(); o.stop(_actx.currentTime + 5.5);
+    });
+  });
+
+  // Theosis moment: rising harmonic — spiritual ascent
+  registerSfx('theosis_moment', (vol=0.35) => {
+    if (!_actx) return;
+    const g = _actx.createGain(); g.gain.setValueAtTime(0, _actx.currentTime);
+    g.gain.linearRampToValueAtTime(vol * 0.4, _actx.currentTime + 0.3);
+    g.gain.exponentialRampToValueAtTime(0.001, _actx.currentTime + 3);
+    g.connect(_gainNode);
+    [330, 440, 550, 660].forEach((freq, i) => {
+      const o = _actx.createOscillator(); o.type = 'sine'; o.frequency.value = freq;
+      const og = _actx.createGain(); og.gain.value = 1 / (i + 1);
+      o.connect(og); og.connect(g);
+      o.start(_actx.currentTime + i * 0.12); o.stop(_actx.currentTime + 3.5);
+    });
+  });
+}
 
 // ============================================================
 // SECTION: systems/history.js
@@ -1374,7 +1455,7 @@ function renderRitual(root) {
   if (phase.text) {
     let raw=Array.isArray(phase.text)?phase.text:[phase.text];
     raw=raw.map(applyLinguisticToggle).map(applyPostEventShifts);
-    raw.forEach(line=>{const p=document.createElement('p');p.className='sp';p.innerHTML=processText(line);body.appendChild(p);});
+    const _ml=injectMicroLines(raw,G.scene); _ml.forEach(line=>{const p=document.createElement('p');p.className='sp';p.innerHTML=processText(injectGhostText(line,G.scene));body.appendChild(p);});
   }
   const cd=document.createElement('div'); cd.className='choices';
   if (phase.ritualChoices) {
@@ -1649,11 +1730,30 @@ function resolveCoverChallenge(action) {
     showToast(`You hold \u2014 barely. ${_fieldLabels[field]||field} costs you.`,'note');emit('coverChallengePartial',{field,result});
   }else{
     degradeCover(1);G.flags.add(`__cover_pressured_${field}`);
-    showToast(`Cover questioned. ${_fieldLabels[field]||field} is under suspicion.`,'note');emit('coverChallengeFailure',{field,result});
+    showToast(`Cover questioned. ${_fieldLabels[field]||field} is under suspicion.`,'note');playSfx('cover_fail');emit('coverChallengeFailure',{field,result});
   }
   G._coverChallenge={...G._coverChallenge,result,resolved:true};scheduleRender();
 }
-function dismissCoverChallenge(){G._coverChallenge=null;scheduleRender();}
+function dismissCoverChallenge(){
+  const ch = G._coverChallenge;
+  G._coverChallenge = null;
+  if (ch && ch.resolved && ch.result) {
+    const key = `_cover_outcome_${ch.field}_${ch.result.outcome}`;
+    if (G.flags.has(key)) { scheduleRender(); return; }
+    G.flags.add(key);
+    // Navigate to field-specific outcome scene if registered
+    const outcomeScene = `cover_${ch.field}_${ch.result.outcome}`;
+    if (_registries.scenes && _registries.scenes[outcomeScene]) {
+      navigate(outcomeScene); return;
+    }
+    // Fallback to generic outcome scene
+    const genericScene = `cover_challenge_${ch.result.outcome}`;
+    if (_registries.scenes && _registries.scenes[genericScene]) {
+      navigate(genericScene); return;
+    }
+  }
+  scheduleRender();
+}
 
 function renderCoverChallengeOverlay(root,processTextFn) {
   if(!G._coverChallenge)return false;
@@ -1675,9 +1775,21 @@ function renderCoverChallengeOverlay(root,processTextFn) {
   }else if(result){
     const res=document.createElement('div');
     res.className=`cover-challenge-result ${result.outcome==='success'?'roll-success':result.outcome==='partial'?'roll-partial':'roll-fail'}`;
-    res.textContent=`[${result.d1}]+[${result.d2}]=${result.roll}+${result.statValue}=${result.total} \u2014 ${result.outcome.toUpperCase()}`;
+    // Dice display
+    const diceRow = document.createElement('div'); diceRow.className='challenge-dice';
+    diceRow.innerHTML = `<span class="die">${result.d1}</span><span class="die">${result.d2}</span> + ${result.statValue} = ${result.total}`;
+    box.appendChild(diceRow);
+    // Outcome narrative
+    const outcomeText = {
+      success: 'The cover holds.',
+      partial: 'It holds — barely. Something was given.',
+      failure: 'The question lands. The cover has shifted.',
+    };
+    res.textContent = outcomeText[result.outcome] || result.outcome.toUpperCase();
+    if (result.charismNote) { const cn=document.createElement('div');cn.className='challenge-charism';cn.textContent=result.charismNote;box.appendChild(cn); }
     box.appendChild(res);
-    const cont=document.createElement('button');cont.className='btn';cont.textContent='Continue';cont.onclick=dismissCoverChallenge;box.appendChild(cont);
+    const cont=document.createElement('button');cont.className='btn';cont.style.cssText='margin-top:1rem;width:100%';
+    cont.textContent='Continue'; cont.onclick=dismissCoverChallenge; box.appendChild(cont);
   }
   overlay.appendChild(box);root.appendChild(overlay);return true;
 }
@@ -1958,7 +2070,24 @@ function resolveTextBlock(textBlock){
 }
 function getSceneText(scene){return resolveTextBlock(scene.text);}
 function resolveLayeredText(scene){return getSceneText(scene);}
-function injectMicroLines(a,_s){return a;}
+function injectMicroLines(lines, sceneId) {
+  // At very high theosis (Illumined tier), inject faint environmental lines
+  const t = G.theosis || 0;
+  const dev = G.magneticDeviation || 0;
+  if (t < 66 && dev < 0.6) return lines;
+  // Append a very faint micro-observation to the last paragraph
+  const microLines = {
+    'foredeck_standing':    'The compass needle holds its deviation. It has been holding for six hours.',
+    'hold_boxes':           'Freezer Beef adjusts her position by one inch. She does not explain this.',
+    'instrument_shimmer':   'The porthole light has a quality that is not weather.',
+    'anomaly_peak':         'The instruments have been correct about everything so far.',
+    'cabin_porthole_stay':  'The sea is the same sea it was before the crossing. It is not the same sea.',
+    'lena_silence':         'The coffee is the right temperature. It is always the right temperature.',
+  };
+  const micro = microLines[sceneId];
+  if (!micro || Math.random() > 0.6) return lines;
+  return [...lines, `<span class="micro-line">${micro}</span>`];
+}
 const _toggleMemo = new Map();
 function applyLinguisticToggle(t){
   const doubt = G.stats.doubt || 0;
@@ -1980,13 +2109,59 @@ function applyLinguisticToggle(t){
 }
 // Clear memo on navigation
 function _clearToggleMemo() { _toggleMemo.clear(); }
-function applyPostEventShifts(t){return t;}
-function applyPastLifeLines(a,_id){return a;}
-function injectGhostText(t,_id){return t;}
+function applyPostEventShifts(t) {
+  if (!t || !_registries.postEventShifts || !_registries.postEventShifts.length) return t;
+  let result = t;
+  for (const shift of _registries.postEventShifts) {
+    if (!G.flags.has(shift.triggerFlag)) continue;
+    for (const p of (shift.patterns || [])) {
+      if (p.pattern && p.replacement) {
+        result = result.replace(new RegExp(_escapeRe(p.pattern), 'g'), p.replacement);
+      }
+    }
+  }
+  return result;
+}
+function applyPastLifeLines(text, sceneId) {
+  if (!text || G.playCount <= 1) return text;
+  const lines = _registries.pastLifeLines[sceneId];
+  if (!lines || !lines.length) return text;
+  let result = text;
+  for (const entry of lines) {
+    if (!entry.pattern || !entry.replacement) continue;
+    result = result.replace(new RegExp(_escapeRe(entry.pattern), 'g'), entry.replacement);
+  }
+  return result;
+}
+function injectGhostText(t, sceneId) {
+  // At high deviation + high doubt, inject ghost fragments into scene text
+  const dev = G.magneticDeviation || 0;
+  const doubt = G.stats.doubt || 0;
+  if (dev < 0.7 && doubt < 6) return t;
+  const intensity = Math.min(1, (dev - 0.5) * 2 + (doubt - 4) * 0.1);
+  if (Math.random() > intensity * 0.4) return t;
+  // Ghost fragments that bleed through at anomaly peak
+  const ghosts = [
+    '\n<span class="ghost-line">( the field receives )</span>',
+    '\n<span class="ghost-line">( something below is listening )</span>',
+    '\n<span class="ghost-line">( thirty years )</span>',
+    '\n<span class="ghost-line">( Заря )</span>',
+    '\n<span class="ghost-line">( the record persists )</span>',
+  ];
+  // Insert one ghost line into the text at a paragraph boundary
+  const para = t.lastIndexOf('\n\n');
+  if (para < 0) return t;
+  const ghost = ghosts[Math.floor(Math.random() * ghosts.length)];
+  return t.slice(0, para) + ghost + t.slice(para);
+}
 function processText(raw){
   if(typeof raw==='function')raw=raw(G);
   if(typeof raw!=='string')return'';
-  return applyNameMapping(raw.replace(/\{ICON\}/g,iconWord()));
+  let t = raw.replace(/\{ICON\}/g,iconWord());
+  t = applyPostEventShifts(t);
+  t = applyPastLifeLines(t, G.scene);
+  t = applyNameMapping(t);
+  return t;
 }
 
 

@@ -983,3 +983,32 @@ body.ship-low-morale .cbar { opacity: 0.7; }
 /* ── Solidarity ending ───────────────────────────────────────── */
 .ending_solidarity .sp { color: var(--fg); }
 .solidarity_morning .location-bar { color: var(--gold); }
+
+/* ── Ghost text and micro-lines (v2.0) ──────────────────────────── */
+.ghost-line {
+  display: block;
+  font-size: .72rem;
+  color: var(--cold-dim);
+  opacity: 0.55;
+  font-style: italic;
+  letter-spacing: .08em;
+  margin-top: .4rem;
+  pointer-events: none;
+  user-select: none;
+}
+
+.micro-line {
+  display: block;
+  font-size: .65rem;
+  color: var(--dim);
+  opacity: 0.45;
+  letter-spacing: .14em;
+  text-transform: lowercase;
+  margin-top: .6rem;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* At high deviation: ghost lines become slightly more visible */
+body.anomaly-high .ghost-line { opacity: 0.75; color: var(--cold); }
+body.anomaly-high .micro-line  { opacity: 0.65; }

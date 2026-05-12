@@ -1,3 +1,220 @@
+## v2.2 "The Field Answers" — May 2026
+
+### All Ten Group-1 Engine Systems Now Active
+
+**1. Choice-level `mod_stance` / `record_memory` / `come_to_believe` / `thought`**
+These fields have always been handled by `applyChoice` but were never used in choices directly — everything went through `onEnter` wrappers. Now: `tags`, `come_to_believe`, and `thought` can be set inline on choices. The `thought` field maps to `offerSounding` — sounding offers can now emerge from choices declaratively.
+
+**2. `thought` choice field**
+Four choices now carry `thought: 'sounding_X'` — offering a sounding as the natural result of a contemplative choice rather than a separately wired `onEnter` call. Compline Connie, Alexei sit together, hold blessing, Nadia 1978 sit.
+
+**3. `advance_time`**
+`S.advanceTime()` exported and wired. The Sunday service advances 2 hours. The archive transmission advances 4 hours. Time now actually passes during significant events, which means the liturgical hour changes as a consequence of major actions and Landstorm's deadline fires organically.
+
+**4. `applyAutoAlignment` + sounding tags**
+All five soundings now have `alignmentTags`:
+- `sounding_crossing`: `['stillness', 'presence', 'silence', 'crossing']`
+- `sounding_forgiveness`: `['pastoral', 'forgiveness', 'presence', 'witness']`
+- `sounding_history`: `['history', 'archive', 'witness', 'memory']`
+- `sounding_solidarity`: `['solidarity', 'presence', 'pastoral', 'witness', 'suffering']`
+- `sounding_sobornost`: `['solidarity', 'sobornost', 'crossing', 'memory', 'witness']`
+
+Four key choices now carry `tags` arrays: hold sit, lena silence, foredeck standing, compline connie stay, alexei sit together, hold bless archive. When a tagged choice is made, `applyAutoAlignment` advances all active soundings that share a tag by 1. Sounding progression now emerges from aligned behaviour rather than manual `progressSounding()` calls.
+
+**5. Note system**
+Eight notes registered and wired to `flagSet` events. When a flag fires, the corresponding note is automatically added to `G.notes` and appears in the observations panel:
+- `zarya_log_read` → the ship's older name
+- `volkov_photo_found` → the photograph, В
+- `nadia_1978_found` → the 1978 gap, evidence
+- `stink_patrol_hands_known` → warm hands through a hatch
+- `anomaly_responds_seen` → the instruments show the anomaly receiving
+- `archive_discovered` → thirty years, five countries
+- `oblong_departed` → Lena has no memory of him
+- `anomaly_signal_returned` → the field answered
+
+**6. Push consequence**
+`S.pushConsequence` wired to `mission_refused_miguel`. When the player refuses the mission at Miguel's scene, a delayed consequence queues `miguel_knows_refusal` flag to be set 3 scenes later — Miguel's body language changes after a delay rather than immediately.
+
+**7. Codex auto-unlock**
+`checkCodexUnlocks()` is now called on every `navigate()`. Five codex entries have `unlockCondition`:
+- `codex_theosis`: theosis ≥ 33
+- `codex_zarya_history`: flag `zarya_log_read`
+- `codex_solidarity`: communion ≥ 5
+- `codex_the_archive`: flag `archive_discovered`
+- `codex_the_mission`: flag `mission_reality_known`
+
+These unlock automatically when conditions are met — no manual `unlockCodexEntry()` call needed.
+
+**8. NPC memories surface in dialogue**
+Three scenes now read `hasNpcMemory()` to alter text:
+- `bridge_hub`: if Miguel remembers "found photograph and returned it" — the photograph is in the air between you. If he remembers being told about the archive — he has adjusted something in how he stands.
+- `galley_hub`: if Lena remembers "sat in silence without asking" — she already knows how to be in the same room as you.
+- `alexei_doubt`: if Alexei remembers "Palamas — thirty years without knowing" — *He has been here since the Palamas conversation. Thinking.*
+
+**9. SFX — 5 sounds registered**
+`initBuiltinSfx()` called on first audio enable. Five sounds:
+- `sounding_settle`: warm sine chord (fundamental + overtones, 2.2s fade) — fires on every sounding settlement
+- `cover_fail`: descending triangle oscillator triplet (340→290→240 Hz) — fires on cover challenge failure
+- `transmission`: bandpass-filtered noise bursts (radio crackle) — fires on archive transmission
+- `anomaly_drone`: deep chord (40/47/53 Hz, 5s fade) — fires on anomaly peak
+- `theosis_moment`: rising harmonic series (330→440→550→660 Hz, staggered onsets) — fires on tier crossing
+
+**10. Quest system**
+Three quests registered and wired to `flagSet` events:
+- `quest_pavel_riddle`: inactive → started → midway → completed
+- `quest_radio_assembly`: inactive → found → assembled → completed
+- `quest_solidarity`: inactive → signal_received → completed
+
+Quest states are queryable with `isQuestActive()`, `isQuestCompleted()`, and conditions using `type: 'quest'` (pending engine condition support).
+
+### Scene Count: 254 defined, 0 missing
+
+## v2.1 "The Cover" — May 2026
+
+### What This Release Fixes
+
+The previous rating identified three things limiting the ceiling:
+1. Cover challenge outcomes not narratively differentiated
+2. Most NPC conversations still monologue blocks despite dialogue system being live
+3. Meta-unlock system registered but no content gated on it
+
+All three are now addressed.
+
+---
+
+### 1. Cover Challenge Outcome Scenes — 12 new scenes
+
+The cover challenge system previously showed dice results and dismissed. Now `dismissCoverChallenge()` reads the field and outcome, navigates to a field-specific outcome scene, and that scene shows what actually happened to the conversation.
+
+**Background (Kylie):**
+- Success: She caps her pen. "Fine." She is still watching.
+- Partial: She doesn't cap the pen. *I am filing this and I will return to it.* The field is tender.
+- Failure: The pen moves faster when she is interested. "We can come back to it." She will.
+
+**Posting (Connie):**
+- Success: She nods. Sufficient — not fully convincing, but sufficient.
+- Partial: "Hm." Clinical neutrality. Something noted in a chart not to be shared.
+- Failure: "The protocols you described changed in 2019." She picks up her pen. She is not accusing. She is noting she noticed something specific.
+
+**Left (Connie/Kylie):**
+- Success: True enough — or true in the parts that mattered.
+- Partial: "That makes sense." The tone of someone for whom it makes sense as a statement and less sense as a complete account.
+- Failure: A pause that lasts one beat too long. "Right." Something gets written. The left-behind field is the most personal failure.
+
+**Connection (Othis):**
+- Success: A brief log entry. Now it exists. That is worse than if it had been wrong.
+- Partial: "I may need to verify that later." He means it procedurally. The procedural meaning is worse than a threat.
+- Failure: "That name is not in the current directory." He will confirm independently. Landstorm will see the note.
+
+### 2. Dialogue System — 4 first-meeting scenes converted
+
+The dialogue system has been live since v1.9 but only wired into one scene. Now four first-meeting scenes use beat-by-beat dialogue:
+
+**`foredeck_first` (Pavel):** Six beats. The player advances through his mid-sentence arrival, his cascade about the ship and ferromagnetism and moral clarity, his turning around, his recognition of the chaplain. *His name, it turns out, is Pavel.* Each advance is a choice to let him continue. The rhythm of his thought is experienced as time rather than read as text.
+
+**`galley_first` (Lena):** Five beats. She hands you coffee without being asked. She looks at you — not waiting, not examining. She says: *Chaplain.* She returns to the fish. The conversation is the absence of conversation.
+
+**`alexei_first` (Alexei):** Six beats. He enters holding a printout. He notices you instead of the coffee. He sits with the urgency of someone who has been saving a question. The question arrives in two beats: field as tendency, then the theological implication.
+
+**`nadia_first` (Nadia):** Four beats. The smile is quick and real. She is glad there is a chaplain. She returns to her tablet. She is still smiling. The warmth is given its own beat to land.
+
+### 3. Meta-Unlock Content
+
+**Title screen marks:** The title screen now shows ✦ through ✦✦✦✦✦ based on which endings have been reached across all crossings. Persists in localStorage. A player who has reached all five endings sees all five marks.
+
+**`crossing_tax_lived` variants:** The second-crossing wake scene now reads differently depending on cross-crossing achievements. Players who have reached Restoration get a line about carrying the transmission forward. Players who have reached The Knowing get a line about the ship feeling less like a place to go and more like a place to become.
+
+### Engine Changes
+
+`dismissCoverChallenge` now routes to `cover_[field]_[outcome]` if the scene exists, then falls back to `cover_challenge_[outcome]`, then falls back to re-render. The challenge overlay result display is richer: separate dice display (`[4]+[3]`), narrative outcome text ("The cover holds" / "It holds — barely" / "The question lands"), charism bonus notation if applicable.
+
+### Scene Count: 254 defined, 0 missing
+## v2.0 "Sobornost" — May 2026
+
+### Six More Engine Systems Activated
+
+**1. Ghost Text + Micro-Lines** — Both stubs implemented. At `magneticDeviation > 0.7` or `doubt >= 6`, ghost fragments bleed into scene text at paragraph breaks: *( the field receives )*, *( Заря )*, *( the record persists )*. At Illumined tier (theosis ≥ 66) or deviation > 0.6, micro-observation lines appear at the end of specific scenes — quietly wrong observations about the sea, Freezer Beef, the coffee, the compass. Both are probabilistic (40% and 60% respectively) so they surface across multiple visits rather than every time.
+
+**2. UI Opacity** — `setUiOpacity` now wired to magnetic deviation: above 0.5, the game-body wrapper fades proportionally (minimum 0.72). At peak anomaly (1.0), the interface is subtly washed out. The fade is applied to the game-wrap div on every render. The dissociation during the anomaly peak is now physically present in the interface.
+
+**3. Items with Registered Effects** — All four items now registered with `registerItem`: `zarya_photograph` (+1 communion while held), `volkov_photograph` (+1 composure), `both_photographs` (+2 communion, +1 composure), `stink_patrol_paper` (+1 vigilance). The held-effect system was already functional in the engine — `recalculateHeldEffects` fires on item acquisition and applies bonuses to stats. Items now have names and descriptions that show in the inventory panel.
+
+**4. Scene Pools** — Three ambient pools registered with weighted, conditioned entries. Proxy scenes (`pool_main_deck_ambient`, `pool_foredeck_ambient`, `pool_hold_ambient`) call `navigateToPool()` on entry and navigate to a random available scene. Nine pool scenes written:
+- Main deck: `main_deck_haircut` (Haircut surveys the ship), `main_deck_nadia_clouds` (the clouds above anomalies are slightly wrong), `main_deck_miguel_adjusts` (adjusting a line that doesn't need adjusting; "good weather"), `main_deck_anomaly_sky` (the gap between the surface and what is below)
+- Foredeck: `foredeck_compass_reading` (twelve degrees; the needle wants to go home but home has moved), `foredeck_cats_together` (Haircut and Freezer Beef in shared space; you sit between them), `foredeck_pavel_rope` (Pavel holds a rope and does not explain it until asked; "thank you for asking, he means it")
+- Hold: `hold_freezer_beef_survey` (Freezer Beef's systematic inspection; her results are known only to her), `hold_sounds_below` (the Stink Patrol's work, heard from above; Freezer Beef finds this entirely expected)
+
+**5. Progress Trackers** — Three registered: Pavel riddle chain (3 steps, fires "Pavel is waiting" toast on completion), solidarity prerequisites (5 conditions, fires "Something is cohering" toast when all met), radio assembly (3 steps, fires "The radio is ready"). Wired into key flag-setting moments.
+
+**6. Meta-Unlocks** — Fire on each ending reached, persisting across all crossings in `localStorage`. Five meta-unlocks: `reached_erasure`, `reached_witness`, `reached_restoration`, `reached_solidarity`, `reached_the_knowing`. These form the foundation for cross-crossing acknowledgment — content gated on `hasMeta()` can now be registered.
+
+**7. Pavel as Companion** — `addCompanion('pavel', {...})` now called when the player invites him aboard. `modCompanionStat('pavel', 'trust', n)` fires when trust builds. Pavel's trust stat (≥ 3) adds +1 to social composure rolls via the roll modifier system. His companion stats mirror his stance — two tracking systems now agree on who he is.
+
+### CSS Additions
+- `.ghost-line` — pale, italic, slightly smaller; appears as a faint intrusion below normal text
+- `.micro-line` — very small, cold-dim colour, wide letter-spacing; ambient observations at the margin of perception
+
+### Scene Count: 242 defined, 0 missing
+
+## v1.9 "The Field" — May 2026
+
+### Engine: Five Systems Activated
+
+**1. Post-Event Text Shifts** (`applyPostEventShifts`) — Previously a no-op stub. Now implemented: registered pattern/replacement pairs fire automatically in `processText()` when their trigger flag is set. Eight shifts registered:
+- `sunday_service_led` → mess hall text changes: "The mess hall. It is different since Sunday."
+- `archive_transmitted` → hold text shifts: "thirty years of measurement — now in the world"
+- `mission_refused` → bridge hub: Miguel's wheel posture described differently
+- `archive_blessed` → Freezer Beef "has not moved from it"
+- `lena_direct_asked` → galley: the question has been asked and answered
+- `cover_crisis_resolved` → cabin: "The letter seems less urgent than before"
+- `compline_connie_seen` → corridor: "Connie's door is closed now"
+- `pavel_past_told` → foredeck hub: "He has told you about the paper"
+
+These implement the consequence-visibility the auditors identified as missing — changed descriptions communicate "the world absorbed this" without notifications.
+
+**2. Past Life Lines** (`applyPastLifeLines`) — Previously a no-op stub. Now implemented: scene-specific pattern/replacement pairs apply silently on second+ crossings. Six past life lines registered:
+- `foredeck_first`: Pavel "was already turned toward you when you came up the steps"
+- `galley_first`: Lena "pours the coffee before you reach the counter. She has done this before."
+- `cabin_porthole_stay`: the sea "familiar now in a way that has no origin you can locate"
+- `hold_first`: "The same exactly."
+- `instrument_shimmer`: "you have seen this before, this exact quality"
+- `bridge_hub`: "You knew before you came up."
+
+Second-crossing players who notice these will understand something. Players who don't will still feel the ship differently.
+
+**3. Atmos Modifiers** — Settled soundings now visibly alter the porthole. Five modifiers registered:
+- `sounding_crossing` settled: fog thins (fogMult −0.3), lamp warms, flicker stops
+- `sounding_solidarity` settled: sobornost ring glows warm, fog clears, lamp brightens
+- `sounding_history` settled: fog thins most (fogMult −0.4), lamp stabilises
+- `sounding_forgiveness` settled: lamp at maximum warmth, all flickering stops
+- `sounding_sobornost` settled: full gold ring, nearly clear fog, deep lamp warmth, goldIntensity 0.7 minimum
+
+This addresses the reported issue where the porthole ring's goldening was not perceptible — settling soundings now drives it explicitly.
+
+**4. Beliefs System** — `comeToBelieve()`, `believes()`, `contradict()` now have condition evaluator support (`type: 'believes'`, `type: 'knows'`, `type: 'not_believes'`). Eight belief points wired:
+- `cover_crisis_resolved` → `believes('chaplain_real')`
+- `pavel_revelation_seen` → `believes('crossings_recurse')`
+- `alexei_palamas_told` → `believes('energies_real')`
+- `nadia_1978_gap_understood` → `believes('archive_suppressed')`
+- `anomaly_signal_returned` → `believes('anomaly_responds')`
+- `lena_knows_transmission` → `believes('archive_matters')`
+- `photos_crossreferenced` → `believes('ship_remembers')`
+- `solidarity_ending_achieved` → `believes('sobornost_real')`
+
+Two new belief-gated scenes: `pavel_crossings_belief` (if `believes('crossings_recurse')`, unique foredeck exchange about what recurrence means) and `anomaly_responds_knows` (if `believes('energies_real')`, Alexei writes "it knows we are here" in his notebook and underlines it).
+
+**5. Dialogue System** (`startDialogue`, `advanceDialogue`) — Now wired into game.js. Two scenes converted from monologue to beat-by-beat dialogue:
+- `foredeck_first`: Pavel's first appearance — five beats, the player advances through his initial cascade. The rhythm of his thought is now experienced as turns, not read as a paragraph.
+- `alexei_first`: Alexei's introduction — five beats, builds from instrument-writing to noticing you to "do you know anything about geomagnetic fields?"
+
+**Roll Modifiers** — Four registered: Fool charism +1 on cover challenge rolls; Confessor +2 on social rolls; Healer +2 on pastoral rolls; Illumined tier (theosis ≥ 66) +1 on all composure rolls. These are passive and require no game.js changes to apply — the cover challenge overlay already calls `performRoll` which checks modifiers.
+
+### New Scenes
+- `pavel_crossings_belief` — belief-gated foredeck exchange about recursion and frequency
+- `anomaly_responds_knows` — belief-gated instrument room scene where Alexei writes the conclusion
+
+### Scene Count: 229 defined, 0 missing
+
 ## v1.8 "Soundings" — May 2026
 
 ### Pavel ASCII Art Fix
