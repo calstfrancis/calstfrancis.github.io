@@ -3163,26 +3163,25 @@ function _renderMapPanelSide(root) {
   // After that, use the return/hub scene — detected by whether visited flag is set.
   const _baseSceneMap = {cabin:'cabin_wake',main_deck:'main_deck_hub',foredeck:'foredeck_first',bridge:'bridge_hub',mess:'mess_hub',galley:'galley_hub',chart_room:'chart_room_first',captain_quarters:'bridge_hub',hold_access:'hold_first',hold:'hold_first',cargo_bay:'hold_first',instrument_room:'instrument_room_first',aft:'instrument_room_first'};
   const _returnSceneMap = {cabin:'cabin_porthole_stay',foredeck:'foredeck_standing',chart_room:'chart_room_first',hold_access:'hold_first',hold:'hold_boxes',instrument_room:'instrument_shimmer'};
-  const sceneMap = {};
-  for(const [nodeId, firstScene] of Object.entries(_baseSceneMap)){
-    const alreadyVisited = isVisited(nodeId);
-    const returnScene = _returnSceneMap[nodeId];
-    sceneMap[nodeId] = (alreadyVisited && returnScene) ? returnScene : firstScene;
-  }
-  // Reverse map: scene ID → node ID (one scene can map to multiple nodes)
-  const reverseSceneMap = {};
-  for(const [nodeId, sceneId] of Object.entries(sceneMap)) reverseSceneMap[sceneId] = nodeId;
-  // A node is visited if: its own visited_ flag is set, OR the scene it maps to has been visited
-  const isVisited = (nodeId) => {
+  // isVisited must be declared BEFORE sceneMap uses it
+  const _checkVisited = (nodeId, sm) => {
     if(G.flags && G.flags.has('visited_'+nodeId)) return true;
-    const scId = sceneMap[nodeId];
+    const scId = sm[nodeId];
     if(scId && G.flags && G.flags.has('visited_'+scId)) return true;
-    // Also check all scenes that map to this node
-    for(const [nid, sid] of Object.entries(sceneMap)) {
+    for(const [nid, sid] of Object.entries(sm)) {
       if(nid === nodeId && G.flags && G.flags.has('visited_'+sid)) return true;
     }
     return false;
   };
+  // Build sceneMap using the base maps first (no isVisited needed yet)
+  const sceneMap = {..._baseSceneMap};
+  // Now apply return-scene overrides where already visited
+  for(const [nodeId, firstScene] of Object.entries(_baseSceneMap)){
+    const returnScene = _returnSceneMap[nodeId];
+    if(returnScene && _checkVisited(nodeId, _baseSceneMap)) sceneMap[nodeId] = returnScene;
+  }
+  // isVisited function for use in categorisation loop
+  const isVisited = (nodeId) => _checkVisited(nodeId, sceneMap);
   const currentNode = sceneToNode[G.scene] || null;
 
   if (!nodes || Object.keys(nodes).length === 0) {
