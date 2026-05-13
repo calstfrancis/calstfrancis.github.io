@@ -2710,10 +2710,9 @@ function _appendBottomNav(root){
   const flicker = Math.max(flickerDoubt, flickerDev);
   const fl = (en, ru) => (flicker > 0 && Math.random() < flicker) ? ru : en;
   const navItems=[
-    {label:fl('observations','наблюдения'),fn:()=>openPanel('notes'),     title:'What has been noticed this crossing'},
+    {label:fl('record','запись'),          fn:()=>openPanel('notes'),     title:'Observations and codex'},
     {label:fl('status','статус'),          fn:()=>openPanel('status'),    title:'Stats, cover, charisms, inventory'},
     {label:'breviary'+(G.soundings.available.length?' \u2691':''),fn:()=>openPanel('breviary'),cls:G.soundings.available.length?' has-available':'', title:'Soundings — moments of contemplation'},
-    {label:fl('codex','кодекс'),           fn:()=>openPanel('glossary'),  title:'What has been learned about the ship'},
     {label:fl('calendar','календарь'),     fn:()=>openPanel('calendar'),  title:'The crossing — day and liturgical hour'},
     {label:fl('map','карта'),              fn:()=>openPanel('map'),       title:'Where things are'},
   ];
@@ -2910,6 +2909,32 @@ function _renderStatusPanel(root) {
     const v = document.createElement('span'); v.className = 'panel-row-value'; v.textContent = val;
     row.appendChild(l); row.appendChild(v); body.appendChild(row);
   });
+
+
+  // ── CODEX section merged below observations ──────────────────
+  const _unlocked = typeof getUnlockedCodex === 'function' ? getUnlockedCodex() : [];
+  const _hasGlossary = _registries.glossary && _registries.glossary.length > 0;
+  if (_unlocked.length || _hasGlossary) {
+    const _cdxSep = document.createElement('div'); _cdxSep.style.cssText='height:1px;background:var(--border);margin:1.4rem 0 1rem;'; body.appendChild(_cdxSep);
+    const _cdxSec = document.createElement('div'); _cdxSec.className='panel-section'; _cdxSec.textContent='codex'; body.appendChild(_cdxSec);
+    const _re = (titleTxt, bodyTxt, catTxt) => {
+      const item=document.createElement('div'); item.className='codex-entry'; item.style.marginBottom='.9rem'; item.style.cursor='pointer';
+      if(catTxt){const c=document.createElement('div');c.className='codex-category';c.textContent=catTxt;item.appendChild(c);}
+      const t=document.createElement('div');t.className='codex-term';t.textContent=titleTxt;
+      const d=document.createElement('div');d.className='codex-body';
+      d.style.cssText='max-height:3.6rem;overflow:hidden;transition:max-height .2s;-webkit-mask-image:linear-gradient(to bottom,black 50%,transparent);mask-image:linear-gradient(to bottom,black 50%,transparent);';
+      d.textContent=bodyTxt; item.appendChild(t); item.appendChild(d);
+      item.onclick=()=>{
+        const ex=d.style.maxHeight==='none';
+        d.style.maxHeight=ex?'3.6rem':'none';
+        d.style.webkitMaskImage=ex?'linear-gradient(to bottom,black 50%,transparent)':'none';
+        d.style.maskImage=ex?'linear-gradient(to bottom,black 50%,transparent)':'none';
+      };
+      body.appendChild(item);
+    };
+    if(_unlocked.length) _unlocked.forEach(id=>{const e=typeof getCodexEntry==='function'?getCodexEntry(id):null;if(e)_re(e.title,e.content,e.category||'');});
+    if(_hasGlossary) _registries.glossary.forEach(({term,def})=>_re(term,def,''));
+  }
 
   panel.appendChild(body); overlay.appendChild(panel); root.appendChild(overlay);
 }
