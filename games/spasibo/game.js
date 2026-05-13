@@ -3344,15 +3344,8 @@ He is looking at you with the complete attention of someone who has decided that
         S.applyEffect && S.applyEffect({ composure: -1 });
         return `The cover holds, barely.\n\n${rollHtml}\n\nHe watches you perform it. You can hear the cost in your own voice. He writes something. The field is not closed.`;
       }
-      return `The cover holds, barely.\n\n${rollHtml}\n\nHe watches you perform it. He knows he is watching a performance. You know he knows. Neither of you says this.
-
-— I'll need your movements accounted for. He says. — All of them.
-
-He leaves.
-
-The cover is thin now. One more pressure and it will not hold.
-
-Behind you, the hold. Inside it, the archive. Somewhere in the instrument room, a radio built for high-deviation magnetic fields.`,
+      return `The cover holds, barely.\n\n${rollHtml}\n\nHe watches you perform it. He knows he is watching a performance. You know he knows. Neither of you says this.\n\n— I'll need your movements accounted for. He says. — All of them.\n\nHe leaves.\n\nThe cover is thin now. One more pressure and it will not hold.\n\nBehind you, the hold. Inside it, the archive. Somewhere in the instrument room, a radio built for high-deviation magnetic fields.`;
+    },
     onEnter: () => { S.degradeCover(2); S.applyEffect({ doubt: 2 }); },
     choices: [
       { text: 'Find the radio. Now. Before he checks.',  next: 'radio_discovery', condition: { type: 'not', condition: { type: 'flag', id: 'radio_found' } } },
