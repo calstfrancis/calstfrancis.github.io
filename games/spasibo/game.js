@@ -707,7 +707,7 @@ S.on('ritualCompleted', (ritualId) => {
 // what happened. No ending is chosen. They are arrived at.
 //
 // Priority order (highest wins when multiple conditions met):
-//   20 The Knowing   — rememberer charism + theosis 90 + transmitted
+//   20 The Knowing   — rememberer charism + theosis 85 + transmitted
 //   10 Restoration   — theosis 66+ + transmitted + radio team
 //    5 Witness       — theosis 33+ + refused mission
 //    0 Erasure       — default (accepted mission OR theosis < 33 with no refusal)
@@ -775,7 +775,7 @@ S.registerEnding({
 });
 
 // The Knowing: second crossing or later, rememberer charism,
-// theosis 90+, transmitted. You have been here before.
+// theosis 85+, transmitted. You have been here before.
 // This ending cannot be reached on a first crossing.
 S.registerEnding({
   id: 'the_knowing', priority: 20,
@@ -1511,6 +1511,7 @@ After a while:
 
 She hands you something wrapped in bread — warm, slightly oily, perfect — without explanation.`,
     onEnter: () => {       S.progressSounding('sounding_crossing', 2);
+      S.recordNpcMemory('lena', 'sat in silence without asking');
 S.modReputation('lena', 2); S.offerSounding('sounding_crossing'); },
     choices: [
       { text: 'Eat. Stay.',             next: 'lena_tenure'   },
@@ -1974,7 +1975,8 @@ He gives it back to you.
       S.modReputation('miguel', 4);
       S.incrementTheosis(4);
       S.applyEffect({ communion: 2 });
-      S.setFlag('miguel_photo_returned');
+            S.recordNpcMemory('miguel', 'returned the photograph');
+S.setFlag('miguel_photo_returned');
       S.addItem('zarya_photograph');
     },
     choices: [
@@ -2035,7 +2037,8 @@ The ship moves under you both.`,
         effect: {},
       });
       S.progressSounding('sounding_forgiveness', 2);
-      S.setFlag('mission_refused');
+            S.recordNpcMemory('miguel', 'refused the mission');
+S.setFlag('mission_refused');
       S.updateProgressTracker('tracker_solidarity', 1);
       S.incrementTheosis(5);
       S.showToast('The crossing shifts.', 'theosis');
@@ -2926,7 +2929,8 @@ Alexei is still at the hand-drawn chart, extending the deviation curve into terr
     onEnter: () => {
       S.incrementTheosis(5);
       S.modReputation('nadia', 4);
-      S.setFlag('nadia_solidarity_act');
+            S.recordNpcMemory('nadia', 'stood with her at the sonar');
+S.setFlag('nadia_solidarity_act');
       S.setFlag('solidarity_act_done');
       S.offerSounding('sounding_solidarity');
     },
@@ -3369,7 +3373,8 @@ He leaves.
 You stand in the corridor. That was either the hardest or the easiest thing that has happened on this ship.`,
     onEnter: () => {
       S.incrementTheosis(8);
-      S.setFlag('othis_turned');
+            S.recordNpcMemory('othis', 'told directly — chose not to look');
+S.setFlag('othis_turned');
       S.setFlag('mission_refused');
       S.applyEffect({ communion: 3 });
       S.modReputation('othis', 5);
@@ -4004,6 +4009,7 @@ She does not ask you anything. She has told you something instead. This is what 
     condition: { type: 'and', conditions: [
       { type: 'flag', id: 'connie_saw_chaplain' },
       { type: 'not', condition: { type: 'flag', id: 'compline_connie_seen' } },
+      { type: 'hour_gte', value: 5 },
     ]},
     choices: [
       { text: 'Stay for a while.', next: 'compline_connie_stay', theosis: 3, composure: 1, tags: ['pastoral', 'presence', 'forgiveness'] },
@@ -4040,7 +4046,8 @@ You both sit with that for a while. The chaplain and the doctor, each having giv
 
 She refills the glass she has not offered you. Then she offers it.`,
     onEnter: () => {
-      S.incrementTheosis(6);
+            S.recordNpcMemory('connie', 'exchanged something real at Compline');
+S.incrementTheosis(6);
       S.modReputation('connie', 4);
       S.modStance('connie', 'solidarity', 3);
       S.applyEffect({ doubt: -2, composure: 2 });
@@ -4400,7 +4407,8 @@ He looks at you.
 
 — You are past that point, I think. He says. — You have already decided. You may not have said it aloud yet.`,
     onEnter: () => {
-      S.incrementTheosis(6);
+            S.recordNpcMemory('pavel', 'heard the paper on the desk');
+S.incrementTheosis(6);
       S.applyEffect({ composure: 2, doubt: -2 });
       S.modStance('pavel', 'solidarity', 2);
     },
@@ -5613,16 +5621,15 @@ A pause.
 
   landstorm_radio_call: {
     id: 'landstorm_radio_call', location: 'Instrument Room', mood: 'tense',
-    text: `The standard radio crackles. It has not crackled before — the anomaly has kept the standard frequencies mostly inert.
-
-The voice is clear despite the interference. It is the voice of someone who has learned to be clear in all conditions.
-
-— This is Landstorm. How is the crossing proceeding?
-
-A pause. He is not asking about the sea conditions. The question has a specific meaning and he expects you to understand it.
-
-You hold the receiver.`,
+    text: ``,
     onEnter: () => {
+      S.startDialogue([
+        { speaker: null, text: 'The standard radio crackles. It has not crackled before — the anomaly has kept the standard frequencies mostly inert.' },
+        { speaker: null, text: 'The voice is clear despite the interference. It is the voice of someone who has learned to be clear in all conditions.' },
+        { speaker: 'Landstorm', text: 'This is Landstorm. How is the crossing proceeding?' },
+        { speaker: null, text: 'He is not asking about the sea conditions. The question has a specific meaning.' },
+        { speaker: null, text: 'You hold the receiver.' },
+      ]);
       S.setFlag('landstorm_called');
       S.applyEffect({ doubt: 2, vigilance: 1 });
       S.showToast('Landstorm on the radio.', 'warning');
@@ -5881,7 +5888,8 @@ She opens the notebook.
 
 — Tell me about the archive. All of it. Everything you've seen.`,
     onEnter: () => {
-      S.setFlag('kylie_in_alliance');
+            S.recordNpcMemory('kylie', 'admitted the mission directly');
+S.setFlag('kylie_in_alliance');
       S.setFlag('mission_refused');
       S.modReputation('kylie', 5);
       S.incrementTheosis(6);
@@ -5998,7 +6006,8 @@ He lies back.
       S.modReputation('alexei', 5);
       S.applyEffect({ communion: 2 });
       if (S.G.worldState) S.G.worldState.sanctity = Math.min(10, S.G.worldState.sanctity + 2);
-      S.setFlag('alexei_palamas_told');
+            S.recordNpcMemory('alexei', 'Palamas — thirty years without knowing');
+S.setFlag('alexei_palamas_told');
       S.comeToBelieve('energies_real');
     },
     choices: [
@@ -6406,7 +6415,8 @@ The help is already there. It has been there for twenty-two years.
 
 The ship knows.`,
     onEnter: () => {
-      S.incrementTheosis(6);
+            S.recordNpcMemory('lena', 'chose the archive');
+S.incrementTheosis(6);
       S.modReputation('lena', 4);
       S.modStance('lena', 'solidarity', 3);
       S.modShipState('morale', 2);
@@ -7082,6 +7092,9 @@ The coffee Lena makes after the service is better than the coffee she makes at o
       } else {
         lines.push(`Alexei stayed in the instrument room throughout. His instruments were still measuring. Even at the end, the ship was doing what she was built for.`);
       }
+      if (S.believes && S.believes('chaplain_real')) {
+        lines.push(`You burned the archive. You were, by the end of it, a chaplain — not performing one. Being one. The archive and what you had become went together. That is the specific cost of this ending, which is not the same as saying it was wrong.`);
+      }
       if (S.hasFlag('met_oblong')) {
         lines.push(`Oblong Vassilithune was not visible. He was not visible before the burning either. Whether he saw it or not is unclear.`);
       }
@@ -7124,6 +7137,9 @@ The coffee Lena makes after the service is better than the coffee she makes at o
       lines.push(`The ship is still moving. Alexei is still measuring. Nadia found something in the data this morning that made her go very still and then start writing. Pavel is on the foredeck. The bronze fittings caught the last of the day's light and held it longer than they should have.`);
       if (S.hasFlag('archive_blessed')) {
         lines.push(`The archive in its new location has been blessed. You are not sure if that changes anything. You are not sure it does not.`);
+      }
+      if (S.believes && S.believes('archive_matters')) {
+        lines.push(`You knew what you were protecting. Not just records — a way of being in the world that measures without distorting, that shares what it finds. You protected that. The archive is in the ship. The ship is still moving.`);
       }
       lines.push(`The ship will continue under another name in other documents. But the archive is still in the world. Somewhere on a ship built to be transparent, thirty years of finding is still findable.`);
       lines.push(`You witnessed.`);
@@ -7172,6 +7188,9 @@ The coffee Lena makes after the service is better than the coffee she makes at o
       lines.push(`Pavel was there. You don't know when he arrived. He said: *yes.* Just that.`);
       if (S.hasFlag('anomaly_archive_connected')) {
         lines.push(`The anomaly below — the structure that Alexei had calculated was aware of being measured — received the transmission on its own frequency. What it does with that is not a question science can answer.`);
+      }
+      if (S.believes && S.believes('sobornost_real')) {
+        lines.push(`Sobornost. The unity of a council. The transmission was not one person's act — it was the ship's, across thirty years of measurement and three days of crossing. Many voices, none erased.`);
       }
       lines.push(`Заря was in the anomaly, at the peak, broadcasting the record of everything she had found.\n\nShe was doing what she was built for.`);
       lines.push(`━━━━━━━━━━━━━━━━━━━━━━━━\n  RESTORATION\n━━━━━━━━━━━━━━━━━━━━━━━━`);
@@ -7339,13 +7358,15 @@ From here you can go anywhere on the ship.`,
     get text() {
       const parts = ['Miguel is at the wheel, or near it. Haircut is on the chart table, sitting on a weather report.'];
       if (S.hasFlag('maintenance_brass')) parts.push('The forward cleats are polished. Miguel noticed.');
-      if (S.hasNpcMemory && S.hasNpcMemory('miguel', 'found photograph and returned it')) {
+      if (S.hasNpcMemory && S.hasNpcMemory('miguel', 'returned the photograph')) {
         parts.push('He has not mentioned the photograph again. Neither have you. It is in the air between you like a settled thing.');
-      } else if (S.hasFlag('volkov_photo_found') && S.hasFlag('miguel_photo_return')) {
-        parts.push('He has not mentioned the photograph again. Neither have you.');
       }
-      if (S.hasNpcMemory && S.hasNpcMemory('miguel', 'told about the archive')) {
-        parts.push('He knows you have been in the archive. He has adjusted something in how he stands.');
+      if (S.hasNpcMemory && S.hasNpcMemory('miguel', 'refused the mission')) {
+        parts.push('He knows. He has always known. He has adjusted how he holds the wheel.');
+      }
+      // High trust: he mentions Irina unprompted
+      if (S.getStance && S.getStance('miguel', 'trust') >= 3 && !S.hasFlag('miguel_irina_told')) {
+        parts.push('He says, without looking at you: — The cook before Lena. Her name was Irina. She taught Lena the coffee. He does not say why he is telling you this.');
       }
       if (S.hasFlag('mission_refused') && !S.hasFlag('mission_accepted')) {
         parts.push('He has his hand on the wheel the way someone holds something they have decided to keep.');

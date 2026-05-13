@@ -130,10 +130,15 @@ function scheduleRender() {
   _scheduled = true;
   queueMicrotask(() => {
     _scheduled = false; _renderFn();
-    // Scroll after paint so new DOM is actually in place
+    // Scroll after paint — double rAF ensures iOS Safari repaints first
     requestAnimationFrame(() => {
-      window.scrollTo(0, 0);
-      document.getElementById('root')?.scrollTo?.(0, 0);
+      requestAnimationFrame(() => {
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+        const root = document.getElementById('root');
+        if (root) { root.scrollTop = 0; root.scrollLeft = 0; }
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+      });
     });
   });
 }
@@ -447,6 +452,9 @@ function evaluateCondition(cond) {
       return minOk && maxOk;
     }
     case 'charism':         return G.charisms.includes(cond.id);
+    case 'hour':            return G.liturgicalHour !== undefined && G.liturgicalHour === cond.value;
+    case 'hour_gte':        return G.liturgicalHour !== undefined && G.liturgicalHour >= cond.value;
+    case 'hour_lte':        return G.liturgicalHour !== undefined && G.liturgicalHour <= cond.value;
     case 'believes':        return G.beliefs && G.beliefs.has(cond.id);
     case 'knows':           return G.knowledge && G.knowledge.has(cond.id);
     case 'not_believes':    return !G.beliefs || !G.beliefs.has(cond.id);
@@ -2622,7 +2630,7 @@ function renderGame(root){
   if(G.panelOpen==='notes')    _renderNotesPanel(root);
   if(G.panelOpen==='status')   _renderStatusPanel(root);
   if(G.panelOpen==='breviary') _renderBreviaryPanel(root);
-  if(G.panelOpen==='glossary') _renderGlossaryPanel(root);
+  if(G.panelOpen==='glossary') _renderNotesPanel(root); // merged into observations
   if(G.panelOpen==='map')      _renderMapPanelSide(root);
   if(G.panelOpen==='calendar') _renderCalendarPanel(root);
   if(G.panelOpen==='journal')  renderJournalPanel(root,openPanel);
@@ -2709,7 +2717,7 @@ function _appendBottomNav(root){
     {label:fl('calendar','календарь'),     fn:()=>openPanel('calendar'),  title:'The crossing — day and liturgical hour'},
     {label:fl('map','карта'),              fn:()=>openPanel('map'),       title:'Where things are'},
   ];
-  const _navPanelIds=['notes','status','breviary','glossary','calendar','map'];
+  const _navPanelIds=['notes','status','breviary','calendar','map'];
   navItems.forEach(({label,fn,cls='',title=''},_ni)=>{
     const b=document.createElement('button');
     b.style.cssText="flex:1;background:none;border:none;border-right:1px solid var(--border);font-family:'GOST type B','Share Tech Mono','Courier Prime',monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;padding:.72rem .2rem .58rem;cursor:pointer;color:var(--dim);border-top:2px solid transparent;position:relative;";
@@ -3260,6 +3268,32 @@ function renderCrossingRecord(root) {
   const taxRow = document.createElement('div'); taxRow.className = 'cr-tax';
   taxRow.textContent = `The body forgets ${tax}. You carry ${carried} into the next crossing.`;
   screen.appendChild(taxRow);
+
+  // ── Ship's log — what the ship witnessed ──────────────────────
+  const _shipLog = [];
+  if (G.flags.has('ending_solidarity_reached') || G.flags.has('ending_restoration_reached')) {
+    _shipLog.push('In the hold throughout: one calico cat. She did not intervene. She witnessed.');
+  }
+  if (G.flags.has('sunday_service_led')) {
+    _shipLog.push('In the mess hall on Sunday: seven people who did not have to stay, stayed.');
+  }
+  if (G.flags.has('archive_transmitted')) {
+    _shipLog.push('On the instrument room radio: a transmission at 4am, at peak anomaly, into the frequencies that use deviation as a carrier. Something received it.');
+  }
+  if (G.flags.has('anomaly_signal_returned')) {
+    _shipLog.push('At 4:18am: the field returned the signal. The instruments confirmed this. Alexei marked the timestamp.');
+  }
+  if (G.flags.has('ending_erasure_reached')) {
+    _shipLog.push('In the hold at 2am: smoke. The sea absorbed it. The anomaly is still measurable at this position.');
+  }
+  if (_shipLog.length) {
+    const div5 = document.createElement('div'); div5.className = 'cr-divider'; screen.appendChild(div5);
+    const logSec = document.createElement('div'); logSec.className = 'cr-section'; logSec.textContent = "The ship's log"; screen.appendChild(logSec);
+    _shipLog.forEach(line => {
+      const row = document.createElement('div'); row.className = 'cr-memory cr-ship-log';
+      row.textContent = line; screen.appendChild(row);
+    });
+  }
 
   // Meta marks — which endings reached
   const metaEndings = ['reached_erasure','reached_witness','reached_restoration','reached_solidarity','reached_the_knowing'];

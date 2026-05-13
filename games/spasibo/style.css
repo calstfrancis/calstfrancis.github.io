@@ -1387,3 +1387,39 @@ body.mood-neutral .sp {
 .stxt.stxt-halo .sp {
   color: var(--cold);
 }
+
+/* ── Quest rows in Breviary ──────────────────────────────────── */
+.quest-row {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: .32rem 0; border-bottom: 1px solid var(--border);
+  font-size: .84rem;
+}
+.quest-row:last-of-type { border-bottom: none; }
+.quest-name { color: var(--fg-dim); }
+.quest-state {
+  font-family: var(--font-display);
+  font-size: .54rem; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--cold-dim);
+}
+
+/* ── Ship log in crossing record ─────────────────────────────── */
+.cr-ship-log {
+  font-style: italic;
+  border-left-color: var(--border);
+  color: var(--dim);
+}
+
+/* ── Compact codex in merged panel ──────────────────────────── */
+.codex-entry-compact .codex-body {
+  max-height: 4.5rem; overflow: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+  cursor: pointer;
+}
+.codex-entry-compact.expanded .codex-body {
+  max-height: none;
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+.panel-codex-merged { border-top: 1px solid var(--border); margin-top: .5rem; padding-top: .3rem; }
+
