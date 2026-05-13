@@ -1423,3 +1423,52 @@ body.mood-neutral .sp {
 }
 .panel-codex-merged { border-top: 1px solid var(--border); margin-top: .5rem; padding-top: .3rem; }
 
+
+/* ── Item rows in status panel ───────────────────────────────── */
+.item-row {
+  padding: .35rem 0; border-bottom: 1px solid var(--border);
+  margin-bottom: .1rem;
+}
+.item-row:last-child { border-bottom: none; }
+.item-name {
+  font-size: .86rem; color: var(--fg-dim);
+  display: flex; align-items: baseline; gap: .5rem;
+}
+.item-bonus {
+  font-family: var(--font-display);
+  font-size: .54rem; letter-spacing: .1em;
+  color: var(--cold-dim); text-transform: uppercase;
+}
+
+/* ── Companion rows ──────────────────────────────────────────── */
+.companion-row {
+  padding: .45rem 0; border-bottom: 1px solid var(--border);
+}
+.companion-row:last-child { border-bottom: none; }
+.companion-name {
+  font-size: .88rem; color: var(--fg);
+}
+.companion-trust {
+  font-size: .7rem; color: var(--cold-dim);
+  letter-spacing: .08em; margin-left: .5rem;
+}
+.companion-memory {
+  font-size: .76rem; color: var(--dim);
+  font-style: italic; margin-top: .2rem;
+  line-height: 1.6;
+}
+
+/* ── Visible rolls ───────────────────────────────────────────── */
+.visible-roll {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: .72rem; letter-spacing: .1em;
+  padding: .2rem .55rem;
+  border-radius: 2px;
+  margin: .6rem 0;
+  border: 1px solid currentColor;
+  opacity: 0.85;
+}
+.visible-roll.roll-success { color: var(--cold);   border-color: var(--cold-dim);  background: rgba(120,184,214,0.06); }
+.visible-roll.roll-partial { color: var(--amber);  border-color: var(--amber-dim); background: rgba(214,168,84,0.06); }
+.visible-roll.roll-fail    { color: var(--rust);   border-color: var(--rust);      background: rgba(184,64,64,0.06); }

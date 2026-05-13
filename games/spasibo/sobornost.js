@@ -1733,6 +1733,12 @@ function startCoverChallenge(field) {
   G._coverChallenge={field,prompt,difficulty,pressured};
   emit('coverChallengeStarted',{field,prompt,difficulty});scheduleRender();
 }
+function visibleRollHtml(result) {
+  const cls = result.outcome === 'success' ? 'roll-success' : result.outcome === 'partial' ? 'roll-partial' : 'roll-fail';
+  const labels = { success: 'holds', partial: 'holds — at cost', failure: 'fails' };
+  return `<span class="visible-roll ${cls}">[${result.d1}·${result.d2}] + ${result.statValue} = ${result.total} — ${labels[result.outcome]||result.outcome}</span>`;
+}
+
 function resolveCoverChallenge(action) {
   if(!G._coverChallenge)return;
   const{field,difficulty}=G._coverChallenge;
@@ -2882,22 +2888,50 @@ function _renderStatusPanel(root) {
     });
   }
 
-  // Companions
+  // Companions — show with trust level and last memory
   if (G.companions && G.companions.length > 0) {
     const cs = document.createElement('div'); cs.className = 'panel-section'; cs.textContent = 'companions'; body.appendChild(cs);
     G.companions.forEach(c => {
-      const row = document.createElement('div'); row.className = 'panel-row';
-      row.textContent = c.name || c.id; body.appendChild(row);
+      const wrap = document.createElement('div'); wrap.className = 'companion-row';
+      const nameEl = document.createElement('div'); nameEl.className = 'companion-name';
+      nameEl.textContent = c.name || c.id;
+      // Trust indicator from npcStance
+      const stance = G.npcStance && G.npcStance[c.id];
+      const trust = stance ? (stance.trust || 0) : (c.stats && c.stats.trust ? c.stats.trust : 0);
+      if (trust > 0) {
+        const trustEl = document.createElement('span'); trustEl.className = 'companion-trust';
+        trustEl.textContent = '  ' + '·'.repeat(Math.min(trust, 5));
+        nameEl.appendChild(trustEl);
+      }
+      wrap.appendChild(nameEl);
+      // Last memory
+      if (stance && stance.memories && stance.memories.length) {
+        const lastMem = stance.memories[stance.memories.length - 1];
+        const memEl = document.createElement('div'); memEl.className = 'companion-memory';
+        memEl.textContent = lastMem.text || '';
+        wrap.appendChild(memEl);
+      }
+      body.appendChild(wrap);
     });
   }
 
-  // Inventory
+  // Inventory — tappable, shows description
   if (G.inventory && G.inventory.length > 0) {
     const cs = document.createElement('div'); cs.className = 'panel-section'; cs.textContent = 'carried'; body.appendChild(cs);
     G.inventory.forEach(id => {
       const item = _registries.items[id];
-      const row = document.createElement('div'); row.className = 'panel-row';
-      row.textContent = item ? (item.name || id) : id; body.appendChild(row);
+      const wrap = document.createElement('div'); wrap.className = 'item-row'; wrap.style.cursor = 'pointer';
+      const name = document.createElement('div'); name.className = 'item-name';
+      name.textContent = item ? (item.name || id) : id;
+      const bonus = item && item.effectWhileHeld ? Object.entries(item.effectWhileHeld).map(([k,v])=>`${k} ${v>0?'+'+v:v}`).join('  ') : '';
+      if (bonus) { const b = document.createElement('span'); b.className = 'item-bonus'; b.textContent = bonus; name.appendChild(b); }
+      wrap.appendChild(name);
+      const desc = document.createElement('div'); desc.className = 'item-desc';
+      desc.style.cssText = 'display:none;font-size:.8rem;color:var(--dim);line-height:1.72;margin-top:.3rem;font-style:italic;padding-left:.8rem;border-left:1px solid var(--border);';
+      desc.textContent = item ? (item.desc || '') : '';
+      wrap.appendChild(desc);
+      wrap.onclick = () => { desc.style.display = desc.style.display === 'none' ? 'block' : 'none'; };
+      body.appendChild(wrap);
     });
   }
 

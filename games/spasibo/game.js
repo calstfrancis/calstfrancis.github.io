@@ -1502,7 +1502,7 @@ You drink the coffee.`,
   },
 
   lena_silence: {
-    id: 'lena_silence', location: 'Galley', mood: 'neutral',
+    id: 'lena_silence', return_to: 'galley_hub', return_label: '← The galley.', location: 'Galley', mood: 'neutral',
     text: `You drink the coffee in silence. She continues with the fish.
 
 After a while:
@@ -1520,7 +1520,7 @@ S.modReputation('lena', 2); S.offerSounding('sounding_crossing'); },
   },
 
   lena_coffee: {
-    id: 'lena_coffee', location: 'Galley', mood: 'neutral',
+    id: 'lena_coffee', return_to: 'galley_hub', return_label: '← The galley.', location: 'Galley', mood: 'neutral',
     text: `She looks at you for the first time.
 
 — Yes.
@@ -1557,7 +1557,7 @@ She stops.
   },
 
   lena_hold: {
-    id: 'lena_hold', location: 'Galley', mood: 'neutral',
+    id: 'lena_hold', return_to: 'galley_hub', return_label: '← The galley.', location: 'Galley', mood: 'neutral',
     text: `She looks at the stove.
 
 — The archive. Everything the ship found. Thirty years of it. Every anomaly measured, every photograph of the sea from positions nobody photographs because there's nothing there except what the instruments were detecting.
@@ -1657,14 +1657,18 @@ The first pages are scientific. Numbers, coordinates, magnetic declination recor
       // The deeper history unlocks only later
     },
     choices: [
-      { text: 'Read more of the 1957 logs.',                    next: 'chartroom_1957'      },
-      { text: 'Look at the current mission documentation.',      next: 'chartroom_current'   },
-      { text: 'Notice the deviation readings on the current chart.', next: 'chartroom_deviation' },
+      { text: 'Read the 1957 logs.',              next: 'chartroom_1957',     condition: { type: 'not', condition: { type: 'flag', id: 'zarya_log_read' } } },
+      { text: 'The 1957 logs.',                   next: 'chartroom_1957',     condition: { type: 'flag', id: 'zarya_log_read' } },
+      { text: 'Look at the later logs.',           next: 'chartroom_late_logs',condition: { type: 'not', condition: { type: 'flag', id: 'late_logs_seen' } } },
+      { text: 'The later logs.',                  next: 'chartroom_late_logs', condition: { type: 'flag', id: 'late_logs_seen' } },
+      { text: 'The current mission documentation.',next: 'chartroom_current',  condition: { type: 'not', condition: { type: 'flag', id: 'mission_docs_read' } } },
+      { text: 'The deviation readings.',           next: 'chartroom_deviation', condition: { type: 'not', condition: { type: 'flag', id: 'deviation_noted' } } },
+      { text: 'Return to the main deck.',          next: 'main_deck_hub' },
     ],
   },
 
   chartroom_1957: {
-    id: 'chartroom_1957', location: 'Chart Room', mood: 'neutral',
+    id: 'chartroom_1957', return_to: 'chart_room_first', return_label: '← Chart room.', location: 'Chart Room', mood: 'neutral',
     text: `Fifty pages. The ship measured the Atlantic grid by grid. Anomalies wherever the field diverged from the model. Unknown mountains under the water making the compass lie.
 
 The scientist's observations, and beside them, in the margins, small notes by the sailor who kept the ship's own log. He signs with initials only.
@@ -1682,7 +1686,7 @@ The scientist's observations, and beside them, in the margins, small notes by th
   },
 
   chartroom_late_logs: {
-    id: 'chartroom_late_logs', location: 'Chart Room', mood: 'neutral',
+    id: 'chartroom_late_logs', return_to: 'chart_room_first', return_label: '← Chart room.', location: 'Chart Room', mood: 'neutral',
     text: `The late logs are different. The handwriting careful but changed. A refit in 1976 — new masts, non-magnetic alloys. The 1982 binder records a thirtieth-anniversary voyage. Scientists from Germany, Finland, Poland.
 
 Then a gap. No binder after 1982.
@@ -1705,7 +1709,7 @@ You do not open it yet.`,
   },
 
   chartroom_manifest: {
-    id: 'chartroom_manifest', location: 'Chart Room', mood: 'uncanny',
+    id: 'chartroom_manifest', return_to: 'chart_room_first', return_label: '← Chart room.', location: 'Chart Room', mood: 'uncanny',
     text: `The final manifest lists the hold cargo. Most is scientific equipment — expected.
 
 The last entry is longer than the others.
@@ -1732,7 +1736,7 @@ You put it back.`,
   },
 
   chartroom_current: {
-    id: 'chartroom_current', location: 'Chart Room', mood: 'neutral',
+    id: 'chartroom_current', return_to: 'chart_room_first', return_label: '← Chart room.', location: 'Chart Room', mood: 'neutral',
     text: `The current documentation is ordinary. Weather, depth charts, route. The crossing moves northeast-by-north toward a waypoint marked with a circle and a date.
 
 In the margin of the route chart, different ink, probably recent: *deviation increasing. anomaly zone: 48hr.*
@@ -1750,7 +1754,7 @@ Someone is tracking the magnetic deviation. Watching for it.`,
   },
 
   chartroom_deviation: {
-    id: 'chartroom_deviation', location: 'Chart Room', mood: 'neutral',
+    id: 'chartroom_deviation', return_to: 'chart_room_first', return_label: '← Chart room.', location: 'Chart Room', mood: 'neutral',
     text: `The deviation readings are in pencil at the side. They have been increasing. Not dramatically. Consistently.
 
 You are sailing into a region where the Earth's magnetic field does not behave as expected.
@@ -1793,19 +1797,21 @@ This is Freezer Beef. You will learn this later. Right now she looks at you with
       }
     },
     choices: [
-      { text: 'Approach Freezer Beef. Look at the boxes.',  next: 'hold_boxes'   },
-      { text: 'Sit on the floor. Just sit.',                 next: 'hold_sit', theosis: 3, composure: 1 },
-      { text: 'Go back up. You need to think.',              next: 'main_deck_hub' },
-      { text: 'Pavel is here too. And looking at something.',  next: 'pavel_riddle_two',
-        condition: { type: 'and', conditions: [
-          { type: 'flag', id: 'pavel_riddle_one_complete' },
-          { type: 'not', condition: { type: 'flag', id: 'pavel_riddle_two' } },
-        ]}},
+      { text: 'Approach the boxes.',              next: 'hold_boxes',          condition: { type: 'not', condition: { type: 'flag', id: 'hold_boxes_seen' } } },
+      { text: 'The boxes.',                        next: 'hold_boxes',          condition: { type: 'flag', id: 'hold_boxes_seen' } },
+      { text: 'Nadia is on the floor with a binder.', next: 'nadia_1978_discovery', condition: { type: 'and', conditions: [{ type: 'flag', id: 'act_two_begun' }, { type: 'not', condition: { type: 'flag', id: 'nadia_1978_found' } }] } },
+      { text: 'Offer a blessing.',                 next: 'hold_bless_archive',  condition: { type: 'and', conditions: [{ type: 'flag', id: 'archive_discovered' }, { type: 'not', condition: { type: 'flag', id: 'archive_blessed' } }] } },
+      { text: 'The hatch below.',                  next: 'stink_patrol_favour', condition: { type: 'and', conditions: [{ type: 'flag', id: 'stink_patrol_hands_known' }, { type: 'stat', stat: 'communion', min: 6 }, { type: 'not', condition: { type: 'flag', id: 'stink_patrol_favour_received' } }] } },
+      { text: 'Sit on the floor.',                 next: 'hold_sit', theosis: 3, composure: 1, condition: { type: 'not', condition: { type: 'flag', id: 'hold_sat' } } },
+      { text: 'Sit for a while longer.',           next: 'hold_sit', theosis: 2, condition: { type: 'flag', id: 'hold_sat' } },
+      { text: 'Pavel is here too.',                next: 'pavel_riddle_two', condition: { type: 'and', conditions: [{ type: 'flag', id: 'pavel_riddle_one_complete' }, { type: 'not', condition: { type: 'flag', id: 'pavel_riddle_two' } }] } },
+      { text: 'A moment here.',                    next: 'pool_hold_ambient' },
+      { text: 'Go back up.',                       next: 'main_deck_hub' },
     ],
   },
 
   hold_sit: {
-    id: 'hold_sit', location: 'Hold', mood: 'uncanny',
+    id: 'hold_sit', return_to: 'hold_first', return_label: '← The hold.', location: 'Hold', mood: 'uncanny',
     text: `You sit on the floor of the hold.
 
 The hull breathes around you. Freezer Beef watches you with the patience of someone who decided a long time ago.
@@ -1818,6 +1824,7 @@ You don't know yet what you're supposed to do about this. You know you are suppo
 
 You sit there for a while.`,
     onEnter: () => {
+      S.setFlag('hold_sat');
       S.incrementTheosis(3);
       S.applyEffect({ composure: 1, communion: 1 });
       S.setFlag('hold_sat');
@@ -1830,7 +1837,7 @@ You sit there for a while.`,
   },
 
   hold_boxes: {
-    id: 'hold_boxes', location: 'Hold', mood: 'uncanny',
+    id: 'hold_boxes', return_to: 'hold_first', return_label: '← The hold.', location: 'Hold', mood: 'uncanny',
     text: `The boxes are sealed. Most of them.
 
 One near the bottom of the nearest stack has a lid only resting in place. Not latched.
@@ -1854,7 +1861,7 @@ The box nearest you is labelled: *1972, Atlantic crossing, photographs, southern
   },
 
   hold_witness: {
-    id: 'hold_witness', location: 'Hold', mood: 'uncanny',
+    id: 'hold_witness', return_to: 'hold_first', return_label: '← The hold.', location: 'Hold', mood: 'uncanny',
     text: `You don't open anything.
 
 You stand in the hold and you look at the boxes, all of them, and you let that be what it is: thirty years of work, packed into a hold on a ship, labelled for disposal.
@@ -1865,6 +1872,7 @@ The ship moves. The sea is loud from here.
 
 Something in you — not a thought, more like a shift of weight — moves from neutral to something that has not yet found its name.`,
     onEnter: () => { S.incrementTheosis(3); S.applyEffect({ communion: 2 }); S.setFlag('hold_witnessed'); },
+      S.setFlag('hold_boxes_seen');
     choices: [
       { text: 'Go up. Find someone to talk to.',          next: 'main_deck_hub' },
       { text: 'Open the 1972 box.',                        next: 'hold_1972_box' },
@@ -1873,7 +1881,7 @@ Something in you — not a thought, more like a shift of weight — moves from n
   },
 
   hold_bless_archive: {
-    id: 'hold_bless_archive', location: 'Hold', mood: 'uncanny',
+    id: 'hold_bless_archive', return_to: 'hold_first', return_label: '← The hold.', location: 'Hold', mood: 'uncanny',
     text: `It is not a formal blessing. There is no form for this.
 
 You stand in the hold of a non-magnetic ship with thirty years of geomagnetic measurement at your back, and you say something. Not loudly. The words are not important — or they are important but not because of their content.
@@ -2814,7 +2822,7 @@ You have not decided what you are going to do.`,
       { text: 'Someone in the mess hall. He has been there a while.',       next: 'oblong_first',          condition: { type: 'not', condition: { type: 'flag', id: 'met_oblong' } } },
       { text: 'Kylie is waiting.',                                           next: 'kylie_act_two',         condition: { type: 'and', conditions: [{ type: 'flag', id: 'kylie_initial_met' }, { type: 'not', condition: { type: 'flag', id: 'kylie_act_two_confronted' } }] } },
       { text: 'Pavel says something that stops you.',                         next: 'pavel_past_story',      condition: { type: 'and', conditions: [{ type: 'flag', id: 'met_pavel' }, { type: 'not', condition: { type: 'flag', id: 'pavel_past_told' } }] } },
-      { text: 'Something has happened to the cover.',                         next: 'cover_identity_crisis', condition: { type: 'and', conditions: [{ type: 'flag', id: 'anomaly_peak_occurred' }, { type: 'theosis', min: 45 }, { type: 'not', condition: { type: 'flag', id: 'cover_crisis_resolved' } }] } },
+      { text: 'Something has happened to the cover.',                         next: 'cover_identity_crisis', condition: { type: 'and', conditions: [{ type: 'or', conditions: [{ type: 'flag', id: 'anomaly_peak_occurred' }, { type: 'stat', stat: 'doubt', min: 7 }] }, { type: 'theosis', min: 45 }, { type: 'not', condition: { type: 'flag', id: 'cover_crisis_resolved' } }] } },
       { text: 'After the service.',                                            next: 'sunday_congregation',   condition: { type: 'and', conditions: [{ type: 'flag', id: 'sunday_service_led' }, { type: 'not', condition: { type: 'flag', id: 'sunday_congregation_seen' } }] } },
       { text: 'Landstorm is on the radio.',                                  next: 'landstorm_radio_call',  condition: { type: 'and', conditions: [{ type: 'flag', id: 'mission_orders_read' }, { type: 'not', condition: { type: 'flag', id: 'landstorm_called' } }] } },
       { text: 'Something below the forward hold.',                           next: 'stink_patrol_encounter', condition: { type: 'and', conditions: [{ type: 'flag', id: 'hold_visited' }, { type: 'not', condition: { type: 'flag', id: 'stink_patrol_encountered' } }] } },
@@ -3326,9 +3334,18 @@ He is looking at you with the complete attention of someone who has decided that
 
   othis_deny: {
     id: 'othis_deny', location: 'Hold Access', mood: 'tense',
-    text: `The cover holds, barely.
-
-He watches you perform it. He knows he is watching a performance. You know he knows. Neither of you says this.
+    get text() {
+      const r = S.performVisibleRoll && S.performVisibleRoll('composure', 11, { isCoverChallenge: true });
+      const rollHtml = r && S.visibleRollHtml ? S.visibleRollHtml(r) : '';
+      if (r && r.outcome === 'failure') {
+        S.degradeCover && S.degradeCover(1);
+        return `You hold the cover.\n\n${rollHtml}\n\nThe answer comes out a half-beat off — a phrasing that sounds memorised. Othis writes something longer than usual. He looks at you once before he leaves.`;
+      }
+      if (r && r.outcome === 'partial') {
+        S.applyEffect && S.applyEffect({ composure: -1 });
+        return `The cover holds, barely.\n\n${rollHtml}\n\nHe watches you perform it. You can hear the cost in your own voice. He writes something. The field is not closed.`;
+      }
+      return `The cover holds, barely.\n\n${rollHtml}\n\nHe watches you perform it. He knows he is watching a performance. You know he knows. Neither of you says this.
 
 — I'll need your movements accounted for. He says. — All of them.
 
@@ -4830,6 +4847,68 @@ So, eventually, do you.`,
   // Dénouement screen between ending and new crossing.
   // Rendered by engine's renderCrossingRecord() function.
 
+
+  // ── STAT-GATED SCENES ────────────────────────────────────────────
+
+  othis_surveillance_noted: {
+    id: 'othis_surveillance_noted', location: 'Corridor', mood: 'tense',
+    text: `You have been counting.
+
+Othis has walked past the instrument room three times since this morning. Each time he slows at the door. He does not stop. He continues.
+
+This is surveillance that is not yet confrontation. He has a threshold. He is waiting for you to give him reason to cross it.
+
+Your vigilance gives you: until tonight, possibly. The Landstorm call made him more careful. He is building a case rather than acting on one.`,
+    onEnter: () => {
+      S.setFlag('othis_surveillance_noted');
+      S.applyEffect({ vigilance: 1 });
+      S.modShipState('paranoia', 1);
+    },
+    choices: [
+      { text: 'Find him. Confront him now.', next: 'othis_confrontation', condition: { type: 'not', condition: { type: 'flag', id: 'othis_confrontation_happened' } } },
+      { text: 'Find the radio. Use the time.',  next: 'radio_discovery', condition: { type: 'not', condition: { type: 'flag', id: 'radio_found' } } },
+      { text: 'Find Miguel.',                   next: 'act_two_miguel' },
+      { text: 'Go to the main deck.',           next: 'main_deck_hub' },
+    ],
+  },
+
+  landstorm_composure_hold: {
+    id: 'landstorm_composure_hold', location: 'Instrument Room', mood: 'tense',
+    text: `You do not speak immediately.
+
+You hold the receiver. You breathe. Your composure is the stillness of someone who has learned that the pressure does not always fill the silence — and that the person applying the pressure is also waiting.
+
+After twelve seconds you say:
+
+— The situation is more complex than the briefing suggested. I need more time.
+
+A long pause.
+
+— How much time. He says.
+
+— Twenty-four hours.
+
+He considers. He is not angry. Anger would be unprofessional.
+
+— You have six. He says. And the line goes quiet.
+
+Six hours before he contacts the vessel directly.`,
+    onEnter: () => {
+      S.setFlag('landstorm_called');
+      S.setFlag('landstorm_delayed');
+      S.setFlag('landstorm_composure_used');
+      S.applyEffect({ composure: 1 });
+      S.modShipState('paranoia', 1);
+      S.showToast('Six hours.', 'warning');
+      S.setDeadline && S.setDeadline('landstorm_pressure', S.G.time.day, (S.G.liturgicalHour||4) + 3, 'othis_acts', { once: true });
+    },
+    choices: [
+      { text: 'Find Miguel.',           next: 'act_two_miguel' },
+      { text: 'Find the radio.',        next: 'radio_discovery', condition: { type: 'not', condition: { type: 'flag', id: 'radio_found' } } },
+      { text: 'Go to the main deck.',   next: 'main_deck_hub' },
+    ],
+  },
+
   crossing_record: {
     id: 'crossing_record', location: '', mood: 'neutral',
     text: '',
@@ -4848,6 +4927,72 @@ So, eventually, do you.`,
     },
     _renderOverride: (root) => { S.renderCrossingRecord(root); },
     choices: [],
+  },
+
+
+  // ── ITEM EXAMINE SCENES ──────────────────────────────────────────
+
+  examine_zarya_photograph: {
+    id: 'examine_zarya_photograph', location: 'The Photograph', mood: 'neutral',
+    text: `1972. The bowsprit of the ship. A young man standing at the anomaly position, looking at something off-frame that the camera cannot see.
+
+He is in his late twenties. He has the posture of someone who has been outside for a long time and is comfortable with it. The light is northern and overcast. The sea behind him is the same sea.
+
+Someone has written a date on the back in pencil. The initial В in the corner. He put one photograph in his breast pocket, Lena said. She never asked which one.
+
+This is probably not that one.
+
+The photograph is heavier than photographs usually are.`,
+    choices: [
+      { text: 'Put it away.', next: 'main_deck_hub' },
+    ],
+  },
+
+  examine_volkov_photograph: {
+    id: 'examine_volkov_photograph', location: 'The Photograph', mood: 'neutral',
+    text: `The cook. Undated.
+
+He is looking directly at the camera with the expression of someone who has decided the record should include him too. He is in the galley — you can see the edge of the stove behind him. His hands are on the counter. Cook's hands.
+
+He was on the ship for nine years. He checked the bilge every morning because the ship needed to know someone was paying attention.
+
+The ship is paying attention back. He is in the archive now, in the photographs. He was always going to be here.
+
+The initial В on the back.`,
+    choices: [
+      { text: 'Put it away.', next: 'main_deck_hub' },
+    ],
+  },
+
+  examine_both_photographs: {
+    id: 'examine_both_photographs', location: 'The Photographs', mood: 'uncanny',
+    text: `Two photographs, held together.
+
+The same man. This took Lena twenty-two years to confirm. The cook on the bowsprit in 1972, looking at something the camera cannot see. The cook in the galley, looking at the camera.
+
+He sailed in 1972. He returned to the ship as cook. He was here for nine years. He checked the bilge every morning.
+
+The ship kept him. He kept the ship. Neither of them explained this to anyone.
+
+The two photographs together have a different weight than either one alone.`,
+    onEnter: () => { S.incrementTheosis(3); },
+    choices: [
+      { text: 'Put them away.', next: 'main_deck_hub' },
+    ],
+  },
+
+  examine_stink_patrol_paper: {
+    id: 'examine_stink_patrol_paper', location: 'The Paper', mood: 'uncanny',
+    text: `A position. Written in the measurement system of the ship's original construction — 1952 notation, Finnish engineering, the way the shipyard would have described a specific internal space.
+
+It describes a location below the forward hold. Below the level of the current manifest. A space that is in the ship's construction but not in any document produced after 1960.
+
+You could find this place. Warm hands showed you how to get there.
+
+The paper itself is slightly warm. It has been handled often, below, where it is always warm.`,
+    choices: [
+      { text: 'Put it away.', next: 'main_deck_hub' },
+    ],
   },
 
   // ── SOLIDARITY ENDING ────────────────────────────────────────────
@@ -4958,13 +5103,19 @@ And she knew.`,
     hub: true,
     get text() {
       const t = S.G.theosis;
+      let base;
       if (t >= 66) {
-        return `The ship is Заря.\n\nThis has always been true. Today it is the truth that matters.\n\nThe anomaly is at its peak. Below the hull: something enormous that has been waiting for thirty years of measurement to return with its record.\n\nThe last hours.`;
+        base = `The ship is Заря.\n\nThis has always been true. Today it is the truth that matters.\n\nThe anomaly is at its peak. Below the hull: something enormous that has been waiting for thirty years of measurement to return with its record.\n\nThe last hours.`;
       } else if (t >= 33) {
-        return `Day Three.\n\nThe anomaly is at its maximum. The instruments are reading something they have never read. The ship holds her course.\n\nThe threads of the crossing are converging.\n\nThe last hours.`;
+        base = `Day Three.\n\nThe anomaly is at its maximum. The instruments are reading something they have never read. The ship holds her course.\n\nThe threads of the crossing are converging.\n\nThe last hours.`;
       } else {
-        return `Day Three. The anomaly is at its peak.\n\nThe crossing is ending. Something has to happen before it does.\n\nThe last hours.`;
+        base = `Day Three. The anomaly is at its peak.\n\nThe crossing is ending. Something has to happen before it does.\n\nThe last hours.`;
       }
+      // Pavel says something if companion and high trust
+      if (S.hasFlag('pavel_is_companion') && S.getStance && S.getStance('pavel', 'trust') >= 3) {
+        base += '\n\nPavel is at the bow. He has not moved in two hours. When you passed him he said: — It knows we are here. That is all he said.';
+      }
+      return base;
     },
     onEnter: () => {
       S.incrementTheosis(3);
@@ -5977,7 +6128,7 @@ He looks at you.
   },
 
   alexei_palamas: {
-    id: 'alexei_palamas', location: "Alexei's Cabin", mood: 'uncanny',
+    id: 'alexei_palamas', return_to: 'instrument_shimmer', return_label: '← Instrument room.', location: "Alexei's Cabin", mood: 'uncanny',
     text: `He sits up slightly.
 
 You tell him about the distinction between the divine essence and the divine energies. The essence unknowable, unreachable, utterly beyond. The energies: real, participable, present in creation. Not the same as the thing itself. The light on Tabor. The field that makes certain things more likely. The anomaly that pulls the compass off true north.
@@ -6260,6 +6411,13 @@ You hold the receiver. You have already decided something. The only question is 
         text: '"The situation has changed. I am no longer able to complete the mission."',
         next: 'landstorm_second_refuse',
         requires_flag: 'mission_refused',
+        requires_stat: ['composure', 4],
+      },
+      {
+        text: '"I need more time to assess the situation." Calm. Total composure.',
+        next: 'landstorm_composure_hold',
+        requires_stat: ['composure', 6],
+        condition: { type: 'not', condition: { type: 'flag', id: 'landstorm_second_called' } },
       },
     ],
   },
@@ -6297,6 +6455,7 @@ He looks at the receiver.
     onEnter: () => { S.incrementTheosis(3); S.applyEffect({ composure: 1 }); S.setFlag('landstorm_knows_something'); },
     choices: [
       { text: 'Find Othis before Landstorm does.', next: 'othis_confrontation', condition: { type: 'not', condition: { type: 'flag', id: 'othis_confrontation_happened' } } },
+      { text: 'You have been counting. He has walked past three times.', next: 'othis_surveillance_noted', requires_stat: ['vigilance', 6], condition: { type: 'not', condition: { type: 'flag', id: 'othis_surveillance_noted' } } },
       { text: 'Find the radio. The other one.',     next: 'radio_discovery', condition: { type: 'not', condition: { type: 'flag', id: 'radio_found' } } },
       { text: 'Go to the main deck.',               next: 'main_deck_hub' },
     ],
@@ -6857,7 +7016,7 @@ He nods. He returns to the clipboard. The inventory, in his version, will be cor
   // ── NPC CONTRADICTIONS ───────────────────────────────────────────
 
   alexei_doubt: {
-    id: 'alexei_doubt', location: 'Instrument Room', mood: 'uncanny',
+    id: 'alexei_doubt', return_to: 'instrument_shimmer', return_label: '← Instrument room.', location: 'Instrument Room', mood: 'uncanny',
     get text() {
       let base = 'Alexei is standing at the porthole.';
       if (S.hasNpcMemory && S.hasNpcMemory('alexei', 'Palamas — thirty years without knowing')) {
