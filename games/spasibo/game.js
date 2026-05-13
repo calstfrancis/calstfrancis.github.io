@@ -822,17 +822,96 @@ S.registerRollModifier('composure',
   (statKey, options, G) => 1
 );
 
-// Pavel companion: trust stat adds to social rolls
+// Pavel companion roll modifiers — tiered by trust
+// Trust >= 2: +1 on all rolls when doubt is high (he steadies you)
 S.registerRollModifier('composure',
   (statKey, options, G) => {
     if (!G.companions) return false;
     const p = G.companions.find(c => c.id === 'pavel');
-    return !!(p && (p.stats?.trust || 0) >= 3 && options.isSocialRoll);
+    const trust = (p && p.stats && p.stats.trust) || (G.npcStance && G.npcStance.pavel && G.npcStance.pavel.trust) || 0;
+    return !!(p && trust >= 2 && (G.stats.doubt || 0) >= 5);
   },
-  (statKey, options, G) => 1
+  () => 1  // +1 composure when doubt is high and Pavel is with you
+);
+
+// Trust >= 3: +1 on social rolls
+S.registerRollModifier('composure',
+  (statKey, options, G) => {
+    if (!G.companions) return false;
+    const p = G.companions.find(c => c.id === 'pavel');
+    const trust = (p && p.stats && p.stats.trust) || (G.npcStance && G.npcStance.pavel && G.npcStance.pavel.trust) || 0;
+    return !!(p && trust >= 3 && options.isSocialRoll);
+  },
+  () => 1  // +1 on social rolls
+);
+
+// Trust >= 4: cover challenge difficulty reduced by 1
+S.registerRollModifier('composure',
+  (statKey, options, G) => {
+    if (!G.companions) return false;
+    const p = G.companions.find(c => c.id === 'pavel');
+    const trust = (p && p.stats && p.stats.trust) || (G.npcStance && G.npcStance.pavel && G.npcStance.pavel.trust) || 0;
+    return !!(p && trust >= 4 && options.isCoverChallenge);
+  },
+  () => 1  // +1 on cover challenges (his presence legitimises the chaplain)
 );
 
 
+
+// ─────────────────────────────────────────────────────────────────
+// PAVEL COMPANION LINES
+// Location-specific ambient observations. Appear in hub get text().
+// trust 0-1: impersonal, philosophical. 2-3: personal. 4-5: intimate.
+// ─────────────────────────────────────────────────────────────────
+
+// FOREDECK — his home base
+S.registerCompanionLine('pavel', { id: 'fo_1', location: 'Foredeck', trustMin: 0, trustMax: 1,
+  text: 'Pavel is at the bow. He is talking to the water, or to whatever the water is a surface for.' });
+S.registerCompanionLine('pavel', { id: 'fo_2', location: 'Foredeck', trustMin: 0, trustMax: 1,
+  text: 'Pavel is at the bow. He looks up when you approach with the expression of someone whose thought was reaching a conclusion.' });
+S.registerCompanionLine('pavel', { id: 'fo_3', location: 'Foredeck', trustMin: 2, trustMax: 3,
+  text: 'Pavel is at the bow. He turns when he hears you. — I was thinking about what you said earlier. He does not specify what. There is only one thing worth thinking about on a crossing.' });
+S.registerCompanionLine('pavel', { id: 'fo_4', location: 'Foredeck', trustMin: 2, trustMax: 3,
+  condition: { type: 'flag', id: 'anomaly_first_noticed' },
+  text: 'Pavel is facing the bow. — The deviation is stronger today, he says without looking at you. — I can feel it in the compass in my jacket pocket. He does not usually carry a compass.' });
+S.registerCompanionLine('pavel', { id: 'fo_5', location: 'Foredeck', trustMin: 4,
+  text: 'Pavel is at the bow. He hears you coming and moves slightly to one side, making room. He does not say anything. He does not need to.' });
+S.registerCompanionLine('pavel', { id: 'fo_6', location: 'Foredeck', trustMin: 4,
+  once: true, condition: { type: 'flag', id: 'anomaly_peak_occurred' },
+  text: 'Pavel is at the bow and he is praying. Not performing it. Doing it. He is facing the water and his lips are moving slightly and his hands are loose at his sides. He looks up when you arrive and nods once, as if you are both expected.' });
+S.registerCompanionLine('pavel', { id: 'fo_rope', location: 'Foredeck', trustMin: 3,
+  condition: { type: 'flag', id: 'pavel_past_told' },
+  text: 'Pavel has the rope again. But this time when you look at him he sees you looking and says: — Old habit. From before. He sets it down.' });
+
+// MAIN DECK — occasional presence
+S.registerCompanionLine('pavel', { id: 'md_1', location: 'Main Deck', trustMin: 1,
+  text: 'Pavel passes through. He gives you the nod of someone who has seen you somewhere important and is acknowledging that it happened.' });
+S.registerCompanionLine('pavel', { id: 'md_2', location: 'Main Deck', trustMin: 2,
+  condition: { type: 'flag', id: 'sunday_service_led' },
+  text: 'Pavel is on the main deck. He is watching the other crew members with the expression of someone taking attendance at something they are very glad is happening.' });
+S.registerCompanionLine('pavel', { id: 'md_3', location: 'Main Deck', trustMin: 3,
+  condition: { type: 'flag', id: 'act_three_begun' },
+  text: 'Pavel appears at your shoulder. He says, very quietly: — Whatever happens today. He leaves the sentence unfinished. He puts his hand on your shoulder once, briefly, and goes back to the foredeck.' });
+
+// HOLD — shows up for the archive
+S.registerCompanionLine('pavel', { id: 'hold_1', location: 'Hold', trustMin: 2,
+  condition: { type: 'flag', id: 'archive_discovered' },
+  text: 'Pavel is sitting on a box near the aft wall. He has been reading something from the archive. He looks up when you come in and closes it carefully. — The 1978 position, he says. — Nadia found it too. He has been here a while.' });
+S.registerCompanionLine('pavel', { id: 'hold_2', location: 'Hold', trustMin: 3,
+  condition: { type: 'flag', id: 'archive_blessed' },
+  text: 'Pavel is in the hold. He is not reading. He is just sitting with the blessed boxes with the demeanour of someone comfortable in a chapel.' });
+S.registerCompanionLine('pavel', { id: 'hold_3', location: 'Hold', trustMin: 4,
+  once: true, condition: { type: 'flag', id: 'archive_transmitted' },
+  text: 'Pavel is in the hold. He looks at the boxes and then at you. — Still here, he says of the boxes. — But not only here now. He nods once, the nod of someone whose long argument has been proven correct by events.' });
+
+// GALLEY — he has history with Lena
+S.registerCompanionLine('pavel', { id: 'gal_1', location: 'Galley', trustMin: 2,
+  text: 'Pavel is at the counter talking to Lena. She is not responding but she is listening in the way she listens — with her full back, which is how you know she is attending.' });
+S.registerCompanionLine('pavel', { id: 'gal_2', location: 'Galley', trustMin: 3,
+  condition: { type: 'flag', id: 'lena_direct_asked' },
+  text: 'Pavel and Lena are both in the galley, not talking, in the particular silence of two people who have known each other for years and have reached the comfortable part.' });
+S.registerCompanionLine('pavel', { id: 'gal_3', location: 'Galley', trustMin: 1, trustMax: 2,
+  text: 'Pavel is attempting to make tea. Lena has not offered to help and he has not asked. They are managing.' });
 
 // ─────────────────────────────────────────────────────────────────
 // SCENE POOLS — ambient variety for recurring hubs
@@ -1259,6 +1338,7 @@ This is a very precise answer to a question about a person.`,
         { speaker: null, text: 'He turns around. He knew you were there.' },
         { speaker: 'Pavel', text: 'Oh good. You are the chaplain. I have been wanting to talk to you.' },
         { speaker: null, text: 'His name, it turns out, is Pavel.' },
+        ...(S.hasFlag('archive_discovered') ? [{ speaker: 'Pavel', text: 'I know about the hold. I have known since yesterday. I want you to know that I know.' }] : []),
       ]);
     },
     choices: [
@@ -1624,6 +1704,8 @@ She doesn't say what the something is.`,
       if (S.hasFlag('hold_bless_archive')) parts.push('She is quieter than usual. Not worried. Something has settled.');
       if (S.hasFlag('stink_patrol_hands_known')) parts.push('The small arrangement near the oven — it has been there since you spoke with her about the Stink Patrol. She does not look at it directly.');
       if (S.hasFlag('lena_direct_asked')) parts.push('She asked her question. You answered it. There is nothing more to establish between you.');
+      const pavLine = S.getCompanionLine && S.getCompanionLine('pavel', 'Galley');
+      if (pavLine) parts.push(pavLine);
       return parts.join('\n\n');
     },
     choices: [
@@ -3003,7 +3085,9 @@ He looks at the water.
 
   foredeck_standing: {
     id: 'foredeck_standing', location: 'Foredeck', mood: 'uncanny',
-    text: `You stand there.
+    get text() {
+      const pavLine = S.getCompanionLine && S.getCompanionLine('pavel', 'Foredeck');
+      const base = `You stand there.
 
 The sea does what it does. The anomaly does what it does. Haircut appears from somewhere and sits between you, which she does with the authority of someone closing a circuit.
 
@@ -4901,6 +4985,192 @@ Six hours before he contacts the vessel directly.`,
     ],
   },
 
+
+  // ── PAVEL COMPANION SCENES ───────────────────────────────────────
+
+  // Scene 1: Pavel at the anomaly peak — his theological reading of it
+  // Available: companion + trust >= 3 + anomaly_peak_occurred
+  pavel_anomaly_theology: {
+    id: 'pavel_anomaly_theology', location: 'Foredeck — Anomaly Peak', mood: 'revelation',
+    art: 'portrait_pavel',
+    text: `He has been at the bow since before the peak.
+
+When you come up he turns, which he does not always do. He looks at you with the expression he gets when he has been saving something.
+
+— I want to tell you what I think it is. He says. — The anomaly.
+
+He turns back to the water.
+
+— Thirty years this ship has been measuring it. Sending instruments down, recording the deviation, doing the work that the ship was built for. Thirty years of attention without distortion. Non-magnetic, so nothing the ship carried could interfere with what was being found.
+
+He is quiet for a moment.
+
+— That is a form of prayer. He says. — I do not mean this metaphorically. I mean that sustained, non-distorting attention toward something real is what prayer actually is. Not the words. The attention.
+
+He looks at the water.
+
+— The anomaly is receiving that. He says. — Thirty years of it. And now it is responding because something about this crossing is different. The archive. The transmission. The fact that we are — He stops. — The fact that we are trying to name it correctly into the world.
+
+He turns to look at you.
+
+— What is correctly named is correctly real. He says. — That is what I think this is.
+
+He goes back to facing the water. He has said what he needed to say.`,
+    onEnter: () => {
+      S.incrementTheosis(9);
+      S.modReputation('pavel', 4);
+      S.modCompanionStat('pavel', 'trust', 1);
+      S.modStance('pavel', 'trust', 2);
+      S.comeToBelieve('anomaly_responds');
+      S.setFlag('pavel_anomaly_theology_seen');
+      S.flashTheosisLight(0.6, 5000);
+      S.showToast('Thirty years of attention.', 'theosis');
+    },
+    condition: { type: 'and', conditions: [
+      { type: 'flag', id: 'pavel_is_companion' },
+      { type: 'flag', id: 'anomaly_peak_occurred' },
+      { type: 'not', condition: { type: 'flag', id: 'pavel_anomaly_theology_seen' } },
+    ]},
+    choices: [
+      { text: 'Stand with him at the bow.',         next: 'foredeck_standing', theosis: 4, composure: 2, tags: ['stillness', 'presence'] },
+      { text: '"What does it mean that it answers?"', next: 'pavel_anomaly_theology_meaning', theosis: 2 },
+    ],
+  },
+
+  pavel_anomaly_theology_meaning: {
+    id: 'pavel_anomaly_theology_meaning', location: 'Foredeck — Anomaly Peak', mood: 'revelation',
+    art: 'portrait_pavel',
+    text: `He is quiet for a long time.
+
+— It means the attention was received. He says finally. — Which is what we always hope, with prayer, but cannot usually verify. The instruments in the room below us are currently verifying it.
+
+He looks at the compass in his jacket pocket — he takes it out, holds it level.
+
+— Twelve degrees. He says. He knows this reading by heart now. — The needle wants to go home but home has moved.
+
+He closes the compass.
+
+— What it means is that paying attention to something real, over a long enough time, in a way that is honest and non-distorting — changes the thing being attended to. Or reveals that it was always capable of response.
+
+He puts the compass away.
+
+— Both are the same. He says. — That is the theological statement I am prepared to make.`,
+    onEnter: () => {
+      S.incrementTheosis(6);
+      S.comeToBelieve('energies_real');
+      S.applyEffect({ composure: 2 });
+    },
+    choices: [
+      { text: 'Go back down.', next: 'main_deck_hub' },
+    ],
+  },
+
+  // Scene 2: Pavel present at the transmission
+  // Available: companion + trust >= 3 + radio_found + mission_refused
+  pavel_at_transmission: {
+    id: 'pavel_at_transmission', location: 'Instrument Room — 4am', mood: 'revelation',
+    art: 'portrait_pavel',
+    text: `He is in the doorway when Alexei starts the transmission.
+
+He didn't ask to be there. He didn't announce himself. He is simply present, the way he is simply present on the foredeck, because the ship is not large and this is where the significant thing is happening.
+
+Alexei works. The radio hums. The deviation holds the carrier frequency.
+
+Pavel does not speak. He watches.
+
+At some point during the transmission he puts his hand on the transmitter housing — not the transmitter itself, just the housing — for perhaps four seconds. Then he removes it. He does not explain this.
+
+When it is done he looks at you.
+
+— Good. He says.
+
+He goes back to the foredeck.
+
+You will remember that he said that.`,
+    onEnter: () => {
+      S.incrementTheosis(7);
+      S.modCompanionStat('pavel', 'trust', 1);
+      S.modStance('pavel', 'solidarity', 3);
+      S.setFlag('pavel_at_transmission');
+      S.applyEffect({ communion: 2 });
+      S.offerSounding('sounding_sobornost');
+    },
+    condition: { type: 'and', conditions: [
+      { type: 'flag', id: 'pavel_is_companion' },
+      { type: 'flag', id: 'archive_transmitted' },
+      { type: 'not', condition: { type: 'flag', id: 'pavel_at_transmission' } },
+    ]},
+    choices: [
+      { text: 'Go to the main deck.', next: 'main_deck_hub' },
+    ],
+  },
+
+  // Scene 3: Pavel as alternative path to Othis confrontation
+  // Available: companion + trust >= 4 + othis not yet confronted
+  pavel_othis_mediation: {
+    id: 'pavel_othis_mediation', location: 'Hold Access', mood: 'tense',
+    art: 'portrait_pavel',
+    text: `— I know him. Pavel says. — Othis. Not well. From a conference in Oslo, years ago. He was a researcher then. He believed in things.
+
+He looks at the hold door.
+
+— He still believes in things. He says. — That is the problem with people like him. They are doing what they believe in. It makes them hard to argue with by conventional means.
+
+He turns to you.
+
+— But it is possible to remind someone of what they believed before they were given instructions. He says. — If you know them.
+
+He is offering something. He is not certain it will work.
+
+— Let me speak to him first. He says. — Before the confrontation. Before the cover challenge. Let me speak to him as someone who knew him when he was a different kind of person.
+
+He looks at you.
+
+— You should be there. He says. — But let me speak first.`,
+    onEnter: () => {
+      S.setFlag('pavel_mediation_offered');
+      S.modCompanionStat('pavel', 'trust', 1);
+    },
+    condition: { type: 'and', conditions: [
+      { type: 'flag', id: 'pavel_is_companion' },
+      { type: 'not', condition: { type: 'flag', id: 'othis_confrontation_happened' } },
+      { type: 'not', condition: { type: 'flag', id: 'pavel_mediation_offered' } },
+    ]},
+    choices: [
+      { text: 'Let him speak first.',           next: 'othis_pavel_approach' },
+      { text: 'Confront Othis yourself.',        next: 'othis_confrontation' },
+    ],
+  },
+
+  othis_pavel_approach: {
+    id: 'othis_pavel_approach', location: 'Hold Access', mood: 'tense',
+    art: 'portrait_othis',
+    text: `Pavel speaks first.
+
+He speaks to Othis the way you speak to someone you knew in a different context — acknowledging the distance between then and now without making it into an accusation. He mentions Oslo. He mentions a paper Othis wrote. He does not pretend they are close.
+
+Othis listens. His clipboard does not go up. This is significant.
+
+Then Pavel says: — The chaplain has something to tell you. And he steps back.
+
+Othis looks at you. He is not closed. He is calculating. He was a researcher once who believed in things. Something of that is visible.
+
+— Go ahead. He says.`,
+    onEnter: () => {
+      S.setFlag('othis_confrontation_happened');
+      S.setFlag('othis_turned');
+      S.modStance('othis', 'trust', 3);
+      S.modReputation('othis', 3);
+      S.degradeCover(-1); // Actually improves cover — Othis is now inside
+      S.incrementTheosis(6);
+      S.showToast('Othis is listening.', 'note');
+    },
+    choices: [
+      { text: 'Tell him about the archive.',     next: 'othis_direct' },
+      { text: 'Tell him what you have refused.', next: 'othis_direct', set_flag: 'mission_refused' },
+    ],
+  },
+
   crossing_record: {
     id: 'crossing_record', location: '', mood: 'neutral',
     text: '',
@@ -6433,17 +6703,13 @@ The lie was clean. That is worse than if it had not been clean.`,
 
   landstorm_second_silence: {
     id: 'landstorm_second_silence', location: 'Instrument Room', mood: 'uncanny',
-    text: `You set the receiver down.
-
-The static.
-
-The anomaly is at its current level, which is high enough that the standard frequencies are genuinely unreliable. It is possible he lost the call again. It is possible he did not.
-
-Alexei appears in the doorway — he hears everything on these frequencies from his instruments.
-
-He looks at the receiver.
-
-— He will try once more. He says, as if he knows. — Then he will call Othis.`,
+    get text() {
+      let t = 'You set the receiver down.\n\nThe static.\n\nThe anomaly is at its current level, which is high enough that the standard frequencies are genuinely unreliable. It is possible he lost the call again. It is possible he did not.\n\nAlexei appears in the doorway — he hears everything on these frequencies from his instruments.\n\nHe looks at the receiver.\n\n— He will try once more. He says, as if he knows. — Then he will call Othis.';
+      if (S.hasCompanion && S.hasCompanion('pavel') && S.getStance && S.getStance('pavel', 'trust') >= 4) {
+        t += '\n\nPavel appears in the doorway behind Alexei. He looks at the receiver. He looks at you.\n\n— Good, he says. Just that.';
+      }
+      return t;
+    },
     onEnter: () => { S.incrementTheosis(3); S.applyEffect({ composure: 1 }); S.setFlag('landstorm_knows_something'); },
     choices: [
       { text: 'Find Othis before Landstorm does.', next: 'othis_confrontation', condition: { type: 'not', condition: { type: 'flag', id: 'othis_confrontation_happened' } } },

@@ -3332,6 +3332,12 @@ function renderCrossingRecord(root) {
   if (G.flags.has('ending_solidarity_reached') || G.flags.has('ending_restoration_reached')) {
     _shipLog.push('In the hold throughout: one calico cat. She did not intervene. She witnessed.');
   }
+  // Pavel in the ship's log if companion
+  if (G.flags.has('pavel_is_companion') && G.flags.has('pavel_anomaly_theology_seen')) {
+    _shipLog.push('On the foredeck at peak: Pavel Ivanovich, who had been in prison for saying things people did not want heard, and who came to the bow of a non-magnetic ship and stood there until the field answered.');
+  } else if (G.flags.has('pavel_is_companion')) {
+    _shipLog.push('On the foredeck throughout: Pavel Ivanovich. He held the rope. He stood at the bow. He said things that turned out to be true.');
+  }
   if (G.flags.has('sunday_service_led')) {
     _shipLog.push('In the mess hall on Sunday: seven people who did not have to stay, stayed.');
   }
@@ -3374,6 +3380,47 @@ function renderCrossingRecord(root) {
   root.appendChild(screen);
 }
 
+// ─────────────────────────────────────────────────────────────────
+// COMPANION HELPERS
+// ─────────────────────────────────────────────────────────────────
+
+// Get a random ambient companion line for the current location/trust.
+// Returns null if companion not present or no lines registered for context.
+function getCompanionLine(companionId, location, trustMin) {
+  if (!hasCompanion(companionId)) return null;
+  const trust = (G.npcStance[companionId] && G.npcStance[companionId].trust) || 0;
+  if (trustMin !== undefined && trust < trustMin) return null;
+  const pool = (_registries.companionLines[companionId] || []).filter(entry => {
+    if (entry.location && entry.location !== location) return false;
+    if (entry.trustMin !== undefined && trust < entry.trustMin) return false;
+    if (entry.trustMax !== undefined && trust > entry.trustMax) return false;
+    if (entry.condition && !evaluateCondition(entry.condition)) return false;
+    if (entry.once && G.flags.has('_cl_shown_' + entry.id)) return false;
+    return true;
+  });
+  if (!pool.length) return null;
+  const entry = pool[Math.floor(Math.random() * pool.length)];
+  if (entry.once) G.flags.add('_cl_shown_' + entry.id);
+  return entry.text;
+}
+
+// Register a companion ambient line.
+function registerCompanionLine(companionId, entry) {
+  if (!_registries.companionLines) _registries.companionLines = {};
+  if (!_registries.companionLines[companionId]) _registries.companionLines[companionId] = [];
+  _registries.companionLines[companionId].push(entry);
+}
+
+// Inject a companion interjection beat into an active dialogue.
+// Call from a scene's onEnter to splice a beat after beatIndex N.
+function injectDialogueBeat(afterIndex, beat) {
+  if (!G._dialogue) return;
+  const beats = G._dialogue.beats;
+  const insertAt = Math.min(afterIndex + 1, beats.length);
+  beats.splice(insertAt, 0, beat);
+}
+
+
 window.SOBORNOST={
   VERSION, G, render, setDebug, undo, redo,
   registerScenes, getScene, setSceneNotFoundHandler,
@@ -3396,6 +3443,7 @@ window.SOBORNOST={
   setMagneticDeviation, getMagneticDeviation, progressSounding, getShipState, modShipState,
   registerNameMapping, setLiturgicalHour,
   addCompanion, removeCompanion, hasCompanion, getCompanion, modCompanionStat, setCompanionCharism,
+  getCompanionLine, registerCompanionLine, injectDialogueBeat,
   learn, comeToBelieve, contradict, knows, believes,
   pushConsequence, scheduleEvent,
   unlockMeta, hasMeta, exportAnalytics,
