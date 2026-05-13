@@ -8,8 +8,8 @@
   --bg2:         #0a1120;
   --bg3:         #0e182e;
   --bg4:         #141f38;
-  --fg:          #d4e4f0;
-  --fg-dim:      #9ab0c8;
+  --fg:          #dce8ec;
+  --fg-dim:      #9cb4c4;
   --dim:         #607888;
   --border:      #1c2c40;
   --border-mid:  #283c54;
@@ -67,12 +67,13 @@ html, body {
      Right edge stays transparent so the porthole shows through. */
   background: linear-gradient(
     90deg,
-    rgba(5,8,14,0.75) 0%,
-    rgba(5,8,14,0.86) 20%,
-    rgba(5,8,14,0.90) 45%,
-    rgba(5,8,14,0.86) 70%,
-    rgba(5,8,14,0.40) 88%,
-    transparent 100%
+    rgba(5,8,14,0.82) 0%,
+    rgba(5,8,14,0.88) 15%,
+    rgba(5,8,14,0.90) 35%,
+    rgba(5,8,14,0.88) 58%,
+    rgba(5,8,14,0.55) 72%,
+    rgba(5,8,14,0.18) 85%,
+    transparent 94%
   );
 }
 
@@ -246,7 +247,7 @@ body.tier-illumined .title-cyrillic {
   border-left: 1px solid var(--border);
   color: var(--fg-dim);
   font-family: var(--font);
-  font-size: .9rem;
+  font-size: .95rem;
   padding: .48rem 0 .48rem 1.1rem;
   cursor: pointer; text-align: left; line-height: 1.65;
   transition: border-color .18s, color .18s, padding-left .14s, border-left-width .14s;
@@ -255,7 +256,7 @@ body.tier-illumined .title-cyrillic {
 .choice:hover, .choice:focus {
   border-left: 2px solid var(--cold);
   color: var(--fg);
-  padding-left: 1.25rem;
+  padding-left: 1.1rem;
   outline: none;
 }
 .choice::before {
@@ -341,7 +342,7 @@ body.tier-illumined .title-cyrillic {
   flex: 1; background: none; border: none;
   border-right: 1px solid var(--border);
   font-family: var(--font-display);
-  font-size: .54rem; letter-spacing: .1em; text-transform: uppercase;
+  font-size: .52rem; letter-spacing: .09em; text-transform: uppercase;
   padding: .72rem .2rem .58rem; cursor: pointer; color: var(--dim);
   transition: color .14s, background .14s, border-top .14s;
   position: relative;
@@ -380,7 +381,7 @@ body.tier-illumined .title-cyrillic {
   animation: panel-overlay-in 200ms ease forwards;
 }
 @keyframes panel-overlay-in {
-  to { background: rgba(4,6,11,.6); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+  to { background: rgba(4,6,11,.84); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
 }
 .panel {
   background: var(--panel-bg);
@@ -418,7 +419,7 @@ body.tier-illumined .title-cyrillic {
   transition: color .14s;
 }
 .panel-close:hover { color: var(--fg); }
-.panel-body { font-size: .88rem; line-height: 1.8; color: var(--fg); }
+.panel-body { font-size: .82rem; line-height: 1.8; color: var(--fg); }
 
 .panel-section {
   font-family: var(--font-display);
@@ -432,7 +433,7 @@ body.tier-illumined .title-cyrillic {
 .panel-row {
   display: flex; align-items: baseline; gap: .65rem;
   padding: .4rem 0; border-bottom: 1px solid var(--border);
-  font-size: .86rem;
+  font-size: .82rem;
 }
 .panel-row:last-child { border-bottom: none; }
 .panel-row-label { color: var(--dim); font-size: .68rem; letter-spacing: .06em; min-width: 85px; text-transform: uppercase; }
@@ -441,7 +442,7 @@ body.tier-illumined .title-cyrillic {
 
 /* Observations notes */
 .obs-note {
-  font-size: .84rem; color: var(--fg-dim); line-height: 1.72;
+  font-size: .82rem; color: var(--fg-dim); line-height: 1.72;
   padding: .35rem 0; border-bottom: 1px solid var(--border);
 }
 .obs-note:last-child { border-bottom: none; }
@@ -466,7 +467,7 @@ body.tier-illumined .title-cyrillic {
   background: var(--border); opacity: 0.5;
 }
 .sp.dialogue-line {
-  font-size: 1rem; line-height: 1.88;
+  font-size: .95rem; line-height: 1.88;
   color: var(--fg); margin-bottom: 0;
 }
 /* Narration beats — clearly differentiated */
@@ -477,7 +478,7 @@ body.tier-illumined .title-cyrillic {
   border-left: none; padding: 0;
 }
 .dialogue-choices { display: flex; flex-direction: column; gap: .42rem; margin-top: .9rem; }
-.choice.dialogue-choice   { font-size: .9rem; }
+.choice.dialogue-choice   { font-size: .95rem; }
 .choice.dialogue-continue {
   color: var(--dim); border-color: transparent;
   font-size: .82rem; padding-left: .6rem;
@@ -568,7 +569,7 @@ body.tier-illumined .title-cyrillic {
   color: var(--cold-dim); margin-bottom: .4rem; opacity: 0.7;
 }
 .sounding-name {
-  font-size: .88rem; color: var(--fg); margin-bottom: .28rem;
+  font-size: .95rem; color: var(--fg); margin-bottom: .28rem;
   letter-spacing: .02em; font-style: italic;
 }
 .sounding-card.settled .sounding-name { color: var(--cold); font-style: normal; }
@@ -578,9 +579,9 @@ body.tier-illumined .title-cyrillic {
   letter-spacing: .1em; margin: .28rem 0;
 }
 .sounding-text {
-  font-size: .8rem; color: var(--dim); line-height: 1.78;
-  font-style: italic; margin-top: .5rem;
-  border-top: 1px solid var(--border); padding-top: .5rem;
+  font-size: .85rem; color: var(--fg-dim); line-height: 1.8;
+  font-style: italic; margin-top: .55rem;
+  /* No border — the text IS the card, not a footnote */
 }
 
 /* ── Codex ───────────────────────────────────────────────────── */
@@ -604,7 +605,7 @@ body.tier-illumined .title-cyrillic {
   padding: .48rem .75rem; border: 1px solid var(--border);
   cursor: pointer; color: var(--fg-dim);
   transition: border-color .14s, color .14s, background .14s;
-  border-radius: var(--r); font-size: .86rem;
+  border-radius: var(--r); font-size: .82rem;
 }
 .map-node:hover     { border-color: var(--cold); color: var(--cold); background: var(--cold-faint); }
 .map-node.visited   { color: var(--dim); }
@@ -687,7 +688,7 @@ body.tier-illumined .title-cyrillic { text-shadow: 0 0 40px rgba(228,196,92,0.2)
   .title-cyrillic { font-size: 2.4rem; }
   .game-body { padding: 1.4rem 1.2rem .6rem; }
   #bottom-nav button { font-size: .54rem; padding: .65rem .15rem; }
-  .sp { font-size: 1rem; }
+  .sp { font-size: 1rem; line-height: 1.75; }
   .choice { font-size: .88rem; }
   .panel { padding: 0 1.2rem 2rem; }
 }
@@ -1318,18 +1319,22 @@ body.ending-knowing     .cr-ending-title { color: var(--gold); text-shadow: 0 0 
 }
 
 .cr-theosis {
+  display: flex;
+  align-items: baseline;
+  gap: .9rem;
   margin-bottom: .35rem;
+  padding-top: .25rem;
+  border-top: 1px solid var(--border);
 }
 .cr-theosis-val {
   font-family: var(--font-display);
-  font-size: 2.2rem; color: var(--gold);
-  letter-spacing: .1em; line-height: 1;
+  font-size: 1.9rem; color: var(--gold);
+  letter-spacing: .08em; line-height: 1;
 }
 .cr-theosis-tier {
   font-family: var(--font-display);
-  font-size: .72rem; color: var(--gold-dim);
-  letter-spacing: .16em; text-transform: uppercase;
-  margin-left: .8rem; vertical-align: middle;
+  font-size: .65rem; color: var(--gold-dim);
+  letter-spacing: .18em; text-transform: uppercase;
 }
 
 .cr-tax {
@@ -1353,3 +1358,32 @@ body.ending-knowing     .cr-ending-title { color: var(--gold); text-shadow: 0 0 
   align-self: flex-start;
 }
 .cr-btn:hover { border-color: var(--cold); }
+
+/* ── Mood-responsive body text ───────────────────────────────── */
+/* Revelation: warmer, slightly brighter — the light has changed */
+.location-bar.revelation ~ * .sp,
+.stxt.revelation .sp {
+  color: #e4ecec;
+}
+
+/* Scene-level mood via body class (set by engine on each scene) */
+body.mood-revelation .sp {
+  color: #e4ecec;
+  line-height: 1.96;
+}
+body.mood-uncanny .sp {
+  color: var(--fg-dim);
+  line-height: 1.96;
+}
+body.mood-tense .sp {
+  color: var(--fg);
+  letter-spacing: .005em;
+}
+body.mood-neutral .sp {
+  color: var(--fg);
+}
+
+/* Stxt halo (high theosis scenes) — cold prose */
+.stxt.stxt-halo .sp {
+  color: var(--cold);
+}

@@ -2519,7 +2519,11 @@ function renderGame(root){
   const scene=getScene(G.scene);
   if(!scene){_registries.sceneNotFound(G.scene,root);return;}
   const liturgical=LITURGICAL_HOURS[G.liturgicalHour];
+  const _sceneMood = (liturgical ? liturgical.mood : scene.mood) || 'neutral';
   if(liturgical)setMood(liturgical.mood);else setMood(scene.mood||'neutral');
+  // Apply mood body class for CSS mood-responsive text
+  document.body.classList.remove('mood-neutral','mood-revelation','mood-uncanny','mood-tense');
+  document.body.classList.add('mood-'+_sceneMood);
   saveGameLegacy();
   const visitKey='visited_'+G.scene,firstVisit=!hasFlag(visitKey);
   if(firstVisit){setFlag(visitKey);if(scene.on_enter){if(scene.on_enter.note)addNote(scene.on_enter.note);if(scene.on_enter.flag)setFlag(scene.on_enter.flag);if(scene.on_enter.thought)offerSounding(scene.on_enter.thought);}
