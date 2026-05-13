@@ -3,10 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SPASIBO</title>
+  <title>СПАСИБО</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%230a111e'/><text x='16' y='23' font-size='18' text-anchor='middle' fill='%2378b8d6'>✦</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preload" href="style.css" as="style">
+  <link rel="preload" href="sobornost.js" as="script">
+  <link rel="preload" href="game.js" as="script">
   <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-  <link href="https://fonts.cdnfonts.com/css/gost-type-b" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <script>
     window.GAME_TITLE    = 'СПАСИБО';
@@ -17,7 +20,7 @@
 <body class="tier-asleep">
   <canvas id="atmos"></canvas>
   <div id="root"></div>
-  <script src="sobornost.js"></script>
-  <script src="game.js"></script>
+  <script src="sobornost.js" defer></script>
+  <script src="game.js" defer></script>
 </body>
 </html>

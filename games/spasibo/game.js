@@ -1871,8 +1871,7 @@ Freezer Beef sits against your ankle. He is warm.
 The ship moves. The sea is loud from here.
 
 Something in you — not a thought, more like a shift of weight — moves from neutral to something that has not yet found its name.`,
-    onEnter: () => { S.incrementTheosis(3); S.applyEffect({ communion: 2 }); S.setFlag('hold_witnessed'); },
-      S.setFlag('hold_boxes_seen');
+    onEnter: () => { S.incrementTheosis(3); S.applyEffect({ communion: 2 }); S.setFlag('hold_witnessed'); S.setFlag('hold_boxes_seen'); },
     choices: [
       { text: 'Go up. Find someone to talk to.',          next: 'main_deck_hub' },
       { text: 'Open the 1972 box.',                        next: 'hold_1972_box' },
