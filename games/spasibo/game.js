@@ -3095,7 +3095,9 @@ At some point Freezer Beef arrives too, from below — you hear her before you s
 
 The four of you watch the water.
 
-Nothing is resolved. Everything is named.`,
+Nothing is resolved. Everything is named.`;
+      return pavLine ? base + '\n\n' + pavLine : base;
+    },
     onEnter: () => {
       S.incrementTheosis(6);
       S.applyEffect({ composure: 2, communion: 1 });
@@ -7969,4 +7971,10 @@ S.on('liturgicalHourChanged', (hour) => {
 // START
 // ─────────────────────────────────────────────────────────────────
 
-S.render();
+// Defer first render until after stylesheets are applied.
+// requestAnimationFrame yields to the browser's style/layout pass first.
+if (document.readyState === 'complete') {
+  requestAnimationFrame(() => S.render());
+} else {
+  window.addEventListener('load', () => requestAnimationFrame(() => S.render()), { once: true });
+}
