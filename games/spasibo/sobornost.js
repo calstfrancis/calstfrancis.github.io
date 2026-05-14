@@ -124,6 +124,39 @@ let _scheduled = false;
 
 function setRenderFn(fn) { _renderFn = fn; }
 
+
+// ─────────────────────────────────────────────────────────────────
+// KEYBOARD NAVIGATION
+// ─────────────────────────────────────────────────────────────────
+function _initKeyboard() {
+  document.addEventListener('keydown', (e) => {
+    // Escape: close open panel
+    if (e.key === 'Escape' && G.panelOpen) { openPanel(null); return; }
+    // Escape: dismiss cover challenge
+    if (e.key === 'Escape' && G._coverChallenge && !G._coverChallenge.resolved) return; // can't escape challenge
+    // Number keys 1-9: activate nth choice
+    if (e.key >= '1' && e.key <= '9' && !G.panelOpen && !G._coverChallenge) {
+      const n = parseInt(e.key) - 1;
+      const choices = document.querySelectorAll('.choices .choice:not([disabled])');
+      if (choices[n]) { choices[n].click(); e.preventDefault(); }
+      return;
+    }
+    // Enter/Space on focused choice: activate
+    if ((e.key === 'Enter' || e.key === ' ') && document.activeElement?.classList.contains('choice')) {
+      document.activeElement.click(); e.preventDefault();
+    }
+    // Arrow keys for panel navigation when panel open
+    if (G.panelOpen && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
+      const items = document.querySelectorAll('.panel-body .obs-note, .panel-body .codex-entry, .panel-body .map-node');
+      if (!items.length) return;
+      const focused = Array.from(items).findIndex(el => el === document.activeElement);
+      const next = e.key === 'ArrowDown' ? Math.min(focused + 1, items.length - 1) : Math.max(focused - 1, 0);
+      items[next]?.focus();
+      e.preventDefault();
+    }
+  });
+}
+
 function scheduleRender() {
   if (_scheduled) return;
   if (!_renderFn) { console.warn('[SOBORNOST] scheduleRender() called before renderer registered'); return; }
@@ -1307,7 +1340,7 @@ function loadJournal(slotId) {
   catch (e) { G.journal = []; }
 }
 function renderJournalPanel(root, openPanelFn) {
-  const overlay = document.createElement('div'); overlay.className = 'panel-overlay';
+  const overlay = document.createElement('div'); overlay.className = 'panel-overlay'; overlay.setAttribute('role','dialog'); overlay.setAttribute('aria-modal','true');
   overlay.onclick = (e) => { if (e.target === overlay) openPanelFn(null); };
   const panel = document.createElement('div'); panel.className = 'panel';
   const hdr = document.createElement('div'); hdr.className = 'panel-header';
@@ -1480,7 +1513,9 @@ function renderRitual(root) {
   if (phase.ritualChoices) {
     phase.ritualChoices.forEach(ch=>{
       const btn=document.createElement('button'); btn.className='choice'+(ch.style==='sacrifice'?' choice-sacrifice':'');
+      const _chNum=++_choiceIdx;
       btn.textContent=processText(ch.text);
+      if(_chNum<=9){btn.setAttribute('data-key',_chNum);btn.setAttribute('aria-keyshortcuts',String(_chNum));}
       btn.onclick=()=>{if(ch.effect)applyEffect(ch.effect);if(ch.set_flag)setFlag(ch.set_flag);_activeRitual.choicesMade.push({phase:_activeRitual.phaseIndex,choice:ch.text,branch:ch.branch});ritualNextPhase(ch.branch);};
       cd.appendChild(btn);
     });
@@ -2552,7 +2587,7 @@ function renderGame(root){
     scene._renderOverride(root);
     return;
   }
-  const wrap=document.createElement('div');wrap.className='game';
+  const wrap=document.createElement('div');wrap.className='game';wrap.setAttribute('role','main');wrap.setAttribute('aria-label','Spasibo — game content');
   const uiOp=getUiOpacity();if(uiOp<1)wrap.style.opacity=uiOp;
   wrap.appendChild(_buildHeader(scene));
   const body=document.createElement('div');body.className='game-body';
@@ -2733,9 +2768,14 @@ function _appendBottomNav(root){
     b.className=_cls;b.textContent=label;b.onclick=fn;if(title)b.title=title;bnav.appendChild(b);
   });
   root.appendChild(bnav);
+  // Canvas toggle button (bottom-left)
+  const _atmBtn=document.createElement('button');_atmBtn.className='atmos-toggle';
+  _atmBtn.textContent=_atmosEnabled?'atmos on':'atmos off';
+  _atmBtn.onclick=toggleAtmos;_atmBtn.title='Toggle atmospheric animation (saves battery)';
+  root.appendChild(_atmBtn);
 }
 function _renderNotesPanel(root) {
-  const overlay = document.createElement('div'); overlay.className = 'panel-overlay';
+  const overlay = document.createElement('div'); overlay.className = 'panel-overlay'; overlay.setAttribute('role','dialog'); overlay.setAttribute('aria-modal','true');
   overlay.onclick = (e) => { if (e.target === overlay) openPanel(null); };
   const panel = document.createElement('div'); panel.className = 'panel';
 
@@ -2818,7 +2858,7 @@ function _renderNotesPanel(root) {
 }
 
 function _renderStatusPanel(root) {
-  const overlay = document.createElement('div'); overlay.className = 'panel-overlay';
+  const overlay = document.createElement('div'); overlay.className = 'panel-overlay'; overlay.setAttribute('role','dialog'); overlay.setAttribute('aria-modal','true');
   overlay.onclick = (e) => { if (e.target === overlay) openPanel(null); };
   const panel = document.createElement('div'); panel.className = 'panel';
 
@@ -2974,7 +3014,7 @@ function _renderStatusPanel(root) {
 }
 
 function _renderBreviaryPanel(root) {
-  const overlay = document.createElement('div'); overlay.className = 'panel-overlay';
+  const overlay = document.createElement('div'); overlay.className = 'panel-overlay'; overlay.setAttribute('role','dialog'); overlay.setAttribute('aria-modal','true');
   overlay.onclick = (e) => { if (e.target === overlay) openPanel(null); };
   const panel = document.createElement('div'); panel.className = 'panel';
 
@@ -3041,7 +3081,7 @@ function _renderBreviaryPanel(root) {
 }
 
 function _renderGlossaryPanel(root) {
-  const overlay = document.createElement('div'); overlay.className = 'panel-overlay';
+  const overlay = document.createElement('div'); overlay.className = 'panel-overlay'; overlay.setAttribute('role','dialog'); overlay.setAttribute('aria-modal','true');
   overlay.onclick = (e) => { if (e.target === overlay) openPanel(null); };
   const panel = document.createElement('div'); panel.className = 'panel';
 
@@ -3086,7 +3126,7 @@ function _renderGlossaryPanel(root) {
 
 
 function _renderCalendarPanel(root) {
-  const overlay = document.createElement('div'); overlay.className = 'panel-overlay';
+  const overlay = document.createElement('div'); overlay.className = 'panel-overlay'; overlay.setAttribute('role','dialog'); overlay.setAttribute('aria-modal','true');
   overlay.onclick = (e) => { if (e.target === overlay) openPanel(null); };
   const panel = document.createElement('div'); panel.className = 'panel';
 
@@ -3134,7 +3174,7 @@ function _renderCalendarPanel(root) {
 }
 
 function _renderMapPanelSide(root) {
-  const overlay = document.createElement('div'); overlay.className = 'panel-overlay';
+  const overlay = document.createElement('div'); overlay.className = 'panel-overlay'; overlay.setAttribute('role','dialog'); overlay.setAttribute('aria-modal','true');
   overlay.onclick = (e) => { if (e.target === overlay) openPanel(null); };
   const panel = document.createElement('div'); panel.className = 'panel';
 
@@ -3242,7 +3282,7 @@ function _renderMapPanelSide(root) {
 }
 
 loadMetaUnlocks();
-initBuiltinSfx();
+initBuiltinSfx(); _initKeyboard();
 
 function renderCrossingRecord(root) {
   // Called before __new_play__ — shows a dénouement screen

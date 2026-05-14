@@ -1474,3 +1474,85 @@ body.mood-neutral .sp {
 .visible-roll.roll-success { color: var(--cold);   border-color: var(--cold-dim);  background: rgba(120,184,214,0.06); }
 .visible-roll.roll-partial { color: var(--amber);  border-color: var(--amber-dim); background: rgba(214,168,84,0.06); }
 .visible-roll.roll-fail    { color: var(--rust);   border-color: var(--rust);      background: rgba(184,64,64,0.06); }
+
+/* ── Autosave indicator ──────────────────────────────────────── */
+@keyframes save-pulse {
+  0%   { opacity: 1; }
+  100% { opacity: 0; }
+}
+.save-indicator {
+  position: fixed; bottom: 3.2rem; right: .8rem;
+  font-family: var(--font-display);
+  font-size: .5rem; letter-spacing: .16em;
+  color: var(--cold-dim); text-transform: uppercase;
+  opacity: 0; pointer-events: none; z-index: 150;
+  animation: save-pulse 2s ease forwards;
+}
+
+/* ── Stat change flash ───────────────────────────────────────── */
+@keyframes stat-pop {
+  0%   { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-12px); }
+}
+.stat-pop {
+  position: fixed; z-index: 300;
+  font-family: var(--font-display);
+  font-size: .62rem; letter-spacing: .1em;
+  pointer-events: none;
+  animation: stat-pop 1.4s ease forwards;
+}
+.stat-pop.positive { color: var(--cold); }
+.stat-pop.negative { color: var(--rust); }
+.stat-pop.theosis  { color: var(--gold-dim); }
+
+/* ── Canvas toggle button ────────────────────────────────────── */
+.atmos-toggle {
+  position: fixed; bottom: 3.2rem; left: .8rem; z-index: 150;
+  background: none; border: 1px solid var(--border);
+  color: var(--dim); font-family: var(--font-display);
+  font-size: .48rem; letter-spacing: .14em; text-transform: uppercase;
+  padding: .3rem .6rem; cursor: pointer; opacity: 0.5;
+  transition: opacity .2s, border-color .2s;
+}
+.atmos-toggle:hover, .atmos-toggle:focus {
+  opacity: 1; border-color: var(--cold-dim); color: var(--cold-dim);
+  outline: 2px solid var(--cold-dim); outline-offset: 2px;
+}
+
+/* ── Focus ring for keyboard navigation ─────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--cold);
+  outline-offset: 2px;
+}
+.choice:focus-visible {
+  border-left-color: var(--cold);
+  outline: none;
+  background: var(--cold-faint);
+}
+.btn:focus-visible { outline: 2px solid var(--cold); outline-offset: 3px; }
+#bottom-nav button:focus-visible {
+  outline: 2px solid var(--cold); outline-offset: -2px;
+}
+.panel-close:focus-visible { outline: 2px solid var(--cold); outline-offset: 2px; }
+
+/* ── Keyboard number hints on choices ───────────────────────── */
+.choice[data-key]::after {
+  content: attr(data-key);
+  float: right;
+  font-family: var(--font-display);
+  font-size: .5rem; letter-spacing: .1em;
+  color: var(--border-mid); opacity: 0.6;
+  margin-top: .1rem;
+}
+.choice[data-key]:hover::after { color: var(--cold-dim); opacity: 0.9; }
+
+/* ── Cover challenge: auto-resolve option ───────────────────── */
+.challenge-autoresolve {
+  font-family: var(--font-display);
+  font-size: .56rem; letter-spacing: .12em;
+  color: var(--dim); text-decoration: underline;
+  cursor: pointer; border: none; background: none;
+  margin-top: .6rem; display: block; text-align: center;
+  opacity: 0.6; width: 100%;
+}
+.challenge-autoresolve:hover { color: var(--cold-dim); opacity: 1; }

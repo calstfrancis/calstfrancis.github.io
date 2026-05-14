@@ -1099,7 +1099,9 @@ There is a letter on the desk.`,
 
 *The First Mate's name is Miguel. He expects you.*
 
-The case is under the bunk. You can feel it with your foot.`,
+The case is under the bunk. You can feel it with your foot.
+
+There is a second page. The handwriting is slightly different — more deliberate, as if written under different circumstances.`,
     onEnter: () => { S.setFlag('letter_read'); },
     choices: [
       { text: 'Go find Miguel.',                  next: 'first_mate_first' },
@@ -6174,6 +6176,10 @@ She opens her notebook. She closes it again.
 
 — What I want to know is whether you are going to do it.`,
     onEnter: () => {
+      if (!S.hasFlag('cover_challenged_before')) {
+        S.showToast('Cover challenge: roll Composure to hold the story.', 'note');
+        S.setFlag('cover_challenged_before');
+      }
       S.setFlag('kylie_act_two_confronted');
       S.applyEffect({ vigilance: 2, doubt: 1 });
     },
