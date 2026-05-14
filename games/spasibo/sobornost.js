@@ -110,7 +110,7 @@ function resetG(preserve = {}) {
   G._sceneCount = 0; G._coverChallenge = null;
   G.deadlines = []; G.choiceHistory = {};
   G.codexUnlocked = new Set(); G.ambientTriggered = new Set();
-  G.magneticDeviation = 0.0;
+  G.magneticDeviation = 0.0; // will be adjusted post-reset by anomaly-grows system
   Object.assign(G, preserve);
 }
 
@@ -1620,12 +1620,42 @@ function applyChoice(ch) {
 function newPlay() {
   addCrossingEntry();
   const currentFlags = [...G.flags];
-  // Crossing Tax: the body forgets 15 points. The soul does not forget all of it.
   const carriedTheosis = Math.max(5, Math.min(85, G.theosis - 15));
-  const preserve = { theosis: carriedTheosis, metaUnlocks: G.metaUnlocks, playCount: G.playCount+1, pastFlags: currentFlags, journal: G.journal };
+
+  // ── META PERSISTENCE ─────────────────────────────────────────
+  // Store the waking charism carried from this crossing
+  const wakingCharisms = (_registries.charisms.waking || []).map(c => c.id);
+  const lastWakingCharism = G.charisms.find(c => wakingCharisms.includes(c));
+  if (lastWakingCharism) G.metaUnlocks['lastCharism_' + G.playCount] = lastWakingCharism;
+
+  // Increment transmission count for anomaly-grows arc
+  if (currentFlags.includes('archive_transmitted')) {
+    G.metaUnlocks.transmissionCount = (G.metaUnlocks.transmissionCount || 0) + 1;
+  }
+
+  // Store which Lena fragment was seen
+  for (let i = 1; i <= 5; i++) {
+    if (currentFlags.includes('lena_fragment_' + i + '_seen')) {
+      G.metaUnlocks['lena_fragment_' + i] = true;
+    }
+  }
+
+  // Pick crew variant for next crossing (cycles through available variants)
+  const nextVariant = ((G.metaUnlocks.crewVariant || 0) + 1) % 3;
+  G.metaUnlocks.crewVariant = nextVariant;
+
+  const preserve = {
+    theosis: carriedTheosis,
+    metaUnlocks: G.metaUnlocks,
+    playCount: G.playCount + 1,
+    pastFlags: currentFlags,
+    journal: G.journal
+  };
   resetG(preserve);
   G.pastLifeFlags = new Set(currentFlags);
-  G.scene = getInitialScene(); G.phase = 'charism';
+  // On second+ crossing, wake scene is the crossing tax lived experience
+  G.scene = G.playCount > 1 ? 'crossing_tax_lived' : getInitialScene();
+  G.phase = 'charism';
   refreshAtmosMods(); _captureSnapshot(); emit('newPlay'); scheduleRender();
 }
 
@@ -2762,7 +2792,7 @@ function _appendBottomNav(root){
     const b=document.createElement('button');
     b.style.cssText="flex:1;background:none;border:none;border-right:1px solid var(--border);font-family:'GOST type B','Share Tech Mono','Courier Prime',monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;padding:.72rem .2rem .58rem;cursor:pointer;color:var(--dim);border-top:2px solid transparent;position:relative;";
     const _pid=_navPanelIds[_ni]||'';
-    if(_pid)b.setAttribute('data-panel',_pid);
+    if(_pid)b.setAttribute('aria-controls','panel-'+_pid);
     let _cls=cls||'';
     if(G.panelOpen===_pid&&_pid) _cls+=(_cls?' ':'')+' panel-active';
     b.className=_cls;b.textContent=label;b.onclick=fn;if(title)b.title=title;bnav.appendChild(b);

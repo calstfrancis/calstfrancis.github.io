@@ -1104,9 +1104,34 @@ The case is under the bunk. You can feel it with your foot.
 There is a second page. The handwriting is slightly different — more deliberate, as if written under different circumstances.`,
     onEnter: () => { S.setFlag('letter_read'); },
     choices: [
+      { text: 'Read the second page.',            next: 'cabin_letter_p2', condition: { type: 'not', condition: { type: 'flag', id: 'letter_p2_read' } } },
       { text: 'Go find Miguel.',                  next: 'first_mate_first' },
       { text: 'Go up to the foredeck first.',     next: 'foredeck_first'   },
       { text: 'Sit with this for a moment.',      next: 'cabin_sit', theosis: 1 },
+    ],
+  },
+
+  cabin_letter_p2: {
+    id: 'cabin_letter_p2', location: 'Cabin — Desk', mood: 'neutral',
+    text: `*A note on what you carry:*
+
+*Four things define what you can do on this crossing. Watch them in STATUS.*
+
+*VIGILANCE — what you notice. High vigilance lets you read situations before they develop.*
+
+*COMPOSURE — what you can hold under pressure. When someone questions your cover, you will roll against Composure. The result — success, partial, or failure — is visible in how you respond.*
+
+*COMMUNION — how much the crew trusts you collectively. It opens paths closed to strangers.*
+
+*DOUBT — what accumulates when the cover strains. Keep it low. At high doubt, things begin to dissolve.*
+
+*There is a fifth thing the instruments cannot measure. The crossing changes people. Yours is called theosis. Watch the porthole.*
+
+*Good luck. Or the appropriate word for this kind of thing.*`,
+    onEnter: () => { S.setFlag('letter_p2_read'); },
+    choices: [
+      { text: 'Go find Miguel.',              next: 'first_mate_first' },
+      { text: 'Go up to the foredeck first.', next: 'foredeck_first'   },
     ],
   },
 
@@ -1128,14 +1153,41 @@ This question is not in any briefing document.`,
 
   first_mate_first: {
     id: 'first_mate_first', location: 'Bridge', mood: 'neutral', art: 'portrait_miguel',
-    text: `Miguel is at the wheel, or near it. One hand resting on it. Looking at the horizon the way someone looks at something they have agreed to trust.
+    get text() {
+      const variant = S.getMetaValue && S.getMetaValue('crewVariant', 0);
+      if (variant === 1 && S.G.playCount > 1) {
+        return `Miguel is at the wheel. He turns before you come through the door.
+
+— Chaplain. He says. He already knows your name. This was not announced.
+
+He has the manner of someone who has been briefed. Not unfriendly. Something more careful.
+
+— Unusual posting for a crossing like this. He says. Not a question either.`;
+      }
+      if (variant === 2 && S.G.playCount > 1) {
+        return `Miguel is at the wheel. He does not turn immediately.
+
+When he does, something about his face has changed from what you remember — or what you think you remember. He is older by more than a year. Or something has cost him.
+
+— Chaplain. He says. — Good. We usually don't get one.
+
+He says it like he means it for a reason he won't explain yet.`;
+      }
+      return `Miguel is at the wheel, or near it. One hand resting on it. Looking at the horizon the way someone looks at something they have agreed to trust.
 
 He turns when he hears you.
 
 — So. The chaplain.
 
-Not a question. He is perhaps fifty. He and the ship have arrived at a mutual accommodation that took years.`,
-    onEnter: () => { S.setFlag('met_miguel'); },
+Not a question. He is perhaps fifty. He and the ship have arrived at a mutual accommodation that took years.`;
+    },
+    onEnter: () => {
+      S.setFlag('met_miguel');
+      // Set variant-specific flags for downstream scenes
+      const variant = S.getMetaValue && S.getMetaValue('crewVariant', 0);
+      if (variant === 1 && S.G.playCount > 1) S.setFlag('miguel_variant_briefed');
+      if (variant === 2 && S.G.playCount > 1) S.setFlag('miguel_variant_grieving');
+    },
     choices: [
       { text: '"That\'s right. I\'m sorry I haven\'t come up sooner."',  next: 'miguel_q_posting', composure: 1 },
       { text: '"Yes. You\'re Miguel."',                                    next: 'miguel_q_posting', vigilance: 1 },
@@ -1713,6 +1765,11 @@ She doesn't say what the something is.`,
     choices: [
       { text: 'Ask about the archive.',         next: 'lena_hold',         condition: { type: 'not', condition: { type: 'flag', id: 'lena_archive_revealed' } } },
       { text: 'She is looking at something.',   next: 'photo_crossreference', condition: { type: 'and', conditions: [{ type: 'flag', id: 'volkov_photo_found' }, { type: 'flag', id: 'hold_micha_photo' }, { type: 'not', condition: { type: 'flag', id: 'photos_crossreferenced' } }] } },
+      { text: 'She says something.',               next: 'lena_arc_1', condition: { type: 'and', conditions: [{ type: 'not', condition: { type: 'flag', id: 'lena_fragment_1_seen' } }] } },
+      { text: 'She says something.',               next: 'lena_arc_2', condition: { type: 'and', conditions: [{ type: 'flag', id: 'lena_fragment_1_seen' }, { type: 'not', condition: { type: 'flag', id: 'lena_fragment_2_seen' } }] } },
+      { text: 'She says something.',               next: 'lena_arc_3', condition: { type: 'and', conditions: [{ type: 'flag', id: 'lena_fragment_2_seen' }, { type: 'flag', id: 'sunday_service_led' }, { type: 'not', condition: { type: 'flag', id: 'lena_fragment_3_seen' } }] } },
+      { text: 'She wants to tell you about Volkov.', next: 'lena_arc_4', condition: { type: 'and', conditions: [{ type: 'flag', id: 'lena_fragment_3_seen' }, { type: 'not', condition: { type: 'flag', id: 'lena_fragment_4_seen' } }] } },
+      { text: 'She has something to say.',          next: 'lena_arc_5', condition: { type: 'and', conditions: [{ type: 'flag', id: 'lena_fragment_4_seen' }, { type: 'flag', id: 'act_three_begun' }, { type: 'not', condition: { type: 'flag', id: 'lena_fragment_5_seen' } }] } },
       { text: 'Sit in silence.',                next: 'lena_silence' },
       { text: 'Go to the main deck.',           next: 'main_deck_hub' },
     ],
@@ -5175,6 +5232,463 @@ Othis looks at you. He is not closed. He is calculating. He was a researcher onc
     ],
   },
 
+
+  // ── FEATURE 2: 1978 POSITION FORK ───────────────────────────────
+
+  position_1978_attempt: {
+    id: 'position_1978_attempt', location: 'Bridge', mood: 'tense',
+    art: 'portrait_miguel',
+    text: `Miguel looks at the chart. He looks at the position Nadia has marked.
+
+Four nautical miles. In these conditions, with the anomaly at this intensity, possible — but it would cost two hours. The transmission window is already tight.
+
+He looks at you.
+
+— Why. He says. Not a challenge. An actual question.
+
+You tell him about the 1978 binder. The gap in the catalogue. The evidence of a decision made about what should not be found.
+
+He is quiet for a moment.
+
+— Alexei. He calls. — Come look at this.
+
+Alexei comes. He looks at the chart. He looks at the 1978 measurements Nadia has. He is very still.
+
+— That position. He says. — At that position the deviation would be — He calculates. — Significantly higher. He looks at Miguel. — This is where the original anomaly was found. Before they moved the official catalogue entry.
+
+Miguel looks at the wheel. He looks at the chart. He makes a decision.
+
+— Two hours. He says. — We can do it in two hours if the wind holds.`,
+    onEnter: () => {
+      S.setFlag('position_1978_attempted');
+      S.modReputation('miguel', 3);
+      S.modReputation('alexei', 3);
+      S.modStance('miguel', 'trust', 2);
+      S.incrementTheosis(6);
+      S.advanceTime(2);
+      S.showToast('Miguel turns the wheel. Four nautical miles.', 'note');
+    },
+    condition: { type: 'and', conditions: [
+      { type: 'flag', id: 'nadia_1978_found' },
+      { type: 'flag', id: 'act_three_begun' },
+      { type: 'not', condition: { type: 'flag', id: 'position_1978_attempted' } },
+    ]},
+    choices: [
+      { text: 'Four nautical miles north.',  next: 'position_1978_arrival' },
+    ],
+  },
+
+  position_1978_arrival: {
+    id: 'position_1978_arrival', location: 'The 1978 Position', mood: 'revelation',
+    text: `The instruments go past their calibrated range at 0.3 nautical miles.
+
+Alexei does not panic. He has been waiting for something like this his whole career. He watches the needles go and goes very still the way scientists go still when what they predicted turns out to be true.
+
+The deviation here is not twelve degrees. It is forty-one.
+
+Nadia is sitting on the deck with her hands flat on the wood, as if the ship itself has something to report.
+
+— This is where the 1978 scientists were. Alexei says. — This is what they found. This is what someone decided the world should not know about.
+
+The instruments are reading something they were not built to read.
+
+The sea at this position is indistinguishable from any other sea. That is the strangest thing.
+
+You transmit from here. The anomaly at forty-one degrees receives the signal immediately. There is no delay. The field here has been waiting.`,
+    onEnter: () => {
+      S.incrementTheosis(12);
+      S.setFlag('position_1978_reached');
+      S.setFlag('archive_transmitted');
+      S.setMagneticDeviation(0.99);
+      S.modShipState('saturation', 5);
+      S.comeToBelieve('anomaly_responds');
+      S.comeToBelieve('archive_suppressed');
+      S.playSfx && S.playSfx('transmission');
+      S.playSfx && S.playSfx('anomaly_drone');
+      S.flashTheosisLight(1.0, 8000);
+      S.unlockMeta('reached_1978_position');
+      S.showToast('Forty-one degrees.', 'theosis');
+    },
+    choices: [
+      { text: 'Return to the crossing.', next: 'act_two_resolve' },
+    ],
+  },
+
+  
+  // ── FEATURE 5: ANOMALY GROWS ─────────────────────────────────────
+
+  anomaly_overcalibrated: {
+    id: 'anomaly_overcalibrated', location: 'Instrument Room', mood: 'revelation',
+    text: `The instruments are reading past their calibration marks.
+
+Alexei stands in front of them with the expression of a person for whom this was theoretically possible and is now actually happening.
+
+— The deviation is exceeding the maximum range of the instruments. He says. — This has not happened before.
+
+He looks at the readings.
+
+— It is increasing faster than in previous crossings. He says. He does not ask how you know about previous crossings. He says it as if you both understand that the situation has been developing over time.
+
+— The field is accumulating something. He says. — Each transmission adds to what the field holds. It is not simply receiving. It is — He pauses. — Storing. Growing.
+
+He writes something. He underlines it.
+
+— The instruments were built for a field of this size. He says. — They were not built for a field of this and growing.`,
+    onEnter: () => {
+      S.incrementTheosis(10);
+      S.modReputation('alexei', 4);
+      S.comeToBelieve('anomaly_responds');
+      S.setFlag('anomaly_overcalibrated_seen');
+      S.setMagneticDeviation(Math.min(1.0, S.getMagneticDeviation() + 0.15));
+      S.showToast('The instruments are past their range.', 'theosis');
+    },
+    condition: { type: 'and', conditions: [
+      { type: 'not', condition: { type: 'flag', id: 'anomaly_overcalibrated_seen' } },
+    ]},
+    choices: [
+      { text: 'Ask what it is accumulating.', next: 'anomaly_what_accumulates' },
+      { text: 'Go to the main deck.',         next: 'main_deck_hub' },
+    ],
+  },
+
+  anomaly_what_accumulates: {
+    id: 'anomaly_what_accumulates', location: 'Instrument Room', mood: 'revelation',
+    text: `— Attention. He says. — And the names of the people who paid it. And the record of what the ship found. And the decisions that were made about what to do with it.
+
+He sets down the pencil.
+
+— The field is not geological anymore. He says. — Or it was never only geological. It is — accumulating witness.
+
+He looks at the readout.
+
+— I do not know what it does with witness. He says. — I do not know what kind of a thing accumulates witness. These are not scientific questions I know how to ask.
+
+He picks up the pencil again.
+
+— But the data is the data. He says. — The field is bigger than it was. And it is growing.`,
+    onEnter: () => {
+      S.incrementTheosis(8);
+      S.comeToBelieve('sobornost_real');
+      S.applyEffect({ composure: 2 });
+    },
+    choices: [
+      { text: 'Go to the main deck.', next: 'main_deck_hub' },
+    ],
+  },
+
+  
+  // ── FEATURE 6: LENA'S ARC ────────────────────────────────────────
+  // Five fragments, one per crossing. Gated on playCount and hasMeta.
+  // Together they answer: who is Lena and what is the ship to her?
+
+  lena_arc_1: {
+    id: 'lena_arc_1', location: 'Galley — After Supper', mood: 'neutral',
+    art: 'portrait_lena',
+    text: `She is cleaning after supper. You are the last one still here.
+
+She says, without looking up:
+
+— First crossing, you said.
+
+— Yes.
+
+She wipes something that is already clean.
+
+— I remember my first crossing. She says. — I was twenty-three. I was terrified of the galley. I had never worked in a commercial kitchen. The previous cook left at two days' notice and I needed the money.
+
+She puts the cloth down.
+
+— I stayed for twenty-two years. She says. — The money was eventually beside the point.
+
+She goes back to the stove.
+
+— The ship decides, she says. Not you. You think you decide. But you come back.`,
+    onEnter: () => { S.setFlag('lena_fragment_1_seen'); S.incrementTheosis(5); S.modStance('lena', 'trust', 2); },
+    condition: { type: 'and', conditions: [
+      { type: 'not', condition: { type: 'flag', id: 'lena_fragment_1_seen' } },
+    ]},
+    choices: [{ text: 'Go to the main deck.', next: 'main_deck_hub' }],
+  },
+
+  lena_arc_2: {
+    id: 'lena_arc_2', location: 'Galley — Early Morning', mood: 'neutral',
+    art: 'portrait_lena',
+    text: `She is up before anyone else, which she always is.
+
+She sees you come in and does not look surprised.
+
+— There was a chaplain before. She says. — On the crossing where Micha died.
+
+She pours coffee without being asked.
+
+— Not died. She corrects herself. — Went over. In the night. They never found — She stops. — The chaplain sat with us afterwards. Two hours. He didn't say much. He didn't try to explain.
+
+She hands you the coffee.
+
+— That is what a chaplain is. She says. — Not explanations. Sitting.
+
+She goes back to the stove. She does not say Micha's name again.`,
+    onEnter: () => { S.setFlag('lena_fragment_2_seen'); S.incrementTheosis(6); S.modStance('lena', 'trust', 2); S.comeToBelieve('chaplain_real'); },
+    condition: { type: 'and', conditions: [
+      { type: 'flag', id: 'lena_fragment_1_seen' },
+      { type: 'not', condition: { type: 'flag', id: 'lena_fragment_2_seen' } },
+    ]},
+    choices: [{ text: 'Go to the main deck.', next: 'main_deck_hub' }],
+  },
+
+  lena_arc_3: {
+    id: 'lena_arc_3', location: 'Galley — After the Service', mood: 'uncanny',
+    art: 'portrait_lena',
+    text: `She watched the service from the back of the mess.
+
+You did not know she was there until it was over.
+
+— My grandmother was religious. She says. — Not in a way anyone would recognise now. Something older. She talked to the sea.
+
+She makes a sound that might be a laugh.
+
+— I thought she was embarrassing. She says. — I was young. I thought talking to things was embarrassing.
+
+She looks at the porthole.
+
+— The ship talks back. She says. — Not in words. But it does. I have been listening for twenty-two years and I know when it is speaking.
+
+She picks up the cloth again.
+
+— Your service was correct. She says. Meaning: the ship agreed.`,
+    onEnter: () => { S.setFlag('lena_fragment_3_seen'); S.incrementTheosis(7); S.modStance('lena', 'solidarity', 3); },
+    condition: { type: 'and', conditions: [
+      { type: 'flag', id: 'lena_fragment_2_seen' },
+      { type: 'flag', id: 'sunday_service_led' },
+      { type: 'not', condition: { type: 'flag', id: 'lena_fragment_3_seen' } },
+    ]},
+    choices: [{ text: 'Go to the main deck.', next: 'main_deck_hub' }],
+  },
+
+  lena_arc_4: {
+    id: 'lena_arc_4', location: 'Galley — Night', mood: 'uncanny',
+    art: 'portrait_lena',
+    text: `She is sitting, which she almost never does.
+
+When you come in she looks up. She looks like someone who has been waiting, not for you specifically, but for whoever came.
+
+— Volkov, she says. — I want to tell you about Volkov.
+
+She tells you: he was the cook before her. She took his job when he retired. He left her three things: a notebook of recipes, a key that doesn't fit any door she has ever found, and one piece of advice.
+
+— He said: the ship remembers everyone who sailed on her. He said: you do not need to.
+
+She looks at her hands.
+
+— I have been trying to let her remember for me. She says. — For twenty-two years. Some crossings I can. Some crossings I still try to do it myself.
+
+She stands.
+
+— Volkov sailed in 1972. She says. — He came back. He always came back. The ship decided.`,
+    onEnter: () => { S.setFlag('lena_fragment_4_seen'); S.incrementTheosis(8); S.comeToBelieve('ship_remembers'); S.modStance('lena', 'trust', 3); },
+    condition: { type: 'and', conditions: [
+      { type: 'flag', id: 'lena_fragment_3_seen' },
+      { type: 'not', condition: { type: 'flag', id: 'lena_fragment_4_seen' } },
+    ]},
+    choices: [{ text: 'Go to the main deck.', next: 'main_deck_hub' }],
+  },
+
+  lena_arc_5: {
+    id: 'lena_arc_5', location: 'Galley — Dawn', mood: 'revelation',
+    art: 'portrait_lena',
+    text: `The last morning. She is making something elaborate, which she only does on final days.
+
+She says, without preamble:
+
+— I am going to tell you why I stay.
+
+She does not look up from what she is making.
+
+— Not the money. Not the habit. Not because the sea is beautiful, which it sometimes is, and sometimes isn't.
+
+She is quiet for a moment.
+
+— I stay because the ship is doing something real. She says. — Not the research. Well — the research too. But the crossing itself. What happens to people during a crossing. What they find out about themselves. I have watched it for twenty-two years.
+
+She sets something down.
+
+— Chaplain. She says. — I have watched maybe forty chaplains come through. Most of them were here for the money or the posting or the quiet. You are the first one in a long time who was here for the crossing.
+
+She looks at you.
+
+— That is all I wanted to say. She says. And goes back to cooking.`,
+    onEnter: () => {
+      S.setFlag('lena_fragment_5_seen');
+      S.incrementTheosis(10);
+      S.modStance('lena', 'solidarity', 4);
+      S.modStance('lena', 'trust', 4);
+      S.unlockMeta('lena_arc_complete');
+      S.showToast('The crossing.', 'theosis');
+    },
+    condition: { type: 'and', conditions: [
+      { type: 'flag', id: 'lena_fragment_4_seen' },
+      { type: 'flag', id: 'act_three_begun' },
+      { type: 'not', condition: { type: 'flag', id: 'lena_fragment_5_seen' } },
+    ]},
+    choices: [{ text: 'Go to the main deck.', next: 'main_deck_hub' }],
+  },
+
+  
+  // ── FEATURE 7: CHARISM COMPOUNDS ─────────────────────────────────
+
+  charism_witness_memory: {
+    id: 'charism_witness_memory', location: 'Cabin', mood: 'uncanny',
+    text: `On the second morning you find something in the cabin you don't remember placing there.
+
+A piece of paper. Not your handwriting — or not quite your handwriting. Slightly different in pressure.
+
+It says: *I was here. I saw the archive. I sat with Alexei when the instruments frightened him. I refused the mission. The ship is still moving.*
+
+You don't know if you wrote this on a previous crossing and forgot, or if someone else did. The paper is real. The handwriting is close.
+
+You fold it and put it in your pocket.
+
+The ship is still moving.`,
+    onEnter: () => {
+      S.incrementTheosis(7);
+      S.setFlag('charism_witness_memory_seen');
+      S.applyEffect({ composure: 2 });
+      S.showToast('The ship is still moving.', 'theosis');
+    },
+    choices: [{ text: 'Go to the main deck.', next: 'main_deck_hub' }],
+  },
+
+  charism_prophet_pavel: {
+    id: 'charism_prophet_pavel', location: 'Foredeck', mood: 'revelation',
+    art: 'portrait_pavel',
+    text: `Pavel looks at you differently this crossing. From the first moment on the foredeck.
+
+He waits until you are alone.
+
+— You said something last time. He says. — Or someone with your face said something last time.
+
+He does not elaborate on what that means.
+
+— They said: the anomaly receives. They said: the transmission matters. He looks at the water. — I want to know if they were right.
+
+He turns.
+
+— The prophet doesn't know. He says. — That is the thing about prophecy people misunderstand. The prophet says what they see. They don't know if it's true until later.
+
+He looks at you.
+
+— Were they right? He asks. — Was the transmission real?`,
+    onEnter: () => {
+      S.incrementTheosis(6);
+      S.setFlag('charism_prophet_pavel_seen');
+      S.modReputation('pavel', 3);
+      S.modCompanionStat && S.modCompanionStat('pavel', 'trust', 2);
+    },
+    choices: [
+      { text: '"Yes. The anomaly answered."',  next: 'pavel_ferromagnetic', theosis: 3, come_to_believe: 'anomaly_responds' },
+      { text: '"I don\'t know yet."',           next: 'foredeck_standing', theosis: 1 },
+    ],
+  },
+
+  charism_rememberer_open: {
+    id: 'charism_rememberer_open', location: 'Instrument Room', mood: 'revelation',
+    text: `The instruments are already reading deviation when you arrive on the first morning.
+
+Alexei is here. He has been here since before dawn.
+
+— It is already at 0.4. He says. — On the first day. He looks at the instruments. — This has not happened before.
+
+He looks at you.
+
+— You have crossed before. He says. It is not a question. He knows. — What was it like at the peak?
+
+You tell him. He listens the way he listens when the instruments are telling him something unexpected — completely, without filtering for what fits.
+
+— Then we are past the beginning. He says. — This crossing starts from where the last one ended.
+
+He turns back to the instruments.
+
+— I think the field remembers us. He says.`,
+    onEnter: () => {
+      S.incrementTheosis(8);
+      S.setFlag('charism_rememberer_open_seen');
+      S.setMagneticDeviation(0.4);
+      S.comeToBelieve('anomaly_responds');
+      S.modReputation('alexei', 3);
+    },
+    choices: [{ text: 'Go to the main deck.', next: 'main_deck_hub' }],
+  },
+
+  
+  // ── FEATURE 9: STINK PATROL RECURRING ────────────────────────────
+  // One gift per crossing from a rotating pool.
+  // The gift index cycles via metaUnlocks.stinkGiftIndex.
+
+  stink_patrol_gift: {
+    id: 'stink_patrol_gift', location: 'Below — The Hatch', mood: 'uncanny',
+    get text() {
+      const idx = S.getMetaValue && S.getMetaValue('stinkGiftIndex', 0) % 4;
+      const texts = [
+        `You go to the hatch. You knock.
+
+The hatch opens. Warm hands. This time they are holding something small: a phrase, written on paper, in a language you do not recognise but whose alphabet looks older than the ship.
+
+Below the phrase, a translation in Russian, in very small letters: *the sea remembers what the shore forgets.*
+
+You fold the paper. You put it in your pocket.
+
+The hatch closes.`,
+        `You go to the hatch. You knock.
+
+The hatch opens. Warm hands offer something: a small object. Smooth, dark, shaped like nothing in particular. It is heavier than its size suggests.
+
+You hold it. It is warm.
+
+There is no note. There is no explanation. The object is from below the level of the schematic. It has been there for some time.
+
+The hatch closes.`,
+        `You go to the hatch. You knock.
+
+The hatch opens. This time: a fragment of the 1952 construction documentation. A page, in Finnish. One section is highlighted in pencil — old pencil, the lead oxidised to near-invisible.
+
+You cannot read Finnish. But the diagram on the page shows a space in the ship that is not on any manifest you have seen. It is different from the space shown in the paper from last crossing.
+
+The ship is larger than it appears.
+
+The hatch closes.`,
+        `You go to the hatch. You knock.
+
+The hatch opens. Nothing comes through. Warm hands are visible, palm up, waiting.
+
+You understand. This crossing they need something from you.
+
+You give them your hand, briefly. They hold it for three seconds. Then they release it.
+
+The hatch closes.
+
+You gave them nothing material. Whatever they needed, you had it.`
+      ];
+      return texts[idx];
+    },
+    onEnter: () => {
+      S.setFlag('stink_patrol_gift_received');
+      S.incrementTheosis(5);
+      S.applyEffect({ communion: 2 });
+      // Advance gift index for next crossing
+      const cur = S.getMetaValue && S.getMetaValue('stinkGiftIndex', 0);
+      if (S.G.metaUnlocks) S.G.metaUnlocks.stinkGiftIndex = (cur + 1) % 4;
+      S.modShipState('saturation', 2);
+    },
+    condition: { type: 'and', conditions: [
+      { type: 'flag', id: 'stink_patrol_hands_known' },
+      { type: 'not', condition: { type: 'flag', id: 'stink_patrol_gift_received' } },
+      { type: 'not', condition: { type: 'flag', id: 'stink_patrol_favour_received' } },
+    ]},
+    choices: [
+      { text: 'Go back up.', next: 'main_deck_hub' },
+    ],
+  },
+
   crossing_record: {
     id: 'crossing_record', location: '', mood: 'neutral',
     text: '',
@@ -5394,10 +5908,12 @@ And she knew.`,
     choices: [
       { text: 'Pavel is at the bow.',                         next: 'pavel_before_convergence',  condition: { type: 'not', condition: { type: 'flag', id: 'pavel_convergence_told' } } },
       { text: 'Lena is in the galley.',                       next: 'lena_direct',               condition: { type: 'and', conditions: [{ type: 'flag', id: 'lena_archive_revealed' }, { type: 'not', condition: { type: 'flag', id: 'lena_direct_asked' } }] } },
+      { text: 'Nadia found something. Show Miguel.',            next: 'position_1978_attempt',  condition: { type: 'and', conditions: [{ type: 'flag', id: 'nadia_1978_found' }, { type: 'not', condition: { type: 'flag', id: 'position_1978_attempted' } }] } },
       { text: 'Alexei has the radio.',                        next: 'radio_what_to_transmit',    condition: { type: 'and', conditions: [{ type: 'flag', id: 'radio_found' }, { type: 'not', condition: { type: 'flag', id: 'transmitted_all' } }, { type: 'not', condition: { type: 'flag', id: 'transmitted_names_first' } }] } },
       { text: 'Find the radio.',                              next: 'radio_lore',                condition: { type: 'and', conditions: [{ type: 'flag', id: 'mission_refused' }, { type: 'not', condition: { type: 'flag', id: 'radio_found' } }] } },
       { text: 'Go to the hold. Sit with the archive.',        next: 'anomaly_peak_hold',         condition: { type: 'not', condition: { type: 'flag', id: 'hold_anomaly_sat' } } },
       { text: 'The anomaly.',                                  next: 'anomaly_peak',              condition: { type: 'not', condition: { type: 'flag', id: 'anomaly_peak_occurred' } } },
+      { text: 'Alexei — the instruments are past their range.',  next: 'anomaly_overcalibrated', condition: { type: 'not', condition: { type: 'flag', id: 'anomaly_overcalibrated_seen' } } },
       { text: 'The instrument room.',                          next: 'anomaly_responds',          condition: { type: 'and', conditions: [{ type: 'flag', id: 'anomaly_peak_occurred' }, { type: 'not', condition: { type: 'flag', id: 'anomaly_responds_seen' } }] } },
       { text: 'The confrontation.',                            next: 'othis_confrontation',       condition: { type: 'and', conditions: [{ type: 'flag', id: 'mission_refused' }, { type: 'not', condition: { type: 'flag', id: 'othis_confrontation_happened' } }] } },
       { text: 'Connie. Her door is open.',                       next: 'compline_connie',        condition: { type: 'and', conditions: [{ type: 'flag', id: 'connie_saw_chaplain' }, { type: 'not', condition: { type: 'flag', id: 'compline_connie_seen' } }] } },
@@ -7934,6 +8450,29 @@ S.setTutorialContent(`
 // ─────────────────────────────────────────────────────────────────
 
 // Initialise worldState if not already on G
+S.on('newPlay', () => {
+  // Feature 7: charism compound scenes — add to available scenes based on last charism
+  const lastCharism = S.getMetaValue && S.getMetaValue('lastCharism_' + (S.G.playCount - 1), null);
+  if (S.G.playCount > 1 && lastCharism) {
+    if (lastCharism === 'witness' && !S.hasFlag('charism_witness_memory_seen')) {
+      S.scheduleEvent && S.scheduleEvent(1, 'charism_witness_memory', {});
+    }
+    if (lastCharism === 'prophet' && !S.hasFlag('charism_prophet_pavel_seen')) {
+      S.setFlag('charism_prophet_available');
+    }
+    if (lastCharism === 'rememberer' && !S.hasFlag('charism_rememberer_open_seen')) {
+      S.setFlag('charism_rememberer_available');
+    }
+  }
+  // Feature 5: anomaly grows — set higher starting deviation
+  const tc = S.getMetaValue && S.getMetaValue('transmissionCount', 0);
+  if (tc >= 1) S.setMagneticDeviation(0.1 + tc * 0.08);
+  if (tc >= 3) {
+    S.setFlag('anomaly_overcalibrated_imminent');
+    S.showToast('The instruments are reading higher than last crossing.', 'note');
+  }
+});
+
 S.on('gameStarted', () => {
   if (!S.G.worldState) {
     S.G.worldState = { shipStability: 5, sanctity: 0, socialTrust: 5 };
