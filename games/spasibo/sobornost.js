@@ -1566,10 +1566,51 @@ function navigate(id) {
     document.body.classList.toggle('ship-exhausted', (G.shipState.exhaustion||0)>=5);
     document.body.classList.toggle('ship-low-morale',(G.shipState.morale||5)<=3);
   }
+  // Close panel immediately on navigation (no animation — scene change takes priority)
+  if (G.panelOpen) {
+    G.panelOpen = null;
+    const _ov = document.querySelector('.panel-overlay');
+    if (_ov) { _ov.classList.remove('open'); _ov.remove(); }
+  }
   emit('sceneChanged', id);
 }
 
-function openPanel(w) { G.panelOpen = G.panelOpen === w ? null : w; scheduleRender(); }
+function openPanel(w) {
+  const prev = G.panelOpen;
+  G.panelOpen = (w && prev === w) ? null : w;
+  // If closing: animate out first, then remove
+  if (!G.panelOpen && prev) {
+    const ov = document.querySelector('.panel-overlay');
+    if (ov) {
+      ov.classList.remove('open');
+      setTimeout(() => { ov.remove(); }, 250);
+    }
+  } else {
+    // Remove any existing overlay immediately before opening new one
+    document.querySelectorAll('.panel-overlay').forEach(el => el.remove());
+    if (G.panelOpen) {
+      const _root = document.getElementById('root');
+      if (_root) _renderPanel(G.panelOpen, _root);
+    }
+  }
+  scheduleRender(); // update nav active states
+}
+function _renderPanel(po, root) {
+  if(po==='notes')    _renderNotesPanel(root);
+  else if(po==='status')   _renderStatusPanel(root);
+  else if(po==='breviary') _renderBreviaryPanel(root);
+  else if(po==='glossary') _renderNotesPanel(root);
+  else if(po==='map')      _renderMapPanelSide(root);
+  else if(po==='calendar') _renderCalendarPanel(root);
+  else if(po==='journal')  renderJournalPanel(root, openPanel);
+  else if(po==='log')      renderEventLogPanel(root, openPanel);
+  else if(po==='codex')    renderCodexPanel(root, openPanel);
+  // Trigger CSS transition: add 'open' class after one frame
+  requestAnimationFrame(() => {
+    const ov = document.querySelector('.panel-overlay');
+    if (ov) ov.classList.add('open');
+  });
+}
 function returnToTitle() { G.phase = 'title'; scheduleRender(); }
 
 let _processingChoice = false;
@@ -2360,8 +2401,6 @@ setRenderFn(render);
 function render(){
   const root=document.getElementById('root');
   if(!root){console.error('[SOBORNOST] No #root element found');return;}
-  // Remove any panel overlays rendered into body from previous frame
-  document.querySelectorAll('.panel-overlay').forEach(el => el.remove());
   root.innerHTML='';
   if(typeof IS_DEMO!=='undefined'&&IS_DEMO){const b=document.createElement('div');b.className='demo-banner';b.textContent='\u2693 DEMO \u2014 '+(window.GAME_TITLE||'Game');root.appendChild(b);}
   if     (G.phase==='title')    renderTitle(root);
@@ -2420,30 +2459,38 @@ function renderMode(root) {
   clearIdleTimer();
   const d = document.createElement('div'); d.className = 'title-screen';
   const modes = _registries.availableModes || ['attended', 'witnessed'];
-  const modeDesc = {
-    attended:  { label: 'Attended',  desc: 'The full crossing. Choices matter. The ship keeps score.' },
-    witnessed: { label: 'Witnessed', desc: 'You observe. Composure does not advance. The record is kept.' },
-    open:      { label: 'Open',      desc: 'No restrictions. Everything is available.' },
+  const reg = _registries.modeDescriptions || {};
+  const fallback = {
+    attended:  { name:'Attended',  long:'Standard play. Your choices matter. The ship keeps score. Cover can fail. All five endings are reachable. Choose this for your first crossing.' },
+    witnessed: { name:'Witnessed', long:'A quieter mode. Cover challenges resolve automatically. The story draws on your history more than your moment-to-moment choices. Choose this if you want the narrative without the mechanical pressure.' },
+    open:      { name:'Open',      long:'No restrictions. Everything is available.' },
   };
-  d.innerHTML = `
-    <div style="font-size:.62rem;color:var(--dim);letter-spacing:.22em;text-transform:uppercase;margin-bottom:2rem">How do you cross?</div>
-    <div style="display:flex;flex-direction:column;gap:.7rem;width:100%;max-width:360px">
-      ${modes.map(m => `
-        <button class="btn mode-btn" data-mode="${m}" style="text-align:left;padding:.8rem 1rem">
-          <div style="font-size:.8rem;color:var(--fg);letter-spacing:.08em;margin-bottom:.3rem">${(modeDesc[m]||{label:m}).label}</div>
-          <div style="font-size:.72rem;color:var(--dim);font-style:italic">${(modeDesc[m]||{desc:''}).desc}</div>
-        </button>`).join('')}
-    </div>`;
-  root.appendChild(d);
-  d.querySelectorAll('.mode-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      G.mode = btn.dataset.mode;
-      G.phase = 'charism';
-      render();
-    });
-  });
-}
 
+  const heading = document.createElement('div');
+  heading.style.cssText = 'font-size:.62rem;color:var(--dim);letter-spacing:.22em;text-transform:uppercase;margin-bottom:2rem;font-family:var(--font-display)';
+  heading.textContent = 'How do you cross?';
+  d.appendChild(heading);
+
+  const btnWrap = document.createElement('div');
+  btnWrap.style.cssText = 'display:flex;flex-direction:column;gap:.7rem;width:100%;max-width:380px';
+  modes.forEach(m => {
+    const md = reg[m] || fallback[m] || { name: m, long: '' };
+    const btn = document.createElement('button');
+    btn.className = 'btn mode-btn';
+    btn.style.cssText = 'text-align:left;padding:.9rem 1.1rem;display:flex;flex-direction:column;gap:.35rem';
+    const nameEl = document.createElement('div');
+    nameEl.style.cssText = 'font-size:.82rem;color:var(--fg);letter-spacing:.06em';
+    nameEl.textContent = md.name || m;
+    const descEl = document.createElement('div');
+    descEl.style.cssText = 'font-size:.74rem;color:var(--dim);line-height:1.65;font-style:italic';
+    descEl.textContent = md.long || md.short || '';
+    btn.appendChild(nameEl); btn.appendChild(descEl);
+    btn.addEventListener('click', () => { G.mode = m; G.phase = 'charism'; render(); });
+    btnWrap.appendChild(btn);
+  });
+  d.appendChild(btnWrap);
+  root.appendChild(d);
+}
 function renderCharism(root) {
   clearIdleTimer();
   const isReplay = G.playCount > 0;
@@ -2724,15 +2771,10 @@ function renderGame(root){
   }
   // Version watermark
   { const vm=document.createElement('div');vm.className='version-mark';vm.textContent='SPASIBO v1.2 — Zarya';root.appendChild(vm); }
-  if(G.panelOpen==='notes')    _renderNotesPanel(root);
-  if(G.panelOpen==='status')   _renderStatusPanel(root);
-  if(G.panelOpen==='breviary') _renderBreviaryPanel(root);
-  if(G.panelOpen==='glossary') _renderNotesPanel(root); // merged into observations
-  if(G.panelOpen==='map')      _renderMapPanelSide(root);
-  if(G.panelOpen==='calendar') _renderCalendarPanel(root);
-  if(G.panelOpen==='journal')  renderJournalPanel(root,openPanel);
-  if(G.panelOpen==='log')      renderEventLogPanel(root,openPanel);
-  if(G.panelOpen==='codex')    renderCodexPanel(root,openPanel);
+  // Render panel only if not already open (openPanel renders synchronously)
+  if(G.panelOpen && !document.querySelector('.panel-overlay')) {
+    _renderPanel(G.panelOpen, root);
+  }
 }
 
 function _buildHeader(scene){
@@ -2823,7 +2865,19 @@ function _appendBottomNav(root){
     if(G.panelOpen===_pid&&_pid) _cls+=(_cls?' ':'')+' panel-active';
     b.className=_cls;b.textContent=label;b.onclick=fn;if(title)b.title=title;bnav.appendChild(b);
   });
-  root.appendChild(bnav);
+  // Persist nav in body — prevents double-fire from root.innerHTML='' clearing it
+  if (document.getElementById('bottom-nav')) {
+    document.getElementById('bottom-nav').querySelectorAll('button').forEach((b, i) => {
+      if (!navItems[i]) return;
+      const pid = _navPanelIds[i] || '';
+      let cls = navItems[i].cls || '';
+      if (G.panelOpen === pid && pid) cls = (cls + ' panel-active').trim();
+      b.className = cls;
+      b.textContent = navItems[i].label;
+    });
+  } else {
+    document.body.appendChild(bnav);
+  }
   // Canvas toggle button (bottom-left)
   const _atmBtn=document.createElement('button');_atmBtn.className='atmos-toggle';
   _atmBtn.textContent=_atmosEnabled?'atmos on':'atmos off';
