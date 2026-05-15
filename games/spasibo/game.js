@@ -1012,6 +1012,16 @@ S.registerCompanionLine('pavel', { id: 'gal_2', location: 'Galley', trustMin: 3,
 S.registerCompanionLine('pavel', { id: 'gal_3', location: 'Galley', trustMin: 1, trustMax: 2,
   text: 'Pavel is attempting to make tea. Lena has not offered to help and he has not asked. They are managing.' });
 
+// Theosis/Cover tension: high theosis makes cover harder (becoming real)
+S.registerRollModifier('composure',
+  (statKey, options, G) => options.isCoverChallenge && (G.theosis || 0) >= 70,
+  (statKey, options, G) => -2  // harder to maintain fiction at high theosis
+);
+S.registerRollModifier('composure',
+  (statKey, options, G) => options.isCoverChallenge && (G.theosis || 0) >= 50 && (G.theosis || 0) < 70,
+  (statKey, options, G) => -1
+);
+
 // ─────────────────────────────────────────────────────────────────
 // SCENE POOLS — ambient variety for recurring hubs
 // navigateToPool() picks by weight, respecting conditions
@@ -5827,6 +5837,341 @@ You gave them nothing material. Whatever they needed, you had it.`
     ],
   },
 
+
+  // ── NPC REACTIVE SCENES ──────────────────────────────────────────
+
+  alexei_after_transmission: {
+    id: 'alexei_after_transmission', location: 'Instrument Room', mood: 'revelation',
+    art: 'portrait_alexei',
+    text: `He is in the doorway of the instrument room. Not inside it — the doorway.
+
+He is looking at the radio.
+
+When you come up behind him he does not turn.
+
+— It answered. He says. He is not speaking to you specifically. He is noting it, the way he notes readings.
+
+After a moment:
+
+— I have been running this equipment for eleven years. The deviation log, the readings, the calibration checks. I have measured what is there and written down what I found and sent the reports through the proper channels.
+
+He turns.
+
+— The proper channels. He says. His voice has a quality you have not heard in it before.
+
+— The transmission went out into the field. The field received it. Whatever the anomaly is — and I have hypotheses but they are hypotheses — it acknowledged what we found.
+
+He picks up his pencil. He does not write anything yet.
+
+— Someone should know this happened. He says. — I am going to write it down. In my log. In my handwriting. With the timestamp and the deviation reading.
+
+He sits down.
+
+— Whatever they do with the rest. He says. — I am going to write this down.`,
+    onEnter: () => {
+      S.incrementTheosis(6);
+      S.modStance('alexei', 'trust', 3);
+      S.modReputation('alexei', 3);
+      S.setFlag('alexei_after_transmission_seen');
+      S.comeToBelieve('anomaly_responds');
+    },
+    condition: { type: 'and', conditions: [
+      { type: 'flag', id: 'archive_transmitted' },
+      { type: 'not', condition: { type: 'flag', id: 'alexei_after_transmission_seen' } },
+    ]},
+    choices: [
+      { text: 'Leave him to write it down.', next: 'main_deck_hub', theosis: 3 },
+    ],
+  },
+
+  miguel_after_refusal: {
+    id: 'miguel_after_refusal', location: 'Bridge', mood: 'uncanny',
+    art: 'portrait_miguel',
+    text: `He does not bring it up.
+
+You come to the bridge and he is at the wheel and he looks at you with the particular look he has when he has decided something about you.
+
+After a while he says:
+
+— The manifest is what the manifest is. He says. — I've been sailing this ship for fifteen years. I know what's in the hold.
+
+He looks at the horizon.
+
+— There are things a first mate notices and things a first mate does not notice. He says. — I have been a first mate for fifteen years. I am quite good at knowing the difference.
+
+He turns the wheel slightly. The ship adjusts.
+
+— The heading is correct. He says. — The crossing is proceeding normally. As far as the log is concerned.
+
+He does not look at you again. He does not need to.`,
+    onEnter: () => {
+      S.modStance('miguel', 'trust', 3);
+      S.modReputation('miguel', 3);
+      S.setFlag('miguel_after_refusal_seen');
+      S.applyEffect({ communion: 1 });
+    },
+    condition: { type: 'and', conditions: [
+      { type: 'flag', id: 'mission_refused' },
+      { type: 'flag', id: 'met_miguel' },
+      { type: 'not', condition: { type: 'flag', id: 'miguel_after_refusal_seen' } },
+      { type: 'flag', id: 'act_two_begun' },
+    ]},
+    choices: [
+      { text: 'Go to the main deck.', next: 'main_deck_hub' },
+    ],
+  },
+
+  lena_after_sounding: {
+    id: 'lena_after_sounding', location: 'Galley', mood: 'uncanny',
+    art: 'portrait_lena',
+    text: `She does not say anything when you come in.
+
+She is cleaning. She is always cleaning. But the quality of the cleaning has changed — she is not cleaning a surface, she is giving her hands something to do while she thinks.
+
+After a while she says:
+
+— Something settled for you. She says.
+
+Not a question.
+
+— I can see it. The same way I can see when the anomaly is at peak — not the instruments, just a quality of the air. Some people become quieter when they understand something. You have become quieter.
+
+She puts down the cloth.
+
+— Good. She says. — The crossing needs someone who is not performing. It always has.
+
+She makes coffee. She hands it to you without being asked.
+
+— My grandmother talked to the sea. I thought this was embarrassing. I was young. I understand now that she was paying attention to something that answers. The form does not matter as much as the attention.
+
+She goes back to the stove.
+
+— You are paying attention. She says. — It notices.`,
+    onEnter: () => {
+      S.incrementTheosis(5);
+      S.modStance('lena', 'trust', 2);
+      S.setFlag('lena_after_sounding_seen');
+    },
+    condition: { type: 'and', conditions: [
+      { type: 'or', conditions: [
+        { type: 'flag', id: 'sounding_crossing_settled' },
+        { type: 'flag', id: 'sounding_history_settled' },
+        { type: 'flag', id: 'sounding_sobornost_settled' },
+      ]},
+      { type: 'not', condition: { type: 'flag', id: 'lena_after_sounding_seen' } },
+    ]},
+    choices: [
+      { text: 'Stay for the coffee.', next: 'galley_hub', tags: ['presence', 'pastoral'] },
+    ],
+  },
+
+  othis_after_turning: {
+    id: 'othis_after_turning', location: 'Corridor', mood: 'neutral',
+    art: 'portrait_othis',
+    text: `He passes you in the corridor.
+
+He does not stop. He does not slow down. But as he passes he says, without looking at you:
+
+— The manifest weight is consistent with the cargo declared at embarkation.
+
+He continues down the corridor.
+
+He does not say: *I chose not to look carefully.* He does not say: *I know what I know and I know what I do not know.* He does not say: *whatever this crossing is, I am not going to be the one who ends it badly.*
+
+He says: the manifest weight is consistent with the cargo declared at embarkation.
+
+Which is a statement about what he has decided to measure and what he has decided not to measure. Which is, from a man who measures for a living, a specific and considered form of solidarity.`,
+    onEnter: () => {
+      S.modStance('othis', 'trust', 2);
+      S.setFlag('othis_after_turning_seen');
+      S.incrementTheosis(4);
+    },
+    condition: { type: 'and', conditions: [
+      { type: 'flag', id: 'othis_turned' },
+      { type: 'not', condition: { type: 'flag', id: 'othis_after_turning_seen' } },
+      { type: 'flag', id: 'act_two_begun' },
+    ]},
+    choices: [
+      { text: 'Go to the main deck.', next: 'main_deck_hub' },
+    ],
+  },
+
+  
+  // ── SOUNDING OFFER SCENES ────────────────────────────────────────
+  // Short scenes where the sounding becomes available as a lived moment
+
+  sounding_crossing_moment: {
+    id: 'sounding_crossing_moment', location: 'Foredeck', mood: 'uncanny',
+    text: `You are at the bow and something happens to your sense of direction.
+
+Not literally. You know where north is. You know where the ship is going. But for a moment — a distinct, bounded moment — you are not going anywhere. You are here. The water is here. The cold is the same cold it would be whether you were moving or standing still.
+
+You have been treating this as transit. As something to get through. As a delay between a departure point and an arrival point.
+
+It is not. You are in it. This is the location. The water and the cold and the sound of the rigging in the wind — this is the place. You live here right now.
+
+The sounding becomes available: *On the nature of a crossing.*`,
+    onEnter: () => {
+      S.offerSounding('sounding_crossing');
+      S.setFlag('sounding_crossing_moment_seen');
+      S.incrementTheosis(3);
+    },
+    condition: { type: 'and', conditions: [
+      { type: 'not', condition: { type: 'flag', id: 'sounding_crossing_moment_seen' } },
+      { type: 'not', condition: { type: 'flag', id: 'sounding_crossing_settled' } },
+    ]},
+    choices: [
+      { text: 'Stay with it.', next: 'foredeck_standing', tags: ['stillness', 'crossing', 'presence'], theosis: 2 },
+      { text: 'Go back to the main deck.', next: 'main_deck_hub' },
+    ],
+  },
+
+  sounding_forgiveness_moment: {
+    id: 'sounding_forgiveness_moment', location: 'Main Deck', mood: 'uncanny',
+    text: `The North Atlantic is indifferent. This becomes suddenly real to you.
+
+It is not that the sea is cruel or kind. It is that it is enormous and does not hold records. Whatever you did, on land, to whoever — the sea does not know. The horizon does not know your name. The water your ship displaces has been displaced by a thousand ships and does not prefer you.
+
+This is not forgiveness. But it is the space in which forgiveness becomes possible. You are very far from anyone you have harmed. The ledger feels — not wrong. Less relevant. You could put it down.
+
+The sounding becomes available: *On forgiveness at sea.*`,
+    onEnter: () => {
+      S.offerSounding('sounding_forgiveness');
+      S.setFlag('sounding_forgiveness_moment_seen');
+      S.incrementTheosis(2);
+    },
+    condition: { type: 'and', conditions: [
+      { type: 'not', condition: { type: 'flag', id: 'sounding_forgiveness_moment_seen' } },
+      { type: 'not', condition: { type: 'flag', id: 'sounding_forgiveness_settled' } },
+      { type: 'flag', id: 'met_miguel' },
+    ]},
+    choices: [
+      { text: 'Stay with it.', next: 'main_deck_hub', tags: ['presence', 'pastoral'], theosis: 2 },
+    ],
+  },
+
+  
+  // ── ACT THREE TRANSITIONAL SCENE ─────────────────────────────────
+  // Fires when act_three_begun — the crossing has arrived somewhere
+
+  the_arrival: {
+    id: 'the_arrival', location: 'Main Deck — Night', mood: 'revelation',
+    text: `Something has changed.
+
+Not in the instruments — Alexei would say if the instruments had changed, and he would say it immediately. Not in the heading. Not in the weather.
+
+In the quality of the crossing.
+
+The first day was arrival. You arrived at the ship, at the cover, at the crew. You learned what the ship was. You learned what the mission was. You began to understand that these two things were in tension.
+
+The second day was complication. The anomaly intensified. Landstorm called. Othis made his threshold known. Kylie wrote in her notebook. Pavel said things that turned out to be significant. The archive became real.
+
+This is the third day.
+
+The third day is where the crossing arrives at what it is. Not what it was supposed to be. What it is.
+
+The anomaly is at its peak. Below the hull: something enormous that has been waiting for thirty years of measurement to return with its record. Above: the North Atlantic sky doing what it does, enormous and indifferent and occasionally, at this latitude, strangely lit.
+
+You are the chaplain. You are actually the chaplain now — not performing it, inhabiting it. This has a cost. It also has a weight that is not the same as burden. You carry it differently.
+
+The last hours of this crossing will determine what the ship was for.`,
+    onEnter: () => {
+      S.setFlag('the_arrival_seen');
+      S.incrementTheosis(5);
+      S.setMagneticDeviation(0.85);
+      S.playSfx && S.playSfx('anomaly_drone');
+      S.showToast('The last hours.', 'theosis');
+    },
+    condition: { type: 'not', condition: { type: 'flag', id: 'the_arrival_seen' } },
+    choices: [
+      { text: 'The instrument room — Alexei.',     next: 'anomaly_responds',           tags: ['crossing', 'witness'] },
+      { text: 'The foredeck — Pavel.',             next: 'pavel_before_convergence',   tags: ['crossing', 'presence'], condition: { type: 'flag', id: 'met_pavel' } },
+      { text: 'The hold.',                          next: 'anomaly_peak_hold',          tags: ['stillness'] },
+      { text: 'The radio.',                         next: 'radio_discovery',            condition: { type: 'not', condition: { type: 'flag', id: 'radio_found' } } },
+    ],
+  },
+
+  
+  // ── COVER STORY PAYOFF SCENES ─────────────────────────────────────
+  // The specific cover choices return in Acts 2-3
+
+  kylie_cover_contradiction: {
+    id: 'kylie_cover_contradiction', location: 'Mess Hall', mood: 'tense',
+    art: 'portrait_kylie',
+    get text() {
+      const posting = S.G.cover && S.G.cover.posting;
+      const postingText = posting ? posting.toLowerCase() : 'your posting';
+      return `She has her notebook open.
+
+— I've been doing some reading. She says. — About chaplaincy postings. Maritime chaplains specifically.
+
+She turns the notebook so you can see a page. It has notes on it. Her handwriting.
+
+— ${postingText}. She says. — What you told me in the mess on the first day.
+
+She looks at you.
+
+— I have a contact at the relevant diocese. She says. — I sent a message before we lost the signal. My contact says the posting you described doesn't match any current assignment they have on file for this vessel.
+
+She does not close the notebook.
+
+— I'm not writing anything yet. She says. — I'm asking. What's the actual posting?`;
+    },
+    onEnter: () => {
+      S.setFlag('kylie_cover_contradiction_happened');
+      S.modStance('kylie', 'suspicion', 2);
+      S.startCoverChallenge('posting', 12);
+    },
+    condition: { type: 'and', conditions: [
+      { type: 'flag', id: 'met_kylie' },
+      { type: 'flag', id: 'act_two_begun' },
+      { type: 'not', condition: { type: 'flag', id: 'kylie_cover_contradiction_happened' } },
+      { type: 'not', condition: { type: 'flag', id: 'kylie_in_alliance' } },
+    ]},
+    choices: [
+      { text: 'Hold the cover. The posting is correct.', next: 'kylie_after_degradation' },
+      { text: 'Tell her the truth about why you are here.', next: 'kylie_act_two_truth', condition: { type: 'theosis', min: 40 } },
+    ],
+  },
+
+  connie_followup_question: {
+    id: 'connie_followup_question', location: 'Mess Hall', mood: 'neutral',
+    art: 'portrait_connie',
+    get text() {
+      const leftBehind = S.G.cover && S.G.cover.left ? S.G.cover.left : 'something';
+      return `She is sitting with her textbook again. She looks up when you come in.
+
+— I've been thinking about what you said. She says. — The first day. About what you left behind.
+
+She closes the textbook.
+
+— People say things like that on ships. They say what sounds right for open water. I do it too. But I've been on a lot of ships and I can usually tell.
+
+She looks at you.
+
+— ${leftBehind}. She says, whatever you told her. — I believe that's true. I'm not sure it's complete.
+
+She picks up her coffee.
+
+— You don't have to say. She says. — I'm not asking for the full picture. I just notice when someone is carrying something heavier than what they've named. It's my job.
+
+She means it. It is her job.`;
+    },
+    onEnter: () => {
+      S.setFlag('connie_followup_seen');
+      S.incrementTheosis(3);
+    },
+    condition: { type: 'and', conditions: [
+      { type: 'flag', id: 'connie_saw_chaplain' },
+      { type: 'flag', id: 'act_two_begun' },
+      { type: 'not', condition: { type: 'flag', id: 'connie_followup_seen' } },
+    ]},
+    choices: [
+      { text: 'Tell her more.', next: 'connie_pastoral', theosis: 3, tags: ['pastoral', 'forgiveness'] },
+      { text: 'She is right that it is not complete.', next: 'mess_hub', theosis: 2, come_to_believe: 'chaplain_real' },
+    ],
+  },
+
   crossing_record: {
     id: 'crossing_record', location: '', mood: 'neutral',
     text: '',
@@ -5955,18 +6300,38 @@ Nobody argues with this.`,
     id: 'ending_solidarity', location: 'Galley — Before Dawn', mood: 'revelation',
     get text() {
       const lines = [];
-      lines.push(`The tea is gone. The galley is warm. Outside: the North Atlantic, the anomaly, the four thousand metres of something that has been there long enough to develop opinions about being measured.`);
-      lines.push(`The boxes are where they are. The manifest says something different. The manifest is wrong.`);
-      if (S.hasFlag('kylie_in_alliance')) {
-        lines.push(`Kylie Matterhorn is not in the galley. She is in her cabin. You can hear, faintly, the sound of typing.`);
+
+      // The galley scene — where solidarity actually lives
+      lines.push(`The galley at 3am. The tea is gone. Lena made more without asking if anyone wanted it. They wanted it.`);
+      lines.push(`Outside: the North Atlantic, doing what the North Atlantic does. The anomaly at four thousand metres below the hull, doing what it has been doing for longer than the ship has been alive. The deviation readings, still running, in Alexei's handwriting in the log: *received.*`);
+      lines.push(`The boxes are where they are. The manifest says something different. The manifest is wrong. Landstorm does not know this yet. He will.`);
+
+      // Who is there — specific, earned
+      if (S.hasFlag('lena_fragment_5_seen')) {
+        lines.push(`Lena is at the stove. She said, this morning — the real morning, before any of this — that she stayed because the crossing changes people. She has watched it for twenty-two years. She is watching it now. She is not surprised by what she sees.`);
+      } else {
+        lines.push(`Lena is at the stove. Twenty-two years on this ship. She has been through captains, refits, fire, deaths. She makes tea. This is also a form of the work.`);
+      }
+      if (S.hasFlag('met_miguel')) {
+        lines.push(`Miguel is not in the galley. Miguel is at the wheel. This is where Miguel is. He said yes to what was needed and went back to the wheel because someone has to hold the wheel while the crossing concludes. This is what Miguel is for.`);
       }
       if (S.hasFlag('pavel_is_companion')) {
-        lines.push(`Pavel is in the corner. He has been there throughout. At some point he will say something that sounds simple and means something else. For now he is drinking tea and looking at nothing in particular with the expression of someone who has arrived.`);
+        lines.push(`Pavel is in the corner with his tea. He has been here throughout. He arrived at some point and nobody questioned it. He is looking at nothing in particular with the expression of someone who has arrived at a place they have been trying to reach for a long time. He does not say what the place is. He does not need to. You are also here.`);
       }
-      lines.push(`This was not one person. It was not theosis or charism or an act of individual clarity.`);
-      lines.push(`It was the ship knowing who was on her. It was twenty-two years of Lena and fifteen years of Miguel and Nadia's specific need to know what is actually there. It was Alexei standing in the corridor saying nothing. It was you, learning, over three days, to be a chaplain rather than perform one.`);
-      lines.push(`Sobornost. The unity of a council. Many voices, none erased.`);
-      lines.push(`The archive is in the ship. The ship is in the crossing. The crossing is ending.`);
+      if (S.hasFlag('kylie_in_alliance')) {
+        lines.push(`Kylie Matterhorn is not in the galley. She is in her cabin. You can hear, faintly, through the wall, the sound of typing. Whatever she is writing, she is writing it now, while the crossing is still happening and the truth is still the truth.`);
+      }
+
+      // The argument — what solidarity is
+      lines.push(`This was not one person.`);
+      lines.push(`It was not theosis — though theosis was present. Not charism. Not an act of individual clarity or courage or decision. It was the ship knowing who was on her. It was twenty-two years of Lena and fifteen years of Miguel and Nadia's specific and irreducible need to know what is actually there. It was Alexei in the corridor, saying nothing, which is its own form of speaking. It was the sounding settling. It was you, over three days, learning to be a chaplain rather than perform one.`);
+      lines.push(`The old word is sobornost. Conciliarity. The unity of a council in which every voice is fully present — not averaged, not represented, not erased into the whole. Present. Each one. You have been in the presence of this for three days and tonight it became visible.`);
+
+      // The ending sentence — where the ship is
+      if (S.hasFlag('sounding_solidarity_settled')) {
+        lines.push(`The sounding has settled. What you carried across three days — what you chose, what you refused, what you allowed yourself to understand — has become part of the ship's record. The ship carries what it carries. It will carry this.`);
+      }
+      lines.push(`The archive is in the ship. The ship is in the crossing. The crossing is ending in the galley at 3am with tea and the particular silence of people who have done something together that cost something and are now, for a moment, simply here.`);
       lines.push(`━━━━━━━━━━━━━━━━━━━━━━━━\n  SOLIDARITY\n━━━━━━━━━━━━━━━━━━━━━━━━`);
       return lines.join('\n\n');
     },
@@ -6052,6 +6417,7 @@ And she knew.`,
       { text: 'Go to the hold. Sit with the archive.',        next: 'anomaly_peak_hold',         condition: { type: 'not', condition: { type: 'flag', id: 'hold_anomaly_sat' } } },
       { text: 'The anomaly.',                                  next: 'anomaly_peak',              condition: { type: 'not', condition: { type: 'flag', id: 'anomaly_peak_occurred' } } },
       { text: 'Alexei — the instruments are past their range.',  next: 'anomaly_overcalibrated', condition: { type: 'not', condition: { type: 'flag', id: 'anomaly_overcalibrated_seen' } } },
+      { text: 'Alexei is in the doorway.',                          next: 'alexei_after_transmission', condition: { type: 'and', conditions: [{ type: 'flag', id: 'archive_transmitted' }, { type: 'not', condition: { type: 'flag', id: 'alexei_after_transmission_seen' } }] } },
       { text: 'The instrument room.',                          next: 'anomaly_responds',          condition: { type: 'and', conditions: [{ type: 'flag', id: 'anomaly_peak_occurred' }, { type: 'not', condition: { type: 'flag', id: 'anomaly_responds_seen' } }] } },
       { text: 'The confrontation.',                            next: 'othis_confrontation',       condition: { type: 'and', conditions: [{ type: 'flag', id: 'mission_refused' }, { type: 'not', condition: { type: 'flag', id: 'othis_confrontation_happened' } }] } },
       { text: 'Connie. Her door is open.',                       next: 'compline_connie',        condition: { type: 'and', conditions: [{ type: 'flag', id: 'connie_saw_chaplain' }, { type: 'not', condition: { type: 'flag', id: 'compline_connie_seen' } }] } },
@@ -8163,27 +8529,46 @@ The coffee Lena makes after the service is better than the coffee she makes at o
     id: 'ending_erasure', location: 'Hold', mood: 'uncanny',
     get text() {
       const lines = [];
+
+      // Opening: the act itself, in detail
       lines.push(`The instructions were clear. You followed them.`);
-      lines.push(`The materials were in the cabinet. Othis gave you the key once you showed him the envelope. He didn't look at you after. He went up to the deck and stood at the rail.`);
-      lines.push(`The archive burned slowly. Paper that has lasted thirty years does not go easily.`);
+      lines.push(`The materials were in the cabinet under the workbench in the hold — accelerant, a metal bin, a lighter that worked on the first try. Othis gave you the key once you showed him the envelope. He held the door for you. He did not look at what you were doing. He went up to the deck and stood at the rail facing away and did not move until it was over.`);
+      lines.push(`Paper that has survived thirty years at sea does not go easily. It took longer than you expected. The photographs went first — they curled inward and went dark and then the images were gone. The logs took longer. You stood with them until they were ash.`);
+      lines.push(`The smoke went up through the hatch. It was thin and pale and dispersed quickly in the Atlantic wind. By the time the crew had any sense of it, it was already nothing.`);
+
+      // What each person did
       if (S.hasFlag('alexei_emergency_talked')) {
-        lines.push(`Alexei stayed in the instrument room throughout. Earlier you had sat with him when the anomaly frightened him. He had said: I think I can sleep now. He did not sleep. His instruments were still measuring.`);
+        lines.push(`Alexei stayed in the instrument room throughout. The instruments continued to measure. The deviation did not change because something had been burned — why would it? The anomaly is geological. It predates the archive by millions of years. It will outlast this crossing by millions more. Earlier, Alexei had said: I think I can sleep now. He did not sleep. He measured.`);
       } else {
-        lines.push(`Alexei stayed in the instrument room throughout. His instruments were still measuring. Even at the end, the ship was doing what she was built for.`);
+        lines.push(`Alexei stayed in the instrument room throughout. His instruments were still measuring — the deviation log running, the readings printing in the small square script of the old machinery. What they measured did not change. The anomaly does not know about the archive. It never did.`);
       }
+
+      if (S.hasFlag('pavel_is_companion')) {
+        lines.push(`Pavel was on the foredeck. He did not watch the smoke. When it was over he came below — not to speak, not to confront, not to witness. He put his hand on the hatch for a moment and then went back up. You understood this.`);
+      } else {
+        lines.push(`Pavel was on the foredeck. He did not watch the smoke. Whether he knew was not something you asked.`);
+      }
+
+      lines.push(`Miguel stood at the wheel. The ship continued north. He said nothing. The ship said nothing. The North Atlantic said nothing. This is what the North Atlantic does.`);
+
+      if (S.hasFlag('lena_fragment_4_seen')) {
+        lines.push(`In the galley, Lena made breakfast. She had told you about Volkov — the cook before her, who had sailed in 1972, who came back, who checked the bilge every morning because the ship needed someone paying attention. She made breakfast the same way she always made it. Her hands knew what to do. Some things are carried in hands and cannot be burned.`);
+      } else if (S.hasFlag('lena_volkov_told')) {
+        lines.push(`In the galley, Lena made breakfast. She made it the same way she always made it. She knew what had happened. She made breakfast anyway. The cook before her had checked the bilge every morning. That was his way of paying attention. She was paying attention too.`);
+      } else {
+        lines.push(`In the galley, Lena made breakfast. She did not speak about what had happened. She made coffee. She made enough for everyone. This was also a kind of attention.`);
+      }
+
+      // What was lost — the specific cost
+      lines.push(`The archive is gone.`);
+      lines.push(`Not the ship's name in the documents — they will find another name for her, or leave the existing one. Not the anomaly — the anomaly is geological and will continue to be measurable at this position long after the ship and the crew and the organization that chartered this crossing have been absorbed into other records or no records. What is gone is the record of who found it and how and what they thought it meant. Thirty years of scientists from five countries, in difficult conditions, carefully measuring something they did not fully understand and faithfully writing down what they found. That is gone.`);
+
       if (S.believes && S.believes('chaplain_real')) {
-        lines.push(`You burned the archive. You were, by the end of it, a chaplain — not performing one. Being one. The archive and what you had become went together. That is the specific cost of this ending, which is not the same as saying it was wrong.`);
+        lines.push(`You burned the archive. You were, by the end of it, a chaplain — not performing one. Being one. The cover became the thing. What you had become and what you destroyed went together, in the hold, in the early morning, in the pale smoke. That is the specific cost of this ending. This is not the same as saying it was wrong. The chaplain does not have the luxury of that certainty.`);
       }
-      if (S.hasFlag('met_oblong')) {
-        lines.push(`Oblong Vassilithune was not visible. He was not visible before the burning either. Whether he saw it or not is unclear.`);
-      }
-      lines.push(`Pavel was on the foredeck. He did not watch the smoke.`);
-      lines.push(`Miguel stood at the wheel. The ship continued north.`);
-      if (S.hasFlag('lena_volkov_told')) {
-        lines.push(`In the galley, Lena made breakfast. She made it the same way she always made it. She knew what had happened. She made breakfast anyway. The cook before her had checked the bilge every morning. That was his way of paying attention.`);
-      }
-      lines.push(`The dawn, when it came, was ordinary. Nothing had happened to it.`);
-      lines.push(`The ship will have a different name in the documents now. The history it had — thirty years of finding, of measuring, of sharing — is over.`);
+
+      // The dawn
+      lines.push(`The dawn, when it came, was ordinary. The sky went from black to dark blue to a pale grey that contained no special information. The sun came up. The instruments continued to run. The ship continued north.`);
       lines.push(`You made a crossing.`);
       lines.push(`━━━━━━━━━━━━━━━━━━━━━━━━\n  ERASURE\n━━━━━━━━━━━━━━━━━━━━━━━━`);
       return lines.join('\n\n');
@@ -8203,25 +8588,37 @@ The coffee Lena makes after the service is better than the coffee she makes at o
     id: 'ending_witness', location: 'Hold', mood: 'uncanny',
     get text() {
       const lines = [];
+
       lines.push(`You refused.`);
-      lines.push(`Quietly. In the hold, in the dark, with Freezer Beef watching. You moved the most important boxes to a location not on the current manifest. A place Miguel showed you, because Miguel knows this ship in ways the people who chartered it do not.`);
+      lines.push(`Not loudly. Not in confrontation. In the hold, in the dark, with Freezer Beef watching from her box in the aft corner with the expression she always has — the one that means she has known what is happening for longer than you have.`);
+      lines.push(`You moved the most important boxes to a location not on any current manifest. A space below the forward hold, in the construction documentation but not in any document produced after 1960. Miguel knew about it. He showed you without asking why you needed to know. He knows this ship in ways the people who chartered this crossing do not.`);
+
+      // What the refusal cost
+      lines.push(`Othis will find this, when the ship docks. He will find it in the difference between the manifest weight and the cargo weight, or in a sound, or in something Landstorm says when he is informed. He is thorough. He will find it.`);
+      lines.push(`Landstorm will be informed. He will have questions that require answers. Those answers will have consequences, and the consequences will arrive on land, in offices, in processes that move slowly and have institutional patience.`);
+      lines.push(`On land is not here.`);
+
+      // The ship in the aftermath
+      lines.push(`Here is what the ship is doing: moving. Alexei is in the instrument room, measuring. Nadia found something in the data this morning — a pattern in the deviation readings that made her go very still and then begin writing in the rapid, focused way she writes when she has found something real. Pavel is on the foredeck with his rope. Lena is in the galley. The bronze fittings caught the last of the day's light and held it.`);
+
       if (S.hasFlag('kylie_in_alliance')) {
-        lines.push(`Kylie recorded everything you told her. The notebook is in her coat. Whatever happens when the ship docks, there are now two accounts.`);
+        lines.push(`Kylie Matterhorn has two notebooks. One is the official record of her embedded research. The other is in her coat. The one in her coat has everything you told her, in her handwriting, dated, signed. Whatever happens when the ship docks, there are two accounts of this crossing. The archive is not the only record.`);
       }
       if (S.hasFlag('connie_saw_chaplain')) {
-        lines.push(`Connie Frank will write something in her own report. What she writes will not be about the cargo.`);
+        lines.push(`Connie Frank will write something in her ship's medical report. It will not be about the cargo. It will be about what she observed in the chaplain over three days — a specific quality of attention that she has seen before, in people who are in the middle of understanding something real about their work. She will not use the word theosis. She will describe what she saw.`);
       }
-      lines.push(`Othis will discover this. Landstorm will be informed. Consequences will arrive on land.`);
-      lines.push(`On land is not here.`);
-      lines.push(`The ship is still moving. Alexei is still measuring. Nadia found something in the data this morning that made her go very still and then start writing. Pavel is on the foredeck. The bronze fittings caught the last of the day's light and held it longer than they should have.`);
       if (S.hasFlag('archive_blessed')) {
-        lines.push(`The archive in its new location has been blessed. You are not sure if that changes anything. You are not sure it does not.`);
+        lines.push(`The archive has been blessed, in its new location. The blessing was not a cause of anything. Whether it changed anything is the kind of question that will not be answered in this crossing.`);
       }
+
+      // The argument
       if (S.believes && S.believes('archive_matters')) {
-        lines.push(`You knew what you were protecting. Not just records — a way of being in the world that measures without distorting, that shares what it finds. You protected that. The archive is in the ship. The ship is still moving.`);
+        lines.push(`You knew what you were protecting. Not just records — though thirty years of scientific records from five countries are not nothing. A way of being in the world. The way the ship was built: to measure without distorting, to find without claiming, to share rather than hold. The archive is not the ship — but the archive is what the ship was doing. You protected what the ship was doing. The archive is in the ship. The ship is still moving.`);
+      } else {
+        lines.push(`The archive is still in the world. Somewhere on a ship built to be transparent — brass fittings, no iron, built so its own material doesn't distort what it finds — thirty years of finding is still findable.`);
       }
-      lines.push(`The ship will continue under another name in other documents. But the archive is still in the world. Somewhere on a ship built to be transparent, thirty years of finding is still findable.`);
-      lines.push(`You witnessed.`);
+
+      lines.push(`You witnessed. This is not a modest achievement. To witness, and to protect what was witnessed, and to refuse the instruction to make it disappear — this is its own form of the work.`);
       lines.push(`━━━━━━━━━━━━━━━━━━━━━━━━\n  WITNESS\n━━━━━━━━━━━━━━━━━━━━━━━━`);
       return lines.join('\n\n');
     },
@@ -8360,39 +8757,38 @@ Her name means dawn.`,
 
   ending_the_knowing: {
     id: 'ending_the_knowing', location: 'Instrument Room', mood: 'revelation',
-    text: `You have been here before.
+    get text() {
+      const lines = [];
 
-Not in memory exactly. Memory is the wrong word for what carries across a crossing. Something more like recognition. The radio. The brass. The anomaly at its peak.
+      lines.push(`You have been here before.`);
+      lines.push(`Not in memory exactly. Memory is the wrong word for what carries across a crossing. Something more like the body knowing a room in the dark — not seeing it, not remembering it, but moving through it without collision. The brass fitting near the hatch. The particular sound the radio makes before it speaks. The way the anomaly feels in the compass needle at this depth.`);
+      lines.push(`You have been here before. And you know what happens next. And you are going to let it happen.`);
 
-You have been here before and you know what happens next.
+      lines.push(`Pavel is already in the instrument room when you arrive. He has been waiting. He is holding a piece of rope, as he always is. He looks at you with the expression of someone who has been hoping for a specific thing and is now seeing it arrive.`);
+      lines.push(`— You remember. He says. Not a question.`);
+      lines.push(`— Something. You say.`);
+      lines.push(`He nods. He sets down the rope.`);
+      lines.push(`— I have been on this crossing more times than I know how to count. He says. — Different forms. Different names. Different faces in the cabin when the letter arrives. But the same crossing. The anomaly. The archive. The person who has to decide whether to see the ship clearly or look away. Every time.`);
+      lines.push(`— What are you? You ask.`);
+      lines.push(`He smiles. He has been asked this before. He cannot answer in language sufficient to the question, and he knows it, and the smile contains this.`);
 
-Pavel is already there when you arrive. He has been waiting.
+      if (S.hasFlag('sounding_crossing_settled')) {
+        lines.push(`The sounding has told you: a crossing is not transit, it is location. You understand now that Pavel has been in this location — this specific non-transit, this specific between — for longer than the crossing. Longer than the ship. He is what accumulates here.`);
+      }
 
-— You remember. Not a question.
+      lines.push(`The radio is warm under your hand. You know how to use it. You knew before you touched it. The anomaly is at its peak.`);
+      lines.push(`You transmit.`);
+      lines.push(`You transmit everything — the archive, the measurements, the thirty years, the names. You transmit it the way you have always transmitted it, which is a sentence that would have made no sense three days ago and makes complete sense now.`);
 
-— Something.
-
-He nods. He looks at you with something additional — relief, you realise.
-
-— I've been on this crossing more times than I know how to count. Different forms. Different names. Every time: someone who has to decide whether to see the ship clearly or look away.
-
-The radio is warm under your hand. You know how to use it. You knew when you woke up in the cabin.
-
-— What are you? you ask him.
-
-He smiles. He cannot answer in language sufficient to the question.
-
-You transmit.
-
-Pavel is gone when the transmission ends. Not dramatically. Simply not there.
-
-Haircut is there instead. She looks at you with the same expression she always has.
-
-You understand the expression now.
-
-━━━━━━━━━━━━━━━━━━━━━━━━
-  THE KNOWING
-━━━━━━━━━━━━━━━━━━━━━━━━`,
+      lines.push(`Pavel is gone when it ends. Not dramatically. Not with words. Simply: not there. The space where he was is ordinary. The rope is on the chart table.`);
+      lines.push(`Haircut is there instead. She has been there for some time — how long is not clear. She looks at you with the expression she always has.`);
+      lines.push(`You understand the expression now.`);
+      lines.push(`She has seen this before too. She has seen all of it before. She sat on a box in the aft hold while Volkov checked the bilge. She sat in the instrument room while Alexei ran his first deviation log. She sat on the foredeck and watched you arrive on your first crossing and on every crossing before it.`);
+      lines.push(`She puts a paw on your knee. She is not being sentimental. She is being precise.`);
+      lines.push(`You are here. You have always been here. The crossing continues.`);
+      lines.push(`━━━━━━━━━━━━━━━━━━━━━━━━\n  THE KNOWING\n━━━━━━━━━━━━━━━━━━━━━━━━`);
+      return lines.join('\n\n');
+    },
     onEnter: () => {
       S.setFlag('ending_knowing_reached');
       S.addJournalEntry({ type: 'ending', text: 'The Knowing — you have been here before.' });
