@@ -169,15 +169,20 @@ function scheduleRender() {
     // scroll-snapping during panel opens, stat updates, dialogue advances
     if (_sceneAtSchedule !== _lastScrolledScene) {
       _lastScrolledScene = _sceneAtSchedule;
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
+      // Scroll every possible container — belt, suspenders, and a third belt
+      const _doScroll = () => {
+        try {
           window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-          const root = document.getElementById('root');
-          if (root) { root.scrollTop = 0; root.scrollLeft = 0; }
           document.documentElement.scrollTop = 0;
           document.body.scrollTop = 0;
-        });
-      });
+          const root = document.getElementById('root');
+          if (root) { root.scrollTop = 0; root.scrollLeft = 0; }
+          // If root is the scroll container (iOS common pattern), find first text element
+          const firstP = document.querySelector('.game-body .sp, .game-body p');
+          if (firstP) firstP.scrollIntoView({ block: 'start', behavior: 'instant' });
+        } catch(e) {}
+      };
+      requestAnimationFrame(() => { requestAnimationFrame(_doScroll); });
     }
   });
 }
@@ -2666,6 +2671,7 @@ function renderGame(root){
   const cd=document.createElement('div');cd.className='choices';
   if(scene.return_to){const rb=document.createElement('button');rb.className='choice choice-return';rb.textContent=scene.return_label||'Return.';rb.onclick=()=>navigate(scene.return_to);cd.appendChild(rb);}
   if(scene.choices){
+    let _choiceIdx=0;
     scene.choices.forEach(ch=>{
       if(ch.hide_if&&hasFlag(ch.hide_if))return;if(ch.show_if&&!hasFlag(ch.show_if))return;if(ch.once&&ch.next&&hasFlag('visited_'+ch.next))return;
       const btn=document.createElement('button');const locked=isChoiceLocked(ch);

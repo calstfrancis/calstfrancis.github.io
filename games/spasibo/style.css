@@ -72,6 +72,7 @@ html, body {
 #root {
   position: relative; z-index: 10;
   min-height: 100vh;
+  overflow: visible; /* window is the scroll container, not root */
   display: flex; flex-direction: column; align-items: center;
   /* Vertical strip that protects text readability.
      Right edge stays transparent so the porthole shows through. */
@@ -1675,3 +1676,7 @@ body.low-power #atmos { display: none; }
     padding: 1.4rem 1.2rem 1rem 1.4rem;
   }
 }
+
+/* ── Scroll anchor: ensure scrollIntoView lands at top of content ── */
+.game-body { scroll-margin-top: 0; }
+.game-body .sp:first-child { scroll-margin-top: 0; }

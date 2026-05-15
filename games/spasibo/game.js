@@ -40,13 +40,13 @@ S.setAvailableModes(['attended', 'witnessed']);
 S.setModeDescriptions({
   attended: {
     name: 'Attended',
-    short: 'The crossing as it is lived.',
-    long: 'You are present in the crossing. Your choices, your cover, your pastoral acts — they accumulate and have weight. What you do on this ship matters to the people on it, and the consequences of your actions will be visible in how things resolve. This is the standard mode. The difficulty is the difficulty of actually being somewhere.',
+    short: 'You are here. Your choices matter.',
+    long: 'Standard play. You navigate the crossing through your choices — what you say, who you trust, what you decide about the mission. Your cover can fail. Your stats accumulate. The crew responds to what you do. All five endings are reachable. Choose this for your first crossing.',
   },
   witnessed: {
     name: 'Witnessed',
-    short: 'The crossing as it is observed.',
-    long: 'You are watching rather than acting. The major decisions of the crossing are determined by the system — by your theosis, your flags, your accumulated history — rather than by explicit choices at branching points. What you did in previous crossings becomes the story. This mode is for players who have been on this ship before and want to see what the world has made of them.',
+    short: 'The crossing unfolds. You observe.',
+    long: 'A quieter mode for experienced players. Cover challenges resolve automatically. The story draws more on your theosis and accumulated history than on moment-to-moment choices. What you carried forward from previous crossings shapes what you see. Choose this if you want to experience the narrative without the mechanical pressure.',
   },
 });
 
