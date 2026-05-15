@@ -486,6 +486,7 @@ function evaluateCondition(cond) {
   if (Array.isArray(cond)) return cond.every(c => evaluateCondition(c));
   switch (cond.type) {
     case 'flag':            return hasFlag(cond.id) === (cond.state !== false);
+    case 'mode':          return G.mode === cond.mode;
     case 'stat': {
       // Support both G.stats and special values like coverIntegrity
       let val = 0;
@@ -1218,6 +1219,8 @@ function saveGameSlot(slotId) {
       codexUnlocked: [...G.codexUnlocked],
       ambientTriggered: [...G.ambientTriggered],
       magneticDeviation: G.magneticDeviation || 0,
+      audioOn: _audioOn,
+      gameMode: G.mode,
       worldState: G.worldState || { shipStability: 5, sanctity: 0, socialTrust: 5 },
       shipState: G.shipState || { morale: 5, paranoia: 0, exhaustion: 0, saturation: 0 },
     };
@@ -1270,6 +1273,8 @@ function loadGameSlot(slotId) {
     G.codexUnlocked    = new Set(s.codexUnlocked   || []);
     G.ambientTriggered = new Set(s.ambientTriggered || []);
     G.magneticDeviation = s.magneticDeviation !== undefined ? s.magneticDeviation : 0;
+    if (s.audioOn !== undefined) { _audioOn = s.audioOn; }
+    if (s.gameMode) { G.mode = s.gameMode; }
     G.worldState = s.worldState || { shipStability: 5, sanctity: 0, socialTrust: 5 };
     G.shipState  = s.shipState  || { morale: 5, paranoia: 0, exhaustion: 0, saturation: 0 };
     loadJournal(slotId);
@@ -1870,6 +1875,7 @@ function resolveCoverChallenge(action) {
   if(result.outcome==='success'){
     G.flags.delete(`__cover_pressured_${field}`);showToast(`Cover holds. ${_fieldLabels[field]||field} is secure.`,'note');emit('coverChallengeSuccess',{field,result});
   }else if(result.outcome==='partial'){
+    G.flags.delete(`__cover_pressured_${field}`); // partial clears pressure — it cost something but holds
     const before=G.stats.composure||0;G.stats.composure=Math.max(0,before-1);
     if(G.stats.composure!==before)emit('statChanged',{stat:'composure',delta:-1});
     showToast(`You hold \u2014 barely. ${_fieldLabels[field]||field} costs you.`,'note');emit('coverChallengePartial',{field,result});
