@@ -564,11 +564,91 @@ function settleSounding(soundingId) {
     if (!G.soundings.settled.includes(soundingId)) {
       G.soundings.settled.push(soundingId);
       const snd = _registries.soundings[soundingId];
+      // Apply effects
+      if (snd && snd.theosis) incrementTheosis(snd.theosis);
+      if (snd && snd.stat && snd.statDelta) applyEffect({ [snd.stat]: snd.statDelta });
       if (snd && snd.effect) applyEffect(snd.effect);
-      showToast(`${snd.name} — settled.`, 'theosis'); playSfx('sounding_settle');
+      if (snd && snd.onSettle) { try { snd.onSettle(); } catch(e) { console.error('onSettle error:', e); } }
+      playSfx('sounding_settle');
+      // Restore 1 cover integrity on settle (groundedness shores up the performance)
+      if (G.coverIntegrity !== undefined && G.coverIntegrity < 5) {
+        G.coverIntegrity = Math.min(5, G.coverIntegrity + 1);
+      }
       refreshAtmosMods(); emit('soundingSettled', soundingId);
+      // Show settle overlay — extended meditation on what was found
+      if (snd && (snd.settleText || snd.settleTitle)) {
+        _showSoundingSettleOverlay(snd);
+      } else {
+        showToast((snd ? snd.name : soundingId) + ' — settled.', 'theosis');
+      }
     }
   }
+}
+
+function _showSoundingSettleOverlay(snd) {
+  // Remove any existing overlay
+  document.querySelectorAll('.sounding-settle-overlay').forEach(el => el.remove());
+  const ov = document.createElement('div');
+  ov.className = 'sounding-settle-overlay';
+  ov.setAttribute('role', 'dialog');
+  ov.setAttribute('aria-label', 'Sounding settled');
+
+  const inner = document.createElement('div');
+  inner.className = 'sounding-settle-inner';
+
+  // Header label
+  const label = document.createElement('div');
+  label.className = 'sounding-settle-label';
+  label.textContent = 'settled';
+  inner.appendChild(label);
+
+  // Sounding name
+  const name = document.createElement('div');
+  name.className = 'sounding-settle-name';
+  name.textContent = snd.name || '';
+  inner.appendChild(name);
+
+  // Divider
+  const div1 = document.createElement('div');
+  div1.className = 'sounding-settle-divider';
+  inner.appendChild(div1);
+
+  // Extended settle text — the meditation
+  if (snd.settleText) {
+    const paras = Array.isArray(snd.settleText) ? snd.settleText : snd.settleText.split('\n\n');
+
+    paras.forEach(para => {
+      const p = document.createElement('p');
+      p.className = 'sounding-settle-para';
+      p.textContent = para.trim();
+      inner.appendChild(p);
+    });
+  }
+
+  // What has changed
+  if (snd.settleDesc) {
+    const div2 = document.createElement('div');
+    div2.className = 'sounding-settle-divider';
+    inner.appendChild(div2);
+    const desc = document.createElement('div');
+    desc.className = 'sounding-settle-desc';
+    desc.textContent = snd.settleDesc;
+    inner.appendChild(desc);
+  }
+
+  // Continue button
+  const btn = document.createElement('button');
+  btn.className = 'btn sounding-settle-btn';
+  btn.textContent = 'Continue.';
+  btn.onclick = () => { ov.remove(); scheduleRender(); };
+  inner.appendChild(btn);
+
+  ov.appendChild(inner);
+  ov.onclick = (e) => { if (e.target === ov) { ov.remove(); scheduleRender(); } };
+  document.body.appendChild(ov);
+
+  // Animate in
+  requestAnimationFrame(() => ov.classList.add('open'));
 }
 
 function applySoundingProgress(soundingId, delta) {

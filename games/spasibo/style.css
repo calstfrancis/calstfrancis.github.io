@@ -1714,3 +1714,62 @@ body.low-power #atmos { display: none; }
 }
 .tutorial-item strong { color: var(--fg); }
 .tutorial-item em { color: var(--dim); font-size: .8rem; }
+
+/* ── Sounding settle overlay ─────────────────────────────────── */
+.sounding-settle-overlay {
+  position: fixed; inset: 0; z-index: 600;
+  background: rgba(4,6,11,0);
+  display: flex; align-items: center; justify-content: center;
+  padding: 1.5rem;
+  transition: background 300ms ease;
+  pointer-events: none;
+}
+.sounding-settle-overlay.open {
+  background: rgba(4,6,11,.96);
+  pointer-events: all;
+}
+.sounding-settle-inner {
+  width: 100%; max-width: 520px;
+  max-height: 90vh; overflow-y: auto;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 350ms ease 100ms, transform 350ms ease 100ms;
+  padding-bottom: 2rem;
+}
+.sounding-settle-overlay.open .sounding-settle-inner {
+  opacity: 1; transform: translateY(0);
+}
+.sounding-settle-label {
+  font-family: var(--font-display);
+  font-size: .52rem; letter-spacing: .3em;
+  text-transform: uppercase; color: var(--cold-dim);
+  margin-bottom: .7rem;
+}
+.sounding-settle-name {
+  font-size: 1.15rem; color: var(--fg);
+  line-height: 1.3; margin-bottom: 1.2rem;
+  font-style: italic;
+}
+.sounding-settle-divider {
+  height: 1px; background: var(--border);
+  margin: 1.4rem 0;
+}
+.sounding-settle-para {
+  font-size: .9rem; color: var(--fg-dim);
+  line-height: 1.82; margin-bottom: 1rem;
+  max-width: 48ch;
+}
+.sounding-settle-para:first-of-type {
+  color: var(--fg); font-style: italic; font-size: .95rem;
+}
+.sounding-settle-desc {
+  font-family: var(--font-display);
+  font-size: .58rem; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--cold-dim);
+}
+.sounding-settle-btn {
+  margin-top: 1.6rem;
+  font-size: .82rem; padding: .65rem 1.4rem;
+  border-color: var(--border-mid);
+}
+.sounding-settle-btn:hover { border-color: var(--cold); }

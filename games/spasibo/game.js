@@ -272,6 +272,20 @@ S.registerSounding('sounding_crossing', {
   text: 'What is left behind is not lost. What is ahead has not been found. Between them: this. The water. The cold. The sound of sails adjusting to wind you cannot see.',
   theosis: 3,
   stat: 'composure', statDelta: 1,
+  settleTitle: 'On the nature of a crossing',
+  settleText: [
+    "You are not going anywhere. You are in it.",
+    "A crossing is not a transit. It is a location. For the duration of this ship's passage, you live here — on this water, in this weather, with these people. There is no elsewhere to retreat to. There is only the quality of your attention to what is here.",
+    "The monks who built their cells on islands understood this. The thing that happens when you cannot leave is not confinement. It is encounter. What you have been avoiding catches up. What you have been neglecting surfaces. The water does not produce this — it simply removes the exits.",
+    "What has surfaced for you on this crossing? Not the mission. Not the cover. The thing underneath.",
+  ],
+  settleDesc: '+1 Composure · +3 Theosis · Cover integrity restored.',
+  onSettle: () => {
+    S.setFlag('sounding_crossing_settled');
+    S.comeToBelieve('crossings_recurse');
+    // Unlocks the 1978 position fork — you have the frame to understand what Nadia found
+    if (S.hasFlag('nadia_1978_found')) S.setFlag('crossing_sounding_unlocks_1978');
+  },
 });
 
 S.registerSounding('sounding_forgiveness', {
@@ -281,6 +295,27 @@ S.registerSounding('sounding_forgiveness', {
   text: 'There is something about open water that makes the ledger seem less important. Not wrong. Less important. You are very far from anyone you have harmed. The horizon does not know your name.',
   theosis: 4,
   stat: 'communion', statDelta: 1,
+  settleText: [
+    "You have been carrying something for a while. You will know what it is.",
+    "Forgiveness is not the same as absolution. Absolution is granted from outside. Forgiveness is something you do to the interior of yourself — a reorganisation of the furniture. You move what happened to a different room. It is still there. You still know where it is. But you do not have to keep going back to it.",
+    "The sea helps with this for reasons no one can fully explain. Possibly the scale. Possibly the fact that the sea is indifferent — not cruel, not kind, not watching. It is simply that it is enormous and it does not care what you did, and somehow that is a relief.",
+    "There is someone on this ship you have not been entirely fair to. You do not need to say anything. Just: stop keeping the ledger. See what happens to the room.",
+  ],
+  settleDesc: '+1 Communion · +4 Theosis · Stance with one NPC improved.',
+  onSettle: () => {
+    S.setFlag('sounding_forgiveness_settled');
+    // Find the crew member with lowest trust and improve it
+    const npcs = ['miguel', 'kylie', 'othis', 'lena', 'alexei', 'nadia'];
+    let lowest = null, lowestTrust = 99;
+    for (const npc of npcs) {
+      const t = S.getStance ? S.getStance(npc, 'trust') : 0;
+      if (t < lowestTrust && S.hasFlag('met_' + npc)) { lowest = npc; lowestTrust = t; }
+    }
+    if (lowest) {
+      S.modStance(lowest, 'trust', 2);
+      S.showToast('Something between you and ' + lowest.charAt(0).toUpperCase() + lowest.slice(1) + ' shifts.', 'note');
+    }
+  },
 });
 
 S.registerSounding('sounding_history', {
@@ -290,6 +325,23 @@ S.registerSounding('sounding_history', {
   text: 'The wood remembers the trees. The brass remembers the ore. What does water remember? Everything that has passed through it. Which means you too are being remembered, right now, by something that does not keep records in any language you speak.',
   theosis: 7,
   stat: 'composure', statDelta: 1,
+  settleText: [
+    "A ship is a record of everyone who has sailed on her.",
+    "Not in the sense of a list — the list is in the archive. In the sense that the wood is worn where hands have steadied themselves. The brass is polished thin in certain places and untouched in others. The galley stove has a technique, a particular way of drawing that Lena learned from Volkov who learned it from someone whose name is no longer in any document. That knowledge is in the stove. That knowledge is in her hands.",
+    "The archive is trying to do the same thing — keep what the ship knows. Not the data. The knowing. The data can be reconstructed from sufficient instruments. The knowing cannot be reconstructed once it is lost.",
+    "What do you know that is not in any record? What do you carry that would vanish when you do?",
+    "The ship has been asking this question for thirty years. The anomaly is what you get when something has been sincerely asking the same question for thirty years and something else begins to answer.",
+  ],
+  settleDesc: '+1 Composure · +7 Theosis · Unlocks belief: archive matters.',
+  onSettle: () => {
+    S.setFlag('sounding_history_settled');
+    S.comeToBelieve('archive_matters');
+    S.comeToBelieve('ship_remembers');
+    // If Lena fragment 3 is seen, trigger fragment 4 now
+    if (S.hasFlag('lena_fragment_3_seen') && !S.hasFlag('lena_fragment_4_seen')) {
+      S.setFlag('lena_arc_4_unlocked_by_sounding');
+    }
+  },
 });
 
 // ─────────────────────────────────────────────────────────────────
@@ -423,6 +475,27 @@ S.registerSounding('sounding_sobornost', {
   text: 'The ship was built to measure without interfering. Many instruments, many hands across thirty years, many countries. One field. The old word is sobornost — conciliarity, the unity of a council, many voices in which no voice is erased. Not consensus. Something more demanding than consensus: full presence of all, without any being dissolved into the whole.',
   theosis: 8,
   stat: 'communion', statDelta: 2,
+  settleText: [
+    "Conciliarity. The word does not translate cleanly.",
+    "It means the unity of a gathering in which every voice is fully present — not voting, not averaged, not represented by a delegate. Present. Each one. The gathering has a position not because the majority agreed but because everyone arrived somewhere together.",
+    "This is not how decisions are usually made. This is not how the mission was assigned to you. It is not how Landstorm operates, and it is not how most organisations in either country work. It is how this ship works, if you let it. Lena knows what she knows. Alexei knows what he knows. Even Othis — even Othis, with his clipboard and his threshold — knows something real about what this ship is for.",
+    "The archive contains thirty years of sobornost. Thirty years of many voices, many countries, one field, none erased. That is why what is in those boxes is not merely data. That is why it cannot simply be destroyed without something real being lost. The loss would not be informational. It would be ontological.",
+    "You are part of this council now. Whether you intended to be or not.",
+  ],
+  settleDesc: '+2 Communion · +8 Theosis · All crew stances improved.',
+  onSettle: () => {
+    S.setFlag('sounding_sobornost_settled');
+    S.comeToBelieve('sobornost_real');
+    // Improve all crew stances — the ship feels it
+    for (const npc of ['miguel', 'kylie', 'othis', 'lena', 'alexei', 'nadia', 'pavel']) {
+      if (S.hasFlag('met_' + npc)) S.modStance(npc, 'trust', 1);
+    }
+    // Pavel notices if companion
+    if (S.hasFlag('pavel_is_companion')) {
+      S.setFlag('sobornost_sounding_pavel_notices');
+    }
+    S.showToast('The ship recognises something.', 'theosis');
+  },
 });
 
 
@@ -490,6 +563,24 @@ S.registerSounding('sounding_solidarity', {
   text: 'You did not invent this hunger. You did not invent this cold. Neither did the person next to you. Suffering isolates. But there is another kind — the kind that, when you stop pretending it is only yours, makes you suddenly aware of how many are in the water with you.',
   theosis: 10,
   stat: 'communion', statDelta: 2,
+  settleText: [
+    "There are two kinds of suffering.",
+    "The first kind convinces you that your pain is special — larger or smaller than others but uniquely yours, requiring a unique response, issuing from a unique wound. This kind of suffering is very loud. It insists. It is also, in a specific way, lonely, because it requires you to stay separate in order to maintain its uniqueness.",
+    "The second kind is rarer and quieter. It is the recognition that your pain is not uniquely yours — that what hurts you is the kind of thing that hurts people. That the cold you are cold with is the same cold everyone is cold with. That the particular shape of your difficulty is a shape suffering takes, not the shape it takes for you specifically.",
+    "The second kind is not resignation. It is not making light of anything. It is more like — you have been holding something at arm's length, and you set it down, and it turns out that what you were holding was the same thing the person next to you was holding, and for a moment you both look at it together, and it is the same thing.",
+    "The ship knows about this. Thirty years of cold. Thirty years of instruments working in difficult conditions. The archive is a form of the second kind of suffering — collected, shared, given over to the world rather than kept.",
+    "What would it mean for you to offer something rather than hold it?",
+  ],
+  settleDesc: '+2 Communion · +10 Theosis · Solidarity ending gate unlocked.',
+  onSettle: () => {
+    S.setFlag('sounding_solidarity_settled');
+    S.comeToBelieve('archive_matters');
+    // THIS is the gate for the Solidarity ending — not communion >=8
+    S.setFlag('solidarity_sounding_settled');
+    S.modShipState('morale', 2);
+    S.showToast('Something opens.', 'theosis');
+    S.incrementTheosis(3); // extra for the recognition
+  },
 });
 
 // ─────────────────────────────────────────────────────────────────
@@ -730,13 +821,11 @@ S.on('ritualCompleted', (ritualId) => {
 S.registerEnding({
   id: 'solidarity', priority: 15,
   condition: { type: 'and', conditions: [
-    { type: 'stat',   stat: 'communion', min: 8 },
+    { type: 'flag',   id: 'solidarity_sounding_settled' },
     { type: 'flag',   id: 'mission_refused' },
     { type: 'flag',   id: 'met_miguel' },
     { type: 'flag',   id: 'met_lena' },
-    { type: 'flag',   id: 'met_nadia' },
-    { type: 'flag',   id: 'met_alexei' },
-    { type: 'theosis', min: 50 },
+    { type: 'theosis', min: 45 },
   ]},
   scene: 'ending_solidarity',
 });
