@@ -1352,11 +1352,11 @@ function loadJournal(slotId) {
 }
 function renderJournalPanel(root, openPanelFn) {
   const overlay = document.createElement('div'); overlay.className = 'panel-overlay'; overlay.setAttribute('role','dialog'); overlay.setAttribute('aria-modal','true');
-  overlay.onclick = (e) => { if (e.target === overlay) closePanel(); };
+  overlay.onclick = (e) => { if (e.target === overlay) openPanelFn(null); };
   const panel = document.createElement('div'); panel.className = 'panel';
   const hdr = document.createElement('div'); hdr.className = 'panel-header';
   const title = document.createElement('div'); title.className = 'panel-title'; title.textContent = 'the journal';
-  const close = document.createElement('button'); close.className = 'panel-close'; close.textContent = '\u00d7'; close.onclick = () => closePanel();
+  const close = document.createElement('button'); close.className = 'panel-close'; close.textContent = '\u00d7'; close.onclick = () => openPanelFn(null);
   hdr.appendChild(title); hdr.appendChild(close); panel.appendChild(hdr);
   const body = document.createElement('div'); body.className = 'panel-body';
   if (!G.journal.length) {
@@ -1378,7 +1378,7 @@ function renderJournalPanel(root, openPanelFn) {
       row.appendChild(meta); row.appendChild(text); body.appendChild(row);
     });
   }
-  panel.appendChild(body); overlay.appendChild(panel); root.appendChild(overlay);
+  panel.appendChild(body); overlay.appendChild(panel); document.body.appendChild(overlay);
 }
 
 
@@ -1566,17 +1566,10 @@ function navigate(id) {
     document.body.classList.toggle('ship-exhausted', (G.shipState.exhaustion||0)>=5);
     document.body.classList.toggle('ship-low-morale',(G.shipState.morale||5)<=3);
   }
-  // Force scroll to top — try multiple targets for iOS compatibility
-  try { window.scrollTo(0,0); } catch(e) {}
   emit('sceneChanged', id);
 }
 
-function openPanel(w) {
-  // If clicking the same panel that's open, close it; otherwise open the new one
-  G.panelOpen = (w && G.panelOpen === w) ? null : w;
-  scheduleRender();
-}
-function closePanel() { G.panelOpen = null; scheduleRender(); }
+function openPanel(w) { G.panelOpen = G.panelOpen === w ? null : w; scheduleRender(); }
 function returnToTitle() { G.phase = 'title'; scheduleRender(); }
 
 let _processingChoice = false;
@@ -1630,7 +1623,10 @@ function applyChoice(ch) {
     if (consequenceRedirected || deadlineRedirect) { emit('choiceApplied', ch); return; }
     if (ch.next === '__new_play__') { newPlay(); return; }
     if (ch.start_ritual) { const [rid,sscene,nscene] = ch.start_ritual; startRitual(rid, sscene, nscene); return; }
-    if (ch.next) navigate(ch.next);
+    if (ch.next) {
+    _lastScrolledScene = null; // force scroll even if scene id is unchanged
+    navigate(ch.next);
+  }
     emit('choiceApplied', ch);
   } finally { _processingChoice = false; }
 }
@@ -1765,11 +1761,11 @@ function getCodexCategories() {
 }
 function renderCodexPanel(root,openPanelFn) {
   const overlay=document.createElement('div');overlay.className='panel-overlay';
-  overlay.onclick=(e)=>{if(e.target===overlay)closePanel();};
+  overlay.onclick=(e)=>{if(e.target===overlay)openPanelFn(null);};
   const panel=document.createElement('div');panel.className='panel';
   const hdr=document.createElement('div');hdr.className='panel-header';
   const title=document.createElement('div');title.className='panel-title';title.textContent='the codex';
-  const close=document.createElement('button');close.className='panel-close';close.textContent='\u00d7';close.onclick=()=>closePanel();
+  const close=document.createElement('button');close.className='panel-close';close.textContent='\u00d7';close.onclick=()=>openPanelFn(null);
   hdr.appendChild(title);hdr.appendChild(close);panel.appendChild(hdr);
   const body=document.createElement('div');body.className='panel-body';
   const entries=getUnlockedCodex();
@@ -1786,7 +1782,7 @@ function renderCodexPanel(root,openPanelFn) {
       });
     });
   }
-  panel.appendChild(body);overlay.appendChild(panel);root.appendChild(overlay);
+  panel.appendChild(body);overlay.appendChild(panel);document.body.appendChild(overlay);
 }
 
 
@@ -2041,12 +2037,12 @@ function _summarise(type,data){
 }
 function renderEventLogPanel(root,openPanelFn){
   const overlay=document.createElement('div');overlay.className='panel-overlay';
-  overlay.onclick=(e)=>{if(e.target===overlay)closePanel();};
+  overlay.onclick=(e)=>{if(e.target===overlay)openPanelFn(null);};
   const panel=document.createElement('div');panel.className='panel';
   const hdr=document.createElement('div');hdr.className='panel-header';
   const title=document.createElement('div');title.className='panel-title';title.textContent='event log';
   const exportBtn=document.createElement('button');exportBtn.className='btn btn-sm';exportBtn.style.cssText='font-size:.58rem;padding:.1rem .4rem;margin-right:.4rem';exportBtn.textContent='export';exportBtn.onclick=exportEventLog;
-  const close=document.createElement('button');close.className='panel-close';close.textContent='\u00d7';close.onclick=()=>closePanel();
+  const close=document.createElement('button');close.className='panel-close';close.textContent='\u00d7';close.onclick=()=>openPanelFn(null);
   hdr.appendChild(title);hdr.appendChild(exportBtn);hdr.appendChild(close);panel.appendChild(hdr);
   const body=document.createElement('div');body.className='panel-body';body.style.fontFamily="'Courier Prime',monospace";
   if(!G.eventLog.length){const empty=document.createElement('p');empty.style.cssText='color:var(--dim);font-size:.7rem;font-style:italic';empty.textContent='No events logged yet.';body.appendChild(empty);}
@@ -2059,7 +2055,7 @@ function renderEventLogPanel(root,openPanelFn){
       row.appendChild(typeEl);row.appendChild(dataEl);row.appendChild(sceneEl);body.appendChild(row);
     });
   }
-  panel.appendChild(body);overlay.appendChild(panel);root.appendChild(overlay);
+  panel.appendChild(body);overlay.appendChild(panel);document.body.appendChild(overlay);
 }
 
 
@@ -2364,6 +2360,8 @@ setRenderFn(render);
 function render(){
   const root=document.getElementById('root');
   if(!root){console.error('[SOBORNOST] No #root element found');return;}
+  // Remove any panel overlays rendered into body from previous frame
+  document.querySelectorAll('.panel-overlay').forEach(el => el.remove());
   root.innerHTML='';
   if(typeof IS_DEMO!=='undefined'&&IS_DEMO){const b=document.createElement('div');b.className='demo-banner';b.textContent='\u2693 DEMO \u2014 '+(window.GAME_TITLE||'Game');root.appendChild(b);}
   if     (G.phase==='title')    renderTitle(root);
@@ -2675,7 +2673,7 @@ function renderGame(root){
   body.appendChild(stxt);
   if(G._dialogue){renderDialogue(body,processText);body.appendChild(_buildRestartBar());wrap.appendChild(body);root.appendChild(wrap);_appendAudioBtn(root);_appendBottomNav(root);return;}
   const cd=document.createElement('div');cd.className='choices';
-  if(scene.return_to){const rb=document.createElement('button');rb.className='choice choice-return';rb.textContent=scene.return_label||'Return.';rb.onclick=()=>navigate(scene.return_to);cd.appendChild(rb);}
+  if(scene.return_to){const rb=document.createElement('button');rb.className='choice choice-return';rb.textContent=scene.return_label||'Return.';rb.onclick=()=>{_lastScrolledScene=null;navigate(scene.return_to);};cd.appendChild(rb);}
   if(scene.choices){
     let _choiceIdx=0;
     scene.choices.forEach(ch=>{
@@ -2851,12 +2849,12 @@ function _appendBottomNav(root){
 }
 function _renderNotesPanel(root) {
   const overlay = document.createElement('div'); overlay.className = 'panel-overlay'; overlay.setAttribute('role','dialog'); overlay.setAttribute('aria-modal','true');
-  overlay.onclick = (e) => { if (e.target === overlay) closePanel(); };
+  overlay.onclick = (e) => { if (e.target === overlay) openPanel(null); };
   const panel = document.createElement('div'); panel.className = 'panel';
 
   const hdr = document.createElement('div'); hdr.className = 'panel-header';
   const t = document.createElement('div'); t.className = 'panel-title'; t.textContent = 'observations';
-  const x = document.createElement('button'); x.className = 'panel-close'; x.textContent = '✕'; x.onclick = () => closePanel();
+  const x = document.createElement('button'); x.className = 'panel-close'; x.textContent = '✕'; x.onclick = () => openPanel(null);
   hdr.appendChild(t); hdr.appendChild(x); panel.appendChild(hdr);
 
   const body = document.createElement('div'); body.className = 'panel-body';
@@ -2929,17 +2927,17 @@ function _renderNotesPanel(root) {
     empty.textContent = 'Nothing noted yet.'; body.appendChild(empty);
   }
 
-  panel.appendChild(body); overlay.appendChild(panel); root.appendChild(overlay);
+  panel.appendChild(body); overlay.appendChild(panel); document.body.appendChild(overlay);
 }
 
 function _renderStatusPanel(root) {
   const overlay = document.createElement('div'); overlay.className = 'panel-overlay'; overlay.setAttribute('role','dialog'); overlay.setAttribute('aria-modal','true');
-  overlay.onclick = (e) => { if (e.target === overlay) closePanel(); };
+  overlay.onclick = (e) => { if (e.target === overlay) openPanel(null); };
   const panel = document.createElement('div'); panel.className = 'panel';
 
   const hdr = document.createElement('div'); hdr.className = 'panel-header';
   const t = document.createElement('div'); t.className = 'panel-title'; t.textContent = 'status';
-  const x = document.createElement('button'); x.className = 'panel-close'; x.textContent = '✕'; x.onclick = () => closePanel();
+  const x = document.createElement('button'); x.className = 'panel-close'; x.textContent = '✕'; x.onclick = () => openPanel(null);
   hdr.appendChild(t); hdr.appendChild(x); panel.appendChild(hdr);
 
   const body = document.createElement('div'); body.className = 'panel-body';
@@ -3085,17 +3083,17 @@ function _renderStatusPanel(root) {
     if(_hasGlossary) _registries.glossary.forEach(({term,def})=>_re(term,def,''));
   }
 
-  panel.appendChild(body); overlay.appendChild(panel); root.appendChild(overlay);
+  panel.appendChild(body); overlay.appendChild(panel); document.body.appendChild(overlay);
 }
 
 function _renderBreviaryPanel(root) {
   const overlay = document.createElement('div'); overlay.className = 'panel-overlay'; overlay.setAttribute('role','dialog'); overlay.setAttribute('aria-modal','true');
-  overlay.onclick = (e) => { if (e.target === overlay) closePanel(); };
+  overlay.onclick = (e) => { if (e.target === overlay) openPanel(null); };
   const panel = document.createElement('div'); panel.className = 'panel';
 
   const hdr = document.createElement('div'); hdr.className = 'panel-header';
   const t = document.createElement('div'); t.className = 'panel-title'; t.textContent = 'breviary';
-  const x = document.createElement('button'); x.className = 'panel-close'; x.textContent = '✕'; x.onclick = () => closePanel();
+  const x = document.createElement('button'); x.className = 'panel-close'; x.textContent = '✕'; x.onclick = () => openPanel(null);
   hdr.appendChild(t); hdr.appendChild(x); panel.appendChild(hdr);
 
   const body = document.createElement('div'); body.className = 'panel-body';
@@ -3152,17 +3150,17 @@ function _renderBreviaryPanel(root) {
     });
   }
 
-  panel.appendChild(body); overlay.appendChild(panel); root.appendChild(overlay);
+  panel.appendChild(body); overlay.appendChild(panel); document.body.appendChild(overlay);
 }
 
 function _renderGlossaryPanel(root) {
   const overlay = document.createElement('div'); overlay.className = 'panel-overlay'; overlay.setAttribute('role','dialog'); overlay.setAttribute('aria-modal','true');
-  overlay.onclick = (e) => { if (e.target === overlay) closePanel(); };
+  overlay.onclick = (e) => { if (e.target === overlay) openPanel(null); };
   const panel = document.createElement('div'); panel.className = 'panel';
 
   const hdr = document.createElement('div'); hdr.className = 'panel-header';
   const t = document.createElement('div'); t.className = 'panel-title'; t.textContent = 'glossary';
-  const x = document.createElement('button'); x.className = 'panel-close'; x.textContent = '✕'; x.onclick = () => closePanel();
+  const x = document.createElement('button'); x.className = 'panel-close'; x.textContent = '✕'; x.onclick = () => openPanel(null);
   hdr.appendChild(t); hdr.appendChild(x); panel.appendChild(hdr);
 
   const body = document.createElement('div'); body.className = 'panel-body';
@@ -3196,18 +3194,18 @@ function _renderGlossaryPanel(root) {
     });
   }
 
-  panel.appendChild(body); overlay.appendChild(panel); root.appendChild(overlay);
+  panel.appendChild(body); overlay.appendChild(panel); document.body.appendChild(overlay);
 }
 
 
 function _renderCalendarPanel(root) {
   const overlay = document.createElement('div'); overlay.className = 'panel-overlay'; overlay.setAttribute('role','dialog'); overlay.setAttribute('aria-modal','true');
-  overlay.onclick = (e) => { if (e.target === overlay) closePanel(); };
+  overlay.onclick = (e) => { if (e.target === overlay) openPanel(null); };
   const panel = document.createElement('div'); panel.className = 'panel';
 
   const hdr = document.createElement('div'); hdr.className = 'panel-header';
   const t = document.createElement('div'); t.className = 'panel-title'; t.textContent = 'the crossing';
-  const x = document.createElement('button'); x.className = 'panel-close'; x.textContent = '✕'; x.onclick = () => closePanel();
+  const x = document.createElement('button'); x.className = 'panel-close'; x.textContent = '✕'; x.onclick = () => openPanel(null);
   hdr.appendChild(t); hdr.appendChild(x); panel.appendChild(hdr);
 
   const body = document.createElement('div'); body.className = 'panel-body';
@@ -3245,17 +3243,17 @@ function _renderCalendarPanel(root) {
   if (G.theosis > 32) tLine.style.color = G.theosis > 65 ? 'var(--gold)' : 'var(--amber)';
   tRow.appendChild(tLine); body.appendChild(tRow);
 
-  panel.appendChild(body); overlay.appendChild(panel); root.appendChild(overlay);
+  panel.appendChild(body); overlay.appendChild(panel); document.body.appendChild(overlay);
 }
 
 function _renderMapPanelSide(root) {
   const overlay = document.createElement('div'); overlay.className = 'panel-overlay'; overlay.setAttribute('role','dialog'); overlay.setAttribute('aria-modal','true');
-  overlay.onclick = (e) => { if (e.target === overlay) closePanel(); };
+  overlay.onclick = (e) => { if (e.target === overlay) openPanel(null); };
   const panel = document.createElement('div'); panel.className = 'panel';
 
   const hdr = document.createElement('div'); hdr.className = 'panel-header';
   const t = document.createElement('div'); t.className = 'panel-title'; t.textContent = 'map — the crossing';
-  const x = document.createElement('button'); x.className = 'panel-close'; x.textContent = '✕'; x.onclick = () => closePanel();
+  const x = document.createElement('button'); x.className = 'panel-close'; x.textContent = '✕'; x.onclick = () => openPanel(null);
   hdr.appendChild(t); hdr.appendChild(x); panel.appendChild(hdr);
 
   const body = document.createElement('div'); body.className = 'panel-body';
@@ -3353,7 +3351,7 @@ function _renderMapPanelSide(root) {
     }
   }
 
-  panel.appendChild(body); overlay.appendChild(panel); root.appendChild(overlay);
+  panel.appendChild(body); overlay.appendChild(panel); document.body.appendChild(overlay);
 }
 
 loadMetaUnlocks();
