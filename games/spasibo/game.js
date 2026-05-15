@@ -331,8 +331,16 @@ S.on('flagSet', (flag) => {
   if (flag === 'radio_found')           S.setQuestState('quest_radio_assembly', 'found');
   if (flag === 'radio_team_assembled')  S.setQuestState('quest_radio_assembly', 'assembled');
   if (flag === 'archive_transmitted')   S.setQuestState('quest_radio_assembly', 'completed');
-  if (flag === 'solidarity_signal_seen') S.setQuestState('quest_solidarity', 'signal_received');
+  if (flag === 'solidarity_signal_seen') { S.setQuestState('quest_solidarity', 'signal_received'); }
   if (flag === 'solidarity_ending_achieved') S.setQuestState('quest_solidarity', 'completed');
+  // Solidarity approach hints via the trust system
+  if (flag === 'met_lena' || flag === 'met_miguel' || flag === 'met_alexei' || flag === 'met_nadia') {
+    const crewMet = ['met_lena','met_miguel','met_alexei','met_nadia','met_kylie'].filter(f => S.hasFlag(f)).length;
+    if (crewMet >= 3 && !S.hasFlag('crew_trust_hint_shown')) {
+      S.setFlag('crew_trust_hint_shown');
+      S.showToast('The crew is beginning to know you.', 'note');
+    }
+  }
 });
 
 // Use isQuestCompleted in conditions throughout game

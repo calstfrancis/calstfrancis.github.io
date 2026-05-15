@@ -1877,7 +1877,8 @@ function renderCoverChallengeOverlay(root,processTextFn) {
       failure:  'does not hold',
     };
     const fieldLabel = field ? (field.charAt(0).toUpperCase()+field.slice(1)) : 'Cover';
-    res.textContent = `${fieldLabel} · total ${result.total} · ${outcomeLabels[result.outcome]||result.outcome}`;
+    const integrityText = G.coverIntegrity !== undefined ? `  ◈ ${G.coverIntegrity}` : '';
+    res.textContent = `${fieldLabel} · total ${result.total} · ${outcomeLabels[result.outcome]||result.outcome}${integrityText}`;
     if (result.charismNote) { const cn=document.createElement('div');cn.className='challenge-charism';cn.textContent=result.charismNote;box.appendChild(cn); }
     box.appendChild(res);
     const cont=document.createElement('button');cont.className='btn';cont.style.cssText='margin-top:1rem;width:100%';
@@ -2802,7 +2803,24 @@ function _appendBottomNav(root){
   const _atmBtn=document.createElement('button');_atmBtn.className='atmos-toggle';
   _atmBtn.textContent=_atmosEnabled?'atmos on':'atmos off';
   _atmBtn.onclick=toggleAtmos;_atmBtn.title='Toggle atmospheric animation (saves battery)';
+  _atmBtn.setAttribute('aria-label','Toggle atmospheric animation');
   root.appendChild(_atmBtn);
+
+  // ? Help button
+  if(!document.querySelector('.help-btn')){
+    const _hBtn=document.createElement('button');_hBtn.className='help-btn';
+    _hBtn.textContent='?';_hBtn.setAttribute('aria-label','How to play');
+    _hBtn.onclick=()=>{ if(G._helpOpen){document.querySelector('.help-overlay')?.remove();G._helpOpen=false;}else{renderHelp(document.getElementById('root'));} };
+    document.body.appendChild(_hBtn);
+  }
+
+  // Restore high contrast pref
+  if(localStorage.getItem('spasibo_hc')==='1') document.body.classList.add('high-contrast');
+
+  // Low power mode on mobile
+  if(!_atmosEnabled||(/Mobi|Android/i.test(navigator.userAgent)&&!localStorage.getItem('spasibo_atmos'))){
+    _canvas.style.display='none';_atmosEnabled=false;
+  }
 }
 function _renderNotesPanel(root) {
   const overlay = document.createElement('div'); overlay.className = 'panel-overlay'; overlay.setAttribute('role','dialog'); overlay.setAttribute('aria-modal','true');
@@ -3490,6 +3508,66 @@ function injectDialogueBeat(afterIndex, beat) {
   beats.splice(insertAt, 0, beat);
 }
 
+
+function renderHelp(root) {
+  const ov = document.createElement('div'); ov.className = 'help-overlay';
+  ov.setAttribute('role','dialog'); ov.setAttribute('aria-label','How to play');
+
+  const close = document.createElement('button'); close.className = 'help-close';
+  close.textContent = '×'; close.setAttribute('aria-label','Close help');
+  close.onclick = () => { ov.remove(); G._helpOpen = false; };
+  ov.appendChild(close);
+
+  const content = `
+<h2>The Crossing</h2>
+<p>You are the ship's chaplain. This is your cover. Your mission is in the case under the bunk.</p>
+<p>The crossing takes three days. What happens in those three days determines which ending you reach — and what you carry into the next crossing.</p>
+
+<h2>Stats</h2>
+<ul>
+<li><strong>Vigilance</strong> — what you notice. High vigilance reveals things before they become problems.</li>
+<li><strong>Composure</strong> — what you can hold under pressure. Used in cover challenges.</li>
+<li><strong>Communion</strong> — how much the crew trusts you collectively. Opens paths.</li>
+<li><strong>Doubt</strong> — accumulates when the cover is strained. High doubt dissolves things.</li>
+</ul>
+
+<h2>Cover Challenges</h2>
+<p>When someone questions your cover, a challenge overlay appears. You roll 2d6 + Composure against the field difficulty.</p>
+<p><strong>Success</strong>: the cover holds cleanly. <strong>Partial</strong>: holds, but costs something. <strong>Failure</strong>: the cover shifts. Cover integrity (◈) tracks how much remains.</p>
+<p>Tap <em>skip — resolve automatically</em> if you prefer narrative play.</p>
+
+<h2>Soundings</h2>
+<p>Soundings are moments of spiritual recognition. Open the Breviary to see available soundings. Take one when it resonates. They progress through contemplative choices — stillness, presence, witness. When a sounding settles, the porthole changes.</p>
+
+<h2>Theosis</h2>
+<p>Theosis is spiritual progression. It rises through contemplation, honest choices, and witness. It changes what's available. Watch the porthole for the tier you're in: Asleep, Waking, Illumined.</p>
+
+<h2>Items</h2>
+<p>Items in your inventory (STATUS panel) can be tapped to read their description. Some modify stats while held.</p>
+
+<h2>Keyboard Shortcuts</h2>
+<ul>
+<li><span class="help-key">1</span>–<span class="help-key">9</span> Activate choices</li>
+<li><span class="help-key">Esc</span> Close panels</li>
+<li><span class="help-key">Tab</span> Navigate elements</li>
+<li><span class="help-key">Enter</span> Activate focused choice</li>
+</ul>
+`;
+  ov.innerHTML += content;
+
+  // High contrast toggle
+  const hcBtn = document.createElement('button'); hcBtn.className = 'contrast-toggle';
+  hcBtn.textContent = document.body.classList.contains('high-contrast') ? 'standard contrast' : 'high contrast';
+  hcBtn.onclick = () => {
+    document.body.classList.toggle('high-contrast');
+    localStorage.setItem('spasibo_hc', document.body.classList.contains('high-contrast') ? '1' : '0');
+    hcBtn.textContent = document.body.classList.contains('high-contrast') ? 'standard contrast' : 'high contrast';
+  };
+  ov.appendChild(hcBtn);
+
+  root.appendChild(ov);
+  G._helpOpen = true;
+}
 
 window.SOBORNOST={
   VERSION, G, render, setDebug, undo, redo,
