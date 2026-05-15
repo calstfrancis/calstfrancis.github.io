@@ -1,3 +1,11 @@
+/* ── Font stack: Share Tech Mono from Google (loaded in HTML) replaces GOST ── */
+/* Declare the name so any GOST references in legacy code resolve gracefully */
+@font-face {
+  font-family: 'GOST type B';
+  src: local('Share Tech Mono'), local('Courier New');
+  font-display: swap;
+}
+
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
 
 /* ─────────────────────────────────────────────────────────────
@@ -1507,16 +1515,17 @@ body.mood-neutral .sp {
 
 /* ── Canvas toggle button ────────────────────────────────────── */
 .atmos-toggle {
-  position: fixed; bottom: 3.2rem; left: .8rem; z-index: 150;
-  background: none; border: 1px solid var(--border);
+  /* In page flow below nav — not fixed */
+  display: block; width: 100%;
+  background: none; border: none; border-top: 1px solid var(--border);
   color: var(--dim); font-family: var(--font-display);
-  font-size: .48rem; letter-spacing: .14em; text-transform: uppercase;
-  padding: .3rem .6rem; cursor: pointer; opacity: 0.5;
-  transition: opacity .2s, border-color .2s;
+  font-size: .44rem; letter-spacing: .12em; text-transform: uppercase;
+  padding: .45rem 1rem; cursor: pointer; opacity: 0.5; text-align: left;
+  transition: opacity .2s, color .2s;
 }
 .atmos-toggle:hover, .atmos-toggle:focus {
-  opacity: 1; border-color: var(--cold-dim); color: var(--cold-dim);
-  outline: 2px solid var(--cold-dim); outline-offset: 2px;
+  opacity: 1; color: var(--cold-dim);
+  outline: 2px solid var(--cold-dim); outline-offset: -2px;
 }
 
 /* ── Focus ring for keyboard navigation ─────────────────────── */
@@ -1656,3 +1665,13 @@ body.low-power #atmos { display: none; }
   padding: .25rem .7rem; background: none;
 }
 .contrast-toggle:hover { color: var(--cold-dim); border-color: var(--cold-dim); }
+
+/* ── Mobile legibility: opaque root background on small screens ── */
+@media (max-width: 600px) {
+  #root {
+    background: rgba(5, 8, 14, 0.97);
+  }
+  .game-body {
+    padding: 1.4rem 1.2rem 1rem 1.4rem;
+  }
+}

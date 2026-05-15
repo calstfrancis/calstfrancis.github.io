@@ -157,22 +157,28 @@ function _initKeyboard() {
   });
 }
 
+let _lastScrolledScene = null;
 function scheduleRender() {
   if (_scheduled) return;
   if (!_renderFn) { console.warn('[SOBORNOST] scheduleRender() called before renderer registered'); return; }
   _scheduled = true;
+  const _sceneAtSchedule = G.scene;
   queueMicrotask(() => {
     _scheduled = false; _renderFn();
-    // Scroll after paint — double rAF ensures iOS Safari repaints first
-    requestAnimationFrame(() => {
+    // Only scroll when the scene actually changed — prevents disorienting
+    // scroll-snapping during panel opens, stat updates, dialogue advances
+    if (_sceneAtSchedule !== _lastScrolledScene) {
+      _lastScrolledScene = _sceneAtSchedule;
       requestAnimationFrame(() => {
-        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-        const root = document.getElementById('root');
-        if (root) { root.scrollTop = 0; root.scrollLeft = 0; }
-        document.documentElement.scrollTop = 0;
-        document.body.scrollTop = 0;
+        requestAnimationFrame(() => {
+          window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+          const root = document.getElementById('root');
+          if (root) { root.scrollTop = 0; root.scrollLeft = 0; }
+          document.documentElement.scrollTop = 0;
+          document.body.scrollTop = 0;
+        });
       });
-    });
+    }
   });
 }
 
@@ -1376,9 +1382,9 @@ function renderJournalPanel(root, openPanelFn) {
 // ============================================================
 
 function addCompanion(id, data) {
-  if (!G.companions.find(c => c.id === id)) { G.companions.push({ id, ...data }); saveGameLegacy(); emit('companionAdded', id); }
+  if (!G.companions.find(c => c.id === id)) { G.companions.push({ id, ...data }); emit('companionAdded', id); }
 }
-function removeCompanion(id) { G.companions = G.companions.filter(c => c.id !== id); saveGameLegacy(); emit('companionRemoved', id); }
+function removeCompanion(id) { G.companions = G.companions.filter(c => c.id !== id); emit('companionRemoved', id); }
 function hasCompanion(id) { return G.companions.some(c => c.id === id); }
 function getCompanion(id) { return G.companions.find(c => c.id === id); }
 function modCompanionStat(id, stat, delta) {
@@ -1842,6 +1848,7 @@ function dismissCoverChallenge(){
       navigate(genericScene); return;
     }
   }
+  saveGameLegacy();
   scheduleRender();
 }
 
@@ -2593,7 +2600,15 @@ function renderGame(root){
     const scene=getScene(G.scene);
     if(scene){const wrap=document.createElement('div');wrap.className='game';wrap.appendChild(_buildHeader(scene));const body=document.createElement('div');body.className='game-body';renderCoverChallengeOverlay(body,processText);body.appendChild(_buildRestartBar());wrap.appendChild(body);root.appendChild(wrap);}
     else{renderCoverChallengeOverlay(root,processText);}
-    _appendAudioBtn(root);_appendBottomNav(root);return;
+    _appendAudioBtn(root);
+  // Atmos toggle in page footer (not overlaid)
+  if (!document.getElementById('_atmos_btn')) {
+    const _ab = document.createElement('button'); _ab.id='_atmos_btn'; _ab.className='atmos-toggle';
+    _ab.textContent = _atmosEnabled ? 'canvas on' : 'canvas off';
+    _ab.onclick = toggleAtmos; _ab.title = 'Toggle atmospheric animation';
+    _ab.setAttribute('aria-label', 'Toggle atmospheric canvas animation');
+    root.appendChild(_ab);
+  }_appendBottomNav(root);return;
   }
   processConsequenceQueue();resetIdleTimer();
   const scene=getScene(G.scene);

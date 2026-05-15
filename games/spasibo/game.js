@@ -325,8 +325,8 @@ S.registerItem('stink_patrol_paper', {
 
 // Pavel riddle chain — 3 scenes across foredeck/hold/mess
 S.on('flagSet', (flag) => {
-  if (flag === 'pavel_riddle_one')     S.setQuestState('quest_pavel_riddle', 'started');
-  if (flag === 'pavel_riddle_two')     S.setQuestState('quest_pavel_riddle', 'midway');
+  if (flag === 'pavel_riddle_one_complete')     S.setQuestState('quest_pavel_riddle', 'started');
+  if (flag === 'pavel_riddle_two_complete')     S.setQuestState('quest_pavel_riddle', 'midway');
   if (flag === 'pavel_revelation_seen') S.setQuestState('quest_pavel_riddle', 'completed');
   if (flag === 'radio_found')           S.setQuestState('quest_radio_assembly', 'found');
   if (flag === 'radio_team_assembled')  S.setQuestState('quest_radio_assembly', 'assembled');
@@ -3775,7 +3775,7 @@ He looks at the water.
 — The question is: what does the ship remember from those crossings.
 
 He does not say more. He picks up a piece of rope and does not do anything with it.`,
-    onEnter: () => { S.setFlag('pavel_riddle_one'); S.incrementTheosis(2); },
+    onEnter: () => { S.setFlag('pavel_riddle_one'); S.setFlag('pavel_riddle_one_complete'); S.incrementTheosis(2); },
     condition: { type: 'and', conditions: [
       { type: 'flag', id: 'met_pavel' },
       { type: 'not', condition: { type: 'flag', id: 'pavel_riddle_one' } },
@@ -3818,7 +3818,7 @@ He looks at one box in particular.
 He finally looks at you.
 
 — What accounts for the difference?`,
-    onEnter: () => { S.setFlag('pavel_riddle_two'); S.incrementTheosis(3); },
+    onEnter: () => { S.setFlag('pavel_riddle_two'); S.setFlag('pavel_riddle_two_complete'); S.incrementTheosis(3); },
     condition: { type: 'and', conditions: [
       { type: 'flag', id: 'pavel_riddle_one_complete' },
       { type: 'flag', id: 'hold_visited' },
