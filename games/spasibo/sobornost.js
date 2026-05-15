@@ -1352,11 +1352,11 @@ function loadJournal(slotId) {
 }
 function renderJournalPanel(root, openPanelFn) {
   const overlay = document.createElement('div'); overlay.className = 'panel-overlay'; overlay.setAttribute('role','dialog'); overlay.setAttribute('aria-modal','true');
-  overlay.onclick = (e) => { if (e.target === overlay) openPanelFn(null); };
+  overlay.onclick = (e) => { if (e.target === overlay) closePanel(); };
   const panel = document.createElement('div'); panel.className = 'panel';
   const hdr = document.createElement('div'); hdr.className = 'panel-header';
   const title = document.createElement('div'); title.className = 'panel-title'; title.textContent = 'the journal';
-  const close = document.createElement('button'); close.className = 'panel-close'; close.textContent = '\u00d7'; close.onclick = () => openPanelFn(null);
+  const close = document.createElement('button'); close.className = 'panel-close'; close.textContent = '\u00d7'; close.onclick = () => closePanel();
   hdr.appendChild(title); hdr.appendChild(close); panel.appendChild(hdr);
   const body = document.createElement('div'); body.className = 'panel-body';
   if (!G.journal.length) {
@@ -1566,10 +1566,17 @@ function navigate(id) {
     document.body.classList.toggle('ship-exhausted', (G.shipState.exhaustion||0)>=5);
     document.body.classList.toggle('ship-low-morale',(G.shipState.morale||5)<=3);
   }
+  // Force scroll to top — try multiple targets for iOS compatibility
+  try { window.scrollTo(0,0); } catch(e) {}
   emit('sceneChanged', id);
 }
 
-function openPanel(w) { G.panelOpen = G.panelOpen === w ? null : w; scheduleRender(); }
+function openPanel(w) {
+  // If clicking the same panel that's open, close it; otherwise open the new one
+  G.panelOpen = (w && G.panelOpen === w) ? null : w;
+  scheduleRender();
+}
+function closePanel() { G.panelOpen = null; scheduleRender(); }
 function returnToTitle() { G.phase = 'title'; scheduleRender(); }
 
 let _processingChoice = false;
@@ -1758,11 +1765,11 @@ function getCodexCategories() {
 }
 function renderCodexPanel(root,openPanelFn) {
   const overlay=document.createElement('div');overlay.className='panel-overlay';
-  overlay.onclick=(e)=>{if(e.target===overlay)openPanelFn(null);};
+  overlay.onclick=(e)=>{if(e.target===overlay)closePanel();};
   const panel=document.createElement('div');panel.className='panel';
   const hdr=document.createElement('div');hdr.className='panel-header';
   const title=document.createElement('div');title.className='panel-title';title.textContent='the codex';
-  const close=document.createElement('button');close.className='panel-close';close.textContent='\u00d7';close.onclick=()=>openPanelFn(null);
+  const close=document.createElement('button');close.className='panel-close';close.textContent='\u00d7';close.onclick=()=>closePanel();
   hdr.appendChild(title);hdr.appendChild(close);panel.appendChild(hdr);
   const body=document.createElement('div');body.className='panel-body';
   const entries=getUnlockedCodex();
@@ -2034,12 +2041,12 @@ function _summarise(type,data){
 }
 function renderEventLogPanel(root,openPanelFn){
   const overlay=document.createElement('div');overlay.className='panel-overlay';
-  overlay.onclick=(e)=>{if(e.target===overlay)openPanelFn(null);};
+  overlay.onclick=(e)=>{if(e.target===overlay)closePanel();};
   const panel=document.createElement('div');panel.className='panel';
   const hdr=document.createElement('div');hdr.className='panel-header';
   const title=document.createElement('div');title.className='panel-title';title.textContent='event log';
   const exportBtn=document.createElement('button');exportBtn.className='btn btn-sm';exportBtn.style.cssText='font-size:.58rem;padding:.1rem .4rem;margin-right:.4rem';exportBtn.textContent='export';exportBtn.onclick=exportEventLog;
-  const close=document.createElement('button');close.className='panel-close';close.textContent='\u00d7';close.onclick=()=>openPanelFn(null);
+  const close=document.createElement('button');close.className='panel-close';close.textContent='\u00d7';close.onclick=()=>closePanel();
   hdr.appendChild(title);hdr.appendChild(exportBtn);hdr.appendChild(close);panel.appendChild(hdr);
   const body=document.createElement('div');body.className='panel-body';body.style.fontFamily="'Courier Prime',monospace";
   if(!G.eventLog.length){const empty=document.createElement('p');empty.style.cssText='color:var(--dim);font-size:.7rem;font-style:italic';empty.textContent='No events logged yet.';body.appendChild(empty);}
@@ -2624,7 +2631,6 @@ function renderGame(root){
   // Apply mood body class for CSS mood-responsive text
   document.body.classList.remove('mood-neutral','mood-revelation','mood-uncanny','mood-tense');
   document.body.classList.add('mood-'+_sceneMood);
-  saveGameLegacy();
   const visitKey='visited_'+G.scene,firstVisit=!hasFlag(visitKey);
   if(firstVisit){setFlag(visitKey);if(scene.on_enter){if(scene.on_enter.note)addNote(scene.on_enter.note);if(scene.on_enter.flag)setFlag(scene.on_enter.flag);if(scene.on_enter.thought)offerSounding(scene.on_enter.thought);}
   // Support arbitrary onEnter function — first visit only
@@ -2845,12 +2851,12 @@ function _appendBottomNav(root){
 }
 function _renderNotesPanel(root) {
   const overlay = document.createElement('div'); overlay.className = 'panel-overlay'; overlay.setAttribute('role','dialog'); overlay.setAttribute('aria-modal','true');
-  overlay.onclick = (e) => { if (e.target === overlay) openPanel(null); };
+  overlay.onclick = (e) => { if (e.target === overlay) closePanel(); };
   const panel = document.createElement('div'); panel.className = 'panel';
 
   const hdr = document.createElement('div'); hdr.className = 'panel-header';
   const t = document.createElement('div'); t.className = 'panel-title'; t.textContent = 'observations';
-  const x = document.createElement('button'); x.className = 'panel-close'; x.textContent = '✕'; x.onclick = () => openPanel(null);
+  const x = document.createElement('button'); x.className = 'panel-close'; x.textContent = '✕'; x.onclick = () => closePanel();
   hdr.appendChild(t); hdr.appendChild(x); panel.appendChild(hdr);
 
   const body = document.createElement('div'); body.className = 'panel-body';
@@ -2928,12 +2934,12 @@ function _renderNotesPanel(root) {
 
 function _renderStatusPanel(root) {
   const overlay = document.createElement('div'); overlay.className = 'panel-overlay'; overlay.setAttribute('role','dialog'); overlay.setAttribute('aria-modal','true');
-  overlay.onclick = (e) => { if (e.target === overlay) openPanel(null); };
+  overlay.onclick = (e) => { if (e.target === overlay) closePanel(); };
   const panel = document.createElement('div'); panel.className = 'panel';
 
   const hdr = document.createElement('div'); hdr.className = 'panel-header';
   const t = document.createElement('div'); t.className = 'panel-title'; t.textContent = 'status';
-  const x = document.createElement('button'); x.className = 'panel-close'; x.textContent = '✕'; x.onclick = () => openPanel(null);
+  const x = document.createElement('button'); x.className = 'panel-close'; x.textContent = '✕'; x.onclick = () => closePanel();
   hdr.appendChild(t); hdr.appendChild(x); panel.appendChild(hdr);
 
   const body = document.createElement('div'); body.className = 'panel-body';
@@ -3084,12 +3090,12 @@ function _renderStatusPanel(root) {
 
 function _renderBreviaryPanel(root) {
   const overlay = document.createElement('div'); overlay.className = 'panel-overlay'; overlay.setAttribute('role','dialog'); overlay.setAttribute('aria-modal','true');
-  overlay.onclick = (e) => { if (e.target === overlay) openPanel(null); };
+  overlay.onclick = (e) => { if (e.target === overlay) closePanel(); };
   const panel = document.createElement('div'); panel.className = 'panel';
 
   const hdr = document.createElement('div'); hdr.className = 'panel-header';
   const t = document.createElement('div'); t.className = 'panel-title'; t.textContent = 'breviary';
-  const x = document.createElement('button'); x.className = 'panel-close'; x.textContent = '✕'; x.onclick = () => openPanel(null);
+  const x = document.createElement('button'); x.className = 'panel-close'; x.textContent = '✕'; x.onclick = () => closePanel();
   hdr.appendChild(t); hdr.appendChild(x); panel.appendChild(hdr);
 
   const body = document.createElement('div'); body.className = 'panel-body';
@@ -3151,12 +3157,12 @@ function _renderBreviaryPanel(root) {
 
 function _renderGlossaryPanel(root) {
   const overlay = document.createElement('div'); overlay.className = 'panel-overlay'; overlay.setAttribute('role','dialog'); overlay.setAttribute('aria-modal','true');
-  overlay.onclick = (e) => { if (e.target === overlay) openPanel(null); };
+  overlay.onclick = (e) => { if (e.target === overlay) closePanel(); };
   const panel = document.createElement('div'); panel.className = 'panel';
 
   const hdr = document.createElement('div'); hdr.className = 'panel-header';
   const t = document.createElement('div'); t.className = 'panel-title'; t.textContent = 'glossary';
-  const x = document.createElement('button'); x.className = 'panel-close'; x.textContent = '✕'; x.onclick = () => openPanel(null);
+  const x = document.createElement('button'); x.className = 'panel-close'; x.textContent = '✕'; x.onclick = () => closePanel();
   hdr.appendChild(t); hdr.appendChild(x); panel.appendChild(hdr);
 
   const body = document.createElement('div'); body.className = 'panel-body';
@@ -3196,12 +3202,12 @@ function _renderGlossaryPanel(root) {
 
 function _renderCalendarPanel(root) {
   const overlay = document.createElement('div'); overlay.className = 'panel-overlay'; overlay.setAttribute('role','dialog'); overlay.setAttribute('aria-modal','true');
-  overlay.onclick = (e) => { if (e.target === overlay) openPanel(null); };
+  overlay.onclick = (e) => { if (e.target === overlay) closePanel(); };
   const panel = document.createElement('div'); panel.className = 'panel';
 
   const hdr = document.createElement('div'); hdr.className = 'panel-header';
   const t = document.createElement('div'); t.className = 'panel-title'; t.textContent = 'the crossing';
-  const x = document.createElement('button'); x.className = 'panel-close'; x.textContent = '✕'; x.onclick = () => openPanel(null);
+  const x = document.createElement('button'); x.className = 'panel-close'; x.textContent = '✕'; x.onclick = () => closePanel();
   hdr.appendChild(t); hdr.appendChild(x); panel.appendChild(hdr);
 
   const body = document.createElement('div'); body.className = 'panel-body';
@@ -3244,12 +3250,12 @@ function _renderCalendarPanel(root) {
 
 function _renderMapPanelSide(root) {
   const overlay = document.createElement('div'); overlay.className = 'panel-overlay'; overlay.setAttribute('role','dialog'); overlay.setAttribute('aria-modal','true');
-  overlay.onclick = (e) => { if (e.target === overlay) openPanel(null); };
+  overlay.onclick = (e) => { if (e.target === overlay) closePanel(); };
   const panel = document.createElement('div'); panel.className = 'panel';
 
   const hdr = document.createElement('div'); hdr.className = 'panel-header';
   const t = document.createElement('div'); t.className = 'panel-title'; t.textContent = 'map — the crossing';
-  const x = document.createElement('button'); x.className = 'panel-close'; x.textContent = '✕'; x.onclick = () => openPanel(null);
+  const x = document.createElement('button'); x.className = 'panel-close'; x.textContent = '✕'; x.onclick = () => closePanel();
   hdr.appendChild(t); hdr.appendChild(x); panel.appendChild(hdr);
 
   const body = document.createElement('div'); body.className = 'panel-body';
