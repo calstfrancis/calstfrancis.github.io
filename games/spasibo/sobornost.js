@@ -2605,16 +2605,32 @@ function _renderTutorial(root){
   const div=document.createElement('div');div.className='tutorial-overlay';
   div.setAttribute('role','dialog');
   div.setAttribute('aria-label','Before you board');
-  // Tap backdrop to dismiss on mobile
   div.addEventListener('click',(e)=>{if(e.target===div)dismissTutorial();});
-  const boxHtml = _registries.tutorialContent || `
+
+  const isWitnessed = G.mode === 'witnessed';
+  const modeNote = isWitnessed
+    ? '<div class="tutorial-mode-note">Witnessed mode — cover challenges resolve automatically. You are here to observe.</div>'
+    : '';
+
+  const customContent = _registries.tutorialContent;
+  const boxHtml = customContent || `
     <div class="tutorial-h">Before you board</div>
-    <div class="tutorial-item"><strong>Stats</strong> \u2014 top of screen. Bearing, Stillness, Solidarity, Static.</div>
-    <div class="tutorial-item"><strong>Cover</strong> \u2014 build it through conversation. Be consistent.</div>
-    <div class="tutorial-item"><strong>Breviary</strong> \u2014 bottom centre. Soundings settle through choices.</div>
-    <div class="tutorial-item"><strong>Observations / Status / Codex / Map</strong> \u2014 bottom row.</div>
-    <div class="tutorial-item" style="color:var(--dim);font-size:.78rem;margin-top:.6rem">Multiple crossings. What carries forward depends on how far you have come.</div>`;
-  div.innerHTML=`<div class="tutorial-box">${boxHtml}<button class="btn" style="margin-top:1.5rem;width:100%;min-height:48px;font-size:1rem" id="dt">Board the ship</button></div>`;
+    ${modeNote}
+    <div class="tutorial-section">The cover</div>
+    <div class="tutorial-item">You are the ship's chaplain. This is a cover. Build it through conversation — be consistent, don't over-explain. It is confirmed by others believing it, not by you asserting it.</div>
+    ${isWitnessed ? '' : '<div class="tutorial-item"><em>When your cover is questioned, a Challenge appears. Roll Composure. Success holds clean. Partial holds but costs. Failure shifts something.</em></div>'}
+    <div class="tutorial-section">The stats</div>
+    <div class="tutorial-item"><strong>Vigilance</strong> — what you notice before it becomes a problem.</div>
+    <div class="tutorial-item"><strong>Composure</strong> — what you can hold under pressure. Used in cover challenges.</div>
+    <div class="tutorial-item"><strong>Communion</strong> — how much the crew trusts you collectively. Opens paths.</div>
+    <div class="tutorial-item"><strong>Doubt</strong> — accumulates when the cover strains. Keep it low.</div>
+    <div class="tutorial-section">Theosis &amp; soundings</div>
+    <div class="tutorial-item">Theosis rises through contemplation, witness, and honest choices. Watch the porthole — it changes at 33 and 66. Soundings are moments of recognition; take them in the Breviary and they settle over time.</div>
+    <div class="tutorial-section">Navigation</div>
+    <div class="tutorial-item">Bottom row: Record · Status · Breviary · Calendar · Map. Keys 1–9 select choices. Escape closes panels. ? for this reference.</div>
+    <div class="tutorial-item" style="color:var(--dim);font-size:.78rem;margin-top:.6rem">The crossing takes three days. What you carry forward depends on how far you have come.</div>
+  `;
+  div.innerHTML=\`<div class="tutorial-box">\${boxHtml}<button class="btn" style="margin-top:1.5rem;width:100%;min-height:48px;font-size:1rem" id="dt">Board the ship</button></div>\`;
   div.querySelector('#dt').addEventListener('click',dismissTutorial);
   root.appendChild(div);
 }

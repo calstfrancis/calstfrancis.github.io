@@ -263,6 +263,8 @@ S.registerMapNode('aft',             { connections: ['instrument_room'],        
 // SOUNDINGS
 // ─────────────────────────────────────────────────────────────────
 
+// First sounding is offered in cabin_porthole_stay —
+// the toast hint fires from the engine's offerSounding display
 S.registerSounding('sounding_crossing', {
   id:   'sounding_crossing',
   alignmentTags: ['stillness', 'presence', 'silence', 'crossing'],
@@ -1032,6 +1034,33 @@ S.registerScenes({
     text: '',
     onEnter: () => { S.navigateToPool('pool_hold_ambient'); },
     choices: [],
+  },
+
+
+  // ── WITNESSED MODE INTRO ─────────────────────────────────────────
+  // Shown to witnessed-mode players before cabin_wake
+  witnessed_orientation: {
+    id: 'witnessed_orientation', location: 'Cabin', mood: 'neutral',
+    text: `You are aboard the research schooner The Dawn as a witness.
+
+You did not make this crossing to act. You made it to see. What you see will determine which of the five endings this crossing reaches — and what carries forward into the next one.
+
+A few differences from the standard crossing:
+
+— Cover challenges resolve automatically. The social mechanics are still present, but you won't be stopped by a failed roll.
+
+— Your theosis accumulates slightly more slowly. Witnessing is not the same as undergoing.
+
+— The ending you reach will depend on what you've observed and what you've let happen — your choices are still meaningful, they just aren't survival choices.
+
+— If you've crossed before in Attended mode, you may notice things that aren't explained. They aren't errors.
+
+The ship is moving. The anomaly is below.`,
+    onEnter: () => { S.setFlag('witnessed_orientation_shown'); },
+    condition: { type: 'mode', mode: 'witnessed' },
+    choices: [
+      { text: 'Board the ship.', next: 'cabin_wake' },
+    ],
   },
 
   cabin_wake: {
@@ -6701,8 +6730,8 @@ She opens her notebook. She closes it again.
 — What I want to know is whether you are going to do it.`,
     onEnter: () => {
       if (!S.hasFlag('cover_challenged_before')) {
-        S.showToast('Cover challenge: roll Composure to hold the story.', 'note');
         S.setFlag('cover_challenged_before');
+        setTimeout(() => S.showToast('Cover challenge incoming — roll Composure. Check STATUS for your stats.', 'warning'), 600);
       }
       S.setFlag('kylie_act_two_confronted');
       S.applyEffect({ vigilance: 2, doubt: 1 });
@@ -8482,6 +8511,12 @@ S.on('newPlay', () => {
 });
 
 S.on('gameStarted', () => {
+  // Mode-specific starting bonuses
+  if (S.G.mode === 'attended') {
+    S.applyEffect({ vigilance: 1 }); // active agent — more alert
+  } else if (S.G.mode === 'witnessed') {
+    S.applyEffect({ communion: 1 }); // observer — more attuned to people
+  }
   if (!S.G.worldState) {
     S.G.worldState = { shipStability: 5, sanctity: 0, socialTrust: 5 };
   }
@@ -8517,6 +8552,15 @@ S.on('liturgicalHourChanged', (hour) => {
   // Compline: increase anomaly slightly
   if (hour >= 7 && S.getMagneticDeviation() < 0.5) {
     S.setMagneticDeviation(S.getMagneticDeviation() + 0.08);
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────
+// WITNESSED MODE: redirect first scene
+// ─────────────────────────────────────────────────────────────────
+S.on('newPlay', () => {
+  if (S.G.mode === 'witnessed' && !S.hasFlag('witnessed_orientation_shown')) {
+    S.G.scene = 'witnessed_orientation';
   }
 });
 
