@@ -1164,7 +1164,7 @@ There is a letter on the desk bolted to the wall. Your name is on the envelope. 
     onEnter: () => { S.setFlag('game_started'); },
     choices: [
       { text: 'Open the letter.',                           next: 'cabin_letter' },
-      { text: 'Look through the porthole first.',           next: 'cabin_porthole' },
+      { text: 'Look through the porthole first.',   tags: ['stillness', 'crossing'], next: 'cabin_porthole' },
       { text: 'Lie still. Try to remember.',                next: 'cabin_remember', theosis: 1 },
     ],
   },
@@ -1209,7 +1209,7 @@ You are supposed to be a chaplain. Somebody's chaplain. The denomination floats 
 There is a letter on the desk.`,
     choices: [
       { text: 'Open the letter.',                          next: 'cabin_letter'   },
-      { text: 'Look through the porthole.',                next: 'cabin_porthole' },
+      { text: 'Look through the porthole.',   tags: ['stillness', 'crossing'],                next: 'cabin_porthole' },
     ],
   },
 
@@ -1230,10 +1230,10 @@ The case is under the bunk. You can feel it with your foot.
 There is a second page. The handwriting is slightly different — more deliberate, as if written under different circumstances.`,
     onEnter: () => { S.setFlag('letter_read'); },
     choices: [
-      { text: 'Read the second page.',            next: 'cabin_letter_p2', condition: { type: 'not', condition: { type: 'flag', id: 'letter_p2_read' } } },
+      { text: 'Read the second page.',          tags: ['crossing', 'stillness'],            next: 'cabin_letter_p2', condition: { type: 'not', condition: { type: 'flag', id: 'letter_p2_read' } } },
       { text: 'Go find Miguel.',                  next: 'first_mate_first' },
       { text: 'Go up to the foredeck first.',     next: 'foredeck_first'   },
-      { text: 'Sit with this for a moment.',      next: 'cabin_sit', theosis: 1 },
+      { text: 'Sit with this for a moment.',      tags: ['stillness', 'silence', 'crossing'], next: 'cabin_sit', theosis: 1 },
     ],
   },
 
@@ -1262,7 +1262,7 @@ There is a second page. The handwriting is slightly different — more deliberat
   },
 
   cabin_sit: {
-    id: 'cabin_sit', location: 'Cabin', mood: 'neutral',
+    id: 'cabin_sit', location: 'Cabin', mood: 'uncanny',
     text: `You put the letter down. You fold your hands. The ship moves.
 
 You are playing a role. What you don't know is whether the role will play you back — whether, by the end of this crossing, chaplain will still be just a word for what you are pretending to be.
@@ -1271,7 +1271,7 @@ This question is not in any briefing document.`,
     onEnter: () => { S.incrementTheosis(2); },
     choices: [
       { text: 'Go find Miguel.',         next: 'first_mate_first' },
-      { text: 'Go to the foredeck.',     next: 'foredeck_first'   },
+      { text: 'Go to the foredeck.',    tags: ['crossing', 'presence'],     next: 'foredeck_first'   },
     ],
   },
 
@@ -1577,6 +1577,10 @@ Then, without transition:
         theosis:   1,
         condition: { type: 'not', condition: { type: 'flag', id: 'toast_cover_denomination' } },
       },
+      // After denomination is established — continue the conversation
+      { text: 'Continue the conversation.',
+        next: 'pavel_denomination_response',
+        condition: { type: 'flag', id: 'toast_cover_denomination' } },
     ],
   },
 
@@ -1600,14 +1604,18 @@ Then, without transition:
         pavelsResponse = `— Roman Catholic. He nods slowly. — You have a tradition that has spent a very long time arguing with itself about whether matter is sacred. That argument is useful on this ship.\n\nHe picks up a piece of rope. He does not do anything with it.`;
       } else if (isEcumenical) {
         pavelsResponse = `— Ecumenical. He looks at you with something like approval. — The boundaries stopped mattering. That is either exhaustion or wisdom. On a ship like this one, it is wisdom.\n\nHe picks up a piece of rope. He does not do anything with it.`;
+      } else if (S.hasFlag('cover_denomination_protestant')) {
+        pavelsResponse = `— Protestant. He says. — Reformed, or thereabouts. Calvin had a theory about election that was, structurally, very interesting. He was wrong about most of the conclusions, but the structure was sound.\n\nHe picks up a piece of rope. He does not do anything with it.`;
       } else {
-        pavelsResponse = `— Reformed. He says. — Calvin had a theory about election that was, structurally, very interesting. He was wrong about most of the conclusions, but the structure was sound.\n\nHe picks up a piece of rope. He does not do anything with it.`;
+        // No denomination set — redirect to denomination choice
+        S.navigate && S.navigate('pavel_ferromagnetic');
+        return '';
       }
       
       return pavelsResponse + `\n\n— I'd like to walk with you. he says. — This crossing specifically. I think it's going to need a witness.`;
     },
     choices: [
-      { text: '"Then stay close."',                          next: 'pavel_joined', add_companion: { id: 'pavel', name: 'Pavel', charisms: ['overflow'] } },
+      { text: '"Then stay close."',           tags: ['pastoral', 'witness'],                          next: 'pavel_joined', add_companion: { id: 'pavel', name: 'Pavel', charisms: ['overflow'] } },
       { text: '"We\'ll see how it goes."',                   next: 'main_deck_hub' },
     ],
   },
@@ -1721,6 +1729,10 @@ He looks at the horizon.
         theosis:   1,
         condition: { type: 'not', condition: { type: 'flag', id: 'toast_cover_denomination' } },
       },
+      // After denomination is established — continue the conversation
+      { text: 'Continue the conversation.',
+        next: 'pavel_denomination_response',
+        condition: { type: 'flag', id: 'toast_cover_denomination' } },
     ],
   },
 
@@ -1896,7 +1908,7 @@ She doesn't say what the something is.`,
       { text: 'She says something.',               next: 'lena_arc_3', condition: { type: 'and', conditions: [{ type: 'flag', id: 'lena_fragment_2_seen' }, { type: 'flag', id: 'sunday_service_led' }, { type: 'not', condition: { type: 'flag', id: 'lena_fragment_3_seen' } }] } },
       { text: 'She wants to tell you about Volkov.', next: 'lena_arc_4', condition: { type: 'and', conditions: [{ type: 'flag', id: 'lena_fragment_3_seen' }, { type: 'not', condition: { type: 'flag', id: 'lena_fragment_4_seen' } }] } },
       { text: 'She has something to say.',          next: 'lena_arc_5', condition: { type: 'and', conditions: [{ type: 'flag', id: 'lena_fragment_4_seen' }, { type: 'flag', id: 'act_three_begun' }, { type: 'not', condition: { type: 'flag', id: 'lena_fragment_5_seen' } }] } },
-      { text: 'Sit in silence.',                next: 'lena_silence' },
+      { text: 'Sit in silence.',                tags: ['pastoral', 'presence', 'witness'], next: 'lena_silence' },
       { text: 'Go to the main deck.',           next: 'main_deck_hub' },
     ],
   },
@@ -1924,9 +1936,9 @@ The first pages are scientific. Numbers, coordinates, magnetic declination recor
       // The deeper history unlocks only later
     },
     choices: [
-      { text: 'Read the 1957 logs.',              next: 'chartroom_1957',     condition: { type: 'not', condition: { type: 'flag', id: 'zarya_log_read' } } },
+      { text: 'Read the 1957 logs.',            tags: ['history', 'archive', 'memory'],              tags: ['history', 'memory'], next: 'chartroom_1957',     condition: { type: 'not', condition: { type: 'flag', id: 'zarya_log_read' } } },
       { text: 'The 1957 logs.',                   next: 'chartroom_1957',     condition: { type: 'flag', id: 'zarya_log_read' } },
-      { text: 'Look at the later logs.',           next: 'chartroom_late_logs',condition: { type: 'not', condition: { type: 'flag', id: 'late_logs_seen' } } },
+      { text: 'Look at the later logs.',           tags: ['history', 'memory'], next: 'chartroom_late_logs',condition: { type: 'not', condition: { type: 'flag', id: 'late_logs_seen' } } },
       { text: 'The later logs.',                  next: 'chartroom_late_logs', condition: { type: 'flag', id: 'late_logs_seen' } },
       { text: 'The current mission documentation.',next: 'chartroom_current',  condition: { type: 'not', condition: { type: 'flag', id: 'mission_docs_read' } } },
       { text: 'The deviation readings.',           next: 'chartroom_deviation', condition: { type: 'not', condition: { type: 'flag', id: 'deviation_noted' } } },
@@ -2064,15 +2076,15 @@ This is Freezer Beef. You will learn this later. Right now she looks at you with
       }
     },
     choices: [
-      { text: 'Approach the boxes.',              next: 'hold_boxes',          condition: { type: 'not', condition: { type: 'flag', id: 'hold_boxes_seen' } } },
+      { text: 'Approach the boxes.',              tags: ['history', 'memory'], next: 'hold_boxes',          condition: { type: 'not', condition: { type: 'flag', id: 'hold_boxes_seen' } } },
       { text: 'The boxes.',                        next: 'hold_boxes',          condition: { type: 'flag', id: 'hold_boxes_seen' } },
       { text: 'Nadia is on the floor with a binder.', next: 'nadia_1978_discovery', condition: { type: 'and', conditions: [{ type: 'flag', id: 'act_two_begun' }, { type: 'not', condition: { type: 'flag', id: 'nadia_1978_found' } }] } },
-      { text: 'Offer a blessing.',                 next: 'hold_bless_archive',  condition: { type: 'and', conditions: [{ type: 'flag', id: 'archive_discovered' }, { type: 'not', condition: { type: 'flag', id: 'archive_blessed' } }] } },
-      { text: 'The hatch below.',                  next: 'stink_patrol_favour', condition: { type: 'and', conditions: [{ type: 'flag', id: 'stink_patrol_hands_known' }, { type: 'stat', stat: 'communion', min: 6 }, { type: 'not', condition: { type: 'flag', id: 'stink_patrol_favour_received' } }] } },
-      { text: 'Sit on the floor.',                 next: 'hold_sit', theosis: 3, composure: 1, condition: { type: 'not', condition: { type: 'flag', id: 'hold_sat' } } },
-      { text: 'Sit for a while longer.',           next: 'hold_sit', theosis: 2, condition: { type: 'flag', id: 'hold_sat' } },
+      { text: 'Offer a blessing.',              tags: ['pastoral', 'witness', 'memory'],                 next: 'hold_bless_archive',  condition: { type: 'and', conditions: [{ type: 'flag', id: 'archive_discovered' }, { type: 'not', condition: { type: 'flag', id: 'archive_blessed' } }] } },
+      { text: 'The hatch below.',                  tags: ['solidarity', 'sobornost', 'pastoral'], next: 'stink_patrol_favour', condition: { type: 'and', conditions: [{ type: 'flag', id: 'stink_patrol_hands_known' }, { type: 'stat', stat: 'communion', min: 6 }, { type: 'not', condition: { type: 'flag', id: 'stink_patrol_favour_received' } }] } },
+      { text: 'Sit on the floor.',                 tags: ['stillness', 'presence', 'silence'], next: 'hold_sit', theosis: 3, composure: 1, condition: { type: 'not', condition: { type: 'flag', id: 'hold_sat' } } },
+      { text: 'Sit for a while longer.',           tags: ['stillness', 'silence'], next: 'hold_sit', theosis: 2, condition: { type: 'flag', id: 'hold_sat' } },
       { text: 'Pavel is here too.',                next: 'pavel_riddle_two', condition: { type: 'and', conditions: [{ type: 'flag', id: 'pavel_riddle_one_complete' }, { type: 'not', condition: { type: 'flag', id: 'pavel_riddle_two' } }] } },
-      { text: 'A moment here.',                    next: 'pool_hold_ambient' },
+      { text: 'A moment here.',                    tags: ['stillness', 'presence'], next: 'pool_hold_ambient' },
       { text: 'Go back up.',                       next: 'main_deck_hub' },
     ],
   },
@@ -2113,9 +2125,9 @@ Freezer Beef shifts from the top of the stack to beside your feet. This is proba
 
 The box nearest you is labelled: *1972, Atlantic crossing, photographs, southern route.*`,
     choices: [
-      { text: 'Open the 1972 box.',                next: 'hold_1972_box',
+      { text: 'Open the 1972 box.',             tags: ['history', 'memory', 'archive'],                next: 'hold_1972_box',
         condition: { type: 'not', condition: { type: 'flag', id: 'box_1972_opened' } } },
-      { text: 'Stand with it. Just bear witness.', next: 'hold_witness', theosis: 3,
+      { text: 'Stand with it. Just bear witness.', tags: ['witness', 'history', 'memory'], next: 'hold_witness', theosis: 3,
         condition: { type: 'not', condition: { type: 'flag', id: 'hold_witnessed' } } },
       { text: 'Bless the archive.',                next: 'hold_bless_archive',
         condition: { type: 'and', conditions: [
@@ -3074,7 +3086,7 @@ You have not decided what you are going to do.`,
       { text: 'Go to the hold.',                                         next: 'act_two_hold_sit', theosis: 3 },
       { text: 'Find the radio.',                                         next: 'radio_discovery',  condition: { type: 'flag', id: 'radio_existence_known' } },
       { text: 'Othis is waiting in the corridor.',                       next: 'othis_confrontation', condition: { type: 'and', conditions: [{ type: 'flag', id: 'archive_discovered' }, { type: 'not', condition: { type: 'flag', id: 'othis_confrontation_happened' } }] } },
-      { text: 'Sunday — lead the service.',                              next: 'sunday_service_begin',      condition: { type: 'not', condition: { type: 'flag', id: 'sunday_service_started' } } },
+      { text: 'Sunday — lead the service.',                              tags: ['pastoral', 'solidarity', 'sobornost'], next: 'sunday_service_begin',      condition: { type: 'not', condition: { type: 'flag', id: 'sunday_service_started' } } },
       { text: 'After the service.',                                            next: 'sunday_service_aftermath',  condition: { type: 'and', conditions: [{ type: 'flag', id: 'sunday_service_led' }, { type: 'not', condition: { type: 'flag', id: 'sunday_aftermath_seen' } }] } },
       { text: 'Main deck.',                                              next: 'main_deck_hub' },
       { text: 'The brass wants polishing. The bilge wants checking.',       next: 'ship_maintenance',      condition: { type: 'not', condition: { type: 'flag', id: 'maintenance_done' } } },
@@ -4293,7 +4305,7 @@ She does not ask you anything. She has told you something instead. This is what 
     ]},
     choices: [
       { text: 'Stay for a while.', next: 'compline_connie_stay', theosis: 3, composure: 1, tags: ['pastoral', 'presence', 'forgiveness'] },
-      { text: 'Say something true.',  next: 'compline_connie_speak' },
+      { text: 'Say something true.',            tags: ['pastoral', 'witness', 'forgiveness'],  tags: ['pastoral', 'forgiveness', 'witness'], next: 'compline_connie_speak' },
     ],
   },
 
@@ -5472,7 +5484,7 @@ He writes something. He underlines it.
       { type: 'not', condition: { type: 'flag', id: 'anomaly_overcalibrated_seen' } },
     ]},
     choices: [
-      { text: 'Ask what it is accumulating.', next: 'anomaly_what_accumulates' },
+      { text: 'Ask what it is accumulating.', tags: ['witness', 'crossing', 'memory'], next: 'anomaly_what_accumulates' },
       { text: 'Go to the main deck.',         next: 'main_deck_hub' },
     ],
   },
@@ -8398,9 +8410,57 @@ You understand the expression now.
   main_deck_hub: {
     id: 'main_deck_hub', location: 'Main Deck', mood: 'neutral',
     hub: true,
-    text: `The main deck. The sails doing their work. The North Atlantic doing what it does.
+    get text() {
+      const parts = [];
+      const t = S.G.theosis || 0;
+      const flags = S.G.flags;
+      const day = S.G.time ? S.G.time.day : 1;
 
-From here you can go anywhere on the ship.`,
+      // ── Base description — changes by day and anomaly state ──────
+      if (flags.has('anomaly_peak_occurred')) {
+        parts.push('The main deck. The anomaly is at its peak — you can feel it in the compass, in the quality of the light, in the way the instruments behave below. The North Atlantic is doing what the North Atlantic does. It does not care about the anomaly. The ship cares.');
+      } else if (flags.has('anomaly_first_noticed')) {
+        parts.push('The main deck. The deviation is increasing — the compass is telling the truth about a different north. The sails are doing their work. The sky is what it always is up here: enormous and indifferent and occasionally startling.');
+      } else if (day >= 3) {
+        parts.push('The main deck, Day Three. The wind has the quality it gets before something concludes. The sails know. The rigging knows. You are becoming fluent in this ship's language of approaching things.');
+      } else if (day >= 2) {
+        parts.push('The main deck, second morning. The ship has its rhythm now. The crew has its rhythm. You are beginning to understand what happens at which hour — who is where, what they are thinking about, how the light changes when the anomaly shifts.');
+      } else {
+        parts.push('The main deck. The sails doing their work. The North Atlantic doing what it does. The scale of the water takes some getting used to. You are somewhere in the middle of something vast.');
+      }
+
+      // ── Haircut presence — always, sometimes doing something specific ──
+      if (flags.has('anomaly_peak_occurred')) {
+        parts.push('Haircut is watching the compass from a specific angle she has found. She has been doing this for two hours.');
+      } else if (flags.has('archive_transmitted')) {
+        parts.push('Haircut is sitting in an unusual position — facing aft, away from her normal spot. The transmission changed something in the ship's social ecology. Even the cats have adjusted.');
+      } else {
+        parts.push('Haircut is somewhere. You can feel her awareness of you. She has opinions about this crossing that she is not sharing.');
+      }
+
+      // ── Transmission aftermath ───────────────────────────────────
+      if (flags.has('archive_transmitted') && !flags.has('anomaly_peak_occurred')) {
+        parts.push('The transmission is in the world. The archive is no longer only here. Something on the ship has shifted — not dramatially, not visibly, more like a collective exhale that nobody has actually made.');
+      }
+
+      // ── Mission pressure ─────────────────────────────────────────
+      if (flags.has('landstorm_second_called') && !flags.has('mission_refused')) {
+        parts.push('Landstorm has called twice. The pressure is on the ship now, not just on you. You can feel it in how people walk past the instrument room.');
+      }
+
+      // ── Theosis register ─────────────────────────────────────────
+      if (t >= 66) {
+        parts.push('The ship is Заря. The ship has always been Заря. Today you know it without effort.');
+      } else if (t >= 33 && flags.has('anomaly_first_noticed')) {
+        parts.push('The anomaly below. The field. Thirty years of measurement converging on this crossing. From the deck the water looks ordinary. That is the detail that keeps returning to you: it looks ordinary.');
+      }
+
+      // ── Pavel companion ──────────────────────────────────────────
+      const pavLine = S.getCompanionLine && S.getCompanionLine('pavel', 'Main Deck');
+      if (pavLine) parts.push(pavLine);
+
+      return parts.join('\n\n');
+    },
     onEnter: () => { S.checkEndings(); },
     choices: [
       { text: 'Foredeck — Pavel is there.',    next: 'foredeck_first',   condition: { type: 'not', condition: { type: 'flag', id: 'met_pavel'  } } },

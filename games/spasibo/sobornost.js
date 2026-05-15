@@ -544,7 +544,7 @@ function isChoiceLocked(ch) {
 // ============================================================
 
 const MAX_SOUNDINGS      = 4;
-const SOUNDING_THRESHOLD = 8;
+const SOUNDING_THRESHOLD = 6; // reachable naturally with tagged choices
 
 function soundingSlotsFull() { return G.soundings.taken.length + G.soundings.settled.length >= MAX_SOUNDINGS; }
 
