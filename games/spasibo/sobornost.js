@@ -2630,7 +2630,7 @@ function _renderTutorial(root){
     <div class="tutorial-item">Bottom row: Record · Status · Breviary · Calendar · Map. Keys 1–9 select choices. Escape closes panels. ? for this reference.</div>
     <div class="tutorial-item" style="color:var(--dim);font-size:.78rem;margin-top:.6rem">The crossing takes three days. What you carry forward depends on how far you have come.</div>
   `;
-  div.innerHTML=\`<div class="tutorial-box">\${boxHtml}<button class="btn" style="margin-top:1.5rem;width:100%;min-height:48px;font-size:1rem" id="dt">Board the ship</button></div>\`;
+  div.innerHTML='<div class="tutorial-box">'+boxHtml+'<button class="btn" style="margin-top:1.5rem;width:100%;min-height:48px;font-size:1rem" id="dt">Board the ship</button></div>';
   div.querySelector('#dt').addEventListener('click',dismissTutorial);
   root.appendChild(div);
 }
