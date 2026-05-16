@@ -1773,3 +1773,35 @@ body.low-power #atmos { display: none; }
   border-color: var(--border-mid);
 }
 .sounding-settle-btn:hover { border-color: var(--cold); }
+
+/* ── Deviation indicator in scene header ─────────────────────── */
+.deviation-indicator {
+  font-family: var(--font-display);
+  font-size: .48rem; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--cold-dim);
+  margin-bottom: .3rem; display: block;
+  transition: color .8s ease, opacity .8s ease;
+}
+[data-deviation="high"] .deviation-indicator {
+  color: var(--amber-dim);
+  animation: deviation-flicker 3s ease-in-out infinite;
+}
+@keyframes deviation-flicker {
+  0%, 100% { opacity: 1; }
+  45%       { opacity: 0.6; }
+  50%       { opacity: 0.9; }
+  55%       { opacity: 0.5; }
+}
+
+/* ── High-deviation body state — subtle distortion ───────────── */
+[data-deviation="high"] .game-body {
+  filter: blur(0.2px);
+}
+[data-deviation="high"] .scene-location {
+  letter-spacing: .14em;
+  color: var(--amber-dim);
+  transition: color 2s ease;
+}
+[data-deviation="mid"] .scene-location {
+  color: var(--cold-dim);
+}

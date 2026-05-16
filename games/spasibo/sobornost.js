@@ -1099,7 +1099,7 @@ function _initAudio() {
     _oscNodes[1].connect(lfoGain1);lfoGain1.connect(chopGain.gain);_oscNodes[1].start();
   } catch(e) { console.warn('Audio:',e); }
 }
-function _gain() { return _currentMoodRef==='tense'?0.055:_currentMoodRef==='revelation'?0.015:_currentMoodRef==='uncanny'?0.008:0.035; }
+function _gain() { return _currentMoodRef==='tense'?0.22:_currentMoodRef==='revelation'?0.18:_currentMoodRef==='uncanny'?0.14:0.18; }
 function _applyMood(m) {
   if (!_actx||!_audioOn) return;
   const t=_actx.currentTime;
@@ -1119,7 +1119,8 @@ function toggleAudio() {
   if(_actx.state==='suspended')_actx.resume();
   _audioOn=!_audioOn;
   if(_gainNode)_gainNode.gain.setTargetAtTime(_audioOn?_gain():0,_actx.currentTime,1.2);
-  if(_audioOn)_applyMood(mood);
+  if(_audioOn){_applyMood(mood);setTimeout(()=>playSfx('ship_ambient_start',0.5),500);}
+  else{playSfx('ship_ambient_stop');}
   const btn=document.getElementById('audio-btn');
   if(btn){btn.textContent=_audioOn?'\u266a on':'\u266a off';btn.style.color=_audioOn?'var(--amber)':'var(--dim)';}
   emit('audioToggled',_audioOn);
@@ -1136,7 +1137,7 @@ function playSfx(name,volume=0.5) {
 }
 function initBuiltinSfx() {
   // Sounding settle: a warm, brief sine tone that fades — spiritual resolution
-  registerSfx('sounding_settle', (vol=0.4) => {
+  registerSfx('sounding_settle', (vol=0.8) => {
     if (!_actx) return;
     const g = _actx.createGain(); g.gain.setValueAtTime(0, _actx.currentTime);
     g.gain.linearRampToValueAtTime(vol * 0.5, _actx.currentTime + 0.08);
@@ -1152,7 +1153,7 @@ function initBuiltinSfx() {
   });
 
   // Cover fail: a brief descending dissonance — tension, something broken
-  registerSfx('cover_fail', (vol=0.3) => {
+  registerSfx('cover_fail', (vol=0.7) => {
     if (!_actx) return;
     const g = _actx.createGain(); g.gain.setValueAtTime(vol * 0.4, _actx.currentTime);
     g.gain.exponentialRampToValueAtTime(0.001, _actx.currentTime + 0.8);
@@ -1167,7 +1168,7 @@ function initBuiltinSfx() {
   });
 
   // Transmission: radio crackle — filtered noise bursts
-  registerSfx('transmission', (vol=0.5) => {
+  registerSfx('transmission', (vol=0.9) => {
     if (!_actx) return;
     const dur = 1.8;
     const buf = _actx.createBuffer(1, _actx.sampleRate * dur, _actx.sampleRate);
@@ -1182,7 +1183,7 @@ function initBuiltinSfx() {
   });
 
   // Anomaly drone: a very low, sustained presence — the field
-  registerSfx('anomaly_drone', (vol=0.2) => {
+  registerSfx('anomaly_drone', (vol=0.6) => {
     if (!_actx) return;
     const g = _actx.createGain(); g.gain.setValueAtTime(0, _actx.currentTime);
     g.gain.linearRampToValueAtTime(vol * 0.3, _actx.currentTime + 1.5);
@@ -1196,7 +1197,7 @@ function initBuiltinSfx() {
   });
 
   // Theosis moment: rising harmonic — spiritual ascent
-  registerSfx('theosis_moment', (vol=0.35) => {
+  registerSfx('theosis_moment', (vol=0.75) => {
     if (!_actx) return;
     const g = _actx.createGain(); g.gain.setValueAtTime(0, _actx.currentTime);
     g.gain.linearRampToValueAtTime(vol * 0.4, _actx.currentTime + 0.3);
@@ -1209,6 +1210,78 @@ function initBuiltinSfx() {
       o.start(_actx.currentTime + i * 0.12); o.stop(_actx.currentTime + 3.5);
     });
   });
+  // Ship ambient: low creaking/drone that runs continuously when audio on
+  registerSfx('ship_ambient_start', (vol=0.5) => {
+    if (!_actx) return;
+    // Low ship hum — two detuned sines + filtered noise
+    const ambGain = _actx.createGain();
+    ambGain.gain.setValueAtTime(0, _actx.currentTime);
+    ambGain.gain.linearRampToValueAtTime(vol * 0.35, _actx.currentTime + 3);
+    ambGain.connect(_gainNode);
+    window._ambientNodes = window._ambientNodes || [];
+    // Fundamental hum
+    [55, 58, 110].forEach((freq, i) => {
+      const o = _actx.createOscillator();
+      o.type = 'sine'; o.frequency.value = freq;
+      const og = _actx.createGain(); og.gain.value = i === 2 ? 0.15 : 0.5;
+      o.connect(og); og.connect(ambGain); o.start();
+      window._ambientNodes.push(o);
+    });
+    // Wind noise layer
+    const buf = _actx.createBuffer(1, _actx.sampleRate * 4, _actx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * 0.3;
+    const src = _actx.createBufferSource(); src.buffer = buf; src.loop = true;
+    const lp = _actx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 400;
+    const wg = _actx.createGain(); wg.gain.value = 0.08;
+    src.connect(lp); lp.connect(wg); wg.connect(ambGain); src.start();
+    window._ambientNodes.push(src);
+    window._ambientGain = ambGain;
+  });
+
+  registerSfx('ship_ambient_stop', (vol=0) => {
+    if (!_actx || !window._ambientGain) return;
+    window._ambientGain.gain.linearRampToValueAtTime(0, _actx.currentTime + 2);
+    setTimeout(() => {
+      (window._ambientNodes || []).forEach(n => { try { n.stop(); } catch(e) {} });
+      window._ambientNodes = [];
+      window._ambientGain = null;
+    }, 2500);
+  });
+
+  // Anomaly pulse: a rhythmic sub-bass throb that intensifies with deviation
+  registerSfx('anomaly_pulse', (vol=0.5) => {
+    if (!_actx) return;
+    const dev = typeof G !== 'undefined' ? (G.magneticDeviation || 0) : 0;
+    const freq = 28 + dev * 15;
+    const g = _actx.createGain();
+    g.gain.setValueAtTime(0, _actx.currentTime);
+    g.gain.linearRampToValueAtTime(vol * 0.4 * (0.3 + dev * 0.7), _actx.currentTime + 0.4);
+    g.gain.exponentialRampToValueAtTime(0.001, _actx.currentTime + 3.5);
+    g.connect(_gainNode);
+    const o = _actx.createOscillator(); o.type = 'sine'; o.frequency.value = freq;
+    const o2 = _actx.createOscillator(); o2.type = 'sine'; o2.frequency.value = freq * 1.5;
+    const og2 = _actx.createGain(); og2.gain.value = 0.3;
+    o.connect(g); o2.connect(og2); og2.connect(g);
+    o.start(); o.stop(_actx.currentTime + 4);
+    o2.start(); o2.stop(_actx.currentTime + 4);
+  });
+
+  // Radio static: Landstorm's channel
+  registerSfx('radio_static', (vol=0.6) => {
+    if (!_actx) return;
+    const dur = 0.6;
+    const buf = _actx.createBuffer(1, _actx.sampleRate * dur, _actx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (i/d.length < 0.1 || i/d.length > 0.85 ? 0.05 : 0.9);
+    const src = _actx.createBufferSource(); src.buffer = buf;
+    const band = _actx.createBiquadFilter(); band.type = 'bandpass';
+    band.frequency.value = 2200; band.Q.value = 5;
+    const g = _actx.createGain(); g.gain.setValueAtTime(vol * 0.7, _actx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, _actx.currentTime + dur);
+    src.connect(band); band.connect(g); g.connect(_gainNode); src.start();
+  });
+
 }
 
 // ============================================================
@@ -2881,6 +2954,19 @@ function renderGame(root){
 
 function _buildHeader(scene){
   const hdr=document.createElement('div');hdr.className='game-header';
+  // Anomaly deviation indicator in header
+  const _dev = G.magneticDeviation || 0;
+  if (_dev > 0.2) {
+    const devIndicator = document.createElement('div');
+    devIndicator.className = 'deviation-indicator';
+    const devDeg = Math.round(_dev * 41); // 0-41 degrees
+    const devText = _dev > 0.7 ? `${devDeg}° — past calibration` :
+                    _dev > 0.4 ? `${devDeg}° deviation` :
+                    `${devDeg}°`;
+    devIndicator.textContent = devText;
+    devIndicator.style.opacity = Math.min(1, _dev * 1.4).toFixed(2);
+    hdr.appendChild(devIndicator);
+  }
   const si=document.createElement('div');si.className='save-indicator';si.textContent='\u25e6 autosaved';si.style.display='none';hdr.appendChild(si);
   const moodCls=scene.mood==='uncanny'?' uncanny':scene.mood==='revelation'?' revelation':'';
   const lb=document.createElement('div');lb.className='location-bar'+moodCls;

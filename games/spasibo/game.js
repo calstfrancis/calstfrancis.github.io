@@ -6079,7 +6079,8 @@ The last hours of this crossing will determine what the ship was for.`,
       S.setFlag('the_arrival_seen');
       S.incrementTheosis(5);
       S.setMagneticDeviation(0.85);
-      S.playSfx && S.playSfx('anomaly_drone');
+      S.playSfx && S.playSfx('anomaly_drone', 0.8);
+      S.playSfx && setTimeout(() => S.playSfx('anomaly_pulse', 0.6), 1500);
       S.showToast('The last hours.', 'theosis');
     },
     condition: { type: 'not', condition: { type: 'flag', id: 'the_arrival_seen' } },
@@ -7060,6 +7061,7 @@ A pause.
     id: 'landstorm_radio_call', location: 'Instrument Room', mood: 'tense',
     text: ``,
     onEnter: () => {
+      S.playSfx && S.playSfx('radio_static', 0.7);
       S.startDialogue([
         { speaker: null, text: 'The standard radio crackles. It has not crackled before — the anomaly has kept the standard frequencies mostly inert.' },
         { speaker: null, text: 'The voice is clear despite the interference. It is the voice of someone who has learned to be clear in all conditions.' },
@@ -8818,7 +8820,7 @@ Her name means dawn.`,
       } else if (flags.has('anomaly_first_noticed')) {
         parts.push('The main deck. The deviation is increasing — the compass is telling the truth about a different north. The sails are doing their work. The sky is what it always is up here: enormous and indifferent and occasionally startling.');
       } else if (day >= 3) {
-        parts.push('The main deck, Day Three. The wind has the quality it gets before something concludes. The sails know. The rigging knows. You are becoming fluent in this ship's language of approaching things.');
+        parts.push(`The main deck, Day Three. The wind has the quality it gets before something concludes. The sails know. The rigging knows. You are becoming fluent in this ship\'s language of approaching things.`);
       } else if (day >= 2) {
         parts.push('The main deck, second morning. The ship has its rhythm now. The crew has its rhythm. You are beginning to understand what happens at which hour — who is where, what they are thinking about, how the light changes when the anomaly shifts.');
       } else {
@@ -8829,7 +8831,7 @@ Her name means dawn.`,
       if (flags.has('anomaly_peak_occurred')) {
         parts.push('Haircut is watching the compass from a specific angle she has found. She has been doing this for two hours.');
       } else if (flags.has('archive_transmitted')) {
-        parts.push('Haircut is sitting in an unusual position — facing aft, away from her normal spot. The transmission changed something in the ship's social ecology. Even the cats have adjusted.');
+        parts.push(`Haircut is sitting in an unusual position — facing aft, away from her normal spot. The transmission changed something in the ship\'s social ecology. Even the cats have adjusted.`);
       } else {
         parts.push('Haircut is somewhere. You can feel her awareness of you. She has opinions about this crossing that she is not sharing.');
       }
