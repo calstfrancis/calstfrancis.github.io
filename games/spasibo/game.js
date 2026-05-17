@@ -1480,7 +1480,7 @@ He says this with the expression of a man setting down something heavy.`,
     onEnter: () => { S.setFlag('crew_names_heard'); },
     choices: [
       { text: '"Who is Pavel?"',                              next: 'miguel_pavel_intro'  },
-      { text: '"What do you mean, \'is cargo\'?"',            next: 'miguel_othis_probe'  },
+      { text: '"What does Othis do, exactly?"',               next: 'miguel_othis_probe'  },
       { text: '"I\'ll find them on my own. Thank you."',      next: 'main_deck_hub'       },
     ],
   },
