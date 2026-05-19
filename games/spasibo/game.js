@@ -366,7 +366,7 @@ S.registerItem('both_photographs', {
   effectWhileHeld: { communion: 2, composure: 1 },
 });
 
-S.registerItem('stink_patrol_paper', {
+S.registerItem('warm_hands_paper', {
   name: 'A position — in 1952 measurements',
   desc: 'A piece of paper with a location described in the original construction measurements of the ship. A space that exists below the level of any manifest Othis knows about. Warm hands delivered it.',
   effectWhileHeld: { vigilance: 1 },
@@ -406,7 +406,7 @@ S.on('flagSet', (flag) => {
 S.registerNote('zarya_name',      'The ship has an older name. Заря. It means dawn. The current documentation uses a different name.');
 S.registerNote('volkov_photo',    'A photograph from 1972: a young man at the anomaly position. Initial on the back: В. The same man who was the cook before Lena.');
 S.registerNote('nadia_1978',      'A 1978 measurement binder — position four nautical miles from current location, significant readings, no catalogue entry. The gap is evidence.');
-S.registerNote('stink_patrol',    'Below the forward hold: a level of the ship not on the schematic. Warm hands through a hatch. They have been aboard as long as Lena. Possibly longer.');
+S.registerNote('warm_hands',    'Below the forward hold: a level of the ship not on the schematic. Warm hands through a hatch. They have been aboard as long as Lena. Possibly longer. Some say since 1952.');
 S.registerNote('anomaly_note',    'The anomaly is responding to something we are doing. Specific types of attention. Sustained, non-instrumental attention. The instruments show this.');
 S.registerNote('archive_note',    'Thirty years of geomagnetic measurement. Five countries. Every scientist who sailed on this ship. Decisions were made about what not to catalogue.');
 S.registerNote('oblong_note',     'A passenger named Oblong Vassilithune. He knew the crossing had a specific purpose. He is no longer at the corner table. Lena has no memory of him.');
@@ -418,7 +418,7 @@ S.on('flagSet', (flag) => {
     'zarya_log_read':          'zarya_name',
     'volkov_photo_found':      'volkov_photo',
     'nadia_1978_found':        'nadia_1978',
-    'stink_patrol_hands_known':'stink_patrol',
+    'warm_hands_known':'warm_hands',
     'anomaly_responds_seen':   'anomaly_note',
     'archive_discovered':      'archive_note',
     'oblong_departed':         'oblong_note',
@@ -623,10 +623,10 @@ S.registerAmbientEvent({
 });
 
 S.registerAmbientEvent({
-  id: 'stink_patrol_rumour',
+  id: 'warm_hands_rumour',
   weight: 0.04,
   oncePerCrossing: true,
-  text: 'Lena mentions the Stink Patrol. She doesn\'t say what they do. She says it without discomfort. There is a warmth in her voice that makes you decide not to ask.',
+  text: 'Lena mentions the Warm Hands. She doesn\'t say what they do. She says it without discomfort. There is a warmth in her voice that makes you decide not to ask.',
 });
 
 // ─────────────────────────────────────────────────────────────────
@@ -1050,7 +1050,7 @@ S.registerScenePool('pool_foredeck_ambient', [
 S.registerScenePool('pool_hold_ambient', [
   { sceneId: 'hold_freezer_beef_survey', weight: 3 },
   { sceneId: 'hold_sounds_below',       weight: 2,
-    condition: { type: 'flag', id: 'stink_patrol_encountered' } },
+    condition: { type: 'flag', id: 'warm_hands_encountered' } },
 ]);
 
 
@@ -1904,7 +1904,7 @@ She doesn't say what the something is.`,
         // Nadia memory accidentally stored under lena — check lena's own memories
       }
       if (S.hasFlag('hold_bless_archive')) parts.push('She is quieter than usual. Not worried. Something has settled.');
-      if (S.hasFlag('stink_patrol_hands_known')) parts.push('The small arrangement near the oven — it has been there since you spoke with her about the Stink Patrol. She does not look at it directly.');
+      if (S.hasFlag('warm_hands_known')) parts.push('The small arrangement near the oven — it has been there since you spoke with her about the Warm Hands. She does not look at it directly.');
       if (S.hasFlag('lena_direct_asked')) parts.push('She asked her question. You answered it. There is nothing more to establish between you.');
       const pavLine = S.getCompanionLine && S.getCompanionLine('pavel', 'Galley');
       if (pavLine) parts.push(pavLine);
@@ -2090,7 +2090,7 @@ This is Freezer Beef. You will learn this later. Right now she looks at you with
       { text: 'The boxes.',                        next: 'hold_boxes',          condition: { type: 'flag', id: 'hold_boxes_seen' } },
       { text: 'Nadia is on the floor with a binder.', next: 'nadia_1978_discovery', condition: { type: 'and', conditions: [{ type: 'flag', id: 'act_two_begun' }, { type: 'not', condition: { type: 'flag', id: 'nadia_1978_found' } }] } },
       { text: 'Offer a blessing.',              tags: ['pastoral', 'witness', 'memory'],                 next: 'hold_bless_archive',  condition: { type: 'and', conditions: [{ type: 'flag', id: 'archive_discovered' }, { type: 'not', condition: { type: 'flag', id: 'archive_blessed' } }] } },
-      { text: 'The hatch below.',                  tags: ['solidarity', 'sobornost', 'pastoral'], next: 'stink_patrol_favour', condition: { type: 'and', conditions: [{ type: 'flag', id: 'stink_patrol_hands_known' }, { type: 'stat', stat: 'communion', min: 6 }, { type: 'not', condition: { type: 'flag', id: 'stink_patrol_favour_received' } }] } },
+      { text: 'The hatch below.',                  tags: ['solidarity', 'sobornost', 'pastoral'], next: 'warm_hands_favour', condition: { type: 'and', conditions: [{ type: 'flag', id: 'warm_hands_known' }, { type: 'stat', stat: 'communion', min: 6 }, { type: 'not', condition: { type: 'flag', id: 'warm_hands_favour_received' } }] } },
       { text: 'Sit on the floor.',                 tags: ['stillness', 'presence', 'silence'], next: 'hold_sit', theosis: 3, composure: 1, condition: { type: 'not', condition: { type: 'flag', id: 'hold_sat' } } },
       { text: 'Sit for a while longer.',           tags: ['stillness', 'silence'], next: 'hold_sit', theosis: 2, condition: { type: 'flag', id: 'hold_sat' } },
       { text: 'Pavel is here too.',                next: 'pavel_riddle_two', condition: { type: 'and', conditions: [{ type: 'flag', id: 'pavel_riddle_one_complete' }, { type: 'not', condition: { type: 'flag', id: 'pavel_riddle_two' } }] } },
@@ -3113,7 +3113,7 @@ You have not decided what you are going to do.`,
       { text: 'Something has happened to the cover.',                         next: 'cover_identity_crisis', condition: { type: 'and', conditions: [{ type: 'or', conditions: [{ type: 'flag', id: 'anomaly_peak_occurred' }, { type: 'stat', stat: 'doubt', min: 7 }] }, { type: 'theosis', min: 45 }, { type: 'not', condition: { type: 'flag', id: 'cover_crisis_resolved' } }] } },
       { text: 'After the service.',                                            next: 'sunday_congregation',   condition: { type: 'and', conditions: [{ type: 'flag', id: 'sunday_service_led' }, { type: 'not', condition: { type: 'flag', id: 'sunday_congregation_seen' } }] } },
       { text: 'Landstorm is on the radio.',                                  next: 'landstorm_radio_call',  condition: { type: 'and', conditions: [{ type: 'flag', id: 'mission_orders_read' }, { type: 'not', condition: { type: 'flag', id: 'landstorm_called' } }] } },
-      { text: 'Something below the forward hold.',                           next: 'stink_patrol_encounter', condition: { type: 'and', conditions: [{ type: 'flag', id: 'hold_visited' }, { type: 'not', condition: { type: 'flag', id: 'stink_patrol_encountered' } }] } },
+      { text: 'Something below the forward hold.',                           next: 'warm_hands_encounter', condition: { type: 'and', conditions: [{ type: 'flag', id: 'hold_visited' }, { type: 'not', condition: { type: 'flag', id: 'warm_hands_encountered' } }] } },
       { text: "Connie needs you. Alexei's cabin.",                          next: 'connie_emergency',      condition: { type: 'and', conditions: [{ type: 'flag', id: 'anomaly_peak_occurred' }, { type: 'not', condition: { type: 'flag', id: 'connie_emergency_happened' } }] } },
     ],
   },
@@ -3862,8 +3862,8 @@ He doesn't explain what he means by *there.* He doesn't need to.`,
 
   // ── WITNESSED MODE EXCLUSIVE ─────────────────────────────────────
 
-  stink_patrol_record: {
-    id: 'stink_patrol_record', location: 'Below — The Record', mood: 'uncanny',
+  warm_hands_record: {
+    id: 'warm_hands_record', location: 'Below — The Record', mood: 'uncanny',
     text: `[The following is a partial transcript recovered from below the forward hold. The authors are unknown. The document was found sealed in a brass tube of non-magnetic construction, dated to the period of the crossing. Translation is approximate.]
 
 —
@@ -3882,14 +3882,15 @@ Recommendation: no intervention required. The ship is doing what the ship does.
 
 Addendum: the calico cat has been spending significant time in the hold. She appears to be in conversation with the archive. We do not record the content of this conversation. Some things are not ours to record.
 
-— The Stink Patrol
+— The Warm Hands
+[Document condition consistent with 1952 manufacture. Paper and ink consistent with original build period. Classification: below manifest threshold.]
 
 [End of document]`,
     condition_to_appear: { type: 'mode', mode: 'witnessed' },
     onEnter: () => {
       S.incrementTheosis(6);
       S.applyEffect({ composure: 2 });
-      S.setFlag('stink_patrol_record_seen');
+      S.setFlag('warm_hands_record_seen');
       S.showToast('A record was kept.', 'theosis');
     },
     choices: [
@@ -4907,10 +4908,10 @@ This is the closest the ship has come, this crossing, to being Заря.`,
     choices: [{ text: 'Go to the main deck.', next: 'main_deck_hub' }],
   },
 
-  // ── 10. STINK PATROL FAVOUR ──────────────────────────────────────
+  // ── 10. THE WARM HANDS FAVOUR ────────────────────────────────────
 
-  stink_patrol_favour: {
-    id: 'stink_patrol_favour', location: 'Below — The Hatch', mood: 'uncanny',
+  warm_hands_favour: {
+    id: 'warm_hands_favour', location: 'Below — The Hatch', mood: 'uncanny',
     text: `You go below the forward hold. Past the hold. Down to the level that is not on the schematic.
 
 There is a hatch. You knock on it. You are not sure why — you have not thought about this carefully. You have just come here.
@@ -4936,18 +4937,18 @@ The hatch closes.
 You do not know what you have done in exchange. You have the strong sense that you have done something. Whatever it is, it has the quality of being exactly proportionate.`,
     onEnter: () => {
       S.incrementTheosis(8);
-      S.setFlag('stink_patrol_favour_received');
+      S.setFlag('warm_hands_favour_received');
       S.setFlag('archive_hidden_location');
-      S.addItem('stink_patrol_paper');
+      S.addItem('warm_hands_paper');
       S.applyEffect({ communion: 2 });
       S.modShipState('saturation', 2);
-      S.showToast('The Stink Patrol has helped.', 'note');
+      S.showToast('The Warm Hands have helped.', 'note');
     },
     condition: { type: 'and', conditions: [
-      { type: 'flag', id: 'stink_patrol_hands_known' },
+      { type: 'flag', id: 'warm_hands_known' },
       { type: 'stat', stat: 'communion', min: 6 },
       { type: 'flag', id: 'mission_refused' },
-      { type: 'not', condition: { type: 'flag', id: 'stink_patrol_favour_received' } },
+      { type: 'not', condition: { type: 'flag', id: 'warm_hands_favour_received' } },
     ]},
     choices: [
       { text: 'Go move the archive.',  next: 'hold_first' },
@@ -5768,12 +5769,12 @@ He turns back to the instruments.
   },
 
   
-  // ── FEATURE 9: STINK PATROL RECURRING ────────────────────────────
+  // ── FEATURE 9: THE WARM HANDS RECURRING ─────────────────────────
   // One gift per crossing from a rotating pool.
   // The gift index cycles via metaUnlocks.stinkGiftIndex.
 
-  stink_patrol_gift: {
-    id: 'stink_patrol_gift', location: 'Below — The Hatch', mood: 'uncanny',
+  warm_hands_gift: {
+    id: 'warm_hands_gift', location: 'Below — The Hatch', mood: 'uncanny',
     get text() {
       const idx = S.getMetaValue && S.getMetaValue('stinkGiftIndex', 0) % 4;
       const texts = [
@@ -5819,7 +5820,7 @@ You gave them nothing material. Whatever they needed, you had it.`
       return texts[idx];
     },
     onEnter: () => {
-      S.setFlag('stink_patrol_gift_received');
+      S.setFlag('warm_hands_gift_received');
       S.incrementTheosis(5);
       S.applyEffect({ communion: 2 });
       // Advance gift index for next crossing
@@ -5828,9 +5829,9 @@ You gave them nothing material. Whatever they needed, you had it.`
       S.modShipState('saturation', 2);
     },
     condition: { type: 'and', conditions: [
-      { type: 'flag', id: 'stink_patrol_hands_known' },
-      { type: 'not', condition: { type: 'flag', id: 'stink_patrol_gift_received' } },
-      { type: 'not', condition: { type: 'flag', id: 'stink_patrol_favour_received' } },
+      { type: 'flag', id: 'warm_hands_known' },
+      { type: 'not', condition: { type: 'flag', id: 'warm_hands_gift_received' } },
+      { type: 'not', condition: { type: 'flag', id: 'warm_hands_favour_received' } },
     ]},
     choices: [
       { text: 'Go back up.', next: 'main_deck_hub' },
@@ -6245,8 +6246,8 @@ The two photographs together have a different weight than either one alone.`,
     ],
   },
 
-  examine_stink_patrol_paper: {
-    id: 'examine_stink_patrol_paper', location: 'The Paper', mood: 'uncanny',
+  examine_warm_hands_paper: {
+    id: 'examine_warm_hands_paper', location: 'The Paper', mood: 'uncanny',
     text: `A position. Written in the measurement system of the ship's original construction — 1952 notation, Finnish engineering, the way the shipyard would have described a specific internal space.
 
 It describes a location below the forward hold. Below the level of the current manifest. A space that is in the ship's construction but not in any document produced after 1960.
@@ -7000,44 +7001,44 @@ The carafe is gone. Haircut appears from somewhere and sits on the table where h
     ],
   },
 
-  // ── STINK PATROL ─────────────────────────────────────────────────
+  // ── THE WARM HANDS ──────────────────────────────────────────────
   // Below the waterline. Their jurisdiction. One scene.
 
-  stink_patrol_encounter: {
-    id: 'stink_patrol_encounter', location: 'Below Decks — Aft', mood: 'uncanny',
+  warm_hands_encounter: {
+    id: 'warm_hands_encounter', location: 'Below Decks — Aft', mood: 'uncanny',
     text: `You are looking for something — a hatch, a panel, a way through — when you hear them.
 
 Not voices exactly. More like the sound of people who are very competent at something specific and are currently doing it. The sounds come from below the forward hold, from a level of the ship that is not on the schematic you were given.
 
 Lena, when you mention it later, nods once, as if you have passed some threshold.
 
-— The Stink Patrol. She says. — They manage the ballast. And some other things.
+— The Warm Hands. She says. — They manage the ballast. And some other things.
 
 — What other things?
 
 She ladles soup.
 
-— They have been on this ship for as long as I have. She says. — Possibly longer. Nobody has asked them directly about the other things. It seems like the kind of question that would be rude.
+— They have been on this ship for a long time. She says. — Some people say since before I joined. Some people say much longer than that. Nobody has asked them directly about the other things. It seems like the kind of question that would be rude.
 
 She hands you the soup.
 
 — They know about the archive. She says. — They have always known. They are not concerned. That is reassuring, in my view.
 
-There is a warmth in her voice when she says *the Stink Patrol* that is not quite affection but is close to it. Something like respect for something that does its work without requiring your understanding of it.`,
+There is a warmth in her voice when she says *the Warm Hands* that is not quite affection but is close to it. Something like respect for something that does its work without requiring your understanding of it.`,
     onEnter: () => {
       S.incrementTheosis(4);
-      S.setFlag('stink_patrol_encountered');
+      S.setFlag('warm_hands_encountered');
       S.applyEffect({ composure: 1 });
       S.modReputation('lena', 2);
     },
     choices: [
-      { text: '"Have you ever spoken to them?"',             next: 'stink_patrol_spoken' },
+      { text: '"Have you ever spoken to them?"',             next: 'warm_hands_spoken' },
       { text: 'Drink the soup. Say nothing.',                next: 'galley_hub', theosis: 2 },
     ],
   },
 
-  stink_patrol_spoken: {
-    id: 'stink_patrol_spoken', location: 'Galley', mood: 'uncanny',
+  warm_hands_spoken: {
+    id: 'warm_hands_spoken', location: 'Galley', mood: 'uncanny',
     text: `Lena thinks about this.
 
 — Once. She says. — I brought food down. I left it at the hatch. One of them — I only saw hands — took it through. The hands were warm. That is the only conversation.
@@ -7048,8 +7049,14 @@ She adjusts the heat.
 
 A pause.
 
+— Miguel says they were on the ship before it was The Dawn. Before the renaming. He says he has seen initials carved in the lower hold that don\'t match anyone on any manifest going back to 1970. He thinks they may have come aboard during construction. 1952, when the yard built her.
+
+She looks at the stove.
+
+— I don\'t know if that\'s true. She says. — But it would explain some things. The Warm Hands know things about the ship that nobody has taught them. Where every drain runs. Where every joint is. The sound she makes when the keel is stressed. Nobody learns that from a manual.
+
 — Alexei thinks they might be related to the anomaly somehow. He thinks this about a lot of things. But in this case he may be right.`,
-    onEnter: () => { S.incrementTheosis(3); S.modReputation('lena', 1); S.setFlag('stink_patrol_hands_known'); },
+    onEnter: () => { S.incrementTheosis(3); S.modReputation('lena', 1); S.setFlag('warm_hands_known'); },
     choices: [
       { text: 'Go to the main deck.', next: 'main_deck_hub' },
     ],
