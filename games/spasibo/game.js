@@ -917,9 +917,13 @@ S.registerEnding({
 // or who never built enough theosis to perceive what the ship carried.
 S.registerEnding({
   id: 'passenger',
-  priority: 1,   // lowest — only fires when nothing else does
+  priority: 1,   // lowest — only fires when nothing else does, and only late game
   condition: { type: 'and', conditions: [
-    { type: 'stat',    stat: 'communion', min: 0 },   // always true — fallback
+    // Must have reached Act 3 — the crossing is genuinely ending
+    { type: 'flag', id: 'act_three_begun' },
+    // The player has been present enough to trigger an ending check
+    { type: 'stat', stat: 'communion', min: 0 },
+    // None of the meaningful actions taken
     { type: 'not', condition: { type: 'flag', id: 'mission_refused' } },
     { type: 'not', condition: { type: 'flag', id: 'archive_transmitted' } },
     { type: 'not', condition: { type: 'flag', id: 'sounding_crossing_settled' } },
@@ -927,6 +931,8 @@ S.registerEnding({
     { type: 'not', condition: { type: 'flag', id: 'sounding_history_settled' } },
     { type: 'not', condition: { type: 'flag', id: 'sounding_sobornost_settled' } },
     { type: 'not', condition: { type: 'flag', id: 'sounding_solidarity_settled' } },
+    // Low communion — didn't engage with the crew
+    { type: 'stat', stat: 'communion', max: 3 },
   ]},
   scene: 'ending_passenger',
 });
@@ -6117,6 +6123,7 @@ She goes back to the stove.
       { text: 'The last morning.', next: 'lena_arc_5_second', condition: { type: 'and', conditions: [{ type: 'past_flag', id: 'been_here_before' }, { type: 'flag', id: 'lena_fragment_5_seen' }, { type: 'flag', id: 'act_three_begun' }, { type: 'not', condition: { type: 'flag', id: 'lena_arc_5_second_seen' } }] } },
       { text: 'Volkov\'s last crossing.', next: 'lena_volkov_last', condition: { type: 'and', conditions: [{ type: 'flag', id: 'lena_fragment_4_seen' }, { type: 'not', condition: { type: 'flag', id: 'lena_volkov_last_seen' } }, { type: 'not', condition: { type: 'flag', id: 'lena_fragment_5_seen' } }] } },
       { text: 'Stay for the coffee.', next: 'galley_hub', tags: ['presence', 'pastoral'] },
+      { text: 'Freezer Beef is on the table.', next: 'freezer_beef_final', condition: { type: 'and', conditions: [{ type: 'flag', id: 'act_three_begun' }, { type: 'not', condition: { type: 'flag', id: 'freezer_beef_final_seen' } }, { type: 'or', conditions: [{ type: 'flag', id: 'solidarity_sounding_settled' }, { type: 'theosis', min: 60 }] }] } },
       { text: 'She sees it.',            next: 'lena_recognises_passenger', condition: { type: 'and', conditions: [{ type: 'past_flag', id: 'was_a_passenger' }, { type: 'not', condition: { type: 'flag', id: 'lena_recognises_passenger_seen' } }] } },
     ],
   },
@@ -8180,8 +8187,8 @@ He looks at the water.
 You have to decide what to say.`,
     onEnter: () => { S.setFlag('foredeck_passenger_rope_seen'); },
     choices: [
-      { text: 'Yes. Give me the rope.', next: 'foredeck_standing', theosis: 4,
-        onChoose: () => { S.setFlag('claimed_the_rope'); S.modStance('pavel','trust',3); S.incrementTheosis(2); }, tags: ['crossing','presence'] },
+      { text: 'Yes. Give me the rope.', next: 'foredeck_standing', theosis: 6,
+        set_flag: 'claimed_the_rope', mod_stance: { npc: 'pavel', key: 'trust', delta: 3 }, tags: ['crossing','presence'] },
       { text: 'I don\'t know yet.', next: 'foredeck_standing', theosis: 2,
         tags: ['presence','stillness'] },
     ],
