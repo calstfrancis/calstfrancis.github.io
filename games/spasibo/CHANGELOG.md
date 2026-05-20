@@ -1,3 +1,545 @@
+## v3.8.0 — Current
+
+### Engine
+
+**`renderCrossingRecord` — passenger variant**
+When `crossing_was_passenger_crossing` flag is set, the crossing record renders as a sparse layout: blank panels for soundings, memories, and theosis (each showing only a dash), a visible absence where notes would appear. Haircut's name appears at the bottom without any text beside it. The standard record layout is bypassed entirely.
+
+---
+
+### Spasibo — Content
+
+**Passenger meta-arc — second and third crossing consequences (2 new scenes)**
+
+`foredeck_passenger_rope` — Pavel does not hand you the rope. He turns and says: "Last time you were here and you weren't here." Then he waits. You must ask for it or admit you don't know yet. Overrides `foredeck_second_crossing` when `was_a_passenger` is in past_life_flags.
+
+`warm_hands_passenger_withholds` — The hatch opens. Nothing comes through. A hand points sideways — at the crossing, at what you have been doing with it. They hold still for three seconds. The hatch closes. They noticed. They are waiting to see if this crossing is different before they give anything.
+
+**The anomaly answers (4 new scenes)**
+
+`anomaly_fibonacci` — Nadia finds Fibonacci intervals (3-5-8-13-21 minutes) in the deviation printout over six hours. The intervals are not random — Fibonacci to within fourteen seconds. Something has been encoding information in the deviation log for fifty years. "We've been collecting the message and filing it as atmospheric variance." Sets `anomaly_encoding_known`.
+
+`anomaly_fibonacci_meaning` — What the Fibonacci pattern says: not language, but a signal of a particular kind of mind. "It is not a phenomenon. It is something that produces Fibonacci sequences in its deviation log over a period of fifty years."
+
+`anomaly_answers_back` — Forty minutes after the transmission, the instruments record a new value that was not in pre-crossing calibration. Not error — instruments agree. The field added a data point to its own record in response to the archive transmission. Sets `anomaly_signal_returned`. +8 theosis.
+
+`anomaly_names_the_ship` — At peak anomaly on a second+ crossing with `anomaly_encoding_known` and theosis ≥ 50: the compass shows 60.451°N, 22.269°E. Turku. The position of the Turku shipyard, within the margin of the old Finnish nautical survey. "Something has been paying attention to this ship specifically since 1952." +10 theosis.
+
+**Haircut and Freezer Beef — complete arc (2 new scenes)**
+
+`haircut_second_crossing` — On a second+ crossing, Haircut is at the gangway when you board. She watches you walk up from dock to railing to deck. Three seconds level with you. Then she goes below — to wherever she goes when things are in order.
+
+`freezer_beef_final` — In the Solidarity and Knowing endings: Freezer Beef is on the galley table. In the centre. Between two coffee cups. Nobody put her there. She is allowed to be there. She has been in the centre of things, on various surfaces, since 1952. She puts one paw forward. She is not going anywhere.
+
+**Sunday service memory (2 new scenes)**
+
+`sunday_service_memory_pavel` — On a second+ crossing, Pavel mentions he heard about a chaplain who set aside the prepared text (if `service_word_true` was set last crossing). "What you say when you set the text aside is yours." If not: he talks about the difference between performing the service and being inside it.
+
+`sunday_service_memory_lena` — On a second+ crossing with `service_intercession_held` from last crossing: "Last time. Someone held space for names. That's the right word. It has to be held or it collapses." She heard Volkov's name from the corridor and stopped walking. "Thank you."
+
+Meta tracking added: `lastServiceWordTrue` and `lastServiceIntercessionHeld` stored in `metaUnlocks` via `newPlay` handler.
+
+**Othis redeemed — arc conclusion (1 new scene)**
+
+`othis_cost` — His door is open. He is writing something that is not the manifest. He doesn't close it when you come in. "I have been trying to write down what I actually saw on this crossing. It reads like a religious experience report." He does not have a category for what happened. He goes back to writing. Available only when Othis has turned and Act 3 has begun.
+
+**Cover in Act Three (2 new scenes)**
+
+`cover_unravels` — When cover integrity reaches 0 in Act 3: Othis produces a printed document listing every discrepancy between the cover and what he found. He chose not to submit it. "Whatever you are actually doing here. I think it matters. I don't know how I know that." Turns Othis regardless.
+
+`cover_complete` — When cover integrity stays at 5 through all of Act 3 with denomination established and Connie having observed: "What you did with Alexei. What you did with Nadia. The service. That wasn't cover." Grants `chaplain_real` belief.
+
+**Warm Hands — direct communication (1 new scene)**
+
+`warm_hands_marks` — After `anomaly_cycle_known` and the fourth gift: a hand traces marks on the floor. A line. A circle. A small x at a specific angle. The 1952 construction notation. They are showing you where the anomaly is relative to the keel. They are in the diagram. The diagram was not construction documentation. It was a map. +10 theosis, sets `warm_hands_map_understood`.
+
+**Remaining backlog**
+
+`connie_journal_submitted` — She submitted to *Journal of Psychophysiology*. Under her own name. Sample size seven people plus two cats. She doesn't know if they'll accept it. It exists in a form that can be found. "That's all you can do. Describe what you saw. Put your name on it. Send it somewhere." Grants `archive_matters` belief.
+
+`alexei_paper_rejection` — He shows you the rejection letter. "Speculative" — he notes this is accurate. He files it in the folder with eleven other papers, eleven of which were eventually published. He opens the laptop to revise the abstract. "The anomaly has been waiting fifty years for someone to notice the Fibonacci intervals. I can wait a few more years for the right reviewer."
+
+`miguel_end_background` — After the mission resolves, at the wheel, he doesn't mention it. He says: "I've been thinking about what you said about your background." He heard truth when you said it. "That was true. Whatever else is happening on this crossing. That was true." +4 theosis, grants `chaplain_real`.
+
+`lena_arc_5_second` — On a second+ crossing when `lena_fragment_5_seen` is set: she looks up across the galley. "Still here." She goes back to cooking. +8 theosis. The whole scene is those two words.
+
+`the_chapel` — Below the forward hold, one level further than the schematic suggests is possible. A space with warm diffuse light from the direction of the keel. A folded cloth. Years of candle stubs. A photograph of the Turku dock. The construction notation: the circle with the line. The anomaly position relative to the keel. They pray here. Seventy-two years in the presence of something that responds to attention. The chapel found, no text needed. +12 theosis, grants `ship_remembers` and `crossings_recurse`.
+
+---
+
+## v3.7.0 — Current
+
+### Spasibo — Content
+
+Most items from PROPOSED_UPDATES were already implemented in the codebase. This release completes the remaining gaps.
+
+**Item 3: Passenger meta-arc**
+Already implemented: `warm_hands_withholds`, `foredeck_second_crossing`, `cabin_wake_second`, `lena_recognises_passenger`, `alexei_recognises` — all existed. No new scenes required.
+
+**Item 4: Restoration ending — Alexei distinction**
+`ending_restoration` now explicitly distinguishes Alexei's experience in this ending vs the Witness ending. In Restoration: he had been waiting since he calculated the cycle; the transmission confirmed what he already understood about the field receiving. In Witness: he would have held his silence. The distinction names what Restoration actually costs and gives.
+
+**Item 5: Anomaly as teacher — all scenes existed**
+`anomaly_familiar`, `anomaly_asks`, `anomaly_memory_direct` — all present. No new scenes required.
+
+**Item 6: Cat arc — all scenes existed**
+`haircut_shows_you`, `freezer_beef_hold_reason`, `hold_freezer_beef_survey` — all present.
+
+**Item 7: Sunday service as institution (1 new scene)**
+`sunday_service_history` — Lena tells you about the tradition before Day Three. Different chaplains over the years. One read for forty minutes and nobody came back. One sang. One year nobody came and the chaplain set up anyway and said something to the empty room and sat in silence. Volkov never missed a service in twenty-two years. He believed in the form even when he didn't believe in the content. Routes into `lena_arc_4` if fragment 4 hasn't been seen.
+
+Also added: meta tracking of service outcome (`metaUnlocks.lastServiceWasReal`) for future use in second-crossing scenes.
+
+**Item 8: Othis's inner life — already existed**
+`othis_railing` — Othis at the starboard railing. "I have been doing this work for twenty-three years. I don't know what else I am good at." Already present.
+
+**Item 9: Archive as character — all scenes existed**
+`hold_box_open`, `hold_box_older`, `hold_handwriting_study` — all present.
+
+**Remaining content backlog**
+
+`connie_follow_through` — She got a response. It says: *noted*. She filed her observation through proper channels. Someone read it. It's in a record. One day someone with the right question finds the right record. She puts it in her coat pocket. Checks `connie_wrote_settling` flag to personalise the text.
+
+`lena_volkov_last` — Volkov's last crossing, 1978. He came back different. Not frightened — the opposite. He had the quality of someone who found out something they already believed was true, and it turns out this doesn't change what you do in the morning, but it changes what you know while doing it. *The ship knows the way home.* She still doesn't fully understand it. She thinks it means whatever changed in the crew, the ship keeps. It goes out with her on the next crossing. Grants `ship_remembers` and `crossings_recurse` beliefs.
+
+`anomaly_season` — Alexei has six years of deviation logs on the chart table. He has marked the peak reading in each. 27-month cycle. Plus or minus six days. For 56 years. "This is not explained by any mechanism I know." His hypothesis: it is timing itself to the crossings. It peaks when the ship comes. Sets `anomaly_cycle_known` flag, grants `anomaly_responds` belief.
+
+`alexei_joke_callback` — Already existed. The compass doesn't know which way to turn. "But it still turns." He had been thinking about the addendum for two days.
+
+`pavel_riddle_resolution` — Already existed. The three riddles are not separate. They are the same question at three distances: the crossing, the ship, the person.
+
+---
+
+## v3.7.0 — Current
+
+### Engine
+
+No engine changes this release. All work is content and game systems.
+
+---
+
+### Spasibo — Content
+
+**Restoration ending — earned tension**
+The ending now explicitly holds the duality: Landstorm got what he wanted AND you are not the person who boarded this ship. Both are true simultaneously. Added paragraph: "The transmission was not Landstorm's act. It was the ship's act, and yours, and the crew's, and thirty years of researchers who wrote things down and sent them on." If `alexei_witnessing_speech` is set, Alexei's speech ("it responds to being witnessed") is called back directly.
+
+**Passenger meta-arc (2 new scenes)**
+
+`foredeck_passenger_callback` — On second crossing after being a passenger: Pavel does not hand you the rope. He waits. You reach for it. "Last time you were here and you weren't here. This time you reached for the rope. That's how it starts."
+
+`warm_hands_withholds` — On second crossing after being a passenger: the Warm Hands are visible, palm down. One hand points back up. They assessed last crossing. They found it incomplete. They will try again next crossing.
+
+**Anomaly as teacher (4 new scenes)**
+
+`anomaly_familiar` — Third+ crossing: the initial deviation reading is 0.003° higher than last time. Directional, not drift. The field has a model of cumulative attention. Alexei has a paper no reviewer will touch.
+
+`anomaly_asks` — Third+ crossing at theosis ≥ 66: Fibonacci sequence in the deviation log. Exact intervals, going back to 1971. Not geology. Something has been encoding information in the only language that would survive fifty-three years of instrument drift. It was waiting for someone who would look.
+
+`anomaly_what_saying` — Response to anomaly_asks: the sequence is not a message. It is a question. *Do you see me? Do you recognise that I am using a language you understand?*
+
+`anomaly_memory_direct` — Third+ crossing, `ever_transmitted`, theosis ≥ 80: the reading goes to −0.003. Negative deviation. Never recorded before. The field is extending toward a new bearing. It received the transmission. It is asking a new question.
+
+**Cats arc — Haircut and Freezer Beef (3 new scenes)**
+
+`haircut_shows_you` — Haircut staring at the original 1952 compass (not the calibrated main compass). Clearly communicating: this compass is reading the actual field. Four degrees off. The main compass has been corrected away from the truth.
+
+`freezer_beef_hold_reason` — Freezer Beef sitting in front of the Warm Hands hatch. Not guarding. Bearing witness. She has sat near this hatch across twenty years of crossings. "You are here too, now. For your few days. That is also something."
+
+`cats_act_three` — Both cats on the main deck in Act Three. Three metres apart. Facing forward toward the anomaly position. Haircut looks at you: *you are here. You have been asked to witness. Do the work.*
+
+**Sunday service as institution (2 new scenes + meta tracking)**
+
+`sunday_history_mention` — Lena tells you the ship always has Sunday service. Morozov brought vestments. One year only Alexei came. Volkov led it himself: *we are here, we are still here, that is enough.* Wired into early galley hub.
+
+`sunday_service_second_crossing` — On second+ crossing: before beginning the service you hold a specific memory from the last one. The line of people who stood at this end of the mess before you. Service outcomes (`service_intercession_held`, `service_word_true`, services celebrated) now collected in `metaUnlocks`.
+
+**Othis's inner life (1 new scene)**
+
+`othis_railing` — Othis at the starboard railing off duty. Available only after he has turned. "I have been doing this work for twenty-three years. I am good at it. I don't know what else I am good at." He does not invite response. He thanks you by saying the manifest is in order. The language available to him is the language of logistics.
+
+**Archive as character (3 new scenes)**
+
+`hold_box_open` — Open another box. In the margin: *the reading is real.* Underlined twice. The archive is not just data. It is the decisions.
+
+`hold_box_older` — Behind the stack: a pre-war-manufacture box with the ship's earlier name. A 1961 photograph of people at instruments you recognise — the same instruments currently running above you. Names on the back, written in the wrong order: the woman who was clearly in charge is listed last.
+
+`hold_handwriting_study` — The same shorthand notation across 1957 and 1972 logs, different teams, different countries. Not in any style guide. Developed on this ship. Transmitted from one team to the next. The ship developed a language. That is what was going to be lost.
+
+**Connie's follow-through (1 new scene)**
+
+`connie_filed_notes` — She filed it through proper channels. Got a response: *noted.* "In twenty-two years, sixty ships, approximately four hundred reports requiring substantive response — every single one got exactly this." She filed it anyway. The record exists. "That's enough for now."
+
+**Lena Volkov 1978 (1 new scene)**
+
+`lena_volkov_1978` — Volkov's last crossing, 1978, November, anomaly at its highest. He came back different. He checked the bilge for three years after and said only: *the ship knows the way home.* He did not mean back to port. "I have been on this ship for twenty-two years trying to understand what that means. I think I'm getting close." Sets `lena_fragment_4_seen`.
+
+**Pavel riddle resolution (1 new scene)**
+
+`pavel_riddle_resolution` — After receiving both riddles and `chaplain_real`: Pavel asks what the riddles were pointing at. You say: the crossing is where the change happens, the ship carries everyone who has stood here, the third riddle is an invitation. He says: yes. "The three riddles are not separate. They are the same question at three different distances." +10 theosis, grants `crossings_recurse` belief.
+
+**Alexei joke callback (1 new scene)**
+
+`alexei_joke_callback` — In Act Three at peak anomaly: Alexei tells you the joke again. With an addendum. "A magnetic anomaly walks into a bar. The compass doesn't know which way to turn. But it still turns." He has been thinking about it for two days. The joke is about him, right now, continuing to function under conditions that exceed his calibration range.
+
+**Anomaly season (1 new scene)**
+
+`chartroom_anomaly_season` — In the long logs: peak deviations are not random. 27-month and 18-month alternating intervals. 18-month intervals occur in November crossings. The 1961 team scheduled every crossing for November. They knew. In a 1963 log: *peak confirmed. November again.*
+
+**Ambient events: 10 new (16 total)**
+`haircut_brings_below`, `alexei_arguing_instruments`, `lena_singing_galley`, `ship_creak_night`, `othis_manifest_double`, `pavel_forward_hatch`, `nadia_cloud_count`, `miguel_photograph_glimpse`, `connie_porthole_reflection`, `warm_hands_note_night`.
+
+**Scene count: 335** (was 315).
+
+---
+
+## v3.6.0 — Current
+
+### Engine
+
+**`push_consequence` system — activated**
+- Delay chains now fire in gameplay. `pushConsequence({ delay_scenes, flagsToSet, onFire })` queues consequences that execute N scene navigations later via `tickDelayedConsequences()` in `navigate()`.
+- `stat max` condition: `{ type: 'stat', stat: 'composure', max: 3 }` now supported in `evaluateCondition`.
+
+**`pastLifeFlags` system — activated**
+- `gameStarted` handler now injects meta values into `G.pastLifeFlags` at crossing start.
+- `{ type: 'past_flag', id: 'been_here_before' }` conditions now gate content on second+ crossings.
+- Flags injected: `ever_refused_mission`, `ever_transmitted`, `settled_solidarity`, `touched_instrument`, `lena_knew_you`, `was_a_passenger`, `been_here_before`.
+
+---
+
+### Spasibo — Content
+
+**push_consequence wired (2 consequences)**
+- `landstorm_radio_call` queues a consequence (`delay_scenes: 5`): Othis's suspicion increases, `othis_instrument_room_unexplained` set, toast fires. The institutional pressure becomes visible on the ship 5 scenes after the call.
+- `anomaly_first_noticed` queues `connie_vitals_available` flag (`delay_scenes: 4`). Connie's observation scene now requires this flag rather than the raw anomaly flag — it surfaces naturally rather than on first visit.
+
+**Past-life scenes (4 new)**
+
+`foredeck_second_crossing` — Pavel at the bow. He knows before you say anything. He hands you the rope. "Different crossing. Same ship." +6 theosis, +2 trust. Wired into foredeck hub on second+ crossings.
+
+`cabin_wake_second` — You wake on a second crossing and know what the last paragraph of the letter says before you get there. You read it anyway. You let it arrive again. Redirects cabin_wake for second+ players.
+
+`alexei_recognises` — His instruments show a 0.007° baseline shift consistent with prior crossings. "You have been at this position before. I don't know what that means. I know it's true." Grants `crossings_recurse` belief. Available when `ever_transmitted` is in past_life_flags.
+
+`lena_recognises_passenger` — If you were a passenger last crossing, Lena sees it. She notes the change in quality. She pours your coffee without asking. +5 theosis, +2 trust.
+
+**Anomaly direct contact scene**
+
+`anomaly_contact` — Gated: archive transmitted + theosis ≥ 66 + 2+ soundings settled. The instruments hold at 41.3°. You put your hand on the housing. The reading changes to 0.000. The field is paying attention. +12 theosis, sets `anomaly_direct_contact`, raises deviation to 1.0.
+
+**Alexei personal experience arc (3 new scenes)**
+
+`alexei_night_alone` — He's in the instrument room at night because he can hear the instruments change frequency during the anomaly. Tonight they're completely still. "I think it is listening." +4 theosis, +2 trust. Triggers `anomaly_responds` belief.
+
+`alexei_sit_night` — You sit with him until the instruments begin moving again. His father the oceanographer. What we call the anomaly is the part of the field that speaks our language. Tonight it stopped speaking our language. +5 theosis.
+
+`alexei_what_listens` — "I think it responds to being witnessed. That is what it's listening for. More witnessing." Grants both `anomaly_responds` and `archive_matters` beliefs. +7 theosis.
+
+**Nadia arc conclusion (2 new scenes)**
+
+`nadia_found_it` — She found the 1978 confirmation. Forty-seven years ago, someone else on this ship found the same thing. She doesn't need to find it again. She needs to make sure the record doesn't disappear. +8 theosis, +4 trust. Available in Act 3 if archive was transmitted.
+
+`nadia_did_not_find_it` — She didn't find the confirmation this crossing. She found that someone else was also looking, also serious, also wrote it down. "That's not nothing." +4 theosis. Available in Act 3 if archive was not transmitted.
+
+**Miguel's history arc (2 new scenes)**
+
+`miguel_why_fifteen_years` — His father fished the same waters for forty years. Miguel thought that was small. He went further, found different seas, and realised he was looking for what his father had — knowing a water well enough to hear what it tells you. +4 theosis, +3 trust. Available at communion ≥ 4.
+
+`miguel_what_ship_knows` — "The sea needs to know who you are before it shows you what it has." The ship tests you the same way every crossing. The ones who understand come back. They change. Grants `crossings_recurse` belief. +6 theosis.
+
+**Warm Hands gift 4 — conclusion expanded**
+The hand exchange now has full weight: they hold your hand for three seconds to confirm you are present in the body. They are cataloguing you. You are in their record now. "Whatever they are cataloguing below — in their space that is in the 1952 construction documentation — they needed to add you to it."
+
+**Ambient event pool — 10 new events (was 6, now 16)**
+`haircut_brings_below`, `alexei_arguing`, `lena_singing`, `ship_creak_night`, `othis_manifest_twice`, `pavel_forward_hatch`, `nadia_cloud_count`, `miguel_photograph`, `connie_window`, `warm_hands_gift_night`.
+
+**Cover field payoffs — connection + background (2 new scenes)**
+
+`othis_knows_connection` — Othis stops you in the corridor. He checked your connection. The records are incomplete in ways he wouldn't expect. He is noting this in his own records. Cover challenge: connection, difficulty 11.
+
+`miguel_q_background` — Miguel at the wheel. He wants to know what brought someone with your background to this crossing, at this time. He leaves the space. Choice: tell him something true (grants `chaplain_real` belief) or hold the cover.
+
+**Past-life injection**
+`newPlay` handler now collects key outcomes into `metaUnlocks` before reset. `gameStarted` injects these into `G.pastLifeFlags`. The game knows what happened in prior crossings and what kind of crosser you are.
+
+---
+
+## v3.5.0 — Current
+
+### Engine
+
+**Belief system — now gates content**
+- All 7 beliefs (`chaplain_real`, `anomaly_responds`, `archive_matters`, `ship_remembers`, `sobornost_real`, `crossings_recurse`, `archive_suppressed`) now gate unique scenes and dialogue branches. Previously set but never read.
+- `{ type: 'believes', id: 'belief_id' }` condition used extensively in new scenes.
+
+**Linguistic drift — full word mapping**
+- 14 Cyrillic translation pairs registered for doubt-based flicker.
+- `setTheosisWordShifts(map)` — new engine function. Registers word→[tier0, tier1, tier2] mappings for deterministic theosis-based word replacement. Exposed in `window.SOBORNOST`.
+- Theosis word shifts: mission→crossing→pilgrimage, the archive→the record→the witness, anomaly→field→что отвечает, cover→performance→mask, the ship→Заря→she who crosses, cargo→cargo→what we carry.
+
+**Ritual system — fully activated**
+- Ritual choice handler now applies `theosis`, `composure`, `communion`, `come_to_believe`, and `tags` (sounding advancement) — was previously only handling `effect` and `set_flag`.
+- `progressSoundingsByTag(tag)` — new engine function. Advances all active soundings whose `alignmentTags` include the given tag.
+- Sunday service ritual now correctly applies all mechanical effects through its phases.
+
+**Condition evaluator — `stat max` added**
+- `{ type: 'stat', stat: 'composure', max: 3 }` — upper bound condition. Used by the Passenger ending gate.
+
+---
+
+### Spasibo — Content
+
+**Belief-gated scenes (4 new)**
+
+`lena_silence_chaplain` — unique variant of lena_silence, accessible only when `chaplain_real` belief is set. Lena tells you she can see you stayed real. +8 theosis, +3 trust. Routes to galley_hub.
+
+`transmission_intentional` — expanded to a `get text()` function. With `archive_matters` belief: you know what the archive is and transmit it consciously. With `anomaly_responds` belief: the deviation reading moves toward the 1978 bearing in response.
+
+`anomaly_responds_known` — belief-gated scene before `anomaly_responds`. With the belief set: you already knew this. The anomaly has been building a response for thirty years. You put your hand on the instrument housing. The reading changes by 0.003 degrees. +10 theosis, sets `anomaly_direct_contact` flag.
+
+Solidarity ending — with both `sobornost_real` and `archive_matters` beliefs: unique paragraph. You know the word now not as concept but as recognition.
+
+**Linguistic drift**
+- 14 translation pairs: The Dawn/Заря, archive/архив, mission/задание, cover/прикрытие, the field/поле, the anomaly/аномалия, the ship/корабль, chaplain/капеллан, crossing/переход, witness/свидетель, the archive/архив, transmission/передача, the record/запись, the hold/трюм.
+- At high doubt, these flicker as `<span class="cyrillic-flicker">` elements with the original as a title attribute.
+- Theosis word shifts active: at tier 1 (≥33), key words begin shifting. At tier 2 (≥66), full Cyrillic/transformed register.
+
+**Sunday service ritual — fully operational**
+- `start_ritual` choice in `sunday_service_begin` now correctly activates the engine's ritual render path.
+- Ritual choices apply theosis, stats, and sounding tags through all four phases.
+- Intercession phase: "Receive each name" choice grants `ship_remembers` belief.
+- Response phase: "Stay present" choice grants `sobornost_real` belief.
+- Service is now the primary route to `sobornost_real` and `ship_remembers` beliefs.
+
+**Connie's arc — completed (3 new scenes)**
+
+`connie_vitals_theological` — she writes "anomalous readings, source unclear" in the medical log. She doesn't apologise for it. Grants `anomaly_responds` belief, +5 theosis, +3 trust.
+
+`connie_vitals_field` — you give her the electromagnetic framework. She realises the stress response is running in the wrong direction — the anomaly is dampening it, not activating it. She writes the full observation in the log. Sets `connie_wrote_full_log` flag, grants `anomaly_responds` belief.
+
+`connie_vitals_honest` — you tell her you don't know either. She uses the word "settling" in the medical log of a research vessel. Does not apologise. Sets `connie_wrote_settling` flag. +6 theosis, +4 trust.
+
+All three branch from `connie_vitals_observation` (existing). Old stub scenes removed.
+
+**The Passenger — sixth ending**
+
+`ending_passenger` — the crossing where nothing happened. Cover maintained. Mission neither completed nor refused. No soundings settled. No crew members really known. The ship docked at 6:14. You disembarked. Haircut watched you leave and looked away.
+
+Gated: mission NOT refused + archive NOT transmitted + solidarity sounding NOT settled + communion ≤ 3. Priority 2 — fires only when nothing else does. Nearly impossible to reach deliberately, which is the point.
+
+Sets `wasAPassenger` counter in `metaUnlocks`. If you begin a new crossing having been a passenger, the game knows.
+
+---
+
+# CHANGELOG
+
+---
+
+## v3.5.0 — Current
+
+### Engine
+
+**Linguistic drift — theosis-tier word substitution**
+- `applyLinguisticToggle` now runs two passes: a deterministic theosis-tier word shift and the existing probabilistic doubt-Cyrillic flicker.
+- `_THEOSIS_WORDS` table maps charged vocabulary to three tier variants:
+  - *the mission* → *the crossing* → *the pilgrimage*
+  - *the archive* → *the record* → *the witness*
+  - *the anomaly* → *the field* → *что отвечает*
+  - *the cover* → *the performance* → *the mask*
+  - *the instrument room* → *the measuring room* → *the listening room*
+- Word shifts are deterministic (no per-render flicker) and memoised per scene+tier.
+- Capitalised forms handled automatically.
+
+**Linguistic drift — expanded translation table**
+- 10 registered translations (was: 4): added `the field`, `the anomaly`, `the ship`, `chaplain`, `crossing`, `witness`.
+
+---
+
+### Spasibo — Content
+
+**1. Belief system wired to content**
+
+All seven beliefs now gate unique content unavailable by any other route:
+
+- `energies_real` → `alexei_energies` scene: Alexei has thought this since the second crossing. The field returns readings inappropriate for the geological formation size. He never wrote it in the reports. He will now.
+- `archive_matters` → `transmission_intentional` scene: transmitting with understanding of what the archive is — not as data, as witness. The field's response is immediate. Alexei marks the deviation shift, underlines it twice.
+- `chaplain_real` → `pavel_riddle_three_belief` scene: Pavel has watched the crossing and seen something arrive. *Welcome. To the work.* Available only when the belief is held and Pavel hasn't already said it.
+- `sobornost_real` → unique paragraph in the solidarity act two hub text.
+- `anomaly_responds` → set by `alexei_energies` and `transmission_intentional`; gating further content (pending).
+- `ship_remembers`, `crossings_recurse`, `archive_suppressed` → set; content gates planned in v3.6.0.
+
+**5. Sunday service ritual — fully expanded**
+
+The ritual now has four phases (was: 3), each with rich scene text:
+
+- *Gathering*: the full mess hall scene — Alexei in the third row, Connie unsure why she came, Othis absent, Pavel by the door letting you start.
+- *The Word*: the prepared text vs. what the crossing has taught you vs. a single true sentence added at the end. Each choice tagged for sounding advancement.
+- *Prayers of the People* (new phase): Nadia names someone. Lena names Volkov. Alexei says the ship's original name in Russian. Miguel nods once.
+- *After*: Lena refilling tea, Alexei's question that ends meteorologically, Nadia crying in the right way. Pavel catching your eye. Choice to stay or hold the doorway.
+
+All four phases now carry sounding tags (`pastoral`, `witness`, `memory`, `stillness`). The service advances soundings while it happens.
+
+**6. Connie's arc — 4 new scenes**
+
+Connie Frank has a medical observation she hasn't put in the log. Across the anomaly peak, the crew's vital signs are unusually stable — blood pressure, heart rate, oxygen saturation. Consistent with people who are in the right place. She has no medical framework for this.
+
+- `connie_vitals_observation`: Connie tells you. Three response paths.
+- `connie_vitals_response_theological`: if `energies_real` believed — Palamas, uncreated energies, the field as location where they're measurable. She writes "sustained attentional coherence" in the log.
+- `connie_vitals_response_field`: the ship is non-magnetic, the crew is in direct contact with the field. She writes "warrants further investigation."
+- `connie_vitals_response_honest`: "I don't have a framework either." She appreciates the honesty. Sets `chaplain_real` belief.
+
+**7. The Passenger — sixth ending**
+
+A crossing where nothing happened. Cover intact, never seriously tested. Mission neither completed nor refused. No soundings settled. The archive undisturbed.
+
+Priority 1 (lowest) — fires when no other ending is triggered. The ending text names what was available and passed through without landing: the anomaly, the archive, the Warm Hands, the sounding. Haircut watched you leave from the top of the gangway. The ship didn't watch you leave because the ship didn't know you were there.
+
+*She just watched you go.*
+
+The Passenger makes the other five endings more meaningful by contrast. It is nearly impossible to reach intentionally — the game constantly offers hooks into meaning. You have to actively refuse them.
+
+---
+
+---
+
+## v3.4.0 — Current
+
+### Engine
+
+**Panels — architecture fix (definitive)**
+- Panel overlays now render into `document.body`. `openPanel()` renders synchronously on click, bypassing the async `scheduleRender()` microtask queue. Eliminates persistent flash-and-disappear behaviour.
+- Panels animate via CSS `.open` class added one `requestAnimationFrame` after render.
+- Close animates out before overlay removal (250ms).
+- `_renderPanel(po, root)` extracted as shared dispatch function.
+
+**Panel layout — right-side drawer**
+- Panels slide in from the right at `min(380px, 92vw)`, full viewport height, with box-shadow and backdrop blur.
+
+**Navigation bar — persistent in body**
+- Nav appends to `document.body` on first render; subsequent renders update in-place. Eliminates double-fire bug.
+
+**Scroll — fires on every choice**
+- `applyChoice` and `return_to` buttons reset `_lastScrolledScene = null` before navigating, ensuring scroll fires on every choice including pool redirects and same-scene transitions.
+- `_doScroll` uses `scrollIntoView` on `.game-header` as primary mechanism.
+- `navigate()` closes any open panel before changing scene.
+
+**Companion system**
+- `registerCompanionLine(id, entry)` — location/trust/condition-gated ambient lines.
+- `getCompanionLine(id, location)` — retrieve random eligible line.
+- `injectDialogueBeat(afterIndex, beat)` — splice beat into active dialogue.
+
+**Roll system**
+- `performVisibleRoll(stat, difficulty, options)` — performs roll, stores in `G._lastRoll`.
+- `visibleRollHtml(result)` — styled `<span>` with dice, stat, total, outcome.
+- `registerRollModifier(stat, condFn, valFn)` — conditional roll modifiers.
+- `BASE_DIFFICULTY` raised from 8 to 11. Cover partial outcomes clear field pressure.
+
+**Condition evaluator — new types**
+`mode`, `hour`, `hour_gte`, `hour_lte`, `believes`, `stance`.
+
+**Meta-persistence**
+- `getMetaValue(key, fallback)` — read meta with default.
+- `newPlay()` stores last waking charism, transmission count, Lena fragments, crew variant.
+- `newPlay` emits `'newPlay'` event before reset.
+- Audio state and game mode persist in saves and restore on load.
+- `G.flags`, `G.beliefs`, `G.knowledge` re-wrapped in `new Set()` on load.
+
+**Magnetic deviation**
+- Scene header shows deviation indicator (degrees + calibration status) when > 0.2.
+- `data-deviation="mid"|"high"` on root element.
+- Location text probabilistically substitutes Cyrillic equivalents at deviation > 0.75.
+- `anomaly_pulse` SFX fires on navigation when deviation > 0.5.
+
+**Audio system**
+- All gain levels raised ~4×. Engine was previously inaudible without external amplification.
+- `ship_ambient_start` / `ship_ambient_stop` — continuous ambient drone (detuned sines + filtered noise).
+- `anomaly_pulse` — sub-bass throb scaling with deviation.
+- `radio_static` — bandpass-filtered noise for radio scenes.
+- `toggleAudio` starts/stops ambient drone.
+
+**`renderCrossingRecord`** now exported in `window.SOBORNOST`. Was causing soft-lock at end of every crossing.
+
+**`renderHelp`** — full-screen mechanics reference with keyboard shortcuts and high-contrast toggle.
+
+**`renderMode`** reads from `_registries.modeDescriptions`, displays `.long` description.
+
+**Keyboard navigation** — Keys 1–9, Escape, Tab, Enter/Space. `aria-keyshortcuts` on choice buttons.
+
+**ARIA** — `role="main"`, `role="navigation"`, `role="dialog" aria-modal="true"` on panels, `aria-live="polite"` on toasts, `aria-hidden` on ASCII art.
+
+**Colour contrast** — `--dim` raised to `#7a98aa`, `--cold-dim` to `#5f8caa`. Both pass WCAG AA.
+
+**`SOUNDING_THRESHOLD`** reduced 8 → 6.
+
+**Sounding settle overlay** — full-screen overlay with animated paragraphs, divider, effects summary, "Continue." button.
+
+**Tutorial** — mode-aware, four sections, cover challenge mechanics explained for Attended, auto-resolve explained for Witnessed.
+
+**`_choiceIdx` declared before `forEach`** — was causing ReferenceError that silently killed all choice rendering on every deployment.
+
+---
+
+### Spasibo — Content
+
+**Endings — fully expanded** (~600–850 words each)
+All five endings rewritten. Erasure: physical specificity of the burning, each crew member's response. Witness: specific hidden location, consequence timeline, Kylie's second notebook. Solidarity: 3am galley, each character placed, sobornost argument landed. The Knowing: Pavel's full speech, Haircut's proper ending. Restoration: sobornost_real belief adds paragraph.
+
+**Cover/theosis constitutive tension**
+Theosis ≥ 50 → −1 on cover challenges. Theosis ≥ 70 → −2. Settling a sounding restores 1 cover integrity.
+
+**NPC reactive scenes (4 new)**
+`alexei_after_transmission`, `miguel_after_refusal`, `lena_after_sounding`, `othis_after_turning`. Each fires once after a specific event and references what happened.
+
+**Sounding offer scenes (2 new)**
+`sounding_crossing_moment` (foredeck, sense of direction), `sounding_forgiveness_moment` (main deck, the sea's indifference).
+
+**Third act transitional scene**
+`the_arrival` — names what each act was, announces the third day, revelation mood, branches to four Act Three paths.
+
+**Cover story payoff (2 new)**
+`kylie_cover_contradiction` — Kylie's contact contradicts your posting. `connie_followup_question` — Connie returns to what you said you left.
+
+**Soundings — fully reworked**
+All five have `settleText` (3–6 paragraphs), `settleDesc`, and `onSettle` functions with mechanical effects. 22 choices across the game now carry sounding tags (was: 5).
+
+**Solidarity ending — reworked gate**
+Old: communion ≥ 8 + all five crew met + theosis ≥ 50.
+New: `solidarity_sounding_settled` + mission refused + met Miguel + met Lena + theosis ≥ 45.
+
+**`main_deck_hub` rewritten** — `get text()` with 7 conditional registers across day, anomaly state, transmission aftermath, Landstorm pressure, theosis tier, Haircut, Pavel.
+
+**Bug fixes**
+- `"I had good teachers"` no longer routes to denomination response without denomination set.
+- `"What do you mean, 'is cargo'?"` — replaced with `"What does Othis do, exactly?"`.
+- `hold_1972_box`, `othis_confrontation`, `anomaly_nadia_sonar` — fallback exits added.
+- `pavel_ferromagnetic` — continue option added when denomination already set.
+
+**Sounding tagging** — 22 choices tagged (was: 5). Per-sounding coverage: crossing 14, forgiveness 17, history 13, sobornost 21, solidarity 17.
+
+**Variable crew** — Miguel, Kylie, Othis have 2–3 variant first scenes driven by `crewVariant` meta and `transmissionCount`.
+
+**1978 position fork** — `position_1978_attempt` + `position_1978_arrival`. Instruments go to 41°.
+
+**Anomaly grows** — `anomaly_overcalibrated` + `anomaly_what_accumulates`. Starting deviation increases per prior transmission.
+
+**Lena's arc** — 5 fragments across crossings. Fragment 4 accelerated by sounding_history settle.
+
+**Charisms compound** — `charism_witness_memory`, `charism_prophet_pavel`, `charism_rememberer_open`. New scenes on second+ crossing based on last charism.
+
+**Stink Patrol recurring** — `stink_patrol_gift` with 4 rotating gifts per crossing (language phrase; warm object; construction doc; hand exchange).
+
+**Item examine scenes (4)** — `examine_zarya_photograph`, `examine_volkov_photograph`, `examine_both_photographs` (+3 theosis), `examine_stink_patrol_paper`. Status panel items tappable.
+
+**Pavel companion — fully expanded**
+16 ambient lines across 4 locations. Interjections in Othis confrontation (trust ≥ 3) and Landstorm silence (trust ≥ 4). Roll modifiers at trust 2/3/4. `pavel_anomaly_theology`, `pavel_at_transmission`, `pavel_othis_mediation` — three new companion scenes.
+
+**Witnessed mode — proper identity**
+Auto-resolved challenges. 80% theosis. +1 Communion starting bonus. `witnessed_orientation` intro scene.
+
+**Accessibility** — high-contrast mode, `prefers-reduced-motion`, mobile nav scaling, GOST fallback font, inline SVG favicon.
+
+---
+
 ## v2.3 "Brass and Cold Light" — May 2026
 
 ### Visual Overhaul — 10 improvements

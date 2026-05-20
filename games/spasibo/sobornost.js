@@ -1691,7 +1691,17 @@ function renderRitual(root) {
   } else if (phase.choices) {
     phase.choices.forEach(ch=>{
       const btn=document.createElement('button');btn.className='choice';btn.textContent=processText(ch.text);
-      btn.onclick=()=>{if(ch.effect)applyEffect(ch.effect);if(ch.set_flag)setFlag(ch.set_flag);ritualNextPhase();};
+      btn.onclick=()=>{
+        if(ch.effect)applyEffect(ch.effect);
+        if(ch.set_flag)setFlag(ch.set_flag);
+        if(ch.theosis)incrementTheosis(ch.theosis);
+        if(ch.composure)applyEffect({composure:ch.composure});
+        if(ch.communion)applyEffect({communion:ch.communion});
+        if(ch.come_to_believe)comeToBelieve(ch.come_to_believe);
+        if(ch.tags&&G.soundings)ch.tags.forEach(tag=>progressSoundingsByTag&&progressSoundingsByTag(tag));
+        _activeRitual.choicesMade.push({phase:_activeRitual.phaseIndex,choice:ch.text});
+        ritualNextPhase();
+      };
       cd.appendChild(btn);
     });
   } else {
@@ -2409,22 +2419,51 @@ function injectMicroLines(lines, sceneId) {
   return [...lines, `<span class="micro-line">${micro}</span>`];
 }
 const _toggleMemo = new Map();
+// Per-theosis-tier word substitution table (beyond the ship name)
+const _THEOSIS_WORDS = {
+  // [asleep_word, waking_word, illumined_word]
+  'the mission':   ['the mission',   'the crossing',    'the pilgrimage'],
+  'the archive':   ['the archive',   'the record',      'the witness'],
+  'the anomaly':   ['the anomaly',   'the field',       'что отвечает'],
+  'the cover':     ['the cover',     'the performance', 'the mask'],
+  'the instrument room': ['the instrument room', 'the measuring room', 'the listening room'],
+};
+
 function applyLinguisticToggle(t){
   const doubt = G.stats.doubt || 0;
-  if (doubt < 4 || !_registries.translations || !Object.keys(_registries.translations).length) return t;
-  // Memoize per scene+doubt-tier to prevent per-render flickering
-  const tier = doubt >= 7 ? 'H' : doubt >= 5 ? 'M' : 'L';
-  const key = G.scene + '|' + tier + '|' + t.slice(0, 32);
-  if (_toggleMemo.has(key)) return _toggleMemo.get(key);
-  const flicker = tier === 'H' ? 0.35 : tier === 'M' ? 0.18 : 0.08;
+  const theosis = G.theosis || 0;
+  const theoTier = theosis >= 66 ? 2 : theosis >= 33 ? 1 : 0;
+  const memoKey = G.scene + '|d' + doubt + '|t' + theoTier + '|' + t.slice(0, 32);
+  if (_toggleMemo.has(memoKey)) return _toggleMemo.get(memoKey);
+
   let result = t;
-  for (const [orig, trans] of Object.entries(_registries.translations)) {
-    if (Math.random() < flicker) {
-      result = result.replaceAll(orig, `<span class="cyrillic-flicker" title="${orig}">${trans}</span>`);
+
+  // Theosis word shifts — deterministic, no flicker
+  if (theoTier > 0) {
+    for (const [orig, variants] of Object.entries(_THEOSIS_WORDS)) {
+      const replacement = variants[theoTier];
+      if (replacement !== orig) {
+        result = result.replaceAll(orig, replacement);
+        // Also try capitalised
+        const cap = orig.charAt(0).toUpperCase() + orig.slice(1);
+        const capRep = replacement.charAt(0).toUpperCase() + replacement.slice(1);
+        result = result.replaceAll(cap, capRep);
+      }
     }
   }
-  _toggleMemo.set(key, result);
-  // Expire memo on scene change
+
+  // Doubt Cyrillic flicker — probabilistic
+  if (doubt >= 4 && _registries.translations && Object.keys(_registries.translations).length) {
+    const tier = doubt >= 7 ? 'H' : doubt >= 5 ? 'M' : 'L';
+    const flicker = tier === 'H' ? 0.35 : tier === 'M' ? 0.18 : 0.08;
+    for (const [orig, trans] of Object.entries(_registries.translations)) {
+      if (Math.random() < flicker) {
+        result = result.replaceAll(orig, `<span class="cyrillic-flicker" title="${orig}">${trans}</span>`);
+      }
+    }
+  }
+
+  _toggleMemo.set(memoKey, result);
   return result;
 }
 // Clear memo on navigation
@@ -3605,12 +3644,39 @@ function renderCrossingRecord(root) {
   screen.className = 'crossing-record';
 
   // Ending title
+  // Passenger crossing — sparse record
+  if (G.flags.has('crossing_was_passenger_crossing')) {
+    screen.className = 'crossing-record crossing-record-passenger';
+    const emptyTitle = document.createElement('div');
+    emptyTitle.className = 'cr-ending-title cr-passenger-title';
+    emptyTitle.textContent = 'THE PASSENGER';
+    screen.appendChild(emptyTitle);
+    const emptyDesc = document.createElement('div');
+    emptyDesc.className = 'cr-ending-desc';
+    emptyDesc.textContent = 'You were here.';
+    screen.appendChild(emptyDesc);
+    const emptyDiv = document.createElement('div'); emptyDiv.className = 'cr-divider'; screen.appendChild(emptyDiv);
+    // Blank panels — visible absence
+    ['Settled this crossing', 'What the ship remembers', 'Theosis'].forEach(label => {
+      const sec = document.createElement('div'); sec.className = 'cr-section cr-section-empty'; sec.textContent = label; screen.appendChild(sec);
+      const blank = document.createElement('div'); blank.className = 'cr-row cr-row-empty'; blank.textContent = '—'; screen.appendChild(blank);
+    });
+    const finalDiv = document.createElement('div'); finalDiv.className = 'cr-divider'; screen.appendChild(finalDiv);
+    // Haircut's name without text
+    const hairEl = document.createElement('div'); hairEl.className = 'cr-memory cr-memory-haircut';
+    const npcSpan = document.createElement('span'); npcSpan.className = 'cr-memory-npc'; npcSpan.textContent = 'Haircut';
+    hairEl.appendChild(npcSpan); screen.appendChild(hairEl);
+    const btn2 = document.createElement('button'); btn2.className = 'btn cr-btn'; btn2.textContent = 'Begin again.'; btn2.onclick = () => newPlay(); screen.appendChild(btn2);
+    root.appendChild(screen); return;
+  }
+
   const endingNames = {
     ending_erasure_reached:     ['ERASURE',     'The archive is gone.'],
     ending_witness_reached:     ['WITNESS',     'The archive is hidden.'],
     ending_restoration_reached: ['RESTORATION', 'The record goes into the world.'],
     ending_solidarity_reached:  ['SOLIDARITY',  'The ship acted as one body.'],
     ending_the_knowing_reached: ['THE KNOWING', 'You have been here before.'],
+    ending_passenger_reached:   ['THE PASSENGER', 'You were here.'],
   };
   let endingTitle = 'THE CROSSING', endingDesc = '';
   for (const [flag, [title, desc]] of Object.entries(endingNames)) {
