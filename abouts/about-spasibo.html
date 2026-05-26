@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Spasibo · Project Reflections</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Spectral:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+<svg width="0" height="0" style="position:absolute;pointer-events:none" aria-hidden="true">
+<defs>
+  <g id="sf">
+    <g fill="#e06030">
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(0)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(25.7)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(51.4)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(77.1)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(102.8)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(128.5)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(154.2)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(180)"/>
+    </g>
+    <circle r="16" fill="#5a2c10"/>
+    <circle r="11" fill="#3e1a08"/>
+  </g>
+  <g id="lf-v">
+    <path d="M0,0 C10,-8 18,-6 20,2 C18,12 8,18 0,16 C-8,18 -18,12 -20,2 C-18,-6 -10,-8 0,0Z" fill="#7a8840"/>
+    <path d="M0,0 L0,16" stroke="#5a6428" stroke-width="1" fill="none"/>
+  </g>
+</defs>
+</svg>
+
+<style>
+/* Exact Color Architecture from index.html */
+:root {
+  --bg:        #6a1710;
+  --bg-2:      #7c1e14;
+  --bg-3:      #8e2218;
+  --nav-bg:    rgba(28,6,4,.97);
+  --border:    #4a0e0b;
+  --border-hi: #8a2a1a;
+  --text:      #f2e4c4;
+  --text-2:    #d8c4a0;
+  --text-3:    #b89c72;
+  --coral:     #e06030;
+  --coral-hi:  #f07848;
+  --cpale:     rgba(224,96,48,.12);
+  --olive:     #7a8840;
+  --olive-hi:  #96aa52;
+  --opale:     rgba(122,136,64,.15);
+  --black:     #100c08;
+}
+
+[data-theme="light"] {
+  --bg:        #f0e4c8;
+  --bg-2:      #fdf6e8;
+  --bg-3:      #e4d4b0;
+  --nav-bg:    rgba(34,10,4,.96);
+  --border:    #c8b890;
+  --border-hi: #a89060;
+  --text:      #28120c;
+  --text-2:    #4a2e18;
+  --text-3:    #7a5a38;
+  --coral:     #b83818;
+  --coral-hi:  #d04825;
+  --cpale:     rgba(184,56,24,.1);
+  --olive:     #4a6018;
+  --olive-hi:  #5a7820;
+  --opale:     rgba(74,96,24,.12);
+  --black:     #faf4e4;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Spectral',Georgia,serif;
+  font-size:1.05rem;
+  line-height:1.8;
+  -webkit-font-smoothing:antialiased;
+  transition:background .25s,color .25s;
+}
+a{color:var(--coral);text-decoration:none;transition:color .15s}
+a:hover{color:var(--coral-hi)}
+.container{max-width:760px;margin:0 auto;padding:0 1.75rem}
+
+/* Navigation Bar */
+nav{
+  background:var(--nav-bg);
+  border-bottom:2px solid var(--border);
+  position:sticky;top:0;z-index:100;
+  backdrop-filter:blur(10px);
+}
+.nav-inner{
+  display:flex;align-items:center;justify-content:space-between;
+  height:52px;max-width:760px;margin:0 auto;padding:0 1.75rem;
+}
+.nav-brand{
+  font-family:'IM Fell English',serif;
+  font-size:1.05rem;color:var(--coral);letter-spacing:.03em;
+  display:flex;align-items:center;gap:.45rem;
+}
+.nav-brand svg{width:20px;height:20px;overflow:visible}
+.theme-toggle{
+  background:none;border:1px solid var(--border-hi);padding:.22rem .65rem;
+  font-family:'Spectral',serif;font-size:.72rem;font-weight:600;
+  letter-spacing:.06em;color:var(--text-3);cursor:pointer;transition:all .15s;
+}
+.theme-toggle:hover{border-color:var(--coral);color:var(--coral)}
+
+/* Essay Header Layout */
+.article-header{
+  padding:4rem 0 2rem;
+  border-bottom:1px dashed var(--border-hi);
+  margin-bottom:2.5rem;
+}
+.back-link {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  color: var(--text-3);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 1.5rem;
+}
+.back-link:hover { color: var(--coral); }
+.project-eyebrow {
+  font-size: .75rem;
+  font-weight: 600;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--olive);
+  margin-bottom: .6rem;
+}
+h1 {
+  font-family:'IM Fell English',serif;
+  font-size: 2.8rem;
+  font-weight: 400;
+  line-height: 1.15;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+[data-theme="light"] h1 { color: #0a0402; }
+.project-subtitle {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 1.2rem;
+  color: var(--text-2);
+}
+
+/* Content Layout */
+.article-body { padding-bottom: 4rem; }
+.article-body p { margin-bottom: 1.6rem; text-indent: 1.5rem; }
+.article-body p:first-of-type { text-indent: 0; font-size: 1.1rem; color: var(--text-2); }
+.article-body em { font-style: italic; color: var(--text); }
+.article-body strong { font-weight: 600; color: var(--text); }
+
+h2, h3 {
+  font-family: 'IM Fell English', serif;
+  font-weight: 400;
+  color: var(--coral);
+  margin: 2.5rem 0 1rem;
+  line-height: 1.2;
+}
+h2 { font-size: 1.6rem; border-bottom: 1px solid var(--border); padding-bottom: 0.3rem;}
+h3 { font-size: 1.25rem; }
+
+/* Structural Callout Component */
+.theological-reflection {
+  background: var(--bg-2);
+  border-left: 3px solid var(--olive);
+  padding: 1.25rem 1.5rem;
+  margin: 2rem 0;
+}
+.theological-reflection h3 { margin-top: 0; color: var(--olive-hi); }
+.theological-reflection p { margin-bottom: 0; text-indent: 0; font-size: 0.95rem; color: var(--text-2); }
+
+/* Decorative Vine Break */
+.section-divider {
+  display: block; width: 100%; max-width: 300px; margin: 3rem auto; opacity: 0.5;
+}
+
+@media(max-width:680px){
+  h1 { font-size: 2.1rem; }
+  .article-header { padding-top: 2.5rem; }
+}
+
+/* Subtle entrance animation */
+@keyframes fadeInUp { from { opacity:0; transform:translateY(12px) } to { opacity:1; transform:translateY(0) } }
+.animate-text { animation: fadeInUp 0.5s ease both; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <span class="nav-brand">
+      <svg viewBox="-55 -55 110 110" aria-hidden="true"><use href="#sf"/></svg>
+      Cal St Francis
+    </span>
+    <button class="theme-toggle" id="themeToggle"><span>🌙</span> Dark</button>
+  </div>
+</nav>
+
+<main class="container animate-text">
+  <header class="article-header">
+    <a href="index.html" class="back-link">← Return to Portfolio</a>
+    <div class="project-eyebrow">Design Notes &amp; Reflections</div>
+    <h1>СПАСИБО/SPASIBO</h1>
+    <div class="project-subtitle">Interactive Fiction as an Exploration of Lost History and Solidarity</div>
+  </header>
+
+  <article class="article-body">
+    <p>
+      The idea for <em>Spasibo</em> (<em>Russian for "Thank You," more or less...</em>) came as I reflected on the heartbreak of lost and erased history. We live in a world where the cruel and exploitative rule, and do everything to erase and twist the history of everything good. We watch it so much in real-time that it's numbing.
+</p>
+    <p>The true story of the <em>Zarya</em> jumped out to me as an example of something beautiful, obscured. We know all the details of how some monster rose to billionaire status on the backs of exploited workers, or exactly how some other monster weighed out their war-crimes options, but any story of the wonderfulness of human solidarity and curiosity seems to get disappeared, or twisted into a story where the goodness is the problem. Malcom X's statement that "if you aren't careful, the newspapers will have you hating the people who are being oppressed and loving the people who are doing the oppressing" was probably just as real when he said it as it is now, but right now it feels like nothing anyone has ever said has been so right.
+    </p>
+
+    <p><em>Spasibo</em> tries to bring some of that history back, as a way of countering what's been done, and as a way of saying "thank you." I hope it does so without hitting anyone over the head with it. The game requires several playthroughs to get to unlock its reality, so my hope is to make it interesting enough to inspire those playthroughs. As you complete "crossings," the game changes based on your choices. You create yourself as you play, in part through building and maintaining a cover -- you aren't exactly who you say you are -- and through your actions. Different interactions become possible, characters' attitudes toward you shift, different endings become available, your attitude shifts (that's the plan, anyway.)
+      </p>
+    <p>I built the SOBORNOST engine for this game. I designed a <em>theosis</em> engine which affects the gameplay, the language, and the interface. A Breviary and Soundings system inspired by Disco Elysium's Thought Cabinet, but progressed through aligned action rather than time. Dual Charism sets, special qualities the character holds which affect gameplay: one chosen from a set with each crossing, one assigned from another set as aligned with who your character <em>has been</em>. SOBORNOST has many other features, many of which I've implemented in Spasibo.</p>
+
+<p>The game is in a playable, but unfinished state. It's up around 26,000 words of written content, with so much branching and so much dependant on a bunch of choices and factors, that there are instances of nonsense throughout, non-sequitors, and a few weird branches. But it's in a state where you can play and experience I think a fair bit of what I'm shooting for. I've taken some time away from development to focus on Rubric and my academic projects, but will get back to it fairly soon.
+
+</p>
+
+
+    <svg class="section-divider" viewBox="0 0 500 50" aria-hidden="true">
+      <path d="M 0,30 C 120,15 240,45 360,25 C 420,15 480,35 500,30" stroke="#5a6428" stroke-width="1.5" fill="none"/>
+      <g transform="translate(240,25) scale(.3)"><use href="#sf"/></g>
+    </svg>
+
+    <h2>Theological Foundations</h2>
+    <p>
+      At the core, the game is built on a kind of liberatory process-<em>theosis</em> model. <em>Theosis</em> is wildly simplified into a kind of score (shrug...), achieved through participation with the divine, though particularly through solidaristic participation... (Liberatory-Process-<em>Theosis</em>, just like I said! Couldn't be clearer.) As your <em>theosis</em> increases, the you and your world open up.
+    </p>
+
+<a href="../spasibo.html" target="_blank" rel="noopener" class="game-link">Check out <em>SPASIBO</em> →</a>
+  </article>
+</main>
+
+<script>
+const themeBtn = document.getElementById('themeToggle');
+const setTheme = t => {
+  document.documentElement.setAttribute('data-theme', t);
+  localStorage.setItem('theme', t);
+  themeBtn.innerHTML = t === 'dark' ? '<span>🌙</span> Dark' : '<span>☀️</span> Light';
+};
+const saved = localStorage.getItem('theme');
+setTheme(saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+themeBtn.addEventListener('click', () => {
+  setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+});
+</script>
+</body>
+</html>

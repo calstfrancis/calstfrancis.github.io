@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Rubric · Project Reflections</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Spectral:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+<svg width="0" height="0" style="position:absolute;pointer-events:none" aria-hidden="true">
+<defs>
+  <g id="sf">
+    <g fill="#e06030">
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(0)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(25.7)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(51.4)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(77.1)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(102.8)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(128.5)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(154.2)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(180)"/>
+    </g>
+    <circle r="16" fill="#5a2c10"/>
+    <circle r="11" fill="#3e1a08"/>
+  </g>
+  <g id="lf-v">
+    <path d="M0,0 C10,-8 18,-6 20,2 C18,12 8,18 0,16 C-8,18 -18,12 -20,2 C-18,-6 -10,-8 0,0Z" fill="#7a8840"/>
+    <path d="M0,0 L0,16" stroke="#5a6428" stroke-width="1" fill="none"/>
+  </g>
+</defs>
+</svg>
+
+<style>
+/* Exact Color Architecture from index.html */
+:root {
+  --bg:        #6a1710;
+  --bg-2:      #7c1e14;
+  --bg-3:      #8e2218;
+  --nav-bg:    rgba(28,6,4,.97);
+  --border:    #4a0e0b;
+  --border-hi: #8a2a1a;
+  --text:      #f2e4c4;
+  --text-2:    #d8c4a0;
+  --text-3:    #b89c72;
+  --coral:     #e06030;
+  --coral-hi:  #f07848;
+  --cpale:     rgba(224,96,48,.12);
+  --olive:     #7a8840;
+  --olive-hi:  #96aa52;
+  --opale:     rgba(122,136,64,.15);
+  --black:     #100c08;
+}
+
+[data-theme="light"] {
+  --bg:        #f0e4c8;
+  --bg-2:      #fdf6e8;
+  --bg-3:      #e4d4b0;
+  --nav-bg:    rgba(34,10,4,.96);
+  --border:    #c8b890;
+  --border-hi: #a89060;
+  --text:      #28120c;
+  --text-2:    #4a2e18;
+  --text-3:    #7a5a38;
+  --coral:     #b83818;
+  --coral-hi:  #d04825;
+  --cpale:     rgba(184,56,24,.1);
+  --olive:     #4a6018;
+  --olive-hi:  #5a7820;
+  --opale:     rgba(74,96,24,.12);
+  --black:     #faf4e4;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Spectral',Georgia,serif;
+  font-size:1.05rem;
+  line-height:1.8;
+  -webkit-font-smoothing:antialiased;
+  transition:background .25s,color .25s;
+}
+a{color:var(--coral);text-decoration:none;transition:color .15s}
+a:hover{color:var(--coral-hi)}
+.container{max-width:760px;margin:0 auto;padding:0 1.75rem}
+
+/* Navigation Bar */
+nav{
+  background:var(--nav-bg);
+  border-bottom:2px solid var(--border);
+  position:sticky;top:0;z-index:100;
+  backdrop-filter:blur(10px);
+}
+.nav-inner{
+  display:flex;align-items:center;justify-content:space-between;
+  height:52px;max-width:760px;margin:0 auto;padding:0 1.75rem;
+}
+.nav-brand{
+  font-family:'IM Fell English',serif;
+  font-size:1.05rem;color:var(--coral);letter-spacing:.03em;
+  display:flex;align-items:center;gap:.45rem;
+}
+.nav-brand svg{width:20px;height:20px;overflow:visible}
+.theme-toggle{
+  background:none;border:1px solid var(--border-hi);padding:.22rem .65rem;
+  font-family:'Spectral',serif;font-size:.72rem;font-weight:600;
+  letter-spacing:.06em;color:var(--text-3);cursor:pointer;transition:all .15s;
+}
+.theme-toggle:hover{border-color:var(--coral);color:var(--coral)}
+
+/* Essay Header Layout */
+.article-header{
+  padding:4rem 0 2rem;
+  border-bottom:1px dashed var(--border-hi);
+  margin-bottom:2.5rem;
+}
+.back-link {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  color: var(--text-3);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 1.5rem;
+}
+.back-link:hover { color: var(--coral); }
+.project-eyebrow {
+  font-size: .75rem;
+  font-weight: 600;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--olive);
+  margin-bottom: .6rem;
+}
+h1 {
+  font-family:'IM Fell English',serif;
+  font-size: 2.8rem;
+  font-weight: 400;
+  line-height: 1.15;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+[data-theme="light"] h1 { color: #0a0402; }
+.project-subtitle {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 1.2rem;
+  color: var(--text-2);
+}
+
+/* Content Layout */
+.article-body { padding-bottom: 4rem; }
+.article-body p { margin-bottom: 1.6rem; text-indent: 1.5rem; }
+.article-body p:first-of-type { text-indent: 0; font-size: 1.1rem; color: var(--text-2); }
+.article-body em { font-style: italic; color: var(--text); }
+.article-body strong { font-weight: 600; color: var(--text); }
+
+h2, h3 {
+  font-family: 'IM Fell English', serif;
+  font-weight: 400;
+  color: var(--coral);
+  margin: 2.5rem 0 1rem;
+  line-height: 1.2;
+}
+h2 { font-size: 1.6rem; border-bottom: 1px solid var(--border); padding-bottom: 0.3rem;}
+h3 { font-size: 1.25rem; }
+
+/* Structural Callout Component */
+.theological-reflection {
+  background: var(--bg-2);
+  border-left: 3px solid var(--olive);
+  padding: 1.25rem 1.5rem;
+  margin: 2rem 0;
+}
+.theological-reflection h3 { margin-top: 0; color: var(--olive-hi); }
+.theological-reflection p { margin-bottom: 0; text-indent: 0; font-size: 0.95rem; color: var(--text-2); }
+
+/* Decorative Vine Break */
+.section-divider {
+  display: block; width: 100%; max-width: 300px; margin: 3rem auto; opacity: 0.5;
+}
+
+@media(max-width:680px){
+  h1 { font-size: 2.1rem; }
+  .article-header { padding-top: 2.5rem; }
+}
+
+/* Subtle entrance animation */
+@keyframes fadeInUp { from { opacity:0; transform:translateY(12px) } to { opacity:1; transform:translateY(0) } }
+.animate-text { animation: fadeInUp 0.5s ease both; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <span class="nav-brand">
+      <svg viewBox="-55 -55 110 110" aria-hidden="true"><use href="#sf"/></svg>
+      Cal St Francis
+    </span>
+    <button class="theme-toggle" id="themeToggle"><span>🌙</span> Dark</button>
+  </div>
+</nav>
+
+<main class="container animate-text">
+  <header class="article-header">
+    <a href="index.html" class="back-link">← Return to Portfolio</a>
+    <div class="project-eyebrow">Design Notes &amp; Reflections</div>
+    <h1>RUBRIC</h1>
+    <div class="project-subtitle">Worship Planning Software for United Church of Canada Worship Leaders</div>
+  </header>
+
+  <article class="article-body">
+    <p>The genesis of <em>Rubric</em> lay in my inability to remember even the slightest outline of what a skeleton of an order of services entails. If it's not written out in front of me, I have no idea. I've been to church many times, I've written and led services, I've had a class where we studied the UCC order of services, and yet when it comes to beginning work on one everything is a surprise. So I thought: what if I wrote it down? And so I did, in an Obsidian note that swiftly fell into the aching chasm that is my disorganized Obsidian note-pile.
+</p>
+    <p>So what if, instead, I wrote it down in something purpose-built that allowed me to build service plans for churches other than the one I'm currently placed at, and it looks like a Gnome program even though I'm plasma-wed? And so began Rubric. Later features arose from my desire to not have to type the date and RCL into google, and to not have to turn my desk chair around and look at a relevant copy of Gathering for hymn suggestions. Later, I thought "what if I didn't have to type hymn names into youtube to find out what they sound like?" The feature set flowed freely from my endless cup of laziness. Soon I set it up to help me easily produce LaTeX outputs for manuscripts, bulletins, and music notes. GitHub integration followed. Previews... <em>Too many features, arguably...</em> </p>
+<p>Now I'm at the state where I realize this could be useful for other worship leaders, and I'm hard at work making it more accessible, and loosening the grip of LaTeX on it (first I made it export to Typst, used by even fewer people, but then to DOCX/ODT and even HTML...) If I hadn't designed it entirely, unbreakably for use on OPENSUSE Tumbleweed, its possible user-base would already be in the higher single-digits! I'm working on that. I've mapped out dependencies on other Linux distros, have an appimage that might work, and set it up for distro through PYPI/PIP! Maybe it will be an <em>rpm</em> soon, a <em>deb</em> even, maybe snap?? Windows? Mac? Maybe!</p><p> Pубрика?</p>
+
+    <svg class="section-divider" viewBox="0 0 500 50" aria-hidden="true">
+      <path d="M 0,30 C 120,15 240,45 360,25 C 420,15 480,35 500,30" stroke="#5a6428" stroke-width="1.5" fill="none"/>
+      <g transform="translate(240,25) scale(.3)"><use href="#sf"/></g>
+    </svg>
+<!--
+    <h2>Theological Foundations</h2>
+    <p>
+      At the core, the game is built on a kind of liberatory process-<em>theosis</em> model. <em>Theosis</em> is wildly simplified into a kind of score (shrug...), achieved through participation with the divine, though particularly through solidaristic participation... (Liberatory-Process-<em>Theosis</em>, just like I said! Couldn't be clearer.) As your <em>theosis</em> increases, the you and your world open up.
+    </p>
+-->
+<a href="https://github.com/calstfrancis/rubric/" target="_blank" rel="noopener" class="game-link">Check out <em>Rubric</em> on GitHub →</a>
+  </article>
+</main>
+
+<script>
+const themeBtn = document.getElementById('themeToggle');
+const setTheme = t => {
+  document.documentElement.setAttribute('data-theme', t);
+  localStorage.setItem('theme', t);
+  themeBtn.innerHTML = t === 'dark' ? '<span>🌙</span> Dark' : '<span>☀️</span> Light';
+};
+const saved = localStorage.getItem('theme');
+setTheme(saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+themeBtn.addEventListener('click', () => {
+  setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+});
+</script>
+</body>
+</html>

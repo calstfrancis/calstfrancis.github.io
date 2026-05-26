@@ -571,8 +571,10 @@ section:nth-of-type(4){animation-delay:.2s}
         </div>
         <div class="game-footer">
           <span class="game-status"><span class="status-pip"></span> Fully Playable now — v1.23</span>
-          <a href="game.html" class="game-link">Descend →</a>
-        </div>
+          <div style="display: flex; gap: 1.5rem; align-items: center;">
+            <a href="/abouts/about-severed-hours.html" class="game-link" style="opacity: 0.8; font-size: 0.8rem;">Design Notes &amp; Reasoning →</a>
+            <a href="game.html" class="game-link">Descend →</a>
+          </div>
       </div>
     </div>
 
@@ -611,66 +613,99 @@ section:nth-of-type(4){animation-delay:.2s}
         </div>
         <div class="game-footer">
           <span class="game-status"><span class="status-pip"></span> Version 1.7 - Testing</span>
+            <a href="/sbouts/about-sasibo.html" class="game-link" style="opacity: 0.8; font-size: 0.8rem;">Design Notes &amp; Reasoning →</a>
           <a href="spasibo.html" target="_blank" rel="noopener" class="game-link">Cross the Atlantic →</a>
         </div>
       </div>
     </div>
 
     <div class="project-list">
-      <!-- SOBORNOST Engine project card -->
+
+      <!-- Rubric project card -->
+            <div class="project-card">
+              <svg class="project-card-flower" width="80" height="80" viewBox="-55 -55 110 110" aria-hidden="true">
+                <use href="#sf"/>
+              </svg>
+              <div class="project-body-wrap">
+                <div class="project-initial">R</div>
+                <div class="project-body">
+                  <div class="project-meta">
+                    <span class="project-name">Rubric — Liturgy Planner</span>
+                    <span class="project-type">LaTeX · UCC</span>
+                    <span class="project-status-dev">v0.14.3 Testing-Release!</span>
+                  </div>
+                  <p class="project-desc">
+                    A worship planning system for United Church of Canada congregations.
+                    Full service flows, lectionary integration, Hymn suggestions and lookup, and print‑ready orders of service/bulletins.
+                    Updated with database support and git versioning built in. Reduced focus on making this a LaTeX pipeline.
+                  </p>
+                  <a href="abouts/about-rubric.html" class="game-link" style="opacity: 0.8; font-size: 0.8rem;">Design Notes &amp; Reasoning →</a>
+                  <a href="https://github.com/calstfrancis/rubric/releases/tag/v0.14.3" target="_blank" rel="noopener" class="project-link">View on GitHub →</a>
+                </div>
+              </div>
+            </div>
+
+      <!-- Zerkalo project card -->
       <div class="project-card">
         <svg class="project-card-flower" width="80" height="80" viewBox="-55 -55 110 110" aria-hidden="true">
           <use href="#sf"/>
         </svg>
         <div class="project-body-wrap">
-          <div class="project-initial">S</div>
+          <div class="project-initial">З</div>
+          <div class="project-body">
+            <div class="project-meta">
+              <span class="project-name">Zerkalo/Зеркало - Typst IDE</span>
+              <span class="project-type">Typst · Academic</span>
+              <span class="project-status-dev">v0.2.0 Way, way pre-release!!</span>
+            </div>
+            <p class="project-desc">
+              A full academic Typst workplace.
+              Easily build a template using the system from Gost that can be either compliant with one of several academic standards (SBL, Chicago, APA, etc..), or built to your specifications.
+              Write easy Typst code that compiles into a well formatted document in your preview pane.
+              Document management, versioned github backup, spellcheck, import from TeX, export to PDF, ODT/DOCX, TeX, HTML even.
+              More features coming.
+               </p>
+            <a href="abouts/about-zerkalo.html" class="game-link" style="opacity: 0.8; font-size: 0.8rem;">Design Notes &amp; Reasoning →</a>
+            <a href="https://github.com/calstfrancis/zerkalo" target="_blank" rel="noopener" class="project-link">View on GitHub →</a>
+          </div>
+        </div>
+      </div>
+
+
+            <!-- SOBORNOST Engine project card -->
+      <div class="project-card">
+        <svg class="project-card-flower" width="80" height="80" viewBox="-55 -55 110 110" aria-hidden="true">
+          <use href="#sf"/>
+        </svg>
+        <div class="project-body-wrap">
+          <div class="project-initial">C</div>
           <div class="project-body">
             <div class="project-meta">
               <span class="project-name">СОБОРНОСТЬ / SOBORNOST — Game Engine</span>
-              <span class="project-type">Narrative Engine · Open Source · MIT</span>
+              <span class="project-type">Narrative Engine · Open Source</span>
               <span class="project-status-dev">Stable · v3.3.1</span>
             </div>
             <p class="project-desc">
-              A browser‑native engine for contemplative, state‑reactive interactive fiction. 
-              Plain JavaScript — no build step, no framework, no compiler. 
+              A browser‑native engine for contemplative, state‑reactive interactive fiction.
+              Plain JavaScript — no build step, no framework, no compiler.
               Soundings, theosis, charisms, branching dialogue, rituals, magnetic deviation, and cross‑playthrough memory.
               Written by a minister‑in‑formation. Designed for theological, atmospheric, and psychological narrative games.
             </p>
+          <!--  <a href="/abouts/about-SOBORNOST.html" class="game-link" style="opacity: 0.8; font-size: 0.8rem;">Design Notes &amp; Reasoning →</a> -->
             <a href="https://github.com/calstfrancis/SOBORNOST" target="_blank" rel="noopener" class="project-link">View on GitHub →</a>
           </div>
         </div>
       </div>
 
-      <!-- Rubric project card -->
-      <div class="project-card">
-        <svg class="project-card-flower" width="80" height="80" viewBox="-55 -55 110 110" aria-hidden="true">
-          <use href="#sf"/>
-        </svg>
-        <div class="project-body-wrap">
-          <div class="project-initial">R</div>
-          <div class="project-body">
-            <div class="project-meta">
-              <span class="project-name">Rubric — Liturgy Planner</span>
-              <span class="project-type">LaTeX · UCC</span>
-              <span class="project-status-dev">v0.14.3 Testing-Release!</span>
-            </div>
-            <p class="project-desc">
-              A worship planning system for United Church of Canada congregations. 
-              Full service flows, lectionary integration, Hymn suggestions and lookup, and print‑ready orders of service/bulletins.
-              Updated with database support and git versioning built in. Reduced focus on making this a LaTeX pipeline. 
-            </p>
-            <a href="https://github.com/calstfrancis/rubric/releases/tag/v0.14.3" target="_blank" rel="noopener" class="project-link">View on GitHub →</a>
-          </div>
-        </div>
-      </div>
 
-      <!-- LaTemplater project card -->
+
+      <!-- Gost project card -->
       <div class="project-card">
         <svg class="project-card-flower" width="80" height="80" viewBox="-55 -55 110 110" aria-hidden="true">
           <use href="#sf"/>
         </svg>
         <div class="project-body-wrap">
-          <div class="project-initial">L</div>
+          <div class="project-initial">Г</div>
           <div class="project-body">
             <div class="project-meta">
               <span class="project-name">ГОСТ / GOST - Academic Essay Templater</span>
@@ -678,9 +713,10 @@ section:nth-of-type(4){animation-delay:.2s}
               <span class="project-status-dev">v0.1.7 Added Docx/Odt!</span>
             </div>
             <p class="project-desc">
-              An easy tool for creating LaTeX or Typst templates for academic essay writing. 
+              An easy tool for creating academic formatting compliant LaTeX, Typst, or DOCX/ODT templates for academic writing.
               Includes features to align with SBL/APA/Chicago/MLA formatting/citation standards, or to import Journal TeX standards.
             </p>
+            <a href="/abouts/about-gost.html" class="game-link" style="opacity: 0.8; font-size: 0.8rem;">Design Notes &amp; Reasoning →</a>
             <a href="https://github.com/calstfrancis/Gost/releases/tag/v0.1.7" target="_blank" rel="noopener" class="project-link">View on GitHub →</a>
           </div>
         </div>
