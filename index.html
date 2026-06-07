@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Cal St Francis · SOBORNOST Engine</title>
+<title>Cal St Francis · SOBORNOST Engine · Flatpak Repo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Spectral:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 
@@ -79,6 +79,10 @@
   --game-link:  #c9a84c;
   --game-link-hover: #e8c870;
   --game-footer-border: #3a3020;
+
+  /* Flatpak specific */
+  --flatpak-green: #2d6a4f;
+  --flatpak-light: #40916c;
 }
 
 [data-theme="light"] {
@@ -107,6 +111,9 @@
   --game-link:  #a05030;
   --game-link-hover: #c06038;
   --game-footer-border: #d0c0a0;
+
+  --flatpak-green: #1b4d3e;
+  --flatpak-light: #2d6a4f;
 }
 
 /* SPASIBO custom theme – dark mode (default) */
@@ -257,6 +264,8 @@ nav{
 .btn-ghost:hover{background:var(--opale);color:var(--text);border-color:var(--olive)}
 .btn-kofi{background:rgba(0,0,0,.2);color:var(--coral);border-color:var(--border-hi)}
 .btn-kofi:hover{background:var(--cpale);border-color:var(--coral)}
+.btn-flatpak{background:var(--flatpak-green);border-color:var(--flatpak-light);color:var(--text)}
+.btn-flatpak:hover{background:var(--flatpak-light);color:white}
 [data-theme="light"] .btn-kofi{background:var(--cpale)}
 
 section{padding:3.5rem 0;border-bottom:2px solid var(--border)}
@@ -366,12 +375,24 @@ section:last-of-type{border-bottom:none}
   font-family:'Spectral',serif;font-size:.64rem;font-weight:600;letter-spacing:.1em;
   text-transform:uppercase;color:var(--olive);border:1px solid var(--olive);padding:.1rem .45rem;
 }
+.flatpak-badge{
+  background:var(--flatpak-green);padding:0.1rem 0.5rem;border-radius:16px;
+  font-size:0.6rem;font-weight:600;letter-spacing:.05em;color:white;
+  font-family:'Spectral',serif;text-transform:uppercase;
+}
 .project-desc{font-size:.88rem;color:var(--text-3);line-height:1.7;margin-bottom:.6rem}
-.project-link{font-family:'Spectral',serif;font-size:.8rem;font-weight:600;letter-spacing:.04em;color:var(--coral)}
+.project-link{font-family:'Spectral',serif;font-size:.8rem;font-weight:600;letter-spacing:.04em;color:var(--coral);margin-right:1rem}
 .project-link:hover{color:var(--coral-hi)}
 .project-status-dev{
   font-family:'Spectral',serif;font-size:.64rem;font-weight:600;letter-spacing:.08em;
   text-transform:uppercase;color:var(--text-3);border:1px solid var(--border-hi);padding:.1rem .45rem;
+}
+.install-commands{
+  margin-top:0.75rem;display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;
+}
+.install-commands code{
+  background:var(--bg-3);padding:0.2rem 0.5rem;border-radius:6px;font-size:0.7rem;
+  font-family:'Courier Prime',monospace;color:var(--text-2);
 }
 
 .about-body{
@@ -452,6 +473,7 @@ footer a:hover{color:var(--coral)}
   .project-body-wrap{padding:1rem 1.1rem;gap:.9rem}
   .project-initial{font-size:1.7rem;width:2rem}
   .project-meta{gap:.4rem}
+  .install-commands{flex-direction:column;align-items:flex-start}
 
   .about-body{grid-template-columns:1fr}
   .about-cell{padding:1.1rem 1.2rem}
@@ -495,14 +517,13 @@ section:nth-of-type(4){animation-delay:.2s}
     <svg class="hero-wm" width="340" height="340" viewBox="-55 -55 110 110" aria-hidden="true">
       <use href="#sf"/>
     </svg>
-    <div class="hero-eyebrow">Student Minister · Amateur Developer</div>
+    <div class="hero-eyebrow">Student Minister · Amateur Developer · Flatpak Maintainer</div>
     <h1>Cal St Francis</h1>
     <p class="hero-subtitle">Candidate for Ordination, United Church of Canada</p>
     <p class="hero-desc">
-       I make some little very specialized tools for ministers and worship leaders, favour theology in the 
+       I make little specialized tools for ministers and worship leaders, favour theology in the
        traditions of <em>liberation and process</em>, and build weird little games as a hobby. 
-       Everything here is free. 
-       If it helps you, consider buying me a coffee.
+       All my desktop applications are now available via <strong>Flatpak</strong> — easy install on any Linux distribution.
     </p>
     <div class="hero-actions">
       <a href="#projects" class="btn btn-coral">See My Work</a>
@@ -533,8 +554,20 @@ section:nth-of-type(4){animation-delay:.2s}
       <svg viewBox="-55 -55 110 110" aria-hidden="true"><use href="#sf"/></svg>
     </div>
     <p class="section-intro">
-      Liturgic and Academic tools, and interactive fiction. All free; source on GitHub.
+      Liturgic and Academic tools, and interactive fiction. All free; desktop apps distributed as Flatpaks.
     </p>
+
+    <!-- Flatpak repo setup notice -->
+    <div style="margin:1rem 0 1.8rem; background:var(--opale); border-left:4px solid var(--flatpak-green); padding:0.8rem 1.2rem; border-radius:8px;">
+      <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;">
+        <span class="flatpak-badge" style="background:var(--flatpak-green);">⚡️ Flatpak Repository</span>
+        <span style="font-size:0.85rem;">Add my repo once, get access to all my apps via Software Center:</span>
+      </div>
+      <div class="install-commands" style="margin-top:0.5rem;">
+        <code>flatpak remote-add --if-not-exists calstfrancis https://github.com/calstfrancis/flatpak/raw/main/calstfrancis.flatpakrepo</code>
+        <a href="https://github.com/calstfrancis/flatpak/raw/main/calstfrancis.flatpakrepo" class="btn btn-flatpak" style="padding:0.2rem 0.8rem; font-size:0.7rem;">📁 Download .flatpakrepo</a>
+      </div>
+    </div>
 
     <!-- Severed Hours game card -->
     <div class="game-feature">
@@ -578,7 +611,7 @@ section:nth-of-type(4){animation-delay:.2s}
       </div>
     </div>
 
-    <!-- SPASIBO game card (the game, not the engine) -->
+    <!-- SPASIBO game card -->
     <div class="game-feature spasibo">
       <svg class="game-bota-top" viewBox="0 0 800 38" style="height:38px;display:block;overflow:hidden" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
         <rect width="800" height="38" fill="#0a1018"/>
@@ -604,79 +637,78 @@ section:nth-of-type(4){animation-delay:.2s}
             <div class="game-label">Theotic Mystery · Browser · MIT</div>
             <div class="game-title">SPASIBO</div>
             <p class="game-desc">
-              A contemplative mystery set aboard a research schooner making a winter North Atlantic crossing. 
-              You are an agent posing as the ship's chaplain. The archive in the hold holds thirty years 
-              of scientific discovery — and someone wants it destroyed. 
+              A contemplative mystery aboard a research schooner making a winter North Atlantic crossing.
               Built on the <strong>SOBORNOST</strong> engine. Theosis, soundings, cover, and the slow disclosure of memory.
             </p>
           </div>
         </div>
         <div class="game-footer">
           <span class="game-status"><span class="status-pip"></span> Version 1.7 - Testing</span>
+          <div style="display: flex; gap: 1.5rem; align-items: center;">
             <a href="/abouts/about-spasibo.html" class="game-link" style="opacity: 0.8; font-size: 0.8rem;">Design Notes &amp; Reasoning →</a>
-          <a href="spasibo.html" target="_blank" rel="noopener" class="game-link">Cross the Atlantic →</a>
+            <a href="spasibo.html" target="_blank" rel="noopener" class="game-link">Cross the Atlantic →</a>
+          </div>
         </div>
       </div>
     </div>
 
     <div class="project-list">
 
-      <!-- Rubric project card -->
-            <div class="project-card">
-              <svg class="project-card-flower" width="80" height="80" viewBox="-55 -55 110 110" aria-hidden="true">
-                <use href="#sf"/>
-              </svg>
-              <div class="project-body-wrap">
-                <div class="project-initial">R</div>
-                <div class="project-body">
-                  <div class="project-meta">
-                    <span class="project-name">Rubric — Liturgy Planner</span>
-                    <span class="project-type">LaTeX · UCC</span>
-                    <span class="project-status-dev">RPM/DEB releases!</span>
-                  </div>
-                  <p class="project-desc">
-                    A worship planning system for United Church of Canada congregations.
-                    Full service flows, lectionary integration, Hymn suggestions and lookup, and print‑ready orders of service/bulletins.
-                    Updated with database support and git versioning built in. Reduced focus on making this a LaTeX pipeline.
-                  </p>
-                  <a href="abouts/about-rubric.html" class="game-link" style="opacity: 0.8; font-size: 0.8rem;">Design Notes &amp; Reasoning →</a>
-                  <a href="https://github.com/calstfrancis/rubric/releases" target="_blank" rel="noopener" class="project-link">View on GitHub →</a>
-                </div>
-              </div>
-            </div>
-
-      <!-- Zerkalo project card -->
+      <!-- Rubric - Flatpak integrated -->
       <div class="project-card">
-        <svg class="project-card-flower" width="80" height="80" viewBox="-55 -55 110 110" aria-hidden="true">
-          <use href="#sf"/>
-        </svg>
+        <svg class="project-card-flower" width="80" height="80" viewBox="-55 -55 110 110" aria-hidden="true"><use href="#sf"/></svg>
+        <div class="project-body-wrap">
+          <div class="project-initial">R</div>
+          <div class="project-body">
+            <div class="project-meta">
+              <span class="project-name">Rubric — Liturgy Planner</span>
+              <span class="project-type">Flatpak · LaTeX · UCC</span>
+              <span class="project-status-dev">Available via Flatpak</span>
+              <span class="flatpak-badge">📦 Flatpak</span>
+            </div>
+            <p class="project-desc">
+              Worship planning system for United Church congregations. Service flows, lectionary, hymn lookup, print‑ready bulletins.
+              Database support, git versioning, LaTeX pipeline.
+            </p>
+            <div class="install-commands">
+              <a href="https://github.com/calstfrancis/flatpak/raw/main/rubric.flatpakref" class="btn btn-flatpak" style="padding:0.2rem 0.8rem;">📦 Install via Flatpak (GUI)</a>
+              <code>flatpak install --user --from https://github.com/calstfrancis/flatpak/raw/main/rubric.flatpakref</code>
+              <a href="/abouts/about-rubric.html" class="game-link" style="opacity: 0.8; font-size: 0.8rem; margin-left: 0.5rem;">Design Notes &amp; Reasoning →</a>
+              <a href="https://github.com/calstfrancis/rubric" class="project-link">Source Code →</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Zerkalo - Flatpak integrated -->
+      <div class="project-card">
+        <svg class="project-card-flower" width="80" height="80" viewBox="-55 -55 110 110" aria-hidden="true"><use href="#sf"/></svg>
         <div class="project-body-wrap">
           <div class="project-initial">З</div>
           <div class="project-body">
             <div class="project-meta">
               <span class="project-name">Zerkalo/Зеркало - Typst IDE</span>
-              <span class="project-type">Typst · Academic</span>
-              <span class="project-status-dev">RPM/DEB releases!</span>
+              <span class="project-type">Flatpak · Typst · Academic</span>
+              <span class="project-status-dev">Available via Flatpak</span>
+              <span class="flatpak-badge">📦 Flatpak</span>
             </div>
             <p class="project-desc">
-              A full academic Typst workplace.
-              Easily build a template that can be either compliant with one of several academic standards (SBL, Chicago, APA, etc..), or built to your specifications.
-              Write easy Typst code that compiles into a well formatted document in your preview pane.
-              Document management, versioned github backup, spellcheck, import from TeX, export to PDF, ODT/DOCX, TeX, HTML even.
-              More features coming.
-               </p>
-            <a href="abouts/about-zerkalo.html" class="game-link" style="opacity: 0.8; font-size: 0.8rem;">Design Notes &amp; Reasoning →</a>
-            <a href="https://github.com/calstfrancis/zerkalo/releases" target="_blank" rel="noopener" class="project-link">View on GitHub →</a>
+              Full academic Typst workplace. Templates for SBL, Chicago, APA, IEEE, Gost, etc... Live preview, document management, versioned backup,
+              spellcheck, export to PDF, DOCX, TeX, HTML.
+            </p>
+            <div class="install-commands">
+              <a href="https://github.com/calstfrancis/flatpak/raw/main/zerkalo.flatpakref" class="btn btn-flatpak" style="padding:0.2rem 0.8rem;">📦 Install via Flatpak (GUI)</a>
+              <code>flatpak install --user --from https://github.com/calstfrancis/flatpak/raw/main/zerkalo.flatpakref</code>
+              <a href="/abouts/about-zerkalo.html" class="game-link" style="opacity: 0.8; font-size: 0.8rem; margin-left: 0.5rem;">Design Notes &amp; Reasoning →</a>
+              <a href="https://github.com/calstfrancis/zerkalo" class="project-link">Source Code →</a>
+            </div>
           </div>
         </div>
       </div>
 
-
-            <!-- SOBORNOST Engine project card -->
+      <!-- SOBORNOST Engine -->
       <div class="project-card">
-        <svg class="project-card-flower" width="80" height="80" viewBox="-55 -55 110 110" aria-hidden="true">
-          <use href="#sf"/>
-        </svg>
+        <svg class="project-card-flower" width="80" height="80" viewBox="-55 -55 110 110" aria-hidden="true"><use href="#sf"/></svg>
         <div class="project-body-wrap">
           <div class="project-initial">C</div>
           <div class="project-body">
@@ -686,38 +718,64 @@ section:nth-of-type(4){animation-delay:.2s}
               <span class="project-status-dev">Stable · v3.3.1</span>
             </div>
             <p class="project-desc">
-              A browser‑native engine for contemplative, state‑reactive interactive fiction.
-              Plain JavaScript — no build step, no framework, no compiler.
-              Soundings, theosis, charisms, branching dialogue, rituals, magnetic deviation, and cross‑playthrough memory.
-              Written by a minister‑in‑formation. Designed for theological, atmospheric, and psychological narrative games.
+              Browser‑native engine for contemplative, state‑reactive interactive fiction. Plain JS — no build step.
+              Soundings, theosis, charisms, branching dialogue, rituals, magnetic deviation.
             </p>
-          <!--  <a href="/abouts/about-SOBORNOST.html" class="game-link" style="opacity: 0.8; font-size: 0.8rem;">Design Notes &amp; Reasoning →</a> -->
-            <a href="https://github.com/calstfrancis/SOBORNOST" target="_blank" rel="noopener" class="project-link">View on GitHub →</a>
+            <a href="/abouts/about-SOBORNOST.html" class="game-link" style="opacity: 0.8; font-size: 0.8rem;">Design Notes &amp; Reasoning →</a>
+            <a href="https://github.com/calstfrancis/SOBORNOST" target="_blank" rel="noopener" class="project-link" style="margin-left: 1rem;">View on GitHub →</a>
           </div>
         </div>
       </div>
 
-
-
-      <!-- Gost project card -->
+      <!-- Gost - Flatpak integrated -->
       <div class="project-card">
-        <svg class="project-card-flower" width="80" height="80" viewBox="-55 -55 110 110" aria-hidden="true">
-          <use href="#sf"/>
-        </svg>
+        <svg class="project-card-flower" width="80" height="80" viewBox="-55 -55 110 110" aria-hidden="true"><use href="#sf"/></svg>
         <div class="project-body-wrap">
           <div class="project-initial">Г</div>
           <div class="project-body">
             <div class="project-meta">
               <span class="project-name">ГОСТ / GOST - Academic Essay Templater</span>
-              <span class="project-type">LaTeX · Typst · Python </span>
-              <span class="project-status-dev">RPM/DEB releases!</span>
+    <!--          <span class="project-type">Flatpak · LaTeX · Typst · Python</span>
+              <span class="project-status-dev">Available via Flatpak</span>
+              <span class="flatpak-badge">📦 Flatpak</span> -->
             </div>
             <p class="project-desc">
-              An easy tool for creating academic formatting compliant LaTeX, Typst, or DOCX/ODT templates for academic writing.
-              Includes features to align with SBL/APA/Chicago/MLA formatting/citation standards, or to import Journal TeX standards.
+              Create academic formatting compliant Latex/Typst/DOCX templates. SBL/APA/Chicago/MLA standards.
+              Import journal TeX standards to have a journal-submission compliant template.
             </p>
-            <a href="/abouts/about-gost.html" class="game-link" style="opacity: 0.8; font-size: 0.8rem;">Design Notes &amp; Reasoning →</a>
-            <a href="https://github.com/calstfrancis/Gost/releases" target="_blank" rel="noopener" class="project-link">View on GitHub →</a>
+      <!--
+                  <div class="install-commands">
+              <a href="https://github.com/calstfrancis/flatpak/raw/main/gost.flatpakref" class="btn btn-flatpak" style="padding:0.2rem 0.8rem;">📦 Install via Flatpak (GUI)</a>
+              <code>flatpak install --user --from https://github.com/calstfrancis/flatpak/raw/main/gost.flatpakref</code>
+                    -->
+              <a href="/abouts/about-gost.html" class="game-link" style="opacity: 0.8; font-size: 0.8rem; margin-left: 0.5rem;">Design Notes &amp; Reasoning →</a>
+              <a href="https://github.com/calstfrancis/Gost" class="project-link">Source Code →</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Kopilka (new addition) -->
+      <div class="project-card">
+        <svg class="project-card-flower" width="80" height="80" viewBox="-55 -55 110 110" aria-hidden="true"><use href="#sf"/></svg>
+        <div class="project-body-wrap">
+          <div class="project-initial">K</div>
+          <div class="project-body">
+            <div class="project-meta">
+              <span class="project-name">Kopilka — Offering Tracker</span>
+              <span class="project-type">Flatpak · Church Admin</span>
+              <span class="project-status-dev">Available via Flatpak</span>
+              <span class="flatpak-badge">📦 Flatpak</span>
+            </div>
+            <p class="project-desc">
+              Simple, privacy‑first offering and donation tracker for small congregations. No cloud, no tracking.
+              Generate reports, track pledges, print contribution statements.
+            </p>
+            <div class="install-commands">
+              <a href="https://github.com/calstfrancis/flatpak/raw/main/kopilka.flatpakref" class="btn btn-flatpak" style="padding:0.2rem 0.8rem;">📦 Install via Flatpak (GUI)</a>
+              <code>flatpak install --user --from https://github.com/calstfrancis/flatpak/raw/main/kopilka.flatpakref</code>
+              <a href="https://github.com/calstfrancis/kopilka" class="project-link">Source Code →</a>
+            </div>
           </div>
         </div>
       </div>
@@ -725,7 +783,7 @@ section:nth-of-type(4){animation-delay:.2s}
   </div>
 </section>
 
-<!-- ABOUT -->
+<!-- ABOUT (unchanged) -->
 <section id="about">
   <div class="container">
     <div class="section-eyebrow">Biography</div>
@@ -746,9 +804,7 @@ section:nth-of-type(4){animation-delay:.2s}
         God's power as invitation, not coercion.</p>
       </div>
       <div class="about-cell">
-        <svg class="about-cell-flower" width="70" height="70" viewBox="-22 -22 44 44" aria-hidden="true">
-          <g transform="scale(.9)"><use href="#lf-v"/></g>
-        </svg>
+        <svg class="about-cell-flower" width="70" height="70" viewBox="-22 -22 44 44" aria-hidden="true"><g transform="scale(.9)"><use href="#lf-v"/></g></svg>
         <h3><svg viewBox="-22 -22 44 44" aria-hidden="true" style="width:18px;height:18px;overflow:visible"><use href="#lf-v"/></svg> Academic Formation</h3>
         <ul>
           <li>MDiv candidate, Atlantic School of Theology</li>
@@ -758,9 +814,7 @@ section:nth-of-type(4){animation-delay:.2s}
         </ul>
       </div>
       <div class="about-cell">
-        <svg class="about-cell-flower" width="70" height="70" viewBox="-22 -22 44 44" aria-hidden="true">
-          <g transform="scale(.9)"><use href="#lf-v"/></g>
-        </svg>
+        <svg class="about-cell-flower" width="70" height="70" viewBox="-22 -22 44 44" aria-hidden="true"><g transform="scale(.9)"><use href="#lf-v"/></g></svg>
         <h3><svg viewBox="-22 -22 44 44" aria-hidden="true" style="width:18px;height:18px;overflow:visible"><use href="#lf-v"/></svg> Theological Commitments</h3>
         <ul>
           <li>Liberation &amp; process theology</li>
@@ -775,7 +829,7 @@ section:nth-of-type(4){animation-delay:.2s}
           <li>LaTeX for liturgy &amp; academic writing</li>
           <li>Illuminated manuscript &amp; calligraphy traditions</li>
           <li>Free and open-source software throughout</li>
-          <li>Plain HTML — no engines, no frameworks</li>
+          <li>Flatpak distribution for Linux</li>
         </ul>
       </div>
     </div>
@@ -826,9 +880,10 @@ section:nth-of-type(4){animation-delay:.2s}
     <p>
       Cal St Francis · Halifax, Nova Scotia<br>
       <a href="mailto:calstfrancis@disroot.org">calstfrancis@disroot.org</a> ·
-      <a href="https://github.com/calstfrancis" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://github.com/calstfrancis" target="_blank" rel="noopener">GitHub</a> ·
+      <a href="https://github.com/calstfrancis/flatpak" target="_blank" rel="noopener">Flatpak Repo</a>
     </p>
-    <p style="margin-top:.4rem;opacity:.45">All content freely given. Source on GitHub.</p>
+    <p style="margin-top:.4rem;opacity:.45">All content freely given. Install via <code style="background:var(--bg-3); padding:0.1rem 0.3rem;">flatpak remote-add --if-not-exists calstfrancis https://github.com/calstfrancis/flatpak/raw/main/calstfrancis.flatpakrepo</code></p>
   </div>
 </footer>
 
