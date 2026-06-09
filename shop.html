@@ -4,6 +4,12 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Shop · Cal St Francis</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta name="description" content="Support Cal St Francis on Ko-fi — pick up a shirt and help keep free liturgical tools, academic writing software, and contemplative interactive fiction free and open.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://calstfrancis.github.io/shop.html">
+<meta property="og:title" content="Shop · Cal St Francis">
+<meta property="og:description" content="Support Cal St Francis on Ko-fi — pick up a shirt and help keep free liturgical tools, academic writing software, and contemplative interactive fiction free and open.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Spectral:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 
@@ -67,7 +73,7 @@
   --ok:        #96aa52;
 }
 [data-theme="light"] {
-  --bg:        #f0e4c8;
+  --bg:        #e8d5b0;
   --bg-2:      #fdf6e8;
   --bg-3:      #e4d4b0;
   --nav-bg:    rgba(34,10,4,.96);
@@ -89,9 +95,13 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{
-  background:var(--bg);color:var(--text);
+  background-color:var(--bg);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.88' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:140px 140px;
+  background-blend-mode:overlay;
+  color:var(--text);
   font-family:'Spectral',Georgia,serif;font-size:1rem;line-height:1.75;
-  -webkit-font-smoothing:antialiased;transition:background .25s,color .25s;
+  -webkit-font-smoothing:antialiased;transition:background-color .25s,color .25s;
 }
 a{color:var(--coral);text-decoration:none;transition:color .15s}
 a:hover{color:var(--coral-hi)}
@@ -140,7 +150,7 @@ section:last-of-type{border-bottom:none}
 /* ── PRODUCT GRID ── */
 .product-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.1rem;}
 .product-card{
-  border:1px solid var(--border-hi);background:rgba(0,0,0,.18);
+  border:1px solid var(--border-hi);border-left:3px solid var(--olive);background:rgba(0,0,0,.18);
   display:flex;flex-direction:column;position:relative;overflow:hidden;
   transition:border-color .2s,background .2s,transform .18s;
 }
@@ -262,7 +272,7 @@ section:last-of-type{border-bottom:none}
 /* ── FULFILMENT NOTE ── */
 .fulfilment-note{
   margin-top:1.6rem;padding:1rem 1.25rem;
-  border:1px solid var(--border-hi);background:rgba(0,0,0,.14);
+  border:1px solid var(--border-hi);border-left:3px solid var(--olive);background:rgba(0,0,0,.14);
   font-size:.82rem;color:var(--text-3);line-height:1.75;
 }
 [data-theme="light"] .fulfilment-note{background:var(--bg-3)}
@@ -297,6 +307,10 @@ footer a:hover{color:var(--coral)}
 .product-card:nth-child(3){animation-delay:.19s}
 .product-card:nth-child(4){animation-delay:.26s}
 .product-card:nth-child(5){animation-delay:.33s}
+
+[data-theme="light"] body { background-blend-mode: multiply; }
+
+nav::after{content:'';position:absolute;bottom:0;left:0;height:2px;background:var(--coral);width:calc(var(--scroll-progress,0) * 100%);pointer-events:none;}
 </style>
 </head>
 <body>
@@ -396,6 +410,12 @@ footer a:hover{color:var(--coral)}
 // ── CONFIG ──────────────────────────────────────────────────────────────────
 // Replace with your actual Netlify Functions URL after deployment
 const BACKEND_URL = 'https://YOUR-NETLIFY-SITE.netlify.app';
+
+// ── SCROLL PROGRESS ─────────────────────────────────────────────────────────
+window.addEventListener('scroll', () => {
+  const pct = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
+  document.documentElement.style.setProperty('--scroll-progress', pct.toFixed(4));
+}, {passive:true});
 
 // ── THEME ───────────────────────────────────────────────────────────────────
 const themeBtn = document.getElementById('themeToggle');

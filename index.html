@@ -4,6 +4,12 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Cal St Francis · MDiv Student &amp; Developer</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta name="description" content="Cal St Francis — MDiv student, developer, and free-software builder. Liturgical tools for United Church ministers, academic writing tools, and contemplative interactive fiction. Available as Flatpak on Linux.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://calstfrancis.github.io/">
+<meta property="og:title" content="Cal St Francis · MDiv Student &amp; Developer">
+<meta property="og:description" content="Free liturgical tools for ministers and worship leaders, academic writing tools, and contemplative interactive fiction. All free, all Flatpak.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Spectral:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 
@@ -86,7 +92,7 @@
 }
 
 [data-theme="light"] {
-  --bg:        #f0e4c8;
+  --bg:        #e8d5b0;
   --bg-2:      #fdf6e8;
   --bg-3:      #e4d4b0;
   --nav-bg:    rgba(34,10,4,.96);
@@ -249,9 +255,12 @@ nav{
 }
 .hero-desc em{font-style:italic;color:var(--text)}
 .hero-actions{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:0}
+@keyframes vineDrift{0%,100%{transform:translateX(0)}50%{transform:translateX(-7px)}}
 .hero-vine{
   display:block;width:100%;margin-top:2.5rem;
   overflow:visible;
+  animation:vineDrift 22s ease-in-out infinite;
+  will-change:transform;
 }
 
 .btn{
@@ -271,8 +280,15 @@ nav{
 .btn-flatpak:hover{background:var(--flatpak-light);color:white}
 [data-theme="light"] .btn-kofi{background:var(--cpale)}
 
-section{padding:3.5rem 0;border-bottom:2px solid var(--border)}
-section:last-of-type{border-bottom:none}
+section{padding:3.5rem 0}
+.vine-divider{margin-top:2.5rem;overflow:visible;opacity:.75}
+.vine-divider svg{display:block;width:100%;overflow:visible}
+nav::after{
+  content:'';position:absolute;bottom:0;left:0;
+  height:2px;background:var(--coral);
+  width:calc(var(--scroll-progress,0) * 100%);
+  pointer-events:none;
+}
 .section-title-row{display:flex;align-items:center;gap:.7rem;margin-bottom:.35rem}
 .section-title-row svg{width:32px;height:32px;overflow:visible;flex-shrink:0}
 .section-eyebrow{
@@ -356,7 +372,7 @@ section:last-of-type{border-bottom:none}
 
 .project-list{display:flex;flex-direction:column;gap:.75rem}
 .project-card{
-  border:1px solid var(--border-hi);background:rgba(0,0,0,.18);
+  border:1px solid var(--border-hi);border-left:3px solid var(--olive);background:rgba(0,0,0,.18);
   display:flex;align-items:flex-start;gap:1.25rem;
   transition:border-color .2s,background .2s;position:relative;overflow:hidden;
 }
@@ -402,12 +418,14 @@ section:last-of-type{border-bottom:none}
 
 .about-body{
   display:grid;grid-template-columns:1fr 1fr;
-  gap:1px;border:1px solid var(--border-hi);background:var(--border-hi);
+  gap:1rem;
 }
 .about-cell{
-  background:var(--bg-2);padding:1.4rem 1.5rem;
-  transition:background .25s;position:relative;overflow:hidden;
+  background:var(--bg-2);padding:1.4rem 1.5rem 1.4rem 1.6rem;
+  border:1px solid var(--border-hi);border-left:3px solid var(--olive);
+  transition:background .25s,border-color .2s;position:relative;overflow:hidden;
 }
+.about-cell:hover{border-color:var(--coral)}
 .about-cell-flower{
   position:absolute;bottom:-14px;right:-14px;
   opacity:.08;pointer-events:none;
@@ -481,7 +499,7 @@ footer a:hover{color:var(--coral)}
   .install-commands{flex-direction:column;align-items:flex-start}
 
   .about-body{grid-template-columns:1fr}
-  .about-cell{padding:1.1rem 1.2rem}
+  .about-cell{padding:1.1rem 1.2rem 1.1rem 1.3rem}
 
   .support-body{flex-direction:column;gap:.8rem;padding:1.4rem 1.2rem}
   .support-bota{width:50px}
@@ -788,10 +806,11 @@ section:nth-of-type(4){animation-delay:.2s}
         </div>
       </div>
     </div>
+    <div class="vine-divider" aria-hidden="true"><svg viewBox="0 0 900 40" preserveAspectRatio="xMidYMid meet" height="40"><path d="M-10,22 C80,8 160,34 220,18 C280,4 340,34 450,20 C560,6 620,34 680,18 C740,4 820,30 910,20" stroke="#5a6428" stroke-width="1.8" fill="none" stroke-linecap="round"/><g transform="translate(220,15) scale(.3)"><use href="#sf"/></g><g transform="translate(450,17) scale(.36)"><use href="#sf"/></g><g transform="translate(680,15) scale(.3)"><use href="#sf"/></g><g transform="translate(120,22) rotate(-22) scale(.38)"><use href="#lf-v"/></g><g transform="translate(335,24) rotate(16) scale(.36)"><use href="#lf-b"/></g><g transform="translate(560,20) rotate(-16) scale(.38)"><use href="#lf-v"/></g><g transform="translate(780,22) rotate(20) scale(.36)"><use href="#lf-b"/></g></svg></div>
   </div>
 </section>
 
-<!-- ABOUT (unchanged) -->
+<!-- ABOUT -->
 <section id="about">
   <div class="container">
     <div class="section-eyebrow">Biography</div>
@@ -841,6 +860,7 @@ section:nth-of-type(4){animation-delay:.2s}
         </ul>
       </div>
     </div>
+    <div class="vine-divider" aria-hidden="true"><svg viewBox="0 0 900 40" preserveAspectRatio="xMidYMid meet" height="40"><path d="M-10,22 C80,8 160,34 220,18 C280,4 340,34 450,20 C560,6 620,34 680,18 C740,4 820,30 910,20" stroke="#5a6428" stroke-width="1.8" fill="none" stroke-linecap="round"/><g transform="translate(220,15) scale(.3)"><use href="#sf"/></g><g transform="translate(450,17) scale(.36)"><use href="#sf"/></g><g transform="translate(680,15) scale(.3)"><use href="#sf"/></g><g transform="translate(120,22) rotate(-22) scale(.38)"><use href="#lf-v"/></g><g transform="translate(335,24) rotate(16) scale(.36)"><use href="#lf-b"/></g><g transform="translate(560,20) rotate(-16) scale(.38)"><use href="#lf-v"/></g><g transform="translate(780,22) rotate(20) scale(.36)"><use href="#lf-b"/></g></svg></div>
   </div>
 </section>
 
@@ -891,7 +911,7 @@ section:nth-of-type(4){animation-delay:.2s}
       <a href="https://github.com/calstfrancis" target="_blank" rel="noopener">GitHub</a> ·
       <a href="https://github.com/calstfrancis/flatpak" target="_blank" rel="noopener">Flatpak Repo</a>
     </p>
-    <p style="margin-top:.4rem;opacity:.45">All content freely given. Install via <code style="background:var(--bg-3); padding:0.1rem 0.3rem; word-break:break-all; overflow-wrap:anywhere;">flatpak remote-add --if-not-exists calstfrancis https://calstfrancis.github.io/flatpak/calstfrancis.flatpakrepo</code></p>
+    <p style="margin-top:.4rem;opacity:.45">All content freely given.</p>
   </div>
 </footer>
 
@@ -902,44 +922,64 @@ section:nth-of-type(4){animation-delay:.2s}
   const ctx = canvas.getContext('2d');
   const dpr = window.devicePixelRatio || 1;
   const SZ = 160;
-  canvas.width = SZ * dpr; canvas.height = SZ * dpr;
-  canvas.style.width = SZ + 'px'; canvas.style.height = SZ + 'px';
+  canvas.width = SZ*dpr; canvas.height = SZ*dpr;
+  canvas.style.width = SZ+'px'; canvas.style.height = SZ+'px';
   ctx.scale(dpr, dpr);
-  const cx = SZ/2, cy = SZ/2, r = SZ * 0.42;
+  const cx = SZ/2, cy = SZ/2, r = SZ*0.42;
   let T = 0;
+
+  // Moods: skyTop, skyBot, waterDeep, waterSurf, waveRGB, waveAlpha, rain, holdFrames
+  const MOODS = [
+    { st:[8,18,32],  sb:[12,26,40], wd:[4,14,28],  ws:[8,22,40],  wc:[45,90,130], wa:.35, rain:false, hold:900  },
+    { st:[14,16,22], sb:[18,22,28], wd:[4,14,28],  ws:[8,22,40],  wc:[45,90,130], wa:.42, rain:true,  hold:750  },
+    { st:[4,8,20],   sb:[6,14,28],  wd:[2,6,18],   ws:[4,12,24],  wc:[30,80,110], wa:.55, rain:false, hold:1100 },
+  ];
+  const TRANS = 200;
+  let mi = 0, mTick = 0;
+
+  function lv(a,b,t){return a+(b-a)*t;}
+  function lc(a,b,t){return[lv(a[0],b[0],t),lv(a[1],b[1],t),lv(a[2],b[2],t)];}
+  function rgba(c,a){return`rgba(${c[0]|0},${c[1]|0},${c[2]|0},${a})`;}
+
   const rain = [];
-  for (let i = 0; i < 22; i++)
-    rain.push({ x: cx+(Math.random()-.5)*r*1.7, y: cy+(Math.random()-.5)*r*1.7, len:5+Math.random()*8, spd:1.1+Math.random()*1.8 });
+  for (let i=0;i<22;i++)
+    rain.push({x:cx+(Math.random()-.5)*r*1.7,y:cy+(Math.random()-.5)*r*1.7,len:5+Math.random()*8,spd:1.1+Math.random()*1.8});
+
   function draw() {
-    T += 0.008;
-    ctx.clearRect(0, 0, SZ, SZ);
-    // brass ring
+    T += 0.008; mTick++;
+    const inTrans = mTick > MOODS[mi].hold;
+    const mLerp = inTrans ? Math.min(1,(mTick-MOODS[mi].hold)/TRANS) : 0;
+    if (mTick >= MOODS[mi].hold+TRANS) { mi=(mi+1)%MOODS.length; mTick=0; }
+    const m0=MOODS[mi], m1=MOODS[(mi+1)%MOODS.length];
+    const st=lc(m0.st,m1.st,mLerp), sb=lc(m0.sb,m1.sb,mLerp);
+    const wd=lc(m0.wd,m1.wd,mLerp), ws=lc(m0.ws,m1.ws,mLerp);
+    const wc=lc(m0.wc,m1.wc,mLerp), wa=lv(m0.wa,m1.wa,mLerp);
+    const doRain = mLerp < .5 ? m0.rain : m1.rain;
+
+    ctx.clearRect(0,0,SZ,SZ);
     ctx.strokeStyle='rgba(95,78,42,0.88)'; ctx.lineWidth=r*.22;
     ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.stroke();
-    // bolts
     ctx.fillStyle='rgba(80,65,35,0.9)';
-    for (let i=0;i<8;i++){const a=(i/8)*Math.PI*2;ctx.beginPath();ctx.arc(cx+Math.cos(a)*(r+r*.06),cy+Math.sin(a)*(r+r*.06),r*.052,0,Math.PI*2);ctx.fill();}
-    // clip interior
+    for(let i=0;i<8;i++){const a=(i/8)*Math.PI*2;ctx.beginPath();ctx.arc(cx+Math.cos(a)*(r+r*.06),cy+Math.sin(a)*(r+r*.06),r*.052,0,Math.PI*2);ctx.fill();}
     ctx.save(); ctx.beginPath(); ctx.arc(cx,cy,r*.86,0,Math.PI*2); ctx.clip();
-    const horizY = cy + r*.08 + Math.sin(T*.15)*r*.06;
-    const sg = ctx.createLinearGradient(cx,cy-r,cx,cy+r);
-    sg.addColorStop(0,'rgba(14,16,22,1)'); sg.addColorStop(.5,'rgba(18,22,28,1)');
-    sg.addColorStop(.52,'rgba(8,22,40,1)'); sg.addColorStop(1,'rgba(4,14,28,1)');
+    const horizY=cy+r*.08+Math.sin(T*.15)*r*.06;
+    const sg=ctx.createLinearGradient(cx,cy-r,cx,cy+r);
+    sg.addColorStop(0,rgba(st,1)); sg.addColorStop(.5,rgba(sb,1));
+    sg.addColorStop(.52,rgba(ws,1)); sg.addColorStop(1,rgba(wd,1));
     ctx.fillStyle=sg; ctx.fillRect(cx-r,cy-r,r*2,r*2);
-    // waves
-    for (let i=0;i<8;i++){
+    for(let i=0;i<8;i++){
       const wy=horizY+r*.1+i*r*.09+Math.sin(T*.3+i*1.1)*r*.018;
-      const amp=r*.028*(1-i*.08), wop=.42*(1-i*.09);
-      ctx.strokeStyle=`rgba(45,90,130,${wop.toFixed(3)})`; ctx.lineWidth=i<2?1.2:.8;
+      const amp=r*.028*(1-i*.08), wop=wa*(1-i*.09);
+      ctx.strokeStyle=rgba(wc,wop); ctx.lineWidth=i<2?1.2:.8;
       ctx.beginPath(); ctx.moveTo(cx-r*.88,wy);
       for(let xi=-r*.88;xi<=r*.88;xi+=3){const la=amp*(1-Math.abs(xi)/(r*.88)*.3);ctx.lineTo(cx+xi,wy+Math.sin(T*(.18+i*.06)+xi*.038+i*1.1)*la);}
       ctx.stroke();
     }
-    // rain
-    ctx.strokeStyle='rgba(120,160,200,0.32)'; ctx.lineWidth=.5;
-    for(const d of rain){d.y+=d.spd;if(d.y>cy+r){d.y=cy-r;d.x=cx+(Math.random()-.5)*r*1.7;}ctx.beginPath();ctx.moveTo(d.x,d.y);ctx.lineTo(d.x-1,d.y+d.len);ctx.stroke();}
+    if(doRain){
+      ctx.strokeStyle='rgba(120,160,200,0.32)'; ctx.lineWidth=.5;
+      for(const d of rain){d.y+=d.spd;if(d.y>cy+r){d.y=cy-r;d.x=cx+(Math.random()-.5)*r*1.7;}ctx.beginPath();ctx.moveTo(d.x,d.y);ctx.lineTo(d.x-1,d.y+d.len);ctx.stroke();}
+    }
     ctx.restore();
-    // inner ring shadow + gleam
     ctx.strokeStyle='rgba(0,0,0,0.6)'; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(cx,cy,r*.86,0,Math.PI*2); ctx.stroke();
     ctx.save(); ctx.beginPath(); ctx.arc(cx,cy,r*.86,0,Math.PI*2); ctx.clip();
     const gl=ctx.createLinearGradient(cx-r*.4,cy-r*.7,cx+r*.1,cy-r*.2);
@@ -949,6 +989,11 @@ section:nth-of-type(4){animation-delay:.2s}
   }
   draw();
 })();
+
+window.addEventListener('scroll', () => {
+  const pct = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
+  document.documentElement.style.setProperty('--scroll-progress', pct.toFixed(4));
+}, {passive:true});
 
 const toggle = document.getElementById('navToggle');
 const links  = document.getElementById('navLinks');
