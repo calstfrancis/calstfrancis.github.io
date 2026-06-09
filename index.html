@@ -172,6 +172,7 @@
   border-top-color: #a0b8c8;
 }
 
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{
@@ -185,6 +186,7 @@ body{
   line-height:1.75;
   -webkit-font-smoothing:antialiased;
   transition:background-color .25s,color .25s;
+  animation:fadeIn .35s ease both;
 }
 a{color:var(--coral);text-decoration:none;transition:color .15s}
 a:hover{color:var(--coral-hi)}
@@ -213,7 +215,7 @@ nav{
   font-family:'Spectral',serif;font-size:.78rem;font-weight:600;
   letter-spacing:.1em;text-transform:uppercase;color:var(--text-3);transition:color .15s;
 }
-.nav-links a:hover{color:var(--coral)}
+.nav-links a:hover,.nav-links a.active{color:var(--coral)}
 .theme-toggle{
   background:none;border:1px solid var(--border-hi);padding:.22rem .65rem;
   font-family:'Spectral',serif;font-size:.72rem;font-weight:600;
@@ -281,6 +283,12 @@ nav{
 [data-theme="light"] .btn-kofi{background:var(--cpale)}
 
 section{padding:3.5rem 0}
+section[id]{scroll-margin-top:64px}
+a:focus-visible,button:focus-visible{outline:2px solid var(--coral);outline-offset:3px}
+.project-desc::first-letter{
+  font-family:'IM Fell English',serif;font-size:1.9rem;line-height:.82;
+  float:left;margin-right:.05em;margin-top:.06em;color:var(--coral);opacity:.75;
+}
 .vine-divider{margin-top:2.5rem;overflow:visible;opacity:.75}
 .vine-divider svg{display:block;width:100%;overflow:visible}
 nav::after{
@@ -395,7 +403,7 @@ nav::after{
   text-transform:uppercase;color:var(--olive);border:1px solid var(--olive);padding:.1rem .45rem;
 }
 .flatpak-badge{
-  background:var(--flatpak-green);padding:0.1rem 0.5rem;border-radius:16px;
+  background:var(--olive);padding:0.1rem 0.5rem;border-radius:2px;
   font-size:0.6rem;font-weight:600;letter-spacing:.05em;color:white;
   font-family:'Spectral',serif;text-transform:uppercase;
 }
@@ -417,7 +425,7 @@ nav::after{
 }
 
 .about-body{
-  display:grid;grid-template-columns:1fr 1fr;
+  display:grid;grid-template-columns:1fr 1fr 1fr;
   gap:1rem;
 }
 .about-cell{
@@ -425,6 +433,7 @@ nav::after{
   border:1px solid var(--border-hi);border-left:3px solid var(--olive);
   transition:background .25s,border-color .2s;position:relative;overflow:hidden;
 }
+.about-cell:first-child{grid-column:1 / -1}
 .about-cell:hover{border-color:var(--coral)}
 .about-cell-flower{
   position:absolute;bottom:-14px;right:-14px;
@@ -499,7 +508,8 @@ footer a:hover{color:var(--coral)}
   .install-commands{flex-direction:column;align-items:flex-start}
 
   .about-body{grid-template-columns:1fr}
-  .about-cell{padding:1.1rem 1.2rem 1.1rem 1.3rem}
+  .about-cell:first-child{grid-column:1}
+  .about-cell{padding:1.1rem 1.1rem 1.1rem 1.3rem}
 
   .support-body{flex-direction:column;gap:.8rem;padding:1.4rem 1.2rem}
   .support-bota{width:50px}
@@ -536,6 +546,7 @@ section:nth-of-type(4){animation-delay:.2s}
     </button>
     <ul class="nav-links" id="navLinks">
       <li><a href="#projects">Projects</a></li>
+      <li><a href="#games">Games</a></li>
       <li><a href="#about">About</a></li>
       <li><a href="#support">Support</a></li>
       <li><button class="theme-toggle" id="themeToggle"><span>🌙</span> Dark</button></li>
@@ -549,7 +560,7 @@ section:nth-of-type(4){animation-delay:.2s}
     <svg class="hero-wm" width="340" height="340" viewBox="-55 -55 110 110" aria-hidden="true">
       <use href="#sf"/>
     </svg>
-    <div class="hero-eyebrow">Student Minister · Developer · Flatpak Maintainer</div>
+    <div class="hero-eyebrow">Student Minister · Developer</div>
     <h1>Cal St Francis</h1>
     <p class="hero-subtitle">Candidate for Ordination, United Church of Canada</p>
     <p class="hero-desc">
@@ -591,19 +602,19 @@ section:nth-of-type(4){animation-delay:.2s}
     </p>
 
     <!-- Flatpak repo setup notice -->
-    <div style="margin:1rem 0 1.8rem; background:var(--opale); border-left:4px solid var(--flatpak-green); padding:0.8rem 1.2rem; border-radius:8px;">
-      <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;">
-        <span class="flatpak-badge" style="background:var(--flatpak-green);">⚡️ Flatpak Repository</span>
-        <span style="font-size:0.85rem;">Add my repo once, get access to all my apps via Software Center:</span>
+    <div style="margin:1rem 0 1.8rem;background:var(--opale);border:1px solid var(--border-hi);border-left:3px solid var(--olive);padding:0.8rem 1.2rem;">
+      <div style="display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;margin-bottom:0.5rem;">
+        <span style="font-family:'Spectral',serif;font-size:.68rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--olive);">Flatpak Repository</span>
+        <span style="font-size:0.85rem;color:var(--text-2);">Add once, then install all apps through your Software Center:</span>
       </div>
-      <div class="install-commands" style="margin-top:0.5rem;">
+      <div class="install-commands">
         <code>flatpak remote-add --if-not-exists calstfrancis https://calstfrancis.github.io/flatpak/calstfrancis.flatpakrepo</code>
-        <a href="https://calstfrancis.github.io/flatpak/calstfrancis.flatpakrepo" class="btn btn-flatpak" style="padding:0.2rem 0.8rem; font-size:0.7rem;">📁 Download .flatpakrepo</a>
+        <a href="https://calstfrancis.github.io/flatpak/calstfrancis.flatpakrepo" class="btn btn-ghost" style="padding:0.2rem 0.8rem;font-size:0.7rem;">Download .flatpakrepo</a>
       </div>
     </div>
 
     <!-- Severed Hours game card -->
-    <div class="game-feature">
+    <div class="game-feature" id="games">
       <svg class="game-bota-top" viewBox="0 0 800 38" style="height:38px;display:block;overflow:hidden" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
         <rect width="800" height="38" fill="#0e0b09"/>
         <path d="M -5,22 C 60,8 130,30 200,18 C 270,6 340,28 400,18 C 460,8 530,30 600,18 C 670,6 740,28 805,18"
@@ -749,8 +760,7 @@ section:nth-of-type(4){animation-delay:.2s}
               Browser‑native engine for contemplative, state‑reactive interactive fiction. Plain JS — no build step.
               Soundings, theosis, charisms, branching dialogue, rituals, magnetic deviation.
             </p>
-            <a href="/abouts/about-SOBORNOST.html" class="game-link" style="opacity: 0.8; font-size: 0.8rem;">Design Notes &amp; Reasoning →</a>
-            <a href="https://github.com/calstfrancis/SOBORNOST" target="_blank" rel="noopener" class="project-link" style="margin-left: 1rem;">View on GitHub →</a>
+            <a href="https://github.com/calstfrancis/SOBORNOST" target="_blank" rel="noopener" class="project-link">View on GitHub →</a>
           </div>
         </div>
       </div>
@@ -978,6 +988,11 @@ section:nth-of-type(4){animation-delay:.2s}
     if(doRain){
       ctx.strokeStyle='rgba(120,160,200,0.32)'; ctx.lineWidth=.5;
       for(const d of rain){d.y+=d.spd;if(d.y>cy+r){d.y=cy-r;d.x=cx+(Math.random()-.5)*r*1.7;}ctx.beginPath();ctx.moveTo(d.x,d.y);ctx.lineTo(d.x-1,d.y+d.len);ctx.stroke();}
+    } else {
+      const sx=cx+Math.sin(T*.07)*r*.75, sy=horizY+Math.cos(T*.05)*r*.04;
+      const swG=ctx.createRadialGradient(sx,sy,0,sx,sy,r*.55);
+      swG.addColorStop(0,'rgba(190,210,230,0.10)'); swG.addColorStop(1,'rgba(190,210,230,0)');
+      ctx.fillStyle=swG; ctx.fillRect(cx-r,cy-r,r*2,r*2);
     }
     ctx.restore();
     ctx.strokeStyle='rgba(0,0,0,0.6)'; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(cx,cy,r*.86,0,Math.PI*2); ctx.stroke();
@@ -985,14 +1000,30 @@ section:nth-of-type(4){animation-delay:.2s}
     const gl=ctx.createLinearGradient(cx-r*.4,cy-r*.7,cx+r*.1,cy-r*.2);
     gl.addColorStop(0,'rgba(255,255,255,0.06)'); gl.addColorStop(1,'rgba(255,255,255,0)');
     ctx.fillStyle=gl; ctx.fillRect(cx-r,cy-r,r*2,r*2); ctx.restore();
-    requestAnimationFrame(draw);
+    _raf = requestAnimationFrame(draw);
   }
-  draw();
+  let _raf = requestAnimationFrame(draw);
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) { cancelAnimationFrame(_raf); _raf = requestAnimationFrame(draw); }
+  });
 })();
 
+const _navSections = [...document.querySelectorAll('.nav-links a[href^="#"]')]
+  .map(a => document.getElementById(a.getAttribute('href').slice(1)))
+  .filter(Boolean)
+  .sort((a,b) => a.compareDocumentPosition(b) & 4 ? -1 : 1);
+const _navAs = [...document.querySelectorAll('.nav-links a[href^="#"]')];
 window.addEventListener('scroll', () => {
   const pct = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
-  document.documentElement.style.setProperty('--scroll-progress', pct.toFixed(4));
+  document.documentElement.style.setProperty('--scroll-progress', (pct||0).toFixed(4));
+  let cur = '';
+  const atBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 8;
+  if (atBottom) {
+    cur = _navSections[_navSections.length - 1].id;
+  } else {
+    _navSections.forEach(s => { if (s.getBoundingClientRect().top <= 80) cur = s.id; });
+  }
+  _navAs.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + cur));
 }, {passive:true});
 
 const toggle = document.getElementById('navToggle');
