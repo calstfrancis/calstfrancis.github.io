@@ -214,8 +214,14 @@ nav{
 .nav-links a{
   font-family:'Spectral',serif;font-size:.78rem;font-weight:600;
   letter-spacing:.1em;text-transform:uppercase;color:var(--text-3);transition:color .15s;
+  position:relative;
+}
+.nav-links a::after{
+  content:'';position:absolute;bottom:-3px;left:0;
+  height:1px;background:var(--coral);width:0;transition:width .22s ease;
 }
 .nav-links a:hover,.nav-links a.active{color:var(--coral)}
+.nav-links a:hover::after,.nav-links a.active::after{width:100%}
 .theme-toggle{
   background:none;border:1px solid var(--border-hi);padding:.22rem .65rem;
   font-family:'Spectral',serif;font-size:.72rem;font-weight:600;
@@ -244,16 +250,17 @@ nav{
   letter-spacing:.18em;text-transform:uppercase;color:var(--olive);margin-bottom:.9rem;
 }
 .hero h1{
-  font-family:'IM Fell English',serif;font-size:3.2rem;font-weight:400;
-  line-height:1.1;color:var(--text);margin-bottom:.3rem;
+  font-family:'IM Fell English',serif;font-size:3.8rem;font-weight:400;
+  line-height:1.05;color:var(--text);margin-bottom:.3rem;letter-spacing:-.01em;
 }
 .hero-subtitle{
   font-family:'IM Fell English',serif;font-style:italic;
   font-size:1.1rem;color:var(--text-2);margin-bottom:1.6rem;
 }
 .hero-desc{
-  font-size:.96rem;color:var(--text-2);line-height:1.85;
-  max-width:520px;margin-bottom:1.8rem;
+  font-size:.93rem;color:var(--text-2);line-height:2;
+  max-width:480px;margin-bottom:1.8rem;
+  border-left:2px solid var(--border-hi);padding-left:1rem;
 }
 .hero-desc em{font-style:italic;color:var(--text)}
 .hero-actions{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:0}
@@ -283,7 +290,7 @@ nav{
 [data-theme="light"] .btn-kofi{background:var(--cpale)}
 
 section{padding:3.5rem 0}
-section[id]{scroll-margin-top:64px}
+section[id],#games,#apps{scroll-margin-top:64px}
 a:focus-visible,button:focus-visible{outline:2px solid var(--coral);outline-offset:3px}
 .project-desc::first-letter{
   font-family:'IM Fell English',serif;font-size:1.9rem;line-height:.82;
@@ -291,6 +298,9 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--coral);outline-offs
 }
 .vine-divider{margin-top:2.5rem;overflow:visible;opacity:.75}
 .vine-divider svg{display:block;width:100%;overflow:visible}
+#projects .vine-divider svg{animation:vineDrift 34s ease-in-out infinite}
+#about .vine-divider svg{animation:vineDrift 38s ease-in-out infinite;animation-delay:-16s}
+[data-theme="light"] .vine-divider svg,[data-theme="light"] .hero-vine,[data-theme="light"] .footer-vine{filter:contrast(1.7) brightness(.82)}
 nav::after{
   content:'';position:absolute;bottom:0;left:0;
   height:2px;background:var(--coral);
@@ -355,6 +365,10 @@ nav::after{
   max-width:500px;
   margin-bottom:1.2rem;
 }
+.game-desc::first-letter{
+  font-family:'IM Fell English',serif;font-size:1.9rem;line-height:.82;
+  float:left;margin-right:.05em;margin-top:.06em;color:#c89830;opacity:.85;
+}
 .game-footer{
   display:flex;
   align-items:center;
@@ -382,7 +396,7 @@ nav::after{
 .project-card{
   border:1px solid var(--border-hi);border-left:3px solid var(--olive);background:rgba(0,0,0,.18);
   display:flex;align-items:flex-start;gap:1.25rem;
-  transition:border-color .2s,background .2s;position:relative;overflow:hidden;
+  transition:border-color .25s,background-color .25s;position:relative;overflow:hidden;
 }
 [data-theme="light"] .project-card{background:var(--bg-2)}
 .project-card:hover{border-color:var(--coral);background:var(--cpale)}
@@ -392,8 +406,8 @@ nav::after{
 }
 .project-body-wrap{padding:1.25rem 1.5rem;flex:1;display:flex;align-items:flex-start;gap:1.25rem}
 .project-initial{
-  font-family:'IM Fell English',serif;font-size:2.2rem;color:var(--coral);
-  line-height:1;flex-shrink:0;width:2.4rem;text-align:center;padding-top:.1rem;opacity:.7;
+  font-family:'IM Fell English',serif;font-style:italic;font-size:3rem;color:var(--coral);
+  line-height:1;flex-shrink:0;width:2.9rem;text-align:center;padding-top:.05rem;opacity:.8;
 }
 .project-body{flex:1}
 .project-meta{display:flex;align-items:center;gap:.65rem;margin-bottom:.3rem;flex-wrap:wrap}
@@ -453,7 +467,7 @@ nav::after{
 .support-body{
   border:1px solid var(--border-hi);background:var(--bg-2);
   padding:2rem 2.2rem;display:flex;align-items:flex-start;gap:1.8rem;
-  transition:background .25s;position:relative;overflow:hidden;
+  transition:background-color .25s,border-color .25s;position:relative;overflow:hidden;
 }
 .support-bota{flex-shrink:0;width:72px;align-self:stretch;display:flex;align-items:center}
 .support-bota svg{width:72px;overflow:visible}
@@ -464,6 +478,15 @@ nav::after{
 
 footer{padding:2.5rem 0;text-align:center}
 .footer-vine{display:block;width:100%;max-width:500px;margin:0 auto 1rem;overflow:visible}
+.back-to-top{
+  position:fixed;bottom:1.5rem;right:1.5rem;z-index:200;
+  background:var(--bg-2);border:1px solid var(--border-hi);
+  width:40px;height:40px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;opacity:0;pointer-events:none;
+  transition:opacity .3s,border-color .2s,background-color .25s;
+}
+.back-to-top.visible{opacity:1;pointer-events:auto}
+.back-to-top:hover{border-color:var(--coral)}
 footer p{
   font-family:'Spectral',serif;font-size:.78rem;
   color:var(--text-3);line-height:1.9;
@@ -503,7 +526,7 @@ footer a:hover{color:var(--coral)}
 
   .project-card-flower{display:none}
   .project-body-wrap{padding:1rem 1.1rem;gap:.9rem}
-  .project-initial{font-size:1.7rem;width:2rem}
+  .project-initial{font-size:2rem;width:2.2rem}
   .project-meta{gap:.4rem}
   .install-commands{flex-direction:column;align-items:flex-start}
 
@@ -545,8 +568,8 @@ section:nth-of-type(4){animation-delay:.2s}
       <span></span><span></span><span></span>
     </button>
     <ul class="nav-links" id="navLinks">
-      <li><a href="#projects">Projects</a></li>
       <li><a href="#games">Games</a></li>
+      <li><a href="#apps">Projects</a></li>
       <li><a href="#about">About</a></li>
       <li><a href="#support">Support</a></li>
       <li><button class="theme-toggle" id="themeToggle"><span>🌙</span> Dark</button></li>
@@ -569,8 +592,8 @@ section:nth-of-type(4){animation-delay:.2s}
        My desktop applications are now available via <strong>Flatpak</strong> — easy install on any Linux distribution.
     </p>
     <div class="hero-actions">
-      <a href="#projects" class="btn btn-coral">See My Work</a>
-      <a href="https://ko-fi.com/calstfrancis" target="_blank" rel="noopener" class="btn btn-kofi">☕ Ko-fi</a>
+      <a href="#games" class="btn btn-coral">See My Work</a>
+      <a href="https://ko-fi.com/calstfrancis" target="_blank" rel="noopener" class="btn btn-kofi"><svg width="13" height="13" viewBox="-55 -55 110 110" aria-hidden="true" style="overflow:visible;flex-shrink:0"><use href="#sf"/></svg> Ko-fi</a>
     </div>
   </div>
   <svg class="hero-vine" viewBox="0 0 900 70" preserveAspectRatio="xMidYMid slice" aria-hidden="true" style="height:70px;display:block;margin-top:2.5rem;overflow:hidden">
@@ -696,7 +719,7 @@ section:nth-of-type(4){animation-delay:.2s}
       </div>
     </div>
 
-    <div class="project-list">
+    <div class="project-list" id="apps">
 
       <!-- Rubric - Flatpak integrated -->
       <div class="project-card">
@@ -772,11 +795,9 @@ section:nth-of-type(4){animation-delay:.2s}
           <div class="project-initial">Г</div>
           <div class="project-body">
             <div class="project-meta">
-              <span class="project-name">ГОСТ / GOST - Academic Essay Templater</span>
-    <!--          <span class="project-type">Flatpak · LaTeX · Typst · Python</span>
-              <span class="project-status-dev">Available via Flatpak</span>
-              <span class="flatpak-badge">📦 Flatpak</span>
-    -->
+              <span class="project-name">ГОСТ / GOST — Academic Essay Templater</span>
+              <span class="project-type">Typst · LaTeX · Python</span>
+              <span class="project-status-dev">In Development</span>
             </div>
             <p class="project-desc">
               Create academic formatting compliant Latex/Typst/DOCX templates. SBL/APA/Chicago/MLA standards.
@@ -836,9 +857,19 @@ section:nth-of-type(4){animation-delay:.2s}
       <div class="about-cell">
         <svg class="about-cell-flower" width="90" height="90" viewBox="-55 -55 110 110" aria-hidden="true"><use href="#sf"/></svg>
         <h3><svg viewBox="-55 -55 110 110" aria-hidden="true"><use href="#sf"/></svg> Ministry</h3>
-        <p>Student minister at Hope United Church, Halifax. I sometimes preach, lead worship,
-        and build liturgical tools for congregations. Grounded in a theology of liberation —
-        God's power as invitation, not coercion.</p>
+        <div style="display:flex;align-items:center;gap:3rem">
+          <p>Student minister at Hope United Church, Halifax. I sometimes preach, lead worship,
+          and build liturgical tools for congregations. Grounded in a theology of liberation —
+          God's power as invitation, not coercion.</p>
+          <div style="flex-shrink:0;opacity:.18;margin-left:auto" aria-hidden="true">
+            <svg width="72" height="96" viewBox="0 0 72 96" style="overflow:visible">
+              <line x1="36" y1="96" x2="36" y2="42" stroke="#5a6428" stroke-width="2.5" stroke-linecap="round"/>
+              <g transform="translate(36,38) scale(.6)"><use href="#sf"/></g>
+              <g transform="translate(36,70) translate(-18,0) rotate(-35) scale(.7)"><use href="#lf-b"/></g>
+              <g transform="translate(36,55) translate(13,0) rotate(28) scale(.65)"><use href="#lf-v"/></g>
+            </svg>
+          </div>
+        </div>
       </div>
       <div class="about-cell">
         <svg class="about-cell-flower" width="70" height="70" viewBox="-22 -22 44 44" aria-hidden="true"><g transform="scale(.9)"><use href="#lf-v"/></g></svg>
@@ -898,7 +929,8 @@ section:nth-of-type(4){animation-delay:.2s}
           and will stay free. If something I've made has been useful to you, a small
           donation goes a long way. No pressure, no paywalls.
         </p>
-        <a href="https://ko-fi.com/calstfrancis" target="_blank" rel="noopener" class="btn btn-kofi">☕ Support on Ko-fi</a>
+        <p style="font-family:'IM Fell English',serif;font-style:italic;font-size:.88rem;color:var(--text-3);line-height:1.7;margin-bottom:1.2rem;opacity:.65">Freely you have received; freely give.</p>
+        <a href="https://ko-fi.com/calstfrancis" target="_blank" rel="noopener" class="btn btn-kofi"><svg width="13" height="13" viewBox="-55 -55 110 110" aria-hidden="true" style="overflow:visible;flex-shrink:0"><use href="#sf"/></svg> Support on Ko-fi</a>
       </div>
     </div>
   </div>
@@ -922,6 +954,10 @@ section:nth-of-type(4){animation-delay:.2s}
       <a href="https://github.com/calstfrancis/flatpak" target="_blank" rel="noopener">Flatpak Repo</a>
     </p>
     <p style="margin-top:.4rem;opacity:.45">All linux and game content freely given.</p>
+    <div style="margin-top:1.6rem;opacity:.28" aria-hidden="true">
+      <svg width="26" height="26" viewBox="-55 -55 110 110" style="overflow:visible"><use href="#sf"/></svg>
+    </div>
+    <p style="font-family:'IM Fell English',serif;font-style:italic;font-size:.8rem;color:var(--text-3);margin-top:.5rem;opacity:.5">freely given · freely received</p>
   </div>
 </footer>
 
@@ -1024,7 +1060,10 @@ window.addEventListener('scroll', () => {
     _navSections.forEach(s => { if (s.getBoundingClientRect().top <= 80) cur = s.id; });
   }
   _navAs.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + cur));
+  document.getElementById('backToTop').classList.toggle('visible', window.scrollY > 400);
 }, {passive:true});
+
+document.getElementById('backToTop').addEventListener('click', () => window.scrollTo({top:0,behavior:'smooth'}));
 
 const toggle = document.getElementById('navToggle');
 const links  = document.getElementById('navLinks');
@@ -1051,5 +1090,10 @@ themeBtn.addEventListener('click', () => {
   setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
 });
 </script>
+
+<button class="back-to-top" id="backToTop" aria-label="Back to top">
+  <svg width="20" height="20" viewBox="-55 -55 110 110" aria-hidden="true" style="overflow:visible"><use href="#sf"/></svg>
+</button>
+
 </body>
 </html>
