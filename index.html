@@ -169,13 +169,16 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{
-  background:var(--bg);
+  background-color:var(--bg);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.78' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:160px 160px;
+  background-blend-mode:soft-light;
   color:var(--text);
   font-family:'Spectral',Georgia,serif;
   font-size:1rem;
   line-height:1.75;
   -webkit-font-smoothing:antialiased;
-  transition:background .25s,color .25s;
+  transition:background-color .25s,color .25s;
 }
 a{color:var(--coral);text-decoration:none;transition:color .15s}
 a:hover{color:var(--coral-hi)}
@@ -389,10 +392,12 @@ section:last-of-type{border-bottom:none}
 }
 .install-commands{
   margin-top:0.75rem;display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;
+  min-width:0;width:100%;
 }
 .install-commands code{
   background:var(--bg-3);padding:0.2rem 0.5rem;border-radius:6px;font-size:0.7rem;
   font-family:'Courier Prime',monospace;color:var(--text-2);
+  display:block;max-width:100%;overflow-x:auto;white-space:nowrap;
 }
 
 .about-body{
@@ -483,6 +488,14 @@ footer a:hover{color:var(--coral)}
 }
 
 [data-theme="light"] .hero h1 { color: #0a0402; }
+
+#sectionPorthole{
+  position:absolute;top:0;right:0;
+  width:160px;height:160px;
+  pointer-events:none;opacity:.82;
+  z-index:0;
+}
+@media(max-width:680px){#sectionPorthole{display:none}}
 @keyframes riseIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
 .hero{animation:riseIn .6s ease both}
 section{animation:riseIn .5s ease both}
@@ -547,7 +560,8 @@ section:nth-of-type(4){animation-delay:.2s}
 
 <!-- PROJECTS -->
 <section id="projects">
-  <div class="container">
+  <div class="container" style="position:relative">
+    <canvas id="sectionPorthole" aria-hidden="true"></canvas>
     <div class="section-eyebrow">Works</div>
     <div class="section-title-row">
       <h2 class="section-title">Projects &amp; Games</h2>
@@ -669,10 +683,8 @@ section:nth-of-type(4){animation-delay:.2s}
             <p class="project-desc">
               Worship planning system for United Church congregations. Service flows, RCL lectionary, hymn lookup, scripture fetching, and print‑ready bulletins via the bundled Typst typesetter. Git sync, undo history, and live PDF preview.
             </p>
-            <div class="install-commands">
-              <a href="https://calstfrancis.github.io/flatpak/rubric.flatpakref" class="btn btn-flatpak" style="padding:0.2rem 0.8rem;">📦 Install via Flatpak (GUI)</a>
-              <code>flatpak install --user --from https://calstfrancis.github.io/flatpak/rubric.flatpakref</code>
-              <a href="/abouts/about-rubric.html" class="game-link" style="opacity: 0.8; font-size: 0.8rem; margin-left: 0.5rem;">Design Notes &amp; Reasoning →</a>
+            <div style="margin-top:0.6rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:center">
+              <a href="/abouts/about-rubric.html" class="game-link" style="opacity:0.8;font-size:0.8rem;">Design Notes &amp; Reasoning →</a>
               <a href="https://github.com/calstfrancis/rubric" class="project-link">Source Code →</a>
             </div>
           </div>
@@ -695,10 +707,8 @@ section:nth-of-type(4){animation-delay:.2s}
               Full academic Typst workplace. Templates for SBL, Chicago, APA, IEEE, Gost, etc... Live preview, document management, versioned backup,
               spellcheck, export to PDF, DOCX, HTML.
             </p>
-            <div class="install-commands">
-              <a href="https://calstfrancis.github.io/flatpak/zerkalo.flatpakref" class="btn btn-flatpak" style="padding:0.2rem 0.8rem;">📦 Install via Flatpak (GUI)</a>
-              <code>flatpak install --user --from https://calstfrancis.github.io/flatpak/zerkalo.flatpakref</code>
-              <a href="/abouts/about-zerkalo.html" class="game-link" style="opacity: 0.8; font-size: 0.8rem; margin-left: 0.5rem;">Design Notes &amp; Reasoning →</a>
+            <div style="margin-top:0.6rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:center">
+              <a href="/abouts/about-zerkalo.html" class="game-link" style="opacity:0.8;font-size:0.8rem;">Design Notes &amp; Reasoning →</a>
               <a href="https://github.com/calstfrancis/zerkalo" class="project-link">Source Code →</a>
             </div>
           </div>
@@ -770,9 +780,7 @@ section:nth-of-type(4){animation-delay:.2s}
             <p class="project-desc">
               Couples budget planner — track spending, income, debts, and savings goals together. Privacy-first: your data stays local or syncs via your own WebDAV server. No cloud, no accounts.
             </p>
-            <div class="install-commands">
-              <a href="https://calstfrancis.github.io/flatpak/kopilka.flatpakref" class="btn btn-flatpak" style="padding:0.2rem 0.8rem;">📦 Install via Flatpak (GUI)</a>
-              <code>flatpak install --user --from https://calstfrancis.github.io/flatpak/kopilka.flatpakref</code>
+            <div style="margin-top:0.6rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:center">
               <a href="https://github.com/calstfrancis/kopilka" class="project-link">Source Code →</a>
             </div>
           </div>
@@ -882,11 +890,65 @@ section:nth-of-type(4){animation-delay:.2s}
       <a href="https://github.com/calstfrancis" target="_blank" rel="noopener">GitHub</a> ·
       <a href="https://github.com/calstfrancis/flatpak" target="_blank" rel="noopener">Flatpak Repo</a>
     </p>
-    <p style="margin-top:.4rem;opacity:.45">All content freely given. Install via <code style="background:var(--bg-3); padding:0.1rem 0.3rem;">flatpak remote-add --if-not-exists calstfrancis https://calstfrancis.github.io/flatpak/calstfrancis.flatpakrepo</code></p>
+    <p style="margin-top:.4rem;opacity:.45">All content freely given. Install via <code style="background:var(--bg-3); padding:0.1rem 0.3rem; word-break:break-all; overflow-wrap:anywhere;">flatpak remote-add --if-not-exists calstfrancis https://calstfrancis.github.io/flatpak/calstfrancis.flatpakrepo</code></p>
   </div>
 </footer>
 
 <script>
+(function(){
+  const canvas = document.getElementById('sectionPorthole');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const SZ = 160;
+  canvas.width = SZ * dpr; canvas.height = SZ * dpr;
+  canvas.style.width = SZ + 'px'; canvas.style.height = SZ + 'px';
+  ctx.scale(dpr, dpr);
+  const cx = SZ/2, cy = SZ/2, r = SZ * 0.42;
+  let T = 0;
+  const rain = [];
+  for (let i = 0; i < 22; i++)
+    rain.push({ x: cx+(Math.random()-.5)*r*1.7, y: cy+(Math.random()-.5)*r*1.7, len:5+Math.random()*8, spd:1.1+Math.random()*1.8 });
+  function draw() {
+    T += 0.008;
+    ctx.clearRect(0, 0, SZ, SZ);
+    // brass ring
+    ctx.strokeStyle='rgba(95,78,42,0.88)'; ctx.lineWidth=r*.22;
+    ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.stroke();
+    // bolts
+    ctx.fillStyle='rgba(80,65,35,0.9)';
+    for (let i=0;i<8;i++){const a=(i/8)*Math.PI*2;ctx.beginPath();ctx.arc(cx+Math.cos(a)*(r+r*.06),cy+Math.sin(a)*(r+r*.06),r*.052,0,Math.PI*2);ctx.fill();}
+    // clip interior
+    ctx.save(); ctx.beginPath(); ctx.arc(cx,cy,r*.86,0,Math.PI*2); ctx.clip();
+    const horizY = cy + r*.08 + Math.sin(T*.15)*r*.06;
+    const sg = ctx.createLinearGradient(cx,cy-r,cx,cy+r);
+    sg.addColorStop(0,'rgba(14,16,22,1)'); sg.addColorStop(.5,'rgba(18,22,28,1)');
+    sg.addColorStop(.52,'rgba(8,22,40,1)'); sg.addColorStop(1,'rgba(4,14,28,1)');
+    ctx.fillStyle=sg; ctx.fillRect(cx-r,cy-r,r*2,r*2);
+    // waves
+    for (let i=0;i<8;i++){
+      const wy=horizY+r*.1+i*r*.09+Math.sin(T*.3+i*1.1)*r*.018;
+      const amp=r*.028*(1-i*.08), wop=.42*(1-i*.09);
+      ctx.strokeStyle=`rgba(45,90,130,${wop.toFixed(3)})`; ctx.lineWidth=i<2?1.2:.8;
+      ctx.beginPath(); ctx.moveTo(cx-r*.88,wy);
+      for(let xi=-r*.88;xi<=r*.88;xi+=3){const la=amp*(1-Math.abs(xi)/(r*.88)*.3);ctx.lineTo(cx+xi,wy+Math.sin(T*(.18+i*.06)+xi*.038+i*1.1)*la);}
+      ctx.stroke();
+    }
+    // rain
+    ctx.strokeStyle='rgba(120,160,200,0.32)'; ctx.lineWidth=.5;
+    for(const d of rain){d.y+=d.spd;if(d.y>cy+r){d.y=cy-r;d.x=cx+(Math.random()-.5)*r*1.7;}ctx.beginPath();ctx.moveTo(d.x,d.y);ctx.lineTo(d.x-1,d.y+d.len);ctx.stroke();}
+    ctx.restore();
+    // inner ring shadow + gleam
+    ctx.strokeStyle='rgba(0,0,0,0.6)'; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(cx,cy,r*.86,0,Math.PI*2); ctx.stroke();
+    ctx.save(); ctx.beginPath(); ctx.arc(cx,cy,r*.86,0,Math.PI*2); ctx.clip();
+    const gl=ctx.createLinearGradient(cx-r*.4,cy-r*.7,cx+r*.1,cy-r*.2);
+    gl.addColorStop(0,'rgba(255,255,255,0.06)'); gl.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle=gl; ctx.fillRect(cx-r,cy-r,r*2,r*2); ctx.restore();
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
 const toggle = document.getElementById('navToggle');
 const links  = document.getElementById('navLinks');
 toggle.addEventListener('click', () => {
