@@ -10,8 +10,7 @@
 <meta property="og:url" content="https://calstfrancis.github.io/">
 <meta property="og:title" content="Cal St Francis · MDiv Student &amp; Developer">
 <meta property="og:description" content="Free linux liturgical tools for ministers and worship leaders, academic writing tools, and contemplative interactive fiction. Everything linux is free, all Flatpak.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Spectral:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/fonts/fonts.css">
 
 <svg width="0" height="0" style="position:absolute;pointer-events:none" aria-hidden="true">
 <defs>
@@ -600,6 +599,31 @@ section{animation:riseIn .5s ease both}
 section:nth-of-type(2){animation-delay:.08s}
 section:nth-of-type(3){animation-delay:.14s}
 section:nth-of-type(4){animation-delay:.2s}
+
+/* ── SCREENSHOT PANEL ── */
+.screenshot-toggle{
+  background:none;border:none;padding:0;
+  font-family:'Spectral',serif;font-size:.78rem;font-weight:600;
+  letter-spacing:.04em;color:var(--text-3);cursor:pointer;
+  transition:color .15s;
+}
+.screenshot-toggle:hover{color:var(--coral)}
+.screenshot-toggle[aria-expanded="true"]{color:var(--coral)}
+.screenshot-panel{
+  margin-top:1rem;
+  border:1px solid var(--border-hi);
+  overflow:hidden;
+  max-height:0;
+  transition:max-height .35s ease, opacity .3s ease;
+  opacity:0;
+}
+.screenshot-panel.open{
+  max-height:600px;
+  opacity:1;
+}
+.screenshot-panel img{
+  display:block;width:100%;height:auto;
+}
 </style>
 </head>
 <body>
@@ -809,6 +833,10 @@ section:nth-of-type(4){animation-delay:.2s}
             <div style="margin-top:0.6rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:center">
               <a href="/abouts/about-zerkalo.html" class="game-link" style="opacity:0.8;font-size:0.8rem;">Design Notes &amp; Reasoning →</a>
               <a href="https://github.com/calstfrancis/zerkalo" class="project-link">GitHub Page →</a>
+              <button class="screenshot-toggle" aria-expanded="false" aria-controls="zerkalo-screenshot">Screenshot ↓</button>
+            </div>
+            <div class="screenshot-panel" id="zerkalo-screenshot" hidden>
+              <img src="/zerkalo.png" alt="Zerkalo — Typst IDE screenshot" loading="lazy">
             </div>
           </div>
         </div>
@@ -1193,6 +1221,18 @@ themeBtn.addEventListener('click', () => {
   // first occurrence: 12–17s after load
   setTimeout(doFlicker, 12000 + Math.random() * 5000);
 })();
+
+// Screenshot toggles
+document.querySelectorAll('.screenshot-toggle').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const panel = document.getElementById(btn.getAttribute('aria-controls'));
+    const open = btn.getAttribute('aria-expanded') === 'true';
+    btn.setAttribute('aria-expanded', String(!open));
+    panel.removeAttribute('hidden');
+    panel.classList.toggle('open', !open);
+    btn.textContent = open ? 'Screenshot ↓' : 'Screenshot ↑';
+  });
+});
 </script>
 
 </body>
