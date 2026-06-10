@@ -135,6 +135,28 @@
 }
 .spasibo-flickering{animation:spasiboFlicker .7s linear;will-change:filter}
 
+/* Severed Hours custom theme */
+.game-feature.severed-hours{background:#0e0a04;border-color:#3a2810}
+.game-feature.severed-hours .game-ascii{color:#7a6040}
+.game-feature.severed-hours .game-label,.game-feature.severed-hours .game-title{color:#e8d4a0}
+.game-feature.severed-hours .game-desc{color:#c0a878}
+.game-feature.severed-hours .game-link{color:#a08848}
+.game-feature.severed-hours .game-link:hover{color:#c8b060}
+.game-feature.severed-hours .game-footer{border-top-color:#3a2810}
+.game-feature.severed-hours .game-status{color:#8a9435}
+.game-feature.severed-hours .status-pip{background:#8a9435}
+[data-theme="light"] .game-feature.severed-hours{background:#f5ead0;border-color:#c0a060}
+[data-theme="light"] .game-feature.severed-hours .game-label,[data-theme="light"] .game-feature.severed-hours .game-title{color:#2a1a08}
+[data-theme="light"] .game-feature.severed-hours .game-desc{color:#503818}
+[data-theme="light"] .game-feature.severed-hours .game-link{color:#6a4010}
+[data-theme="light"] .game-feature.severed-hours .game-link:hover{color:#8a5a18}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
+  body{animation:none !important}
+  #sectionPorthole{display:none}
+}
+
 /* SPASIBO custom theme – dark mode (default) */
 .game-feature.spasibo {
   background: #0a121c;
@@ -413,10 +435,10 @@ nav::after{
 .project-card{
   border:1px solid var(--border-hi);border-left:3px solid var(--olive);background:rgba(0,0,0,.18);
   display:flex;align-items:flex-start;gap:1.25rem;
-  transition:border-color .25s,background-color .25s;position:relative;overflow:hidden;
+  transition:border-color .25s,background-color .25s,border-left-width .2s;position:relative;overflow:hidden;
 }
 [data-theme="light"] .project-card{background:var(--bg-2)}
-.project-card:hover{border-color:var(--coral);background:var(--cpale);box-shadow:inset 0 0 0 1px var(--coral)}
+.project-card:hover{border-color:var(--coral);background:var(--cpale);box-shadow:inset 0 0 0 1px var(--coral);border-left-width:5px}
 .project-card-flower{
   position:absolute;right:-18px;top:50%;transform:translateY(-50%);
   opacity:.12;pointer-events:none;
@@ -558,6 +580,10 @@ footer a:hover{color:var(--coral)}
 [data-theme="light"] .hero h1 { color: #0a0402; }
 [data-theme="light"] body { background-blend-mode: multiply; }
 [data-theme="light"] #sectionPorthole{filter:brightness(1.4) saturate(.7)}
+[data-theme="light"] .hero-desc{border-left-color:var(--olive)}
+#about .section-intro{text-align:center;margin-left:auto;margin-right:auto}
+#about .section-intro::before,#about .section-intro::after{content:'❧';display:inline;color:var(--olive);opacity:.7;padding:0 .4em;font-size:.85em}
+.back-to-top:hover svg{animation:heroWmSpin 2s linear infinite;transform-origin:center}
 .nav-brand-text{border-bottom:1px solid rgba(90,100,40,.38);padding-bottom:1px}
 .game-feature.spasibo .game-title{transition:none}
 
@@ -580,10 +606,10 @@ section:nth-of-type(4){animation-delay:.2s}
 
 <nav>
   <div class="nav-inner">
-    <span class="nav-brand">
+    <a href="#" class="nav-brand">
       <svg viewBox="-55 -55 110 110" aria-hidden="true"><use href="#sf"/></svg>
       <span class="nav-brand-text">Cal St Francis</span>
-    </span>
+    </a>
     <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
       <span></span><span></span><span></span>
     </button>
@@ -657,9 +683,9 @@ section:nth-of-type(4){animation-delay:.2s}
     </div>
 
     <!-- Severed Hours game card -->
-    <div class="game-feature" id="games">
+    <div class="game-feature severed-hours" id="games">
       <svg class="game-bota-top" viewBox="0 0 800 38" style="height:38px;display:block;overflow:hidden" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-        <rect width="800" height="38" fill="#0e0b09"/>
+        <rect width="800" height="38" fill="#0e0a04"/>
         <path d="M -5,22 C 60,8 130,30 200,18 C 270,6 340,28 400,18 C 460,8 530,30 600,18 C 670,6 740,28 805,18"
           stroke="#5a6428" stroke-width="2" fill="none" stroke-linecap="round"/>
         <g transform="translate(200,15) scale(.32)"><use href="#sf"/></g>
@@ -758,7 +784,7 @@ section:nth-of-type(4){animation-delay:.2s}
             </p>
             <div style="margin-top:0.6rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:center">
               <a href="/abouts/about-rubric.html" class="game-link" style="opacity:0.8;font-size:0.8rem;">Design Notes &amp; Reasoning →</a>
-              <a href="https://github.com/calstfrancis/rubric" class="project-link">Source Code →</a>
+              <a href="https://github.com/calstfrancis/rubric" class="project-link">GitHub Page →</a>
             </div>
           </div>
         </div>
@@ -782,7 +808,7 @@ section:nth-of-type(4){animation-delay:.2s}
             </p>
             <div style="margin-top:0.6rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:center">
               <a href="/abouts/about-zerkalo.html" class="game-link" style="opacity:0.8;font-size:0.8rem;">Design Notes &amp; Reasoning →</a>
-              <a href="https://github.com/calstfrancis/zerkalo" class="project-link">Source Code →</a>
+              <a href="https://github.com/calstfrancis/zerkalo" class="project-link">GitHub Page →</a>
             </div>
           </div>
         </div>
@@ -803,7 +829,7 @@ section:nth-of-type(4){animation-delay:.2s}
               Browser‑native engine for contemplative, state‑reactive interactive fiction. Plain JS — no build step.
               Soundings, theosis, charisms, branching dialogue, rituals, magnetic deviation.
             </p>
-            <a href="https://github.com/calstfrancis/SOBORNOST" target="_blank" rel="noopener" class="project-link">View on GitHub →</a>
+            <a href="https://github.com/calstfrancis/SOBORNOST" target="_blank" rel="noopener" class="project-link">GitHub Page →</a>
           </div>
         </div>
       </div>
@@ -829,7 +855,7 @@ section:nth-of-type(4){animation-delay:.2s}
               <code>flatpak install --user --from https://calstfrancis.github.io/flatpak/gost.flatpakref</code>
       -->
               <a href="/abouts/about-gost.html" class="game-link" style="opacity: 0.8; font-size: 0.8rem; margin-left: 0.5rem;">Design Notes &amp; Reasoning →</a>
-              <a href="https://github.com/calstfrancis/Gost" class="project-link">Source Code →</a>
+              <a href="https://github.com/calstfrancis/Gost" class="project-link">GitHub Page →</a>
             </div>
           </div>
         </div>
@@ -848,10 +874,11 @@ section:nth-of-type(4){animation-delay:.2s}
               <span class="flatpak-badge">📦 Flatpak</span>
             </div>
             <p class="project-desc">
-              Couples budget planner — track spending, income, debts, and savings goals together. Privacy-first: your data stays local or syncs via your own WebDAV server. No cloud, no accounts.
+              Couples budget planner — track spending, income, debts, and savings goals together. Privacy-first: your data stays local or syncs via your own WebDAV server. No cloud, no accounts. Android companion available.
             </p>
             <div style="margin-top:0.6rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:center">
-              <a href="https://github.com/calstfrancis/kopilka" class="project-link">Source Code →</a>
+              <a href="https://github.com/calstfrancis/kopilka" class="project-link">GitHub Page →</a>
+              <a href="https://github.com/calstfrancis/kopilka-android" class="project-link" style="opacity:.75">Android →</a>
             </div>
           </div>
         </div>
@@ -930,7 +957,7 @@ section:nth-of-type(4){animation-delay:.2s}
   <div class="container">
     <div class="section-eyebrow">Support</div>
     <div class="section-title-row">
-      <h2 class="section-title">Buy Me a Coffee</h2>
+      <h2 class="section-title">Support the Work</h2>
       <svg viewBox="-55 -55 110 110" aria-hidden="true"><use href="#sf"/></svg>
     </div>
     <div class="support-body">
@@ -989,6 +1016,7 @@ section:nth-of-type(4){animation-delay:.2s}
 (function(){
   const canvas = document.getElementById('sectionPorthole');
   if (!canvas) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const ctx = canvas.getContext('2d');
   const dpr = window.devicePixelRatio || 1;
   const SZ = 160;
@@ -1116,6 +1144,7 @@ themeBtn.addEventListener('click', () => {
 });
 
 (function(){
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const card = document.querySelector('.game-feature.spasibo');
   const title = card && card.querySelector('.game-title');
   if (!card || !title) return;
