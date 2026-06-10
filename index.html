@@ -10,6 +10,7 @@
 <meta property="og:url" content="https://calstfrancis.github.io/">
 <meta property="og:title" content="Cal St Francis · MDiv Student &amp; Developer">
 <meta property="og:description" content="Free linux liturgical tools for ministers and worship leaders, academic writing tools, and contemplative interactive fiction. Everything linux is free, all Flatpak.">
+<meta property="og:image" content="https://calstfrancis.github.io/og-default.svg">
 <link rel="stylesheet" href="/fonts/fonts.css">
 
 <svg width="0" height="0" style="position:absolute;pointer-events:none" aria-hidden="true">
@@ -287,7 +288,7 @@ nav{
   letter-spacing:.18em;text-transform:uppercase;color:var(--olive);margin-bottom:.9rem;
 }
 .hero h1{
-  font-family:'IM Fell English',serif;font-size:3.8rem;font-weight:400;
+  font-family:'IM Fell English',serif;font-size:clamp(2rem,1.5rem + 3vw,3.8rem);font-weight:400;
   line-height:1.05;color:var(--text);margin-bottom:.3rem;letter-spacing:-.01em;
 }
 .hero-subtitle{
@@ -548,7 +549,6 @@ footer a:hover{color:var(--coral)}
   .theme-toggle{border:none;padding:.85rem 1.75rem;width:100%;justify-content:flex-start}
 
   .hero{padding:3rem 0 0}
-  .hero h1{font-size:2.2rem}
   .hero-wm{display:none}
   .hero-actions{flex-direction:column;align-items:stretch}
   .btn{justify-content:center;padding:.75rem 1.2rem}
@@ -624,9 +624,18 @@ section:nth-of-type(4){animation-delay:.2s}
 .screenshot-panel img{
   display:block;width:100%;height:auto;
 }
+.skip-link{
+  position:absolute;top:-100%;left:1rem;
+  padding:.4rem .9rem;background:var(--coral);color:#fff;
+  font-size:.85rem;font-weight:600;letter-spacing:.05em;
+  z-index:9999;transition:top .15s;
+}
+.skip-link:focus{top:.75rem;color:#fff}
 </style>
 </head>
 <body>
+
+<a href="#main-content" class="skip-link">Skip to content</a>
 
 <nav>
   <div class="nav-inner">
@@ -642,13 +651,13 @@ section:nth-of-type(4){animation-delay:.2s}
       <li><a href="#apps">Projects</a></li>
       <li><a href="#about">About</a></li>
       <li><a href="#support">Support</a></li>
-      <li><button class="theme-toggle" id="themeToggle"><span>🌙</span> Dark</button></li>
+      <li><button class="theme-toggle" id="themeToggle" aria-pressed="false"><span>🌙</span> Dark</button></li>
     </ul>
   </div>
 </nav>
 
 <!-- HERO -->
-<section class="hero">
+<section class="hero" id="main-content">
   <div class="container" style="position:relative">
     <svg class="hero-wm" width="340" height="340" viewBox="-55 -55 110 110" aria-hidden="true">
       <use href="#sf"/>
@@ -889,7 +898,7 @@ section:nth-of-type(4){animation-delay:.2s}
         </div>
       </div>
 
-      <!-- Kopilka (new addition) -->
+      <!-- Kopilka (desktop) -->
       <div class="project-card">
         <svg class="project-card-flower" width="80" height="80" viewBox="-55 -55 110 110" aria-hidden="true"><use href="#sf"/></svg>
         <div class="project-body-wrap">
@@ -902,11 +911,32 @@ section:nth-of-type(4){animation-delay:.2s}
               <span class="flatpak-badge">📦 Flatpak</span>
             </div>
             <p class="project-desc">
-              Couples budget planner — track spending, income, debts, and savings goals together. Privacy-first: your data stays local or syncs via your own WebDAV server. No cloud, no accounts. Android companion available.
+              Couples budget planner — track spending, income, debts, and savings goals together. Privacy-first: your data stays local or syncs via your own WebDAV server. No cloud, no accounts.
             </p>
             <div style="margin-top:0.6rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:center">
               <a href="https://github.com/calstfrancis/kopilka" class="project-link">GitHub Page →</a>
-              <a href="https://github.com/calstfrancis/kopilka-android" class="project-link" style="opacity:.75">Android →</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Kopilka Android -->
+      <div class="project-card">
+        <svg class="project-card-flower" width="80" height="80" viewBox="-55 -55 110 110" aria-hidden="true"><use href="#sf"/></svg>
+        <div class="project-body-wrap">
+          <div class="project-initial" style="background:linear-gradient(135deg,#2a6a5a,#1a4a3a);color:#a0e0c8">К</div>
+          <div class="project-body">
+            <div class="project-meta">
+              <span class="project-name">Kopilka Android — Companion App</span>
+              <span class="project-type">Kotlin · Jetpack Compose · Android</span>
+              <span class="project-status-dev">v1.1.0 Released</span>
+            </div>
+            <p class="project-desc">
+              Android companion for Kopilka. Log spending on the go, track budgets per category, view savings goals and debts. Syncs with the desktop app via WebDAV. Biometric lock, home screen widgets, partner notifications.
+            </p>
+            <div style="margin-top:0.6rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:center">
+              <a href="https://github.com/calstfrancis/kopilka-android/releases/latest" class="project-link">Latest Release →</a>
+              <a href="https://github.com/calstfrancis/kopilka-android" class="project-link" style="opacity:.75">GitHub →</a>
             </div>
           </div>
         </div>
@@ -1148,14 +1178,17 @@ if (_btt) _btt.addEventListener('click', () => window.scrollTo({top:0,behavior:'
 
 const toggle = document.getElementById('navToggle');
 const links  = document.getElementById('navLinks');
+toggle.setAttribute('aria-expanded', 'false');
 toggle.addEventListener('click', () => {
-  toggle.classList.toggle('open');
-  links.classList.toggle('open');
+  const open = toggle.classList.toggle('open');
+  links.classList.toggle('open', open);
+  toggle.setAttribute('aria-expanded', String(open));
 });
 links.querySelectorAll('a').forEach(a => {
   a.addEventListener('click', () => {
     toggle.classList.remove('open');
     links.classList.remove('open');
+    toggle.setAttribute('aria-expanded', 'false');
   });
 });
 
@@ -1163,6 +1196,7 @@ const themeBtn = document.getElementById('themeToggle');
 const setTheme = t => {
   document.documentElement.setAttribute('data-theme', t);
   localStorage.setItem('theme', t);
+  themeBtn.setAttribute('aria-pressed', t === 'dark' ? 'true' : 'false');
   themeBtn.innerHTML = t === 'dark' ? '<span>🌙</span> Dark' : '<span>☀️</span> Light';
 };
 const saved = localStorage.getItem('theme');
