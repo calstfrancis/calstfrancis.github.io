@@ -12,9 +12,30 @@
 <meta property="og:description" content="Design notes and reflections on SPASIBO — a contemplative mystery built on the SOBORNOST engine, exploring lost history, solidarity, and theosis aboard a winter North Atlantic crossing.">
 <meta property="og:image" content="https://calstfrancis.github.io/og-spasibo.svg">
 <link rel="canonical" href="https://calstfrancis.github.io/abouts/about-spasibo.html">
+<meta name="color-scheme" content="dark light">
 <meta name="theme-color" content="#6a1710" id="themeColorMeta">
 <link rel="stylesheet" href="/fonts/fonts.css">
 <link rel="stylesheet" href="/abouts/shared-about.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Spasibo",
+  "description": "Narrative game engine for branching interactive fiction, written in JavaScript.",
+  "applicationCategory": "GameApplication",
+  "operatingSystem": "Web",
+  "url": "https://github.com/calstfrancis/SOBORNOST",
+  "author": {
+    "@type": "Person",
+    "name": "Cal St Francis",
+    "url": "https://calstfrancis.github.io/"
+  },
+  "isPartOf": {
+    "@type": "WebSite",
+    "url": "https://calstfrancis.github.io/"
+  }
+}
+</script>
 </head>
 <body>
 
@@ -66,5 +87,6 @@
 </main>
 
 <script src="/abouts/shared-about.js"></script>
+<script>if("serviceWorker"in navigator)navigator.serviceWorker.register("/sw.js").catch(()=>{});</script>
 </body>
 </html>

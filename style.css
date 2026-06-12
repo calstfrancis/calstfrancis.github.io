@@ -1,4 +1,7 @@
+@view-transition { navigation: auto; }
+
 :root {
+  color-scheme: dark light;
   --bg:        #6a1710;
   --bg-2:      #7c1e14;
   --bg-3:      #8e2218;
@@ -152,8 +155,12 @@ nav{
   font-family:'IM Fell English',serif;
   font-size:1.05rem;color:var(--coral);letter-spacing:.03em;
   display:flex;align-items:center;gap:.45rem;
+  view-transition-name: site-brand;
 }
 .nav-brand svg{width:20px;height:20px;overflow:visible;flex-shrink:0}
+@media(prefers-reduced-motion:no-preference){
+  .nav-brand:hover svg,.nav-brand:focus-within svg{animation:heroWmSpin 3s linear infinite;transform-origin:center}
+}
 .nav-links{display:flex;align-items:center;gap:1.8rem;list-style:none}
 .nav-links a{
   font-family:'Spectral',serif;font-size:.78rem;font-weight:600;
@@ -184,7 +191,7 @@ nav{
 .nav-toggle.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
 
 /* ── HERO ── */
-.hero{border-bottom:2px solid var(--border);position:relative;overflow:hidden;padding:4.5rem 0 0}
+.hero{border-bottom:2px solid var(--border);position:relative;overflow:hidden;padding:4.5rem 0 0;view-transition-name:page-hero}
 @keyframes heroWmSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 .hero-wm{
   position:absolute;right:-40px;top:-30px;
@@ -551,6 +558,33 @@ section.section-visible{animation:riseIn .5s ease both}
 .download-badge{
   font-family:'Spectral',serif;font-size:.6rem;font-weight:600;letter-spacing:.05em;
   text-transform:uppercase;color:var(--text-3);opacity:.75;margin-left:.3rem;
+}
+
+/* ── SCROLL-DRIVEN ANIMATIONS (Chrome 115+) ── */
+@keyframes heroParallax { to { translate: 0 80px } }
+@keyframes vineParallax { to { translate: 0 30px } }
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-wm {
+      animation: heroWmSpin 120s linear infinite, heroParallax linear;
+      animation-timeline: auto, scroll(root block);
+    }
+    .hero-vine {
+      animation: vineDrift 22s ease-in-out infinite, vineParallax linear;
+      animation-timeline: auto, scroll(root block);
+    }
+  }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    section:not(.hero) {
+      opacity: 0;
+      animation: riseIn .5s ease both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 40%;
+    }
+    section:not(.hero).section-visible { animation: riseIn .5s ease both; animation-timeline: view(); animation-range: entry 0% entry 40% }
+  }
 }
 
 /* ── PRINT ── */

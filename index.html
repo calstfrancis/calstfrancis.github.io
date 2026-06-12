@@ -12,6 +12,7 @@
 <meta property="og:description" content="Free linux liturgical tools for ministers and worship leaders, academic writing tools, and contemplative interactive fiction. Everything linux is free, all Flatpak.">
 <meta property="og:image" content="https://calstfrancis.github.io/og-default.svg">
 <link rel="canonical" href="https://calstfrancis.github.io/">
+<meta name="color-scheme" content="dark light">
 <meta name="theme-color" content="#6a1710" id="themeColorMeta">
 <link rel="manifest" href="/manifest.json">
 <link rel="stylesheet" href="/fonts/fonts.css">
@@ -19,6 +20,24 @@
 <link rel="preload" as="font" type="font/woff2" href="/fonts/rnCr-xNNww_2s0amA9M5kng.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/fonts/rnCt-xNNww_2s0amA9M8onrmTA.woff2" crossorigin>
 <link rel="stylesheet" href="/style.css">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Cal St Francis",
+  "url": "https://calstfrancis.github.io/",
+  "email": "calstfrancis@disroot.org",
+  "description": "MDiv student at Atlantic School of Theology, developer of free Linux liturgical tools, academic writing software, and contemplative interactive fiction.",
+  "jobTitle": "Candidate for Ordination",
+  "affiliation": { "@type": "Organization", "name": "Atlantic School of Theology" },
+  "sameAs": [
+    "https://github.com/calstfrancis",
+    "https://ko-fi.com/calstfrancis"
+  ],
+  "knowsAbout": ["Worship Planning", "Liturgical Software", "Linux", "Interactive Fiction", "Process Theology", "Liberation Theology"]
+}
+</script>
 
 <svg width="0" height="0" style="position:absolute;pointer-events:none" aria-hidden="true">
 <defs>
@@ -608,18 +627,27 @@ const _navSections = [...document.querySelectorAll('.nav-links a[href^="#"]')]
   .filter(Boolean)
   .sort((a,b) => a.compareDocumentPosition(b) & 4 ? -1 : 1);
 const _navAs = [...document.querySelectorAll('.nav-links a[href^="#"]')];
+const _heroWm   = document.querySelector('.hero-wm');
+const _heroVine = document.querySelector('.hero-vine');
+const _parallaxOk = !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  && !CSS.supports('animation-timeline', 'scroll()');
 window.addEventListener('scroll', () => {
-  const pct = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
+  const y = window.scrollY;
+  const pct = y / (document.documentElement.scrollHeight - window.innerHeight);
   document.documentElement.style.setProperty('--scroll-progress', (pct||0).toFixed(4));
+  if (_parallaxOk) {
+    if (_heroWm)   _heroWm.style.translate   = `0 ${y * 0.18}px`;
+    if (_heroVine) _heroVine.style.translate = `0 ${y * 0.07}px`;
+  }
   let cur = '';
-  const atBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 8;
+  const atBottom = y + window.innerHeight >= document.documentElement.scrollHeight - 8;
   if (atBottom) {
     cur = _navSections[_navSections.length - 1].id;
   } else {
     _navSections.forEach(s => { if (s.getBoundingClientRect().top <= 80) cur = s.id; });
   }
   _navAs.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + cur));
-  document.getElementById('backToTop').classList.toggle('visible', window.scrollY > 400);
+  document.getElementById('backToTop').classList.toggle('visible', y > 400);
 }, {passive:true});
 
 const _btt = document.getElementById('backToTop');
@@ -736,12 +764,13 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
   });
 });
 
-// Section entrance animations via IntersectionObserver
+// Section entrance animations via IntersectionObserver (fallback for non-scroll-timeline browsers)
 (function () {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     document.querySelectorAll('section').forEach(s => s.classList.add('section-visible'));
     return;
   }
+  if (CSS.supports('animation-timeline', 'view()')) return; // CSS @supports block handles it
   const io = new IntersectionObserver(entries => {
     entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('section-visible'); io.unobserve(e.target); } });
   }, { threshold: 0.08 });
@@ -799,6 +828,10 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
       });
     });
 })();
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(() => {});
+}
 </script>
 
 </body>

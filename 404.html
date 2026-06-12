@@ -6,6 +6,7 @@
 <title>404 · Page Not Found · Cal St Francis</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <meta name="robots" content="noindex">
+<meta name="color-scheme" content="dark light">
 <link rel="canonical" href="https://calstfrancis.github.io/">
 <meta name="theme-color" content="#6a1710" id="themeColorMeta">
 <link rel="stylesheet" href="/fonts/fonts.css">
@@ -112,5 +113,6 @@ themeBtn.addEventListener('click', () => {
   setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
 });
 </script>
+<script>if("serviceWorker"in navigator)navigator.serviceWorker.register("/sw.js").catch(()=>{});</script>
 </body>
 </html>

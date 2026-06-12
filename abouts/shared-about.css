@@ -1,5 +1,8 @@
 /* Shared stylesheet for all about/project-reflection pages */
+@view-transition { navigation: auto; }
+
 :root {
+  color-scheme: dark light;
   --bg:        #6a1710;
   --bg-2:      #7c1e14;
   --bg-3:      #8e2218;
@@ -99,8 +102,13 @@ nav::after {
   font-family: 'IM Fell English', serif;
   font-size: 1.05rem; color: var(--coral); letter-spacing: .03em;
   display: flex; align-items: center; gap: .45rem;
+  view-transition-name: site-brand;
 }
 .nav-brand svg { width: 20px; height: 20px; overflow: visible }
+@media (prefers-reduced-motion: no-preference) {
+  .nav-brand:hover svg, .nav-brand:focus-within svg { animation: heroWmSpin 3s linear infinite; transform-origin: center }
+  @keyframes heroWmSpin { from { transform: rotate(0deg) } to { transform: rotate(360deg) } }
+}
 .theme-toggle {
   background: none; border: 1px solid var(--border-hi); padding: .22rem .65rem;
   font-family: 'Spectral', serif; font-size: .72rem; font-weight: 600;
@@ -110,6 +118,7 @@ nav::after {
 
 /* Article header */
 .article-header {
+  view-transition-name: page-hero;
   padding: 4rem 0 2rem;
   border-bottom: 1px dashed var(--border-hi);
   margin-bottom: 2.5rem;

@@ -1,5 +1,33 @@
 /* Shared JS for all about/project-reflection pages */
 
+// Service worker registration
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(() => {});
+}
+
+// Related projects strip
+(function () {
+  const PROJECTS = [
+    { slug: 'about-rubric',        title: 'Rubric',            sub: 'Worship Planning' },
+    { slug: 'about-zerkalo',       title: 'Зеркало',           sub: 'Typst Editor',        lang: 'ru' },
+    { slug: 'about-spasibo',       title: 'Spasibo',           sub: 'Narrative Engine' },
+    { slug: 'about-gost',          title: 'ГОСТ',              sub: 'Essay Templater',     lang: 'ru' },
+    { slug: 'about-severed-hours', title: 'The Severed Hours',  sub: 'Interactive Fiction' },
+  ];
+  const current = location.pathname.split('/').pop().replace('.html', '');
+  const others = PROJECTS.filter(p => p.slug !== current);
+  if (!others.length) return;
+
+  const strip = document.createElement('nav');
+  strip.setAttribute('aria-label', 'Other project reflections');
+  strip.style.cssText = 'border-top:1px dashed var(--border-hi);padding:2rem 0 1rem;margin-top:1rem';
+  strip.innerHTML = `<p style="font-family:'Spectral',serif;font-size:.7rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--olive);margin-bottom:1rem">More Reflections</p>
+<div style="display:flex;flex-wrap:wrap;gap:.6rem">${others.map(p => `<a href="/abouts/${p.slug}.html" style="display:inline-flex;flex-direction:column;padding:.55rem .9rem;border:1px solid var(--border-hi);font-family:'IM Fell English',serif;text-decoration:none;transition:border-color .15s,color .15s" onmouseover="this.style.borderColor='var(--coral)'" onmouseout="this.style.borderColor='var(--border-hi)'"><span style="font-size:.88rem;color:var(--text)"${p.lang ? ` lang="${p.lang}"` : ''}>${p.title}</span><span style="font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text-3);font-family:'Spectral',serif;font-weight:600;margin-top:.15rem">${p.sub}</span></a>`).join('')}</div>`;
+
+  const article = document.querySelector('.article-body') || document.querySelector('main');
+  if (article) article.appendChild(strip);
+})();
+
 // Load SVG symbol defs from the cacheable /defs.svg file
 (function () {
   fetch('/defs.svg')
