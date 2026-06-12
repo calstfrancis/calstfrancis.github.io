@@ -5890,8 +5890,43 @@ He looks at you.
       S.modCompanionStat && S.modCompanionStat('pavel', 'trust', 2);
     },
     choices: [
-      { text: '"Yes. The anomaly answered."',  next: 'pavel_ferromagnetic', theosis: 3, come_to_believe: 'anomaly_responds' },
+      { text: '"Yes. The anomaly answered."',  next: 'charism_prophet_pavel_affirmed', theosis: 3, come_to_believe: 'anomaly_responds' },
       { text: '"I don\'t know yet."',           next: 'foredeck_standing', theosis: 1 },
+    ],
+  },
+
+  charism_prophet_pavel_affirmed: {
+    id: 'charism_prophet_pavel_affirmed', location: 'Foredeck', mood: 'revelation',
+    art: 'portrait_pavel',
+    text: `He nods once. Not surprised.
+
+— Good. He says. — I thought so. But the prophet doesn't know — that is the rule. You have to hear it from someone who was there.
+
+He looks at the water for a long time.
+
+— What did it say back?
+
+He is not asking about the deviation readings. He is asking what you understood.
+
+You tell him what you understood.
+
+He listens the way he listens to everything important: without moving, without interrupting, looking at the water the whole time as though the water is part of the conversation.
+
+When you are finished he is quiet for a while.
+
+— I was hoping it would be something like that. He says. — Something that required more of us. Not less.
+
+He holds out the rope.`,
+    onEnter: () => {
+      S.incrementTheosis(5);
+      S.setFlag('charism_prophet_affirmed_seen');
+      S.modReputation('pavel', 4);
+      S.modCompanionStat && S.modCompanionStat('pavel', 'trust', 3);
+      S.comeToBelieve('anomaly_responds');
+    },
+    choices: [
+      { text: 'Take the rope.', next: 'foredeck_standing', theosis: 3, set_flag: 'claimed_the_rope', tags: ['crossing', 'presence'] },
+      { text: 'Go to the main deck.', next: 'main_deck_hub' },
     ],
   },
 
@@ -6785,6 +6820,7 @@ She hands you the coffee.
     onEnter: () => {
       // Requires 2+ soundings settled — checked in scene, not condition, for access to G
       if ((S.G.soundings && S.G.soundings.settled || []).length < 2) {
+        S.showToast('Something in the room stills — almost. Something is not yet in place. The moment recedes.', 'note');
         S.navigate('instrument_room_first');
         return;
       }
@@ -8206,9 +8242,9 @@ You have to decide what to say.`,
     id: 'warm_hands_passenger_withholds', location: 'Below — The Hatch', mood: 'uncanny',
     condition: { type: 'and', conditions: [
       { type: 'past_flag', id: 'was_a_passenger' },
-      { type: 'past_flag', id: 'was_a_passenger' },
       { type: 'flag', id: 'warm_hands_known' },
       { type: 'not', condition: { type: 'flag', id: 'warm_hands_gift_received' } },
+      { type: 'not', condition: { type: 'flag', id: 'warm_hands_passenger_withholds_seen' } },
       { type: 'not', condition: { type: 'flag', id: 'warm_hands_withholds_seen' } },
     ]},
     text: `You go to the hatch. You knock.
@@ -8227,7 +8263,7 @@ The hatch closes.
 
 They noticed. You passed through last time. They have a record of this. They are waiting to see if this crossing is different before they give anything.`,
     onEnter: () => {
-      S.setFlag('warm_hands_withholds_seen');
+      S.setFlag('warm_hands_passenger_withholds_seen');
       S.incrementTheosis(3);
     },
     choices: [
@@ -9233,7 +9269,11 @@ The ship continues on its heading. The crossing is ending.`,
       const t = S.G.theosis;
       const transmitted = S.hasFlag('archive_transmitted');
       const refused = S.hasFlag('mission_refused');
-      if (transmitted && t >= 66) {
+      const solidarityMet = S.hasFlag('solidarity_sounding_settled') && refused
+        && S.hasFlag('met_miguel') && S.hasFlag('met_lena') && t >= 45;
+      if (solidarityMet) {
+        S.setFlag('_route_solidarity');
+      } else if (transmitted && t >= 66) {
         S.setFlag('_route_restoration');
       } else if (refused && t >= 33) {
         S.setFlag('_route_witness');
@@ -10215,23 +10255,24 @@ He looks at you.
 — Is that possible? He asks. — Theologically.`,
     onEnter: () => {
       S.incrementTheosis(5);
-      S.setFlag('alexei_emergency_talked');
       S.modReputation('alexei', 4);
     },
     choices: [
       {
         text: '"Gregory Palamas would say: yes. And no. And the distinction is everything."',
         next: 'alexei_palamas',
-        theosis: 4,
+        theosis: 4, set_flag: 'alexei_emergency_talked',
       },
       {
         text: "'I do not know. But the question is correct.'",
         next: 'alexei_honest_answer', theosis: 2,
+        set_flag: 'alexei_emergency_talked',
         condition: { type: 'not', condition: { type: 'flag', id: 'alexei_emergency_talked' } },
       },
       {
         text: 'Sit with him. No answer yet.',
         next: 'alexei_sit_together', theosis: 3, composure: 1, tags: ['pastoral', 'solidarity', 'presence'],
+        set_flag: 'alexei_emergency_talked',
         condition: { type: 'not', condition: { type: 'flag', id: 'alexei_emergency_talked' } },
       },
     ],
@@ -10274,7 +10315,7 @@ He writes something in his log. He underlines it.
   },
 
   alexei_palamas: {
-    id: 'alexei_palamas', return_to: 'instrument_shimmer', return_label: '← Instrument room.', location: "Alexei's Cabin", mood: 'uncanny',
+    id: 'alexei_palamas', return_to: 'act_two_resolve', return_label: '← The crossing.', location: "Alexei's Cabin", mood: 'uncanny',
     text: `He sits up slightly.
 
 You tell him about the distinction between the divine essence and the divine energies. The essence unknowable, unreachable, utterly beyond. The energies: real, participable, present in creation. Not the same as the thing itself. The light on Tabor. The field that makes certain things more likely. The anomaly that pulls the compass off true north.
@@ -10560,7 +10601,6 @@ One word. The word has the quality of a document reference rather than a questio
 
 You hold the receiver. You have already decided something. The only question is how you communicate it.`,
     onEnter: () => {
-      S.setFlag('landstorm_second_called');
       S.applyEffect({ doubt: 2, vigilance: 1 });
       S.modShipState('paranoia', 2);
       S.showToast('Landstorm again.', 'warning');
@@ -10569,24 +10609,26 @@ You hold the receiver. You have already decided something. The only question is 
       {
         text: 'Maintain cover. Everything is proceeding.',
         next: 'landstorm_second_lie',
+        set_flag: 'landstorm_second_called',
         condition: { type: 'not', condition: { type: 'flag', id: 'mission_refused' } },
       },
       {
         text: 'Set the receiver down again. Let the anomaly have it.',
         next: 'landstorm_second_silence',
-        theosis: 2,
+        theosis: 2, set_flag: 'landstorm_second_called',
       },
       {
         text: '"The situation has changed. I am no longer able to complete the mission."',
         next: 'landstorm_second_refuse',
+        set_flag: 'landstorm_second_called',
         requires_flag: 'mission_refused',
         requires_stat: ['composure', 4],
       },
       {
         text: '"I need more time to assess the situation." Calm. Total composure.',
         next: 'landstorm_composure_hold',
+        set_flag: 'landstorm_second_called',
         requires_stat: ['composure', 6],
-        condition: { type: 'not', condition: { type: 'flag', id: 'landstorm_second_called' } },
       },
     ],
   },
@@ -11181,7 +11223,7 @@ He nods. He returns to the clipboard. The inventory, in his version, will be cor
   // ── NPC CONTRADICTIONS ───────────────────────────────────────────
 
   alexei_doubt: {
-    id: 'alexei_doubt', return_to: 'instrument_shimmer', return_label: '← Instrument room.', location: 'Instrument Room', mood: 'uncanny',
+    id: 'alexei_doubt', return_to: 'act_two_resolve', return_label: '← The crossing.', location: 'Instrument Room', mood: 'uncanny',
     get text() {
       let base = 'Alexei is standing at the porthole.';
       if (S.hasNpcMemory && S.hasNpcMemory('alexei', 'Palamas — thirty years without knowing')) {
