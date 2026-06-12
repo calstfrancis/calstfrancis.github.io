@@ -3224,7 +3224,7 @@ You have not decided what you are going to do.`,
       { text: 'Something has happened to the cover.',                         next: 'cover_identity_crisis', condition: { type: 'and', conditions: [{ type: 'or', conditions: [{ type: 'flag', id: 'anomaly_peak_occurred' }, { type: 'stat', stat: 'doubt', min: 7 }] }, { type: 'theosis', min: 45 }, { type: 'not', condition: { type: 'flag', id: 'cover_crisis_resolved' } }] } },
       { text: 'After the service.',                                            next: 'sunday_congregation',   condition: { type: 'and', conditions: [{ type: 'flag', id: 'sunday_service_led' }, { type: 'not', condition: { type: 'flag', id: 'sunday_congregation_seen' } }] } },
       { text: 'Landstorm is on the radio.',                                  next: 'landstorm_radio_call',  condition: { type: 'and', conditions: [{ type: 'flag', id: 'mission_orders_read' }, { type: 'not', condition: { type: 'flag', id: 'landstorm_called' } }] } },
-      { text: 'Further below.',                                              next: 'the_chapel', condition: { type: 'and', conditions: [{ type: 'flag', id: 'warm_hands_encountered' }, { type: 'theosis', min: 40 }, { type: 'not', condition: { type: 'flag', id: 'the_chapel_found' } }] } },
+      { text: 'Further below.',                                              next: 'the_chapel', condition: { type: 'and', conditions: [{ type: 'flag', id: 'warm_hands_encountered' }, { type: 'flag', id: 'act_two_begun' }, { type: 'theosis', min: 40 }, { type: 'not', condition: { type: 'flag', id: 'the_chapel_found' } }] } },
       { text: 'Something below the forward hold.',                           next: 'warm_hands_encounter', condition: { type: 'and', conditions: [{ type: 'flag', id: 'hold_visited' }, { type: 'not', condition: { type: 'flag', id: 'warm_hands_encountered' } }] } },
       { text: "Connie needs you. Alexei's cabin.",                          next: 'connie_emergency',      condition: { type: 'and', conditions: [{ type: 'flag', id: 'anomaly_peak_occurred' }, { type: 'not', condition: { type: 'flag', id: 'connie_emergency_happened' } }] } },
     ],
@@ -5930,6 +5930,42 @@ He holds out the rope.`,
     ],
   },
 
+  charism_sleeper_return: {
+    id: 'charism_sleeper_return', location: 'Foredeck', mood: 'uncanny',
+    condition: { type: 'and', conditions: [
+      { type: 'flag', id: 'charism_sleeper_available' },
+      { type: 'not', condition: { type: 'flag', id: 'charism_sleeper_return_seen' } },
+    ]},
+    text: `Pavel is at the bow. He looks at you when you approach, and something in his expression shifts — not recognition exactly. More like recalibration.
+
+— You were here before. He says. Not a question.
+
+— Yes.
+
+He turns back to the water. After a while:
+
+— I remember you. He says. — Not specifically. The way you remember weather.
+
+He is quiet for a long time.
+
+— Some people pass through a crossing and it doesn't move them. He says. — That's not a judgement. The crossing is what it is. Not everyone is ready for it when they arrive.
+
+He looks at you.
+
+— But you came back. He says. — That's the thing. You came back.
+
+He holds out the rope.`,
+    onEnter: () => {
+      S.setFlag('charism_sleeper_return_seen');
+      S.incrementTheosis(4);
+      S.modReputation('pavel', 2);
+    },
+    choices: [
+      { text: 'Take the rope.', next: 'foredeck_standing', theosis: 2, set_flag: 'claimed_the_rope', tags: ['crossing', 'presence'] },
+      { text: 'Not yet.', next: 'main_deck_hub', theosis: 1 },
+    ],
+  },
+
   charism_rememberer_open: {
     id: 'charism_rememberer_open', location: 'Instrument Room', mood: 'revelation',
     text: `The instruments are already reading deviation when you arrive on the first morning.
@@ -6493,36 +6529,6 @@ She picks up her pen and opens the log.
 
 
 
-
-
-  ending_passenger: {
-    id: 'ending_passenger', location: 'The Record', mood: 'neutral',
-    text: `The ship docked at 0614.
-
-You disembarked. You had your bag. Your cover was intact — it was never seriously tested. Your composure held — nothing required it. The archive is where it was when you boarded.
-
-Haircut watched you leave from the top of the gangway. She watched you the way she watches everything: with the expression of someone who has already understood what is happening and is simply noting it.
-
-The crew was busy with mooring. Miguel was on the bridge. Lena was in the galley making coffee for the next crossing. Alexei was running a final calibration on the instruments. Nadia had her notebook out. Pavel was on the foredeck.
-
-None of them knew you were leaving specifically. You were a passenger. The ship carries passengers. It does not keep track of them.
-
-You were here for three days. The anomaly was below you the entire time. The archive was in the hold. Thirty years of measurement by five countries was forty feet away at any given moment. The Warm Hands were below the forward hold. The sounding was available.
-
-You made a crossing as a passenger.
-
-This is not a judgement. The ship does not judge. The crossing does not judge. The North Atlantic does not judge. Haircut does not judge.
-
-She just watched you go.`,
-    onEnter: () => {
-      S.setFlag('ending_passenger_reached');
-      S.setFlag('crossing_was_passenger_crossing');
-      S.playSfx && S.playSfx('ship_ambient_stop');
-    },
-    choices: [
-      { text: 'Board again.', next: '__new_play__' },
-    ],
-  },
 
 
   // ── CONNIE'S ARC ──────────────────────────────────────────────────
@@ -7562,6 +7568,7 @@ You understand the expression now.
       { type: 'flag', id: 'met_lena' },
       { type: 'not', condition: { type: 'flag', id: 'sunday_history_mentioned' } },
       { type: 'not', condition: { type: 'flag', id: 'sunday_service_started' } },
+      { type: 'not', condition: { type: 'flag', id: 'sunday_service_history_seen' } },
     ]},
     text: `Lena says, without preamble, while stirring something:
 
@@ -8004,6 +8011,7 @@ He turns back.
     art: 'portrait_lena',
     condition: { type: 'and', conditions: [
       { type: 'not', condition: { type: 'flag', id: 'sunday_service_history_seen' } },
+      { type: 'not', condition: { type: 'flag', id: 'sunday_history_mentioned' } },
       { type: 'flag', id: 'met_lena' },
     ]},
     text: `She mentions it without being asked.
@@ -8312,7 +8320,10 @@ She looks at the printout.
       S.setFlag('anomaly_encoding_known');
     },
     choices: [
-      { text: 'Transmit. Now. This needs to go out.', next: 'radio_discovery', theosis: 4, tags: ['witness','archive','history'], condition: { type: 'not', condition: { type: 'flag', id: 'archive_transmitted' } } },
+      { text: 'Transmit. Now. This needs to go out.', next: 'radio_discovery', theosis: 4, tags: ['witness','archive','history'],
+        condition: { type: 'and', conditions: [{ type: 'not', condition: { type: 'flag', id: 'archive_transmitted' } }, { type: 'not', condition: { type: 'flag', id: 'radio_found' } }] } },
+      { text: 'Transmit. Now. This needs to go out.', next: 'radio_what_to_transmit', theosis: 4, tags: ['witness','archive','history'],
+        condition: { type: 'and', conditions: [{ type: 'not', condition: { type: 'flag', id: 'archive_transmitted' } }, { type: 'flag', id: 'radio_found' }] } },
       { text: 'What is it saying?', next: 'anomaly_fibonacci_meaning', tags: ['witness','crossing'] },
     ],
   },
@@ -8952,6 +8963,7 @@ Still here.`,
     condition: { type: 'and', conditions: [
       { type: 'flag', id: 'warm_hands_encountered' },
       { type: 'flag', id: 'hold_visited' },
+      { type: 'flag', id: 'act_two_begun' },
       { type: 'theosis', min: 40 },
       { type: 'not', condition: { type: 'flag', id: 'the_chapel_found' } },
     ]},
@@ -9222,7 +9234,10 @@ And she knew.`,
       return base;
     },
     onEnter: () => {
-      S.incrementTheosis(3);
+      if (!S.hasFlag('_resolve_hub_entered')) {
+        S.setFlag('_resolve_hub_entered');
+        S.incrementTheosis(3);
+      }
       S.setFlag('act_three_begun');
       S.unlockCodexEntry('codex_zarya_history');
       S.unlockCodexEntry('codex_solidarity');
@@ -11902,7 +11917,7 @@ S.on('newPlay', () => {
   if (S.hasFlag('sunday_service_started')) meta.servicesCelebrated = (meta.servicesCelebrated || 0) + 1;
   // Save last charism for compound scenes
   if (S.G.charisms && S.G.charisms.length > 0) {
-    const wakingCharism = S.G.charisms.find(c => ['illumined','witness','prophet','rememberer'].includes(c.id));
+    const wakingCharism = S.G.charisms.find(c => ['illumined','witness','prophet','rememberer','sleeper'].includes(c.id));
     if (wakingCharism) meta['lastCharism_' + S.G.playCount] = wakingCharism.id;
   }
 
@@ -11995,6 +12010,9 @@ S.on('newPlay', () => {
     }
     if (lastCharism === 'rememberer' && !S.hasFlag('charism_rememberer_open_seen')) {
       S.setFlag('charism_rememberer_available');
+    }
+    if (lastCharism === 'sleeper' && !S.hasFlag('charism_sleeper_return_seen')) {
+      S.setFlag('charism_sleeper_available');
     }
   }
   // Feature 5: anomaly grows — set higher starting deviation
