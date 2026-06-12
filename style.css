@@ -60,6 +60,7 @@
 
   --flatpak-green: #1b4d3e;
   --flatpak-light: #2d6a4f;
+  --text-3:    #5a3a18;
 }
 
 @keyframes spasiboFlicker{
@@ -517,10 +518,7 @@ footer a:hover{color:var(--coral)}
 @media(max-width:680px){#sectionPorthole{display:none}}
 @keyframes riseIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
 .hero{animation:riseIn .6s ease both}
-section{animation:riseIn .5s ease both}
-section:nth-of-type(2){animation-delay:.08s}
-section:nth-of-type(3){animation-delay:.14s}
-section:nth-of-type(4){animation-delay:.2s}
+section.section-visible{animation:riseIn .5s ease both}
 
 /* ── SCREENSHOT PANEL ── */
 .screenshot-toggle{
@@ -548,3 +546,56 @@ section:nth-of-type(4){animation-delay:.2s}
   z-index:9999;transition:top .15s;
 }
 .skip-link:focus{top:.75rem;color:#fff}
+
+/* ── DOWNLOAD BADGE ── */
+.download-badge{
+  font-family:'Spectral',serif;font-size:.6rem;font-weight:600;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--text-3);opacity:.75;margin-left:.3rem;
+}
+
+/* ── PRINT ── */
+@media print{
+  *{animation:none!important;transition:none!important}
+  nav,
+  .back-to-top,
+  #sectionPorthole,
+  .hero-wm,
+  .hero-vine,
+  .vine-divider,
+  .footer-vine,
+  .hero-actions,
+  .screenshot-toggle,
+  .screenshot-panel,
+  .project-filters,
+  .flatpak-badge{display:none!important}
+
+  body{
+    background:#fff!important;color:#111!important;
+    font-size:10pt;line-height:1.5;
+    background-image:none!important;
+  }
+  a{color:#111!important;text-decoration:underline}
+  a[href^="http"]::after{content:" (" attr(href) ")";font-size:.75em;color:#555}
+  a[href^="/"]::after{content:" (calstfrancis.github.io" attr(href) ")";font-size:.75em;color:#555}
+  .btn::after,.game-link::after,.project-link::after,.back-link::after{display:none}
+
+  .hero{border:none;padding:1rem 0}
+  .hero h1{color:#111!important;font-size:28pt}
+  .hero-subtitle,.hero-eyebrow{color:#333!important}
+  .hero-desc{border-left:2px solid #999;color:#333!important}
+
+  section{padding:1rem 0;page-break-inside:avoid}
+  .container{max-width:100%;padding:0}
+
+  .game-feature{border:1px solid #ccc;background:#fff!important;color:#111!important}
+  .game-title,.game-label,.game-desc,.game-status{color:#111!important}
+
+  .project-card{border:1px solid #ccc;background:#fff!important}
+  .project-name,.project-desc,.project-type,.project-status-dev{color:#111!important}
+  .project-card-flower{display:none!important}
+
+  .about-cell{border:1px solid #ccc;background:#fff!important}
+  .support-body{border:1px solid #ccc;background:#fff!important}
+
+  footer{border-top:1px solid #ccc;padding:.5rem 0;color:#555!important}
+}

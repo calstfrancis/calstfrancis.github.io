@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.88" numOctaves="3" stitchTiles="stitch" result="noise"/><feColorMatrix type="saturate" values="0" in="noise" result="grey"/><feBlend in="SourceGraphic" in2="grey" mode="overlay"/></filter>
+    <g id="sf"><g fill="#e06030"><path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(0)"/><path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(51.4)"/><path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(102.8)"/><path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(154.2)"/><path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(205.7)"/><path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(257.1)"/><path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(308.5)"/></g><circle r="14" fill="#5a2c10"/><circle r="9" fill="#3e1a08"/></g>
+  </defs>
+  <rect width="1200" height="630" fill="#6a1710" filter="url(#n)"/>
+  <rect x="0" y="0" width="6" height="630" fill="#e06030" opacity="0.8"/>
+  <g transform="translate(1020, 110) scale(5.5)" opacity="0.10"><use href="#sf"/></g>
+  <text x="80" y="220" font-family="Georgia, serif" font-size="24" font-weight="600" fill="#7a8840" letter-spacing="5">DESIGN NOTES &amp; REFLECTIONS</text>
+  <text x="80" y="310" font-family="Georgia, serif" font-size="96" font-weight="400" fill="#f2e4c4" letter-spacing="-2">RUBRIC</text>
+  <text x="82" y="378" font-family="Georgia, serif" font-style="italic" font-size="30" fill="#d8c4a0">Worship Planning Software · United Church of Canada</text>
+  <text x="82" y="560" font-family="Georgia, serif" font-size="22" fill="#8a6a44">calstfrancis.github.io</text>
+</svg>

@@ -1,0 +1,60 @@
+name: Update project versions
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+jobs:
+  update-versions:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch release data
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          fetch() {
+            gh api "/repos/$1/releases/latest" \
+              --jq '{tag_name,published_at,html_url,downloads:([.assets[].download_count]|add//0)}' \
+              2>/dev/null || echo 'null'
+          }
+          python3 - <<'PY'
+          import subprocess, json, datetime
+
+          repos = [
+            "calstfrancis/rubric",
+            "calstfrancis/zerkalo",
+            "calstfrancis/kopilka",
+            "calstfrancis/kopilka-android",
+            "calstfrancis/SOBORNOST",
+          ]
+
+          data = {"updated": datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"), "repos": {}}
+          for repo in repos:
+            result = subprocess.run(
+              ["gh", "api", f"/repos/{repo}/releases/latest",
+               "--jq", "{tag_name,published_at,html_url,downloads:([.assets[].download_count]|add//0)}"],
+              capture_output=True, text=True,
+              env={**__import__("os").environ}
+            )
+            try:
+              data["repos"][repo] = json.loads(result.stdout)
+            except Exception:
+              data["repos"][repo] = None
+
+          with open("versions.json", "w") as f:
+            json.dump(data, f, indent=2)
+          print("Written versions.json")
+          PY
+
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add versions.json
+          git diff --cached --quiet || git commit -m "chore: update project versions [skip ci]"
+          git push

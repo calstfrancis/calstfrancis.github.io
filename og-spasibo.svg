@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.88" numOctaves="3" stitchTiles="stitch" result="noise"/><feColorMatrix type="saturate" values="0" in="noise" result="grey"/><feBlend in="SourceGraphic" in2="grey" mode="overlay"/></filter>
+  </defs>
+  <rect width="1200" height="630" fill="#0a121c" filter="url(#n)"/>
+  <rect x="0" y="0" width="6" height="630" fill="#7aa8c0" opacity="0.7"/>
+  <line x1="80" y1="540" x2="700" y2="540" stroke="#2a4a5a" stroke-width="1"/>
+  <text x="80" y="220" font-family="Georgia, serif" font-size="24" font-weight="600" fill="#2a6a8a" letter-spacing="5">DESIGN NOTES &amp; REFLECTIONS</text>
+  <text x="80" y="330" font-family="Georgia, serif" font-size="100" font-weight="400" fill="#c0d8e8" letter-spacing="4">SPASIBO</text>
+  <text x="80" y="382" font-family="Georgia, serif" font-size="22" fill="#5a8898" letter-spacing="8">С П А С И Б О</text>
+  <text x="82" y="460" font-family="Georgia, serif" font-style="italic" font-size="28" fill="#7aa8c0">Contemplative mystery · North Atlantic crossing</text>
+  <text x="82" y="560" font-family="Georgia, serif" font-size="22" fill="#3a6070">calstfrancis.github.io</text>
+</svg>

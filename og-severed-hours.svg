@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.88" numOctaves="3" stitchTiles="stitch" result="noise"/><feColorMatrix type="saturate" values="0" in="noise" result="grey"/><feBlend in="SourceGraphic" in2="grey" mode="overlay"/></filter>
+  </defs>
+  <rect width="1200" height="630" fill="#0e0a04" filter="url(#n)"/>
+  <rect x="0" y="0" width="6" height="630" fill="#a08848" opacity="0.7"/>
+  <text x="80" y="220" font-family="Georgia, serif" font-size="24" font-weight="600" fill="#5a5228" letter-spacing="5">DESIGN NOTES &amp; REFLECTIONS</text>
+  <text x="80" y="315" font-family="Georgia, serif" font-size="80" font-weight="400" fill="#e8d4a0" letter-spacing="-1">THE SEVERED</text>
+  <text x="80" y="400" font-family="Georgia, serif" font-size="80" font-weight="400" fill="#e8d4a0" letter-spacing="-1">HOURS</text>
+  <text x="82" y="470" font-family="Georgia, serif" font-style="italic" font-size="28" fill="#c0a878">Contemplative interactive fiction</text>
+  <text x="82" y="560" font-family="Georgia, serif" font-size="22" fill="#5a4820">calstfrancis.github.io</text>
+</svg>
