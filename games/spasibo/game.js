@@ -1978,7 +1978,11 @@ She goes back to cooking. The conversation is over. This is not hostility. It is
 
   lena_reasons: {
     id: 'lena_reasons', location: 'Galley', mood: 'neutral',
-    onEnter: () => { S.setFlag('lena_reasons_heard'); },
+    onEnter: () => {
+      S.setFlag('lena_reasons_heard');
+      S.incrementTheosis(2);
+      S.modReputation('lena', 2);
+    },
     text: `She is quiet long enough that you think the answer isn't coming.
 
 — She was built to find things. Things that are there but hidden. The anomalies. The irregularities. She was built to be transparent enough that the hidden things could show through. Twenty-two years ago, that was still what she was for.
@@ -1988,7 +1992,6 @@ She turns the stove down.
 — Now she's being used to go somewhere and do something. That's different.
 
 She doesn't say what the something is.`,
-    onEnter: () => { S.incrementTheosis(2); S.modReputation('lena', 2); },
     choices: [
       { text: '"What is she being used to do?"',  next: 'lena_hold'    },
       { text: 'Go to the hold.',                   next: 'hold_first'   },
@@ -2662,6 +2665,7 @@ She doesn't elaborate on the isn't. She doesn't have to.
         S.setFlag('toast_cover_left');
         S.showToast('Cover: left-behind established.', 'note');
       }
+      S.modReputation('connie', 1);
     },
     text: `She nods. Not sympathy — recognition. She has heard the shape of this before, in different forms.
 
@@ -2670,7 +2674,6 @@ She doesn't elaborate on the isn't. She doesn't have to.
 She closes the textbook.
 
 — Any particular pastoral needs I should know about, from my side?`,
-    onEnter: () => { S.modReputation('connie', 1); },
     choices: [
       { text: '"Who should I be watching?"',         next: 'connie_pastoral'  },
       { text: '"How are you, while we\'re at it?"',  next: 'connie_self', requires_charism: 'healer' },
@@ -2685,6 +2688,7 @@ She closes the textbook.
         S.setFlag('connie_posting_challenged');
         setTimeout(() => S.startCoverChallenge('posting'), 600);
       }
+      S.modReputation('connie', 1);
     },
     text: `— Nadia is anxious about something. Not medical. Alexei sleeps badly when the anomalies are active — his instruments wake him. Miguel is carrying something.
 
@@ -2695,7 +2699,6 @@ She closes the textbook.
 She looks at you steadily.
 
 — How are you? The chaplain's wellbeing also mattering.`,
-    onEnter: () => { S.modReputation('connie', 1); },
     choices: [
       { text: '"Fine. Getting my sea legs."',                            next: 'connie_accepted'                           },
       { text: '"Honestly, I\'m still figuring out what I\'m for here."', next: 'connie_honest', theosis: 1 },
@@ -3735,20 +3738,25 @@ He is looking at you with the complete attention of someone who has decided that
 
   othis_deny: {
     id: 'othis_deny', location: 'Hold Access', mood: 'tense',
-    get text() {
+    onEnter: () => {
       const r = S.performVisibleRoll && S.performVisibleRoll('composure', 11, { isCoverChallenge: true });
+      S.G._othis_deny_roll = r;
+      S.degradeCover(2);
+      S.applyEffect({ doubt: 2 });
+      if (r && r.outcome === 'failure') S.degradeCover && S.degradeCover(1);
+      if (r && r.outcome === 'partial') S.applyEffect && S.applyEffect({ composure: -1 });
+    },
+    get text() {
+      const r = S.G._othis_deny_roll;
       const rollHtml = r && S.visibleRollHtml ? S.visibleRollHtml(r) : '';
       if (r && r.outcome === 'failure') {
-        S.degradeCover && S.degradeCover(1);
         return `You hold the cover.\n\n${rollHtml}\n\nThe answer comes out a half-beat off — a phrasing that sounds memorised. Othis writes something longer than usual. He looks at you once before he leaves.`;
       }
       if (r && r.outcome === 'partial') {
-        S.applyEffect && S.applyEffect({ composure: -1 });
         return `The cover holds, barely.\n\n${rollHtml}\n\nHe watches you perform it. You can hear the cost in your own voice. He writes something. The field is not closed.`;
       }
       return `The cover holds, barely.\n\n${rollHtml}\n\nHe watches you perform it. He knows he is watching a performance. You know he knows. Neither of you says this.\n\n— I'll need your movements accounted for. He says. — All of them.\n\nHe leaves.\n\nThe cover is thin now. One more pressure and it will not hold.\n\nBehind you, the hold. Inside it, the archive. Somewhere in the instrument room, a radio built for high-deviation magnetic fields.`;
     },
-    onEnter: () => { S.degradeCover(2); S.applyEffect({ doubt: 2 }); },
     choices: [
       { text: 'Find the radio. Now. Before he checks.',  next: 'radio_discovery', condition: { type: 'not', condition: { type: 'flag', id: 'radio_found' } } },
       { text: 'Go find Miguel.',                          next: 'act_two_miguel' },
@@ -8188,7 +8196,7 @@ You have to decide what to say.`,
     onEnter: () => { S.setFlag('foredeck_passenger_rope_seen'); },
     choices: [
       { text: 'Yes. Give me the rope.', next: 'foredeck_standing', theosis: 6,
-        set_flag: 'claimed_the_rope', mod_stance: { npc: 'pavel', key: 'trust', delta: 3 }, tags: ['crossing','presence'] },
+        set_flag: 'claimed_the_rope', mod_stance: { pavel: { trust: 3 } }, tags: ['crossing','presence'] },
       { text: 'I don\'t know yet.', next: 'foredeck_standing', theosis: 2,
         tags: ['presence','stillness'] },
     ],
@@ -9871,7 +9879,6 @@ She looks at the stove.
         { speaker: null, text: 'He is not asking about the sea conditions. The question has a specific meaning.' },
         { speaker: null, text: 'You hold the receiver.' },
       ]);
-      S.setFlag('landstorm_called');
       S.applyEffect({ doubt: 2, vigilance: 1 });
       S.showToast('Landstorm on the radio.', 'warning');
     },
@@ -9879,18 +9886,27 @@ She looks at the stove.
       {
         text: '"The crossing is proceeding. Everything is in order."',
         next: 'landstorm_lie', vigilance: 1,
+        set_flag: 'landstorm_called',
         condition: { type: 'not', condition: { type: 'flag', id: 'landstorm_called' } },
       },
       {
         text: '"I need more time to assess the situation."',
         next: 'landstorm_delay',
+        set_flag: 'landstorm_called',
         condition: { type: 'not', condition: { type: 'flag', id: 'landstorm_called' } },
       },
       {
         text: 'Set the receiver down without answering.',
         next: 'landstorm_silence', theosis: 3,
+        set_flag: 'landstorm_called',
         requires_flag: 'mission_reality_known',
         condition: { type: 'not', condition: { type: 'flag', id: 'landstorm_called' } },
+      },
+      {
+        text: 'Set the receiver down.',
+        next: 'landstorm_silence',
+        set_flag: 'landstorm_called',
+        condition: { type: 'flag', id: 'landstorm_called' },
       },
     ],
   },
