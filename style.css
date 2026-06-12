@@ -575,15 +575,12 @@ section.section-visible{animation:riseIn .5s ease both}
 }
 
 /* ── SCROLLBAR ── */
-::-webkit-scrollbar{width:7px;height:7px}
+::-webkit-scrollbar{width:12px;height:12px}
 ::-webkit-scrollbar-track{background:var(--bg)}
-::-webkit-scrollbar-thumb{background:var(--border-hi);border-radius:4px}
+::-webkit-scrollbar-thumb{background:var(--border-hi);border-radius:3px}
 ::-webkit-scrollbar-thumb:hover{background:var(--coral)}
-*{scrollbar-width:thin;scrollbar-color:var(--border-hi) transparent}
+*{scrollbar-color:var(--border-hi) var(--bg)}
 
-/* ── CUSTOM CURSOR ── */
-html,body{cursor:url('/cursor.svg') 12 12,auto}
-a,button,[role="button"],.filter-btn,.game-link,.project-link,.screenshot-toggle,.nav-toggle{cursor:url('/cursor.svg') 12 12,pointer}
 
 /* ── HERO H1 SHIMMER ── */
 @keyframes h1Shimmer{to{background-position:-250% center}}
