@@ -47,9 +47,12 @@
 
 body {
   background-color: var(--bg);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.88' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size: 140px 140px;
-  background-blend-mode: overlay;
+  background-image:
+    radial-gradient(ellipse at 22% 18%, rgba(210,180,100,.06) 0%, transparent 52%),
+    radial-gradient(ellipse at 78% 82%, rgba(110,52,18,.08) 0%, transparent 52%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.88' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 100% 100%, 100% 100%, 140px 140px;
+  background-blend-mode: normal, normal, overlay;
   color: var(--text);
   font-family: 'Spectral', Georgia, serif;
   font-size: 1.05rem;

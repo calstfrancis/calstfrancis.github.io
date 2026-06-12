@@ -32,6 +32,9 @@
   /* Flatpak specific */
   --flatpak-green: #2d6a4f;
   --flatpak-light: #40916c;
+
+  --teal:      #3a9a9a;
+  --teal-pale: rgba(58,154,154,.12);
 }
 
 [data-theme="light"] {
@@ -64,6 +67,8 @@
   --flatpak-green: #1b4d3e;
   --flatpak-light: #2d6a4f;
   --text-3:    #5a3a18;
+  --teal:      #207878;
+  --teal-pale: rgba(32,120,120,.12);
 }
 
 @keyframes spasiboFlicker{
@@ -169,7 +174,8 @@ nav{
 }
 .nav-links a::after{
   content:'';position:absolute;bottom:-3px;left:0;
-  height:1px;background:var(--coral);width:0;transition:width .22s ease;
+  height:1px;background:var(--coral);width:0;
+  transition:width .22s ease,box-shadow .22s ease;
 }
 .nav-links a:hover,.nav-links a.active{color:var(--coral)}
 .nav-links a:hover::after,.nav-links a.active::after{width:100%}
@@ -572,6 +578,73 @@ section.section-visible{animation:riseIn .5s ease both}
 .download-badge{
   font-family:'Spectral',serif;font-size:.6rem;font-weight:600;letter-spacing:.05em;
   text-transform:uppercase;color:var(--text-3);opacity:.75;margin-left:.3rem;
+}
+
+/* ── NAV GLOW UNDERLINE ── */
+.nav-links a:hover::after,.nav-links a.active::after{
+  width:100%;
+  box-shadow:0 0 5px var(--coral),0 0 12px rgba(224,96,48,.4);
+}
+
+/* ── HERO VIGNETTE ── */
+.hero::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse at 50% 45%,transparent 42%,rgba(0,0,0,.32) 100%);
+}
+[data-theme="light"] .hero::before{
+  background:radial-gradient(ellipse at 50% 45%,transparent 42%,rgba(0,0,0,.11) 100%);
+}
+
+/* ── CATEGORY BORDER COLOURS ── */
+.project-card[data-category="engine"]{border-left-color:var(--coral)}
+.project-card[data-category="android"]{border-left-color:var(--teal)}
+.project-card[data-category="android"]:hover{border-left-color:var(--teal);box-shadow:0 6px 28px rgba(0,0,0,.3),inset 0 0 0 1px var(--teal);border-color:var(--teal)}
+[data-theme="light"] .project-card[data-category="android"]:hover{box-shadow:0 6px 28px rgba(0,0,0,.12),inset 0 0 0 1px var(--teal)}
+
+/* ── FLOATING CATEGORY LABEL ── */
+.project-card::after{
+  position:absolute;top:.65rem;right:2.6rem;
+  font-family:'Spectral',serif;font-size:.58rem;font-weight:600;
+  letter-spacing:.12em;text-transform:uppercase;
+  color:var(--olive);background:var(--bg);
+  border:1px solid var(--border-hi);padding:.1rem .4rem;
+  opacity:0;transform:translateY(-5px);
+  transition:opacity .22s ease,transform .22s ease;
+  pointer-events:none;line-height:1.6;
+}
+.project-card:hover::after{opacity:1;transform:translateY(0)}
+.project-card[data-category="linux"]::after{content:'Linux App'}
+.project-card[data-category="engine"]::after{content:'JS Engine';color:var(--coral);border-color:var(--coral)}
+.project-card[data-category="android"]::after{content:'Android';color:var(--teal);border-color:var(--teal)}
+[data-theme="light"] .project-card::after{background:var(--bg-2)}
+
+/* ── KO-FI PULSE RING ── */
+@keyframes kofiPulse{
+  0%{box-shadow:0 0 0 0 rgba(224,96,48,.4)}
+  70%{box-shadow:0 0 0 9px rgba(224,96,48,0)}
+  100%{box-shadow:0 0 0 0 rgba(224,96,48,0)}
+}
+@media(prefers-reduced-motion:no-preference){
+  .btn-kofi{animation:kofiPulse 3.2s ease-out infinite}
+  .btn-kofi:hover{animation:none}
+}
+
+/* ── BACK-TO-TOP SLIDE IN ── */
+.back-to-top{transform:translateY(12px);transition:opacity .3s,border-color .2s,background-color .25s,transform .3s ease}
+.back-to-top.visible{transform:translateY(0)}
+
+/* ── GAME TITLE GLOW ── */
+@keyframes seGlow{
+  0%,100%{text-shadow:0 0 0 rgba(200,176,80,0)}
+  50%{text-shadow:0 0 14px rgba(200,176,80,.38),0 0 28px rgba(168,136,72,.15)}
+}
+@keyframes spGlow{
+  0%,100%{text-shadow:0 0 0 rgba(90,168,200,0)}
+  50%{text-shadow:0 0 14px rgba(90,168,200,.38),0 0 28px rgba(60,130,170,.15)}
+}
+@media(prefers-reduced-motion:no-preference){
+  .game-feature.severed-hours .game-title{animation:seGlow 4s ease-in-out infinite}
+  .game-feature.spasibo .game-title{animation:spGlow 4s ease-in-out infinite;animation-delay:-2s}
 }
 
 /* ── SCROLLBAR ── */
