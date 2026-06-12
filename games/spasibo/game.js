@@ -815,7 +815,9 @@ S.registerRitual({
     {
       id:    'gathering',
       title: 'Gathering',
-      text:  'The mess hall has been rearranged. Miguel moved the table last night without being asked. Seven chairs in rough rows. Haircut near the back. Alexei in the third row, not his usual chair. Lena standing. Nadia with her hands folded. Connie Frank in the back with the expression of someone not sure why they came but deciding to stay.\n\nYou stand at the end that is now the front.\n\nThe ship moves under you. The anomaly is lower but not gone. The instruments are still reading.\n\nPavel is near the door. He is letting you start.',
+      text:  () => S.hasFlag('sunday_service_second_seen')
+        ? 'You know this room like this. The table moved by Miguel without being asked — you knew he would, this time. Seven chairs in the same arrangement.\n\nAlexei in the third row. Nadia with her hands folded. Lena standing. Connie near the back, deciding for herself again.\n\nYou stand at the end that is now the front. You have stood here before. You know what it feels like from the inside.\n\nThe ship moves under you. The anomaly is lower but not gone. The instruments are still reading.\n\nPavel is near the door. He is not letting you start. He is waiting to see what you do differently.'
+        : 'The mess hall has been rearranged. Miguel moved the table last night without being asked. Seven chairs in rough rows. Haircut near the back. Alexei in the third row, not his usual chair. Lena standing. Nadia with her hands folded. Connie Frank in the back with the expression of someone not sure why they came but deciding to stay.\n\nYou stand at the end that is now the front.\n\nThe ship moves under you. The anomaly is lower but not gone. The instruments are still reading.\n\nPavel is near the door. He is letting you start.',
       choices: [
         { text: 'Open with silence. Let the ship speak first.',       theosis: 3, set_flag: 'service_opened_silence', tags: ['stillness', 'presence', 'pastoral'] },
         { text: 'Open with a standard greeting. Hold the form.',      composure: 1 },
@@ -825,7 +827,9 @@ S.registerRitual({
     {
       id:    'word',
       title: 'The Word',
-      text:  'You have the text. You have something prepared.\n\nStanding here, with the North Atlantic doing what it does outside, the prepared words feel like an ill-fitting coat. Not wrong — the tradition that produced them is real. But something in the room is expecting something else. The anomaly below. The archive in the hold. Alexei\'s instruments still running. Nadia\'s notebook.\n\nSomething else is trying to get through.',
+      text:  () => S.hasFlag('sunday_service_second_seen')
+        ? 'You have the text. You\'ve used it before — or something like it. The words are not wrong. They are worn smooth.\n\nStanding here again, with the ship moving the way it moved last time, the words feel more like a report than a witness. You know what they sound like from the outside. You know what they sound like when they\'re true.\n\nYou are about to choose between those two things again. You know which one costs more.'
+        : 'You have the text. You have something prepared.\n\nStanding here, with the North Atlantic doing what it does outside, the prepared words feel like an ill-fitting coat. Not wrong — the tradition that produced them is real. But something in the room is expecting something else. The anomaly below. The archive in the hold. Alexei\'s instruments still running. Nadia\'s notebook.\n\nSomething else is trying to get through.',
       choices: [
         { text: 'Stay with the prepared text. The form holds something.',             composure: 1 },
         { text: 'Set it aside. Say what this crossing has taught you so far.',        theosis: 5, communion: 1, set_flag: 'service_word_true', tags: ['witness', 'pastoral'] },

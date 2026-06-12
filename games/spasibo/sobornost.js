@@ -1674,7 +1674,8 @@ function renderRitual(root) {
   hdr.appendChild(lb); wrap.appendChild(hdr);
   const body=document.createElement('div'); body.className='game-body';
   if (phase.text) {
-    let raw=Array.isArray(phase.text)?phase.text:[phase.text];
+    const _textVal = typeof phase.text === 'function' ? phase.text() : phase.text;
+    let raw=Array.isArray(_textVal)?_textVal:[_textVal];
     raw=raw.map(applyLinguisticToggle).map(applyPostEventShifts);
     const _ml=injectMicroLines(raw,G.scene); _ml.forEach(line=>{const p=document.createElement('p');p.className='sp';p.innerHTML=processText(injectGhostText(line,G.scene));body.appendChild(p);});
   }
