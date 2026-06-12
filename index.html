@@ -829,6 +829,50 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
     });
 })();
 
+// Typewriter on hero eyebrow
+(function(){
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const el = document.querySelector('.hero-eyebrow');
+  if (!el) return;
+  const text = el.textContent;
+  el.textContent = '';
+  let i = 0;
+  function type(){ if(i<text.length){ el.textContent+=text[i++]; setTimeout(type,32+Math.random()*28); } }
+  setTimeout(type, 350);
+})();
+
+// Vine ink draw on scroll entry
+(function(){
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  document.querySelectorAll('.vine-divider, .hero-vine, .footer-vine').forEach(vine => {
+    const path = vine.querySelector('path');
+    if (!path) return;
+    const len = path.getTotalLength();
+    path.style.strokeDasharray = len;
+    path.style.strokeDashoffset = len;
+    const io = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting) {
+        path.classList.add('vine-draw-path');
+        requestAnimationFrame(() => requestAnimationFrame(() => { path.style.strokeDashoffset = '0'; }));
+        io.disconnect();
+      }
+    }, { threshold: 0.15 });
+    io.observe(vine);
+  });
+})();
+
+// Staggered project card entrance
+(function(){
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (CSS.supports('animation-timeline', 'view()')) return;
+  const pl = document.querySelector('.project-list');
+  if (!pl) return;
+  const io = new IntersectionObserver(e => {
+    if (e[0].isIntersecting) { pl.classList.add('cards-visible'); io.disconnect(); }
+  }, { threshold: 0.02 });
+  io.observe(pl);
+})();
+
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js').catch(() => {});
 }

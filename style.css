@@ -270,7 +270,13 @@ nav::after{
 .section-title{
   font-family:'IM Fell English',serif;font-size:1.7rem;font-weight:400;
   color:var(--text);line-height:1.2;
+  display:flex;align-items:center;gap:.55rem;
 }
+.section-title::before,.section-title::after{
+  content:'';display:block;width:1.6rem;height:1px;flex-shrink:0;
+}
+.section-title::before{background:linear-gradient(to right,transparent,var(--border-hi))}
+.section-title::after{background:linear-gradient(to left,transparent,var(--border-hi))}
 .section-intro{
   color:var(--text-3);font-size:.93rem;line-height:1.8;
   max-width:580px;margin-top:.5rem;margin-bottom:1.8rem;
@@ -278,8 +284,14 @@ nav::after{
 
 .game-feature{
   border:2px solid var(--border);background:var(--black);
-  margin-bottom:1.2rem;position:relative;overflow:hidden;
+  margin-bottom:1.2rem;position:relative;overflow:hidden;isolation:isolate;
 }
+.game-feature::before{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:0;opacity:.055;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:150px 150px;mix-blend-mode:screen;
+}
+[data-theme="light"] .game-feature::before{mix-blend-mode:multiply;opacity:.025}
 [data-theme="light"] .game-feature{border-color:var(--border-hi)}
 .game-feature::after{
   content:'';position:absolute;inset:0;pointer-events:none;
@@ -365,10 +377,12 @@ nav::after{
 .project-card{
   border:1px solid var(--border-hi);border-left:3px solid var(--olive);background:rgba(0,0,0,.18);
   display:flex;align-items:flex-start;gap:1.25rem;
-  transition:border-color .25s,background-color .25s,border-left-width .2s;position:relative;overflow:hidden;
+  transition:border-color .25s,background-color .25s,border-left-width .2s,transform .2s ease,box-shadow .2s ease;
+  position:relative;overflow:hidden;
 }
 [data-theme="light"] .project-card{background:var(--bg-2)}
-.project-card:hover{border-color:var(--coral);background:var(--cpale);box-shadow:inset 0 0 0 1px var(--coral);border-left-width:5px}
+.project-card:hover{border-color:var(--coral);background:var(--cpale);box-shadow:0 6px 28px rgba(0,0,0,.3),inset 0 0 0 1px var(--coral);border-left-width:5px;transform:translateY(-3px)}
+[data-theme="light"] .project-card:hover{box-shadow:0 6px 28px rgba(0,0,0,.12),inset 0 0 0 1px var(--coral)}
 .project-card-flower{
   position:absolute;right:-18px;top:50%;transform:translateY(-50%);
   opacity:.12;pointer-events:none;
@@ -506,7 +520,7 @@ footer a:hover{color:var(--coral)}
   .support-bota{width:50px}
 }
 
-[data-theme="light"] .hero h1{color:#0a0402}
+@media(prefers-reduced-motion:reduce){[data-theme="light"] .hero h1{color:#0a0402}}
 [data-theme="light"] body{background-blend-mode:multiply}
 [data-theme="light"] #sectionPorthole{filter:brightness(1.4) saturate(.7)}
 [data-theme="light"] .hero-desc{border-left-color:var(--olive)}
@@ -559,6 +573,60 @@ section.section-visible{animation:riseIn .5s ease both}
   font-family:'Spectral',serif;font-size:.6rem;font-weight:600;letter-spacing:.05em;
   text-transform:uppercase;color:var(--text-3);opacity:.75;margin-left:.3rem;
 }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:7px;height:7px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border-hi);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:var(--coral)}
+*{scrollbar-width:thin;scrollbar-color:var(--border-hi) transparent}
+
+/* ── CUSTOM CURSOR ── */
+html,body{cursor:url('/cursor.svg') 12 12,auto}
+a,button,[role="button"],.filter-btn,.game-link,.project-link,.screenshot-toggle,.nav-toggle{cursor:url('/cursor.svg') 12 12,pointer}
+
+/* ── HERO H1 SHIMMER ── */
+@keyframes h1Shimmer{to{background-position:-250% center}}
+@media(prefers-reduced-motion:no-preference){
+  .hero h1{
+    background:linear-gradient(90deg,var(--text) 35%,#e8c870 48%,#f4d980 52%,var(--text) 65%);
+    background-size:250% auto;
+    -webkit-background-clip:text;background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:h1Shimmer 9s linear infinite;
+  }
+  [data-theme="light"] .hero h1{
+    background:linear-gradient(90deg,#100804 35%,#b08020 47%,#c8a030 53%,#100804 65%);
+    background-size:250% auto;
+    -webkit-background-clip:text;background-clip:text;
+    -webkit-text-fill-color:transparent;
+  }
+}
+
+/* ── HERO DROP CAP ── */
+.hero-desc::first-letter{
+  font-family:'IM Fell English',serif;
+  font-size:2.6em;line-height:.78;
+  float:left;margin-right:.07em;margin-top:.05em;
+  color:var(--coral);
+}
+
+/* ── STAGGERED CARD ENTRANCE ── */
+@keyframes cardRise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:no-preference){
+  .project-list .project-card{opacity:0}
+  .project-list.cards-visible .project-card{animation:cardRise .45s ease both}
+  .project-list.cards-visible .project-card:nth-child(2){animation-delay:.08s}
+  .project-list.cards-visible .project-card:nth-child(3){animation-delay:.16s}
+  .project-list.cards-visible .project-card:nth-child(4){animation-delay:.24s}
+  .project-list.cards-visible .project-card:nth-child(5){animation-delay:.32s}
+  .project-list.cards-visible .project-card:nth-child(6){animation-delay:.40s}
+}
+@media(prefers-reduced-motion:reduce){.project-list .project-card{opacity:1!important}}
+@supports(animation-timeline:view()){.project-list .project-card{opacity:1!important}}
+
+/* ── VINE INK DRAW ── */
+.vine-draw-path{transition:stroke-dashoffset 1.6s cubic-bezier(.4,0,.2,1)}
 
 /* ── SCROLL-DRIVEN ANIMATIONS (Chrome 115+) ── */
 @keyframes heroParallax { to { translate: 0 80px } }

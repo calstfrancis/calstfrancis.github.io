@@ -1,4 +1,4 @@
-const CACHE = 'calstfrancis-v1';
+const CACHE = 'calstfrancis-v2';
 const PRECACHE = [
   '/index.html',
   '/style.css',
@@ -8,6 +8,7 @@ const PRECACHE = [
   '/fonts/rnCt-xNNww_2s0amA9M8onrmTA.woff2',
   '/defs.svg',
   '/favicon.svg',
+  '/cursor.svg',
   '/manifest.json',
   '/abouts/shared-about.css',
   '/abouts/shared-about.js',
