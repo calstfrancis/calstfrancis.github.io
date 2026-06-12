@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>404 · Page Not Found · Cal St Francis</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#6a1710" id="themeColorMeta">
+<link rel="stylesheet" href="/fonts/fonts.css">
+<link rel="stylesheet" href="/style.css">
+<style>
+.notfound-wrap{
+  min-height:calc(100vh - 52px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:3rem 1.75rem;
+}
+.notfound-code{
+  font-family:'IM Fell English',serif;
+  font-size:clamp(5rem,18vw,9rem);
+  line-height:1;color:var(--coral);opacity:.35;
+  font-weight:400;letter-spacing:-.04em;
+  margin-bottom:-.5rem;
+}
+.notfound-sf{
+  opacity:.22;margin:1.2rem 0;
+  animation:heroWmSpin 120s linear infinite;
+}
+.notfound-title{
+  font-family:'IM Fell English',serif;
+  font-size:clamp(1.4rem,4vw,2.2rem);
+  color:var(--text);font-weight:400;margin-bottom:.6rem;
+}
+.notfound-desc{
+  font-size:.93rem;color:var(--text-3);
+  max-width:420px;line-height:1.9;margin-bottom:2rem;
+}
+.notfound-links{display:flex;gap:.75rem;flex-wrap:wrap;justify-content:center}
+</style>
+</head>
+<body>
+
+<a href="#main-content" class="skip-link">Skip to content</a>
+
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="nav-brand">
+      <svg viewBox="-55 -55 110 110" aria-hidden="true"><use href="#sf"/></svg>
+      <span class="nav-brand-text">Cal St Francis</span>
+    </a>
+    <button class="theme-toggle" id="themeToggle" aria-pressed="false"><span>🌙</span> Dark</button>
+  </div>
+</nav>
+
+<svg width="0" height="0" style="position:absolute;pointer-events:none" aria-hidden="true">
+<defs>
+  <g id="sf">
+    <g fill="#e06030">
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(0)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(25.7)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(51.4)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(77.1)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(102.8)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(128.5)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(154.2)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(180)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(205.7)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(231.4)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(257.1)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(282.8)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(308.5)"/>
+      <path d="M0,-16 C8,-24 8,-38 0,-46 C-8,-38 -8,-24 0,-16Z" transform="rotate(334.2)"/>
+    </g>
+    <circle r="16" fill="#5a2c10"/>
+    <circle r="11" fill="#3e1a08"/>
+  </g>
+</defs>
+</svg>
+
+<main id="main-content">
+  <div class="notfound-wrap">
+    <div class="notfound-code" aria-hidden="true">404</div>
+    <svg class="notfound-sf" width="80" height="80" viewBox="-55 -55 110 110" aria-hidden="true">
+      <use href="#sf"/>
+    </svg>
+    <h1 class="notfound-title">Page not found</h1>
+    <p class="notfound-desc">
+      This path doesn't lead anywhere — perhaps it was moved, renamed, or never existed.
+    </p>
+    <div class="notfound-links">
+      <a href="/" class="btn btn-coral">← Back to Portfolio</a>
+      <a href="/#games" class="btn btn-ghost">Games</a>
+      <a href="/#apps" class="btn btn-ghost">Projects</a>
+    </div>
+  </div>
+</main>
+
+<script>
+const themeBtn = document.getElementById('themeToggle');
+const _themeColor = document.getElementById('themeColorMeta');
+const setTheme = t => {
+  document.documentElement.setAttribute('data-theme', t);
+  localStorage.setItem('theme', t);
+  themeBtn.setAttribute('aria-pressed', t === 'dark' ? 'true' : 'false');
+  themeBtn.innerHTML = t === 'dark' ? '<span>🌙</span> Dark' : '<span>☀️</span> Light';
+  if (_themeColor) _themeColor.content = t === 'dark' ? '#6a1710' : '#e8d5b0';
+};
+const saved = localStorage.getItem('theme');
+setTheme(saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+themeBtn.addEventListener('click', () => {
+  setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+});
+</script>
+</body>
+</html>

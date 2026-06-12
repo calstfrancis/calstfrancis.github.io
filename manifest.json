@@ -1,0 +1,17 @@
+{
+  "name": "Cal St Francis",
+  "short_name": "Cal St Francis",
+  "description": "MDiv Student & Developer — liturgical tools, academic writing tools, and contemplative interactive fiction.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#6a1710",
+  "theme_color": "#6a1710",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any maskable"
+    }
+  ]
+}
