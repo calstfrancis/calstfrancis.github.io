@@ -1,10 +1,33 @@
 {
-  "updated": null,
+  "updated": "2026-06-13T06:43:26Z",
   "repos": {
-    "calstfrancis/rubric": null,
-    "calstfrancis/zerkalo": null,
-    "calstfrancis/kopilka": null,
-    "calstfrancis/kopilka-android": null,
-    "calstfrancis/SOBORNOST": null
+    "calstfrancis/rubric": {
+      "downloads": 0,
+      "html_url": "https://github.com/calstfrancis/rubric/releases/tag/v0.17.4",
+      "published_at": "2026-06-12T21:41:35Z",
+      "tag_name": "v0.17.4"
+    },
+    "calstfrancis/zerkalo": {
+      "downloads": 0,
+      "html_url": "https://github.com/calstfrancis/zerkalo/releases/tag/v0.13.6",
+      "published_at": "2026-06-12T20:18:33Z",
+      "tag_name": "v0.13.6"
+    },
+    "calstfrancis/kopilka": {
+      "message": "Not Found",
+      "documentation_url": "https://docs.github.com/rest/releases/releases#get-the-latest-release",
+      "status": "404"
+    },
+    "calstfrancis/kopilka-android": {
+      "downloads": 1,
+      "html_url": "https://github.com/calstfrancis/kopilka-android/releases/tag/v1.1.0",
+      "published_at": "2026-06-10T22:01:24Z",
+      "tag_name": "v1.1.0"
+    },
+    "calstfrancis/SOBORNOST": {
+      "message": "Not Found",
+      "documentation_url": "https://docs.github.com/rest/releases/releases#get-the-latest-release",
+      "status": "404"
+    }
   }
 }
