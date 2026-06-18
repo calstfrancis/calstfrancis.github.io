@@ -1,3 +1,139 @@
+## dev — Phase 10: polish
+
+**10.1 — Sunday service history deduplication:** `sunday_service_history` and `sunday_history_mention` were both unreachable dead code (no navigation pointed to either). Both already had correct mutual exclusion flags. Fix: linked `sunday_service_history` into `galley_hub` as a new choice — "She mentions the Sunday service." — with conditions: `met_lena`, `not sunday_service_history_seen`, `not sunday_history_mentioned`, `not sunday_service_started`, `not sunday_service_led`. The existing flags prevent duplication if `sunday_history_mention` somehow also fires.
+
+**10.2 — Second-crossing ritual variant:** The intercession and response ritual phases were static strings, identical on every crossing. Converted both to `text: () => ...` functions. Second-crossing variants acknowledge the familiarity of the form: Lena starts refilling before the service ends; Alexei's annual prayer is recognisable; the silence after names is different the second time. Rememberer charism adds additional beats: the silence is the same and never the same; Pavel's nod is recognition rather than confirmation.
+
+**10.3 — `ending_passenger` dead definition:** Already resolved — only one definition exists (the `get text()` reactive version at line 7537). No action needed.
+
+**10.4 — `anomaly_fibonacci` routing:** Already resolved — choices already branch on `radio_found` (→ `radio_what_to_transmit` if found, → `radio_discovery` if not). No action needed.
+
+---
+
+## dev — Phase 9: past-flag UX
+
+Engine change in `sobornost.js`. Two new helpers: `_conditionHasPastFlag(cond)` (recursive traversal through `and`/`or`/`not` conditions) and `isChoicePastFlagLocked(ch)` (true when a choice is locked specifically because a `past_flag` condition failed, not any other lock type).
+
+During scene rendering, if any choice in the scene is past-flag-locked, a note is appended below the choice list: *"Some things will only be visible after another crossing."* Styled as `.past-flag-note` — dim, italic, small. The note does not appear in `open` mode (where locked choices are hidden entirely).
+
+This resolves the first-crossing UX problem where greyed choices with no explanation read as bugs.
+
+---
+
+## dev — Phase 7: charism expansion — Fool and Rememberer
+
+**Fool charism (4 scenes):**
+
+`fool_cover_slip` — When a Fool player fails the `othis_deny` cover roll, Othis pauses in the corridor. He saw through it, but what he saw wasn't threat — just someone lost. He chooses not to report it. Sets `othis_fool_understands`, -2 suspicion with Othis. The cover roll sets `_fool_deny_failed` when Fool + failure, unlocking this choice.
+
+`fool_hold_accident` — Fool players who fumble the bilge pump dislodge a hidden panel in the hold bulkhead. Inside: a single folio page from the archive in oilcloth, ending *"If you are reading this in the bilge, you found it the right way."* +7 theosis, comes to believe `ship_remembers` + `anomaly_responds`. Entry choice added to `maintenance_bilge`.
+
+`fool_pavel_encounter` — Pavel watches the fumble and says what he wouldn't say to someone who had it together: the difference between the unprepared and the performed, and what the anomaly does to each. Sets `fool_pavel_told_directly`. +6 theosis, +2 trust/communion. Entry choice added to `foredeck_standing`.
+
+`fool_sounding_break` — A Fool player who tries to articulate the crossing's question says the wrong thing — and the wrong words open something the correct sentence would have filled. Settles `sounding_crossing` via +6 progress. Entry choice added to `cabin_porthole_stay`.
+
+**Rememberer charism (3 scenes):**
+
+`rememberer_bow_knows` — On first arrival at `foredeck_first`, the Rememberer walks past Pavel to the bow point without being shown it. Pavel stops mid-sentence. "The anomaly knew you. I think it has been waiting." +10 theosis, +3 trust, comes to believe `crossings_recurse` + `anomaly_responds`. Entry choice added to `foredeck_first`.
+
+`rememberer_radio_hands` — On first finding the radio, the Rememberer's hands know the handset — including a frequency catch at 6.3 MHz (the archive's original 1957 transmission frequency, which no one has used since). Alexei watches and concludes the ship showed you something. +9 theosis, +2 trust, comes to believe `ship_remembers` + `anomaly_responds`. Entry choice added to `radio_discovery`.
+
+`rememberer_lena_order` — Lena has the Rememberer's order ready without being asked, because she remembers it from last crossing. "I don't know which one of us is doing it — the galley or me." Comes to believe `sobornost_real`. +7 theosis, +3 composure. Entry choice added to `galley_hub`.
+
+---
+
+## dev — Phase 8: mission state machine
+
+`mission_final_decision` — cabin scene, Night Three. Players who reach `day_three_landing` without having set `mission_refused` or `mission_accepted` are now intercepted before the Erasure approach and given an explicit choice: carry out the instructions, or refuse. Erasing the archive is now a chosen ending rather than a failure state.
+
+**Routing change:** `day_three_landing.onEnter()` now clears stale `_route_*` flags on re-entry (fixes the double-choice bug if a player returns via `mission_refused` refusal and the landing scene is re-entered). New `_route_final_decision` branch fires when: not solidarity, not knowing, not restoration, not witness, not passenger, and `mission_refused` is not yet set.
+
+**Scene prose:** `mission_final_decision` text is reactive — it acknowledges the `chaplain_real` belief, notes if the archive has already been transmitted, and notes if the player has met the archive's authors. Refusing in this scene sets `mission_refused`, awards +5 theosis, and re-enters `day_three_landing` (which now routes correctly to witness or passenger based on current stats).
+
+---
+
+## dev — Phase 6.1: reputation payoffs
+
+Four NPCs now reveal something significant when reputation is high enough. Engine change: `{ type: 'reputation', npc, min }` added to `evaluateCondition` in `sobornost.js`. Connie's cover challenge is skipped inline at `connie_pastoral.onEnter()` when `getReputation('connie') >= 3`.
+
+**Miguel rep ≥ 4** — `rep_miguel_mission_candid`: Miguel privately says the mission is wrong — not illegal, wrong. He's hoping you don't do it. +7 theosis, +2 communion, +3 solidarity. Accessible from `miguel_return`.
+
+**Lena rep ≥ 3** — `rep_lena_previous_chaplain`: Lena tells you about the chaplain who was on the crossing when Micha went over. He was young and bad at explaining but he stayed. "You have weight," she says. +8 theosis, +2 communion, comes to believe `chaplain_real`. Accessible from `galley_hub`.
+
+**Alexei rep ≥ 4** — `rep_alexei_archive_frequency`: Alexei has already run a second deviation log at the archive's magnetic signature frequency. The field responds to the content. +8 theosis, comes to believe `archive_matters` + `anomaly_responds`. Accessible from `act_two_resolve`.
+
+**Nadia rep ≥ 4** — `rep_nadia_own_archive_entry`: Nadia stands in front of the box containing her first-crossing data sheets. "Is that enough as a reason?" +8 theosis, +3 communion, comes to believe `archive_matters`. Sets `mission_refused` on acceptance. Accessible from `act_two_resolve`.
+
+---
+
+## dev — Phase 6.2: stance payoffs
+
+Five stance thresholds now produce narrative consequences. `{ type: 'stance', npc, key, min }` conditions throughout.
+
+**Pavel trust ≥ 3** — `stance_pavel_rope_trust`: Pavel sets the rope down and tells you about it unprompted — the prison, the counting, why he still holds things. +5 theosis, +2 communion. Available from `foredeck_standing`.
+
+**Pavel trust ≥ 5** — `stance_pavel_anomaly_direct`: Pavel tells you what the anomaly is in direct terms, no parable. "A field of awareness… the deviation data is the record of its attention." +10 theosis, comes to believe `anomaly_responds` + `crossings_recurse`. Available from `act_two_resolve`.
+
+**Miguel suspicion ≥ 3** — `stance_miguel_cover_warning`: Miguel privately tells you that Othis is building toward something and you have two days. Sets `mission_refused` on acknowledgement. +3 vigilance, +3 reputation. Suspicion increments added to `othis_deny.onEnter()` (+2) and `cover_identity_crisis.onEnter()` (+1). Available from `bridge_hub`.
+
+**Lena solidarity ≥ 3** — `stance_lena_joins_radio`: Lena appears in the corridor with her coat on, already ready. "No one asked me if I knew how." Sets `radio_team_assembled` without recruitment. +6 theosis, +3 communion. Available from `act_two_resolve`.
+
+**Alexei trust ≥ 4** — `stance_alexei_private_log`: Alexei opens the drawer with the green notebook — the readings he was told to discard in 1987 and kept. +8 theosis, comes to believe `archive_suppressed` + `archive_matters`. Available from `act_two_resolve`.
+
+---
+
+## dev — Phase 6.3: belief payoffs
+
+Six beliefs now produce narrative consequences. `{ type: 'believes', id: '...' }` conditions throughout.
+
+**`crossings_recurse`** — `belief_crossings_pavel`: Pavel at the bow responds differently to someone who says the recursion plainly. He was waiting for it. +8 theosis, +5 reputation, +3 trust. Accessible from `foredeck_standing` when the belief is held.
+
+**`archive_matters`** — New choice in `radio_what_to_transmit`: "You already know. Everything — in the order it comes." Transmits all without deliberation. +5 theosis (vs. +2 for the standard all-at-once choice). Gated on `believes: archive_matters`.
+
+**`ship_remembers`** — `belief_hold_ship_remembers`: Standing in the hold, the player feels the ship's attention. The hold has been listening. +6 theosis, +2 communion, +2 sanctity. Accessible from `hold_first` when the belief is held.
+
+**`sobornost_real`** — Two payoffs: (1) `ritualCompleted` gives +4 bonus theosis if the player already believes when the service ends. (2) `belief_sobornost_after_service`: reflection in the mess hall doorway — the community existed before the service named it. +5 theosis, comes to believe `chaplain_real`. Accessible from `act_two_resolve`.
+
+**`anomaly_responds`** — `belief_anomaly_address`: player speaks directly to the anomaly in the instrument room. It responds with the 1978 bearing. +10 theosis, +3 sanctity. Accessible from `act_two_resolve` when the belief is held and instruments have been seen.
+
+**`chaplain_real`** — `ending_approach_restoration` gains a dynamic text paragraph when `chaplain_real` is believed: "You know what you are. Not a cover, not an approximation — a chaplain."
+
+---
+
+## dev — Phase 5: balance and mechanical integrity
+
+**Witnessed mode composure (5.5)**
+
+Composure gains for Witnessed mode are now halved (`Math.ceil(v / 2)`) instead of zeroed. Single-point gains register as 1. The mode remains mechanically distinct without being a statistical penalty.
+
+`witnessed_quiet_crossing` — new scene: the player sits in their cabin and finds, after a while, that something is less heavy than it was. +3 composure, +2 theosis. Gated on `mode: 'witnessed'`, available once per crossing. Acknowledges the cost of witness without framing it as failure.
+
+**Sleeper charism scenes (5.6)**
+
+`sleeper_hold_recognition` — ambient scene in the hold: the body knows the room before the mind does. The player realises they have been in this hold before without remembering it. +5 theosis, +2 communion, comes to believe `crossings_recurse`. Gated on Sleeper charism + hold visited.
+
+`sleeper_solidarity_opening` — Lena asks what you are going to do this time that you didn't do last time. Offers the Solidarity sounding. +4 theosis, +3 communion, modReputation(lena, 3). Gated on Sleeper charism + met_lena + act_two_begun. Opens the Solidarity path for low-theosis returning players.
+
+**Already resolved in prior sessions (confirmed)**
+- 5.1: `the_chapel` already requires `act_two_begun` ✓
+- 5.2: `act_two_resolve` already gates theosis behind `_resolve_hub_entered` ✓
+- 5.3: `radio_discovery.onEnter` already sets `radio_existence_known` ✓
+- 5.4: Solidarity ending no longer requires `not archive_transmitted`; routing prioritises Solidarity over Restoration ✓
+
+---
+
+## dev — Phases 3–4 fixes
+
+**Ending arc — Knowing and Passenger routes**
+
+`ending_approach_knowing` — new approach scene: the instrument room at night, Pavel already there, the radio warm. Routes explicitly to `ending_the_knowing`. Knowing is now a first-class route in `day_three_landing` rather than an accidental byproduct of the Restoration check.
+
+`ending_approach_passenger` — new approach scene: the gangway at morning, the feeling of having passed through without leaving a mark. Routes to `ending_passenger`. The Passenger ending now arrives with its own intentionality.
+
+`day_three_landing` routing updated: added explicit Knowing check (rememberer charism + theosis ≥ 85 + archive_transmitted) before Restoration; added Passenger check (communion ≤ 3, mission not yet accepted) below Witness. Both have distinct routing flags. Knowing choice text: "The crossing ends. You have been here before."
+
+---
+
 ## v3.8.0 — Current
 
 ### Engine

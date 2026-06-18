@@ -300,6 +300,8 @@ body.tier-illumined .title-cyrillic {
 .choice.choice-cover   { border-color: var(--amber-dim); color: var(--amber-dim); }
 .choice.choice-visited { color: var(--dim); }
 
+.past-flag-note { font-size: .72rem; color: var(--dim); font-style: italic; letter-spacing: .04em; margin: .6rem 0 0; padding: 0; opacity: .7; }
+
 /* ── Buttons ─────────────────────────────────────────────────── */
 .btn {
   background: none; border: 1px solid var(--border);

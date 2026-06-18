@@ -297,7 +297,12 @@ function applyEffect(e) {
   const hasPoa = G.charisms.includes('presence_of_absence');
   for (const [k, v] of Object.entries(e)) {
     if (G.stats[k] !== undefined) {
-      if (k === 'composure' && v > 0 && G.mode === 'witnessed') continue;
+      if (k === 'composure' && v > 0 && G.mode === 'witnessed') {
+        const halved = Math.ceil(v / 2);
+        G.stats.composure = Math.max(0, G.stats.composure + halved);
+        emit('statChanged', { stat: k, delta: halved });
+        continue;
+      }
       if (v < 0 && hasPoa) { if (!G._poaAbsorbedThisScene) { G._poaAbsorbedThisScene = true; showToast('\u2014', 'note'); } continue; }
       G.stats[k] = Math.max(0, G.stats[k] + v);
       emit('statChanged', { stat: k, delta: v });
@@ -486,7 +491,8 @@ function evaluateCondition(cond) {
   if (Array.isArray(cond)) return cond.every(c => evaluateCondition(c));
   switch (cond.type) {
     case 'flag':            return hasFlag(cond.id) === (cond.state !== false);
-    case 'mode':          return G.mode === cond.mode;
+    case 'mode':            return G.mode === cond.mode;
+    case 'reputation':      return getReputation(cond.npc) >= (cond.min || 0);
     case 'stat': {
       // Support both G.stats and special values like coverIntegrity
       let val = 0;
@@ -535,6 +541,21 @@ function isChoiceLocked(ch) {
   if (ch.requires_quest_state) { for (const [id, state] of Object.entries(ch.requires_quest_state)) if (getQuestState(id) !== state) return true; }
   if (ch.requires_belief && !believes(ch.requires_belief)) return true;
   if (ch.requires_knowledge && !knows(ch.requires_knowledge)) return true;
+  return false;
+}
+
+function _conditionHasPastFlag(cond) {
+  if (!cond) return false;
+  if (cond.type === 'past_flag') return true;
+  if (cond.type === 'not') return _conditionHasPastFlag(cond.condition);
+  if ((cond.type === 'and' || cond.type === 'or') && Array.isArray(cond.conditions))
+    return cond.conditions.some(_conditionHasPastFlag);
+  return false;
+}
+
+function isChoicePastFlagLocked(ch) {
+  if (ch.requires_past_flag && !G.pastLifeFlags.has(ch.requires_past_flag)) return true;
+  if (ch.condition && _conditionHasPastFlag(ch.condition) && !evaluateCondition(ch.condition)) return true;
   return false;
 }
 
@@ -2937,11 +2958,12 @@ function renderGame(root){
   const cd=document.createElement('div');cd.className='choices';
   if(scene.return_to){const rb=document.createElement('button');rb.className='choice choice-return';rb.textContent=scene.return_label||'Return.';rb.onclick=()=>{_lastScrolledScene=null;navigate(scene.return_to);};cd.appendChild(rb);}
   if(scene.choices){
-    let _choiceIdx=0;
+    let _choiceIdx=0;let _hasPastFlagLocked=false;
     scene.choices.forEach(ch=>{
       if(ch.hide_if&&hasFlag(ch.hide_if))return;if(ch.show_if&&!hasFlag(ch.show_if))return;if(ch.once&&ch.next&&hasFlag('visited_'+ch.next))return;
       const btn=document.createElement('button');const locked=isChoiceLocked(ch);
       if(locked){
+        if(isChoicePastFlagLocked(ch))_hasPastFlagLocked=true;
         if(G.mode==='open')return;btn.className='choice choice-locked';btn.disabled=true;
         let hint=processText(ch.text);
         if(ch.requires_stat)hint+=` [${ch.requires_stat[0]} ${ch.requires_stat[1]}+]`;if(ch.requires_charism)hint+=` [charism: ${ch.requires_charism}]`;
@@ -2969,6 +2991,11 @@ function renderGame(root){
       }
       cd.appendChild(btn);
     });
+    if(_hasPastFlagLocked&&G.mode!=='open'){
+      const note=document.createElement('p');note.className='past-flag-note';
+      note.textContent='Some things will only be visible after another crossing.';
+      cd.appendChild(note);
+    }
   }
   body.appendChild(cd);
   body.appendChild(_buildRestartBar());wrap.appendChild(body);root.appendChild(wrap);
