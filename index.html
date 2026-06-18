@@ -330,26 +330,28 @@
       </div>
 
       <!-- Gost - Flatpak integrated -->
-      <div class="project-card" data-category="linux">
+      <div class="project-card" data-category="linux" data-repo="calstfrancis/Gost">
         <svg class="project-card-flower" width="80" height="80" viewBox="-55 -55 110 110" aria-hidden="true"><use href="#sf"/></svg>
         <div class="project-body-wrap">
           <div class="project-initial">Г</div>
           <div class="project-body">
             <div class="project-meta">
-              <span class="project-name"><span lang="ru">ГОСТ</span> / GOST — Academic Essay Templater</span>
-              <span class="project-type">Typst · LaTeX · Python</span>
-              <span class="project-status-dev">In Development</span>
+              <span class="project-name"><span lang="ru">ГОСТ</span> / Gost — Academic Essay Templater</span>
+              <span class="project-type">Flatpak · Typst · LaTeX · Word</span>
+              <span class="project-status-dev" data-repo="calstfrancis/Gost">Available via Flatpak</span>
+              <span class="flatpak-badge">📦 Flatpak</span>
             </div>
             <p class="project-desc">
-              Create academic formatting compliant Latex/Typst/DOCX templates. SBL/APA/Chicago/MLA standards.
-              Import journal TeX standards to have a journal-submission compliant template.
+              Generate ready-to-compile academic templates in LaTeX, Typst, or Word (.docx).
+              Supports SBL, Chicago, MLA, APA, ASA, Turabian, and Harvard citation styles.
+              Full book publishing layout — binding gutter, bleed and crop marks, recto chapter openings,
+              running headers, front matter, and colophon. Live compiled preview, journal template importer,
+              grammar check via LanguageTool, and saved template profiles.
             </p>
-      <!--
-                  <div class="install-commands">
-              <a href="https://calstfrancis.github.io/flatpak/gost.flatpakref" class="btn btn-flatpak" style="padding:0.2rem 0.8rem;">📦 Install via Flatpak (GUI)</a>
-              <code>flatpak install --user --from https://calstfrancis.github.io/flatpak/gost.flatpakref</code>
-      -->
-              <a href="/abouts/about-gost.html" class="game-link" style="opacity: 0.8; font-size: 0.8rem; margin-left: 0.5rem;">Design Notes &amp; Reasoning →</a>
+            <div class="install-commands" style="margin-top:0.5rem">
+              <code>flatpak install calstfrancis ca.calstfrancis.Gost</code>
+            </div>
+            <div style="margin-top:0.6rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:center">
               <a href="https://github.com/calstfrancis/Gost" class="project-link">GitHub Page →</a>
             </div>
           </div>
