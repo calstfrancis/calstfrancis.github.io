@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-30T06:42:01Z",
+  "updated": "2026-07-01T06:59:26Z",
   "repos": {
     "calstfrancis/rubric": {
       "downloads": 0,
@@ -9,9 +9,9 @@
     },
     "calstfrancis/zerkalo": {
       "downloads": 0,
-      "html_url": "https://github.com/calstfrancis/zerkalo/releases/tag/v0.14.0",
-      "published_at": "2026-06-29T23:58:15Z",
-      "tag_name": "v0.14.0"
+      "html_url": "https://github.com/calstfrancis/zerkalo/releases/tag/v0.14.2-dev1",
+      "published_at": "2026-06-30T22:32:25Z",
+      "tag_name": "v0.14.2-dev1"
     },
     "calstfrancis/kopilka": {
       "message": "Not Found",
