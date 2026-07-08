@@ -1,17 +1,17 @@
 {
-  "updated": "2026-07-07T06:32:41Z",
+  "updated": "2026-07-08T05:38:55Z",
   "repos": {
     "calstfrancis/rubric": {
       "downloads": 0,
-      "html_url": "https://github.com/calstfrancis/rubric/releases/tag/v0.18.0",
-      "published_at": "2026-07-04T20:16:53Z",
-      "tag_name": "v0.18.0"
+      "html_url": "https://github.com/calstfrancis/rubric/releases/tag/v0.18.1",
+      "published_at": "2026-07-07T13:09:36Z",
+      "tag_name": "v0.18.1"
     },
     "calstfrancis/zerkalo": {
       "downloads": 0,
-      "html_url": "https://github.com/calstfrancis/zerkalo/releases/tag/v0.15.1-dev8",
-      "published_at": "2026-07-06T23:15:55Z",
-      "tag_name": "v0.15.1-dev8"
+      "html_url": "https://github.com/calstfrancis/zerkalo/releases/tag/v0.16.1-dev3",
+      "published_at": "2026-07-07T17:48:07Z",
+      "tag_name": "v0.16.1-dev3"
     },
     "calstfrancis/kopilka": {
       "message": "Not Found",
