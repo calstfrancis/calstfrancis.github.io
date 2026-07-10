@@ -28,6 +28,7 @@ jobs:
           repos = [
             "calstfrancis/rubric",
             "calstfrancis/zerkalo",
+            "calstfrancis/skrizhal",
             "calstfrancis/kopilka",
             "calstfrancis/kopilka-android",
             "calstfrancis/SOBORNOST",
