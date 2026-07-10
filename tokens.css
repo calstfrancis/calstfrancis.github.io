@@ -2,7 +2,7 @@
    Single source of truth — edit here, not in per-page <style> blocks. */
 :root {
   color-scheme: dark light;
-  --font-display: 'Gost Type B', serif;
+  --font-display: 'Alegreya', 'Spectral', serif;
   --font-body:    'Spectral', serif;
   --font-mono:    'Courier Prime', monospace;
   --bg:        #6a1710;

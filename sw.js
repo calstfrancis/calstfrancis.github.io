@@ -3,7 +3,7 @@ const PRECACHE = [
   '/style.css',
   '/tokens.css',
   '/fonts/fonts.css',
-  '/fonts/gosttypeb.woff2',
+  '/fonts/4UacrEBBsBhlBjvfkQjt71kZfyBzPgNG9hU4-6qj.woff2',
   '/fonts/rnCr-xNNww_2s0amA9M5kng.woff2',
   '/fonts/rnCt-xNNww_2s0amA9M8onrmTA.woff2',
   '/defs.svg',
