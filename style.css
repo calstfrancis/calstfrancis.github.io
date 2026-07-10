@@ -1,5 +1,5 @@
-@view-transition { navigation: auto; }
 @import url('/tokens.css');
+@view-transition { navigation: auto; }
 
 @keyframes spasiboFlicker{
   0%,100%{filter:brightness(1)}

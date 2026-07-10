@@ -1,6 +1,6 @@
 /* Shared stylesheet for all about/project-reflection pages */
-@view-transition { navigation: auto; }
 @import url('/tokens.css');
+@view-transition { navigation: auto; }
 
 @keyframes fadeIn { from { opacity:0 } to { opacity:1 } }
 @keyframes fadeInUp { from { opacity:0; transform:translateY(12px) } to { opacity:1; transform:translateY(0) } }
