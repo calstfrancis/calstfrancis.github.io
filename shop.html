@@ -10,8 +10,8 @@
 <meta property="og:url" content="https://calstfrancis.github.io/shop.html">
 <meta property="og:title" content="Shop · Cal St Francis">
 <meta property="og:description" content="Support Cal St Francis on Ko-fi — pick up a shirt and help keep free liturgical tools, academic writing software, and contemplative interactive fiction free and open.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Spectral:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/fonts/fonts.css">
+<link rel="stylesheet" href="/tokens.css">
 
 <svg width="0" height="0" style="position:absolute;pointer-events:none" aria-hidden="true">
 <defs>
@@ -53,45 +53,7 @@
 </svg>
 
 <style>
-:root {
-  --bg:        #6a1710;
-  --bg-2:      #7c1e14;
-  --bg-3:      #8e2218;
-  --nav-bg:    rgba(28,6,4,.97);
-  --border:    #4a0e0b;
-  --border-hi: #8a2a1a;
-  --text:      #f2e4c4;
-  --text-2:    #d8c4a0;
-  --text-3:    #b89c72;
-  --coral:     #e06030;
-  --coral-hi:  #f07848;
-  --cpale:     rgba(224,96,48,.12);
-  --olive:     #7a8840;
-  --olive-hi:  #96aa52;
-  --opale:     rgba(122,136,64,.15);
-  --black:     #100c08;
-  --ok:        #96aa52;
-}
-[data-theme="light"] {
-  --bg:        #e8d5b0;
-  --bg-2:      #fdf6e8;
-  --bg-3:      #e4d4b0;
-  --nav-bg:    rgba(34,10,4,.96);
-  --border:    #c8b890;
-  --border-hi: #a89060;
-  --text:      #28120c;
-  --text-2:    #4a2e18;
-  --text-3:    #7a5a38;
-  --coral:     #b83818;
-  --coral-hi:  #d04825;
-  --cpale:     rgba(184,56,24,.1);
-  --olive:     #4a6018;
-  --olive-hi:  #5a7820;
-  --opale:     rgba(74,96,24,.12);
-  --black:     #faf4e4;
-  --ok:        #4a6018;
-}
-
+@view-transition { navigation: auto; }
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
@@ -112,12 +74,12 @@ a:hover{color:var(--coral-hi)}
 /* ── NAV ── */
 nav{background:var(--nav-bg);border-bottom:2px solid var(--border);position:sticky;top:0;z-index:200;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);}
 .nav-inner{display:flex;align-items:center;justify-content:space-between;height:52px;max-width:860px;margin:0 auto;padding:0 1.75rem;}
-.nav-brand{font-family:'IM Fell English',serif;font-size:1.05rem;color:var(--coral);letter-spacing:.03em;display:flex;align-items:center;gap:.45rem;}
+.nav-brand{font-family:var(--font-display);font-size:1.05rem;color:var(--coral);letter-spacing:.03em;display:flex;align-items:center;gap:.45rem;view-transition-name:site-brand;}
 .nav-brand svg{width:20px;height:20px;overflow:visible;flex-shrink:0}
 .nav-links{display:flex;align-items:center;gap:1.8rem;list-style:none}
-.nav-links a{font-family:'Spectral',serif;font-size:.78rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text-3);transition:color .15s;}
+.nav-links a{font-family:var(--font-body);font-size:.78rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text-3);transition:color .15s;}
 .nav-links a:hover,.nav-links a.active{color:var(--coral)}
-.theme-toggle{background:none;border:1px solid var(--border-hi);padding:.22rem .65rem;font-family:'Spectral',serif;font-size:.72rem;font-weight:600;letter-spacing:.06em;color:var(--text-3);cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:border-color .15s,color .15s;}
+.theme-toggle{background:none;border:1px solid var(--border-hi);padding:.22rem .65rem;font-family:var(--font-body);font-size:.72rem;font-weight:600;letter-spacing:.06em;color:var(--text-3);cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:border-color .15s,color .15s;}
 .theme-toggle:hover{border-color:var(--coral);color:var(--coral)}
 .nav-toggle{display:none;flex-direction:column;justify-content:center;gap:5px;width:36px;height:36px;background:none;border:1px solid var(--border-hi);cursor:pointer;padding:8px 7px;}
 .nav-toggle span{display:block;height:1px;background:var(--text-3);transition:all .2s}
@@ -128,14 +90,14 @@ nav{background:var(--nav-bg);border-bottom:2px solid var(--border);position:stic
 /* cart button in nav */
 .nav-cart-btn{
   background:none;border:1px solid var(--border-hi);padding:.22rem .65rem;
-  font-family:'Spectral',serif;font-size:.72rem;font-weight:600;letter-spacing:.06em;
+  font-family:var(--font-body);font-size:.72rem;font-weight:600;letter-spacing:.06em;
   color:var(--text-3);cursor:pointer;display:inline-flex;align-items:center;gap:5px;
   transition:border-color .15s,color .15s;position:relative;
 }
 .nav-cart-btn:hover{border-color:var(--coral);color:var(--coral)}
 .cart-badge{
   display:none;background:var(--coral);color:#fff;
-  font-size:.6rem;font-family:'Courier Prime',monospace;
+  font-size:.6rem;font-family:var(--font-mono);
   border-radius:0;padding:1px 4px;min-width:16px;text-align:center;
 }
 .cart-badge.visible{display:inline-block}
@@ -143,10 +105,10 @@ nav{background:var(--nav-bg);border-bottom:2px solid var(--border);position:stic
 /* ── SECTIONS ── */
 section{padding:3.5rem 0;border-bottom:2px solid var(--border)}
 section:last-of-type{border-bottom:none}
-.section-eyebrow{font-family:'Spectral',serif;font-size:.7rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--olive);margin-bottom:.3rem;}
+.section-eyebrow{font-family:var(--font-body);font-size:.7rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--olive);margin-bottom:.3rem;}
 .section-title-row{display:flex;align-items:center;gap:.7rem;margin-bottom:.35rem;}
 .section-title-row svg{width:32px;height:32px;overflow:visible}
-.section-title{font-family:'IM Fell English',serif;font-size:1.7rem;font-weight:400;color:var(--text);line-height:1.2;}
+.section-title{font-family:var(--font-display);font-size:1.7rem;font-weight:400;color:var(--text);line-height:1.2;}
 .section-intro{color:var(--text-3);font-size:.93rem;line-height:1.8;max-width:580px;margin-top:.5rem;margin-bottom:1.8rem;}
 
 /* ── PRODUCT GRID ── */
@@ -166,11 +128,11 @@ section:last-of-type{border-bottom:none}
   display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;
 }
 .product-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
-.product-thumb-glyph{font-family:'IM Fell English',serif;font-size:4rem;color:var(--border-hi);opacity:.5;user-select:none;}
+.product-thumb-glyph{font-family:var(--font-display);font-size:4rem;color:var(--border-hi);opacity:.5;user-select:none;}
 
 .product-body{padding:1rem 1.1rem 1.1rem;flex:1;display:flex;flex-direction:column;gap:.35rem;}
-.product-name{font-family:'IM Fell English',serif;font-size:1.05rem;color:var(--text);line-height:1.3;}
-.product-material{font-family:'Courier Prime',monospace;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);}
+.product-name{font-family:var(--font-display);font-size:1.05rem;color:var(--text);line-height:1.3;}
+.product-material{font-family:var(--font-mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);}
 .product-desc{font-size:.875rem;color:var(--text-2);line-height:1.65;margin-top:.15rem;flex:1;}
 
 /* colour swatches */
@@ -185,7 +147,7 @@ section:last-of-type{border-bottom:none}
 .colour-swatch[title]::after{
   content:attr(title);
   position:absolute;bottom:calc(100% + 5px);left:50%;transform:translateX(-50%);
-  background:var(--black);color:var(--text);font-family:'Courier Prime',monospace;
+  background:var(--black);color:var(--text);font-family:var(--font-mono);
   font-size:.6rem;letter-spacing:.06em;white-space:nowrap;
   padding:2px 6px;pointer-events:none;opacity:0;transition:opacity .15s;
 }
@@ -194,7 +156,7 @@ section:last-of-type{border-bottom:none}
 /* size selector */
 .product-sizes{display:flex;gap:.35rem;margin-top:.25rem;flex-wrap:wrap;}
 .size-btn{
-  font-family:'Courier Prime',monospace;font-size:.62rem;letter-spacing:.08em;
+  font-family:var(--font-mono);font-size:.62rem;letter-spacing:.08em;
   text-transform:uppercase;background:none;border:1px solid var(--border-hi);
   color:var(--text-3);padding:.18rem .45rem;cursor:pointer;
   transition:border-color .12s,color .12s,background .12s;
@@ -203,11 +165,11 @@ section:last-of-type{border-bottom:none}
 .size-btn.selected{border-color:var(--coral);color:var(--coral);background:var(--cpale);}
 
 .product-footer{display:flex;align-items:center;justify-content:space-between;margin-top:.75rem;padding-top:.65rem;border-top:1px solid var(--border);}
-.product-price{font-family:'IM Fell English',serif;font-size:1.1rem;color:var(--coral);}
-.product-price small{font-family:'Spectral',serif;font-size:.7rem;color:var(--text-3);font-style:italic;margin-left:.2rem;}
+.product-price{font-family:var(--font-display);font-size:1.1rem;color:var(--coral);}
+.product-price small{font-family:var(--font-body);font-size:.7rem;color:var(--text-3);font-style:italic;margin-left:.2rem;}
 
 .btn-add{
-  font-family:'Spectral',serif;font-size:.72rem;font-weight:600;
+  font-family:var(--font-body);font-size:.72rem;font-weight:600;
   letter-spacing:.09em;text-transform:uppercase;color:var(--text);
   background:none;border:1px solid var(--border-hi);padding:.28rem .7rem;
   cursor:pointer;transition:border-color .15s,color .15s,background .15s;
@@ -233,7 +195,7 @@ section:last-of-type{border-bottom:none}
   display:flex;align-items:center;justify-content:space-between;
   padding:1.1rem 1.4rem;border-bottom:1px solid var(--border-hi);flex-shrink:0;
 }
-.cart-title{font-family:'IM Fell English',serif;font-size:1.1rem;color:var(--text);}
+.cart-title{font-family:var(--font-display);font-size:1.1rem;color:var(--text);}
 .cart-close{
   background:none;border:1px solid var(--border-hi);color:var(--text-3);
   font-size:1rem;line-height:1;padding:.2rem .5rem;cursor:pointer;
@@ -247,23 +209,23 @@ section:last-of-type{border-bottom:none}
   padding:.85rem 0;border-bottom:1px solid var(--border);
 }
 .cart-item:last-child{border-bottom:none}
-.cart-item-name{font-family:'IM Fell English',serif;font-size:.95rem;color:var(--text);line-height:1.3;}
-.cart-item-meta{font-family:'Courier Prime',monospace;font-size:.62rem;letter-spacing:.07em;text-transform:uppercase;color:var(--text-3);margin-top:.18rem;}
-.cart-item-price{font-family:'IM Fell English',serif;font-size:.95rem;color:var(--coral);text-align:right;white-space:nowrap;}
+.cart-item-name{font-family:var(--font-display);font-size:.95rem;color:var(--text);line-height:1.3;}
+.cart-item-meta{font-family:var(--font-mono);font-size:.62rem;letter-spacing:.07em;text-transform:uppercase;color:var(--text-3);margin-top:.18rem;}
+.cart-item-price{font-family:var(--font-display);font-size:.95rem;color:var(--coral);text-align:right;white-space:nowrap;}
 .cart-item-remove{
   background:none;border:none;color:var(--text-3);font-size:.72rem;
-  font-family:'Courier Prime',monospace;letter-spacing:.06em;text-transform:uppercase;
+  font-family:var(--font-mono);letter-spacing:.06em;text-transform:uppercase;
   cursor:pointer;padding:0;text-align:right;text-decoration:underline;
   transition:color .12s;
 }
 .cart-item-remove:hover{color:var(--coral)}
 .cart-footer{padding:1.1rem 1.4rem;border-top:1px solid var(--border-hi);flex-shrink:0;}
 .cart-total-row{display:flex;justify-content:space-between;margin-bottom:1rem;}
-.cart-total-label{font-family:'Spectral',serif;font-size:.82rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);}
-.cart-total-amount{font-family:'IM Fell English',serif;font-size:1.2rem;color:var(--text);}
+.cart-total-label{font-family:var(--font-body);font-size:.82rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);}
+.cart-total-amount{font-family:var(--font-display);font-size:1.2rem;color:var(--text);}
 .btn-checkout{
   width:100%;padding:.7rem 1rem;
-  font-family:'Spectral',serif;font-size:.82rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+  font-family:var(--font-body);font-size:.82rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
   background:var(--coral);color:#fff;border:none;cursor:pointer;
   transition:background .15s;
 }
@@ -278,7 +240,7 @@ section:last-of-type{border-bottom:none}
   font-size:.82rem;color:var(--text-3);line-height:1.75;
 }
 [data-theme="light"] .fulfilment-note{background:var(--bg-3)}
-.fulfilment-note strong{font-family:'IM Fell English',serif;font-size:.9rem;color:var(--olive);font-weight:400;display:block;margin-bottom:.2rem;}
+.fulfilment-note strong{font-family:var(--font-display);font-size:.9rem;color:var(--olive);font-weight:400;display:block;margin-bottom:.2rem;}
 
 /* ── FOOTER ── */
 footer{padding:2.2rem 0 1.8rem;border-top:2px solid var(--border);text-align:center;}

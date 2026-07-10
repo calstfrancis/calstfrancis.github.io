@@ -1,75 +1,5 @@
 @view-transition { navigation: auto; }
-
-:root {
-  color-scheme: dark light;
-  --bg:        #6a1710;
-  --bg-2:      #7c1e14;
-  --bg-3:      #8e2218;
-  --nav-bg:    rgba(28,6,4,.97);
-  --border:    #4a0e0b;
-  --border-hi: #8a2a1a;
-  --text:      #f2e4c4;
-  --text-2:    #d8c4a0;
-  --text-3:    #b89c72;
-  --coral:     #e06030;
-  --coral-hi:  #f07848;
-  --cpale:     rgba(224,96,48,.12);
-  --olive:     #7a8840;
-  --olive-hi:  #96aa52;
-  --opale:     rgba(122,136,64,.15);
-  --black:     #100c08;
-  --ok:        #96aa52;
-
-  /* Game card text colors (dark mode defaults) */
-  --game-title: #f0e0a0;
-  --game-desc:  #a89060;
-  --game-ascii: #6a5a38;
-  --game-label: #6a5a38;
-  --game-link:  #c9a84c;
-  --game-link-hover: #e8c870;
-  --game-footer-border: #3a3020;
-
-  /* Flatpak specific */
-  --flatpak-green: #2d6a4f;
-  --flatpak-light: #40916c;
-
-  --teal:      #3a9a9a;
-  --teal-pale: rgba(58,154,154,.12);
-}
-
-[data-theme="light"] {
-  --bg:        #e8d5b0;
-  --bg-2:      #fdf6e8;
-  --bg-3:      #e4d4b0;
-  --nav-bg:    rgba(34,10,4,.96);
-  --border:    #c8b890;
-  --border-hi: #a89060;
-  --text:      #28120c;
-  --text-2:    #4a2e18;
-  --text-3:    #7a5a38;
-  --coral:     #b83818;
-  --coral-hi:  #d04825;
-  --cpale:     rgba(184,56,24,.1);
-  --olive:     #4a6018;
-  --olive-hi:  #5a7820;
-  --opale:     rgba(74,96,24,.12);
-  --black:     #faf4e4;
-  --ok:        #4a6018;
-
-  --game-title: #3a2c1c;
-  --game-desc:  #4a3a28;
-  --game-ascii: #5a4a30;
-  --game-label: #5a4a30;
-  --game-link:  #a05030;
-  --game-link-hover: #c06038;
-  --game-footer-border: #d0c0a0;
-
-  --flatpak-green: #1b4d3e;
-  --flatpak-light: #2d6a4f;
-  --text-3:    #5a3a18;
-  --teal:      #207878;
-  --teal-pale: rgba(32,120,120,.12);
-}
+@import url('/tokens.css');
 
 @keyframes spasiboFlicker{
   0%,100%{filter:brightness(1)}
@@ -157,7 +87,7 @@ nav{
   height:52px;max-width:860px;margin:0 auto;padding:0 1.75rem;
 }
 .nav-brand{
-  font-family:'IM Fell English',serif;
+  font-family:var(--font-display);
   font-size:1.05rem;color:var(--coral);letter-spacing:.03em;
   display:flex;align-items:center;gap:.45rem;
   view-transition-name: site-brand;
@@ -168,7 +98,7 @@ nav{
 }
 .nav-links{display:flex;align-items:center;gap:1.8rem;list-style:none}
 .nav-links a{
-  font-family:'Spectral',serif;font-size:.78rem;font-weight:600;
+  font-family:var(--font-body);font-size:.78rem;font-weight:600;
   letter-spacing:.1em;text-transform:uppercase;color:var(--text-3);transition:color .15s;
   position:relative;
 }
@@ -181,7 +111,7 @@ nav{
 .nav-links a:hover::after,.nav-links a.active::after{width:100%}
 .theme-toggle{
   background:none;border:1px solid var(--border-hi);padding:.22rem .65rem;
-  font-family:'Spectral',serif;font-size:.72rem;font-weight:600;
+  font-family:var(--font-body);font-size:.72rem;font-weight:600;
   letter-spacing:.06em;color:var(--text-3);cursor:pointer;transition:all .15s;
   display:inline-flex;align-items:center;gap:5px;
 }
@@ -206,15 +136,15 @@ nav{
   transform-origin:center center;
 }
 .hero-eyebrow{
-  font-family:'Spectral',serif;font-size:.72rem;font-weight:600;
+  font-family:var(--font-body);font-size:.72rem;font-weight:600;
   letter-spacing:.18em;text-transform:uppercase;color:var(--olive);margin-bottom:.9rem;
 }
 .hero h1{
-  font-family:'IM Fell English',serif;font-size:clamp(2rem,1.5rem + 3vw,3.8rem);font-weight:400;
+  font-family:var(--font-display);font-size:clamp(2rem,1.5rem + 3vw,3.8rem);font-weight:400;
   line-height:1.05;color:var(--text);margin-bottom:.3rem;letter-spacing:-.01em;
 }
 .hero-subtitle{
-  font-family:'IM Fell English',serif;font-style:italic;
+  font-family:var(--font-display);
   font-size:1.1rem;color:var(--text-2);margin-bottom:1.6rem;
 }
 .hero-desc{
@@ -235,7 +165,7 @@ nav{
 .btn{
   display:inline-flex;align-items:center;gap:.4rem;
   padding:.52rem 1.15rem;
-  font-family:'Spectral',serif;font-size:.84rem;font-weight:600;
+  font-family:var(--font-body);font-size:.84rem;font-weight:600;
   letter-spacing:.04em;cursor:pointer;transition:all .15s;
   border:1px solid transparent;text-decoration:none!important;
 }
@@ -253,8 +183,9 @@ section{padding:3.5rem 0}
 section[id],#games,#apps{scroll-margin-top:64px}
 a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--coral);outline-offset:3px}
 .project-desc::first-letter{
-  font-family:'IM Fell English',serif;font-size:1.9rem;line-height:.82;
-  float:left;margin-right:.05em;margin-top:.06em;color:var(--coral);opacity:.75;
+  font-family:var(--font-display);font-size:1.6rem;line-height:.82;
+  float:left;margin-right:.08em;margin-top:.08em;color:var(--coral);opacity:.8;
+  border-bottom:1px solid currentColor;padding-bottom:.03em;
 }
 .vine-divider{margin-top:2.5rem;overflow:visible;opacity:.75}
 .vine-divider svg{display:block;width:100%;overflow:visible}
@@ -270,11 +201,11 @@ nav::after{
 .section-title-row{display:flex;align-items:center;gap:.7rem;margin-bottom:.35rem}
 .section-title-row svg{width:32px;height:32px;overflow:visible;flex-shrink:0}
 .section-eyebrow{
-  font-family:'Spectral',serif;font-size:.76rem;font-weight:600;
+  font-family:var(--font-body);font-size:.76rem;font-weight:600;
   letter-spacing:.22em;text-transform:uppercase;color:var(--olive);margin-bottom:.3rem;
 }
 .section-title{
-  font-family:'IM Fell English',serif;font-size:1.7rem;font-weight:400;
+  font-family:var(--font-display);font-size:1.7rem;font-weight:400;
   color:var(--text);line-height:1.2;
   display:flex;align-items:center;gap:.55rem;
 }
@@ -308,7 +239,7 @@ nav::after{
 .game-body{padding:1.5rem 2rem 1.75rem;position:relative;z-index:1}
 .game-header{display:flex;align-items:flex-start;gap:2rem;margin-bottom:1.2rem}
 .game-ascii{
-  font-family:'Courier Prime',monospace;
+  font-family:var(--font-mono);
   font-size:.62rem;
   color:var(--game-ascii);
   white-space:pre;
@@ -316,7 +247,7 @@ nav::after{
   flex-shrink:0;
 }
 .game-label{
-  font-family:'Spectral',serif;
+  font-family:var(--font-body);
   font-size:.68rem;
   font-weight:600;
   letter-spacing:.14em;
@@ -325,7 +256,7 @@ nav::after{
   margin-bottom:.35rem;
 }
 .game-title{
-  font-family:'IM Fell English',serif;
+  font-family:var(--font-display);
   font-size:1.6rem;
   color:var(--game-title);
   line-height:1.15;
@@ -339,8 +270,9 @@ nav::after{
   margin-bottom:1.2rem;
 }
 .game-desc::first-letter{
-  font-family:'IM Fell English',serif;font-size:1.9rem;line-height:.82;
-  float:left;margin-right:.05em;margin-top:.06em;color:#c89830;opacity:.85;
+  font-family:var(--font-display);font-size:1.6rem;line-height:.82;
+  float:left;margin-right:.08em;margin-top:.08em;color:#c89830;opacity:.9;
+  border-bottom:1px solid currentColor;padding-bottom:.03em;
 }
 .game-footer{
   display:flex;
@@ -351,13 +283,13 @@ nav::after{
 }
 .game-status{
   display:inline-flex;align-items:center;gap:.4rem;
-  font-family:'Spectral',serif;font-size:.72rem;font-weight:600;
+  font-family:var(--font-body);font-size:.72rem;font-weight:600;
   letter-spacing:.08em;text-transform:uppercase;color:var(--ok);
 }
 .status-pip{width:6px;height:6px;border-radius:50%;background:var(--ok);display:inline-block;animation:pip 2.5s ease-in-out infinite}
 @keyframes pip{0%,100%{opacity:.5}50%{opacity:1}}
 .game-link{
-  font-family:'Spectral',serif;
+  font-family:var(--font-body);
   font-size:.84rem;
   font-weight:600;
   letter-spacing:.04em;
@@ -370,7 +302,7 @@ nav::after{
   display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.1rem;
 }
 .filter-btn{
-  font-family:'Spectral',serif;font-size:.7rem;font-weight:600;
+  font-family:var(--font-body);font-size:.7rem;font-weight:600;
   letter-spacing:.1em;text-transform:uppercase;
   background:transparent;border:1px solid var(--border-hi);
   color:var(--text-3);padding:.22rem .7rem;cursor:pointer;transition:all .15s;
@@ -395,26 +327,27 @@ nav::after{
 }
 .project-body-wrap{padding:1.25rem 1.5rem;flex:1;display:flex;align-items:flex-start;gap:1.25rem}
 .project-initial{
-  font-family:'IM Fell English',serif;font-style:italic;font-size:3rem;color:var(--coral);
-  line-height:1;flex-shrink:0;width:2.9rem;text-align:center;padding-top:.05rem;opacity:.8;
+  font-family:var(--font-display);font-size:2.6rem;color:var(--coral);
+  line-height:1;flex-shrink:0;width:2.9rem;text-align:center;padding-top:.08rem;padding-bottom:.12rem;
+  opacity:.8;border-bottom:1px solid currentColor;
 }
 .project-body{flex:1}
 .project-meta{display:flex;align-items:center;gap:.65rem;margin-bottom:.3rem;flex-wrap:wrap}
-.project-name{font-family:'IM Fell English',serif;font-style:italic;font-size:1.08rem;color:var(--text)}
+.project-name{font-family:var(--font-display);font-size:1.08rem;color:var(--text)}
 .project-type{
-  font-family:'Spectral',serif;font-size:.64rem;font-weight:600;letter-spacing:.1em;
+  font-family:var(--font-body);font-size:.64rem;font-weight:600;letter-spacing:.1em;
   text-transform:uppercase;color:var(--olive);border:1px solid var(--olive);padding:.1rem .45rem;
 }
 .flatpak-badge{
   background:var(--olive);padding:0.1rem 0.5rem;border-radius:2px;
   font-size:0.6rem;font-weight:600;letter-spacing:.05em;color:white;
-  font-family:'Spectral',serif;text-transform:uppercase;
+  font-family:var(--font-body);text-transform:uppercase;
 }
 .project-desc{font-size:.88rem;color:var(--text-3);line-height:1.7;margin-bottom:.6rem}
-.project-link{font-family:'Spectral',serif;font-size:.8rem;font-weight:600;letter-spacing:.04em;color:var(--coral);margin-right:1rem}
+.project-link{font-family:var(--font-body);font-size:.8rem;font-weight:600;letter-spacing:.04em;color:var(--coral);margin-right:1rem}
 .project-link:hover{color:var(--coral-hi)}
 .project-status-dev{
-  font-family:'Spectral',serif;font-size:.64rem;font-weight:600;letter-spacing:.08em;
+  font-family:var(--font-body);font-size:.64rem;font-weight:600;letter-spacing:.08em;
   text-transform:uppercase;color:var(--text-3);border:1px solid var(--border-hi);padding:.1rem .45rem;
 }
 .install-commands{
@@ -423,7 +356,7 @@ nav::after{
 }
 .install-commands code{
   background:var(--bg-3);padding:0.2rem 0.5rem;border-radius:6px;font-size:0.7rem;
-  font-family:'Courier Prime',monospace;color:var(--text-2);
+  font-family:var(--font-mono);color:var(--text-2);
   display:block;max-width:100%;overflow-x:auto;white-space:nowrap;
 }
 
@@ -443,7 +376,7 @@ nav::after{
   opacity:.08;pointer-events:none;
 }
 .about-cell h3{
-  font-family:'IM Fell English',serif;font-size:.98rem;font-weight:400;
+  font-family:var(--font-display);font-size:.98rem;font-weight:400;
   color:var(--coral);margin-bottom:.7rem;letter-spacing:.02em;
   display:flex;align-items:center;gap:.45rem;
 }
@@ -477,7 +410,7 @@ footer{padding:2.5rem 0;text-align:center}
 .back-to-top.visible{opacity:1;pointer-events:auto}
 .back-to-top:hover{border-color:var(--coral)}
 footer p{
-  font-family:'Spectral',serif;font-size:.78rem;
+  font-family:var(--font-body);font-size:.78rem;
   color:var(--text-3);line-height:1.9;
 }
 footer a{color:var(--text-3)}
@@ -550,7 +483,7 @@ section.section-visible{animation:riseIn .5s ease both}
 /* ── SCREENSHOT PANEL ── */
 .screenshot-toggle{
   background:none;border:none;padding:0;
-  font-family:'Spectral',serif;font-size:.78rem;font-weight:600;
+  font-family:var(--font-body);font-size:.78rem;font-weight:600;
   letter-spacing:.04em;color:var(--text-3);cursor:pointer;
   transition:color .15s;
 }
@@ -576,7 +509,7 @@ section.section-visible{animation:riseIn .5s ease both}
 
 /* ── DOWNLOAD BADGE ── */
 .download-badge{
-  font-family:'Spectral',serif;font-size:.6rem;font-weight:600;letter-spacing:.05em;
+  font-family:var(--font-body);font-size:.6rem;font-weight:600;letter-spacing:.05em;
   text-transform:uppercase;color:var(--text-3);opacity:.75;margin-left:.3rem;
 }
 
@@ -604,7 +537,7 @@ section.section-visible{animation:riseIn .5s ease both}
 /* ── FLOATING CATEGORY LABEL ── */
 .project-card::after{
   position:absolute;top:.65rem;right:2.6rem;
-  font-family:'Spectral',serif;font-size:.58rem;font-weight:600;
+  font-family:var(--font-body);font-size:.58rem;font-weight:600;
   letter-spacing:.12em;text-transform:uppercase;
   color:var(--olive);background:var(--bg);
   border:1px solid var(--border-hi);padding:.1rem .4rem;
@@ -675,10 +608,11 @@ section.section-visible{animation:riseIn .5s ease both}
 
 /* ── HERO DROP CAP ── */
 .hero-desc::first-letter{
-  font-family:'IM Fell English',serif;
-  font-size:2.6em;line-height:.78;
-  float:left;margin-right:.07em;margin-top:.05em;
+  font-family:var(--font-display);
+  font-size:2.2em;line-height:.78;
+  float:left;margin-right:.09em;margin-top:.08em;
   color:var(--coral);
+  border-bottom:1px solid currentColor;padding-bottom:.02em;
 }
 
 /* ── STAGGERED CARD ENTRANCE ── */

@@ -16,7 +16,10 @@
 <meta name="theme-color" content="#6a1710" id="themeColorMeta">
 <link rel="manifest" href="/manifest.json">
 <link rel="stylesheet" href="/fonts/fonts.css">
-<link rel="preload" as="font" type="font/woff2" href="/fonts/Ktk1ALSLW8zDe0rthJysWrnLsAzHEKOY.woff2" crossorigin>
+<!-- Preloads below are display-font (Gost Type B) + above-the-fold Spectral weights.
+     Filenames must match the @font-face src in /fonts/fonts.css — if that file changes
+     which font/filename backs --font-display or --font-body, update these too. -->
+<link rel="preload" as="font" type="font/woff2" href="/fonts/gosttypeb.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/fonts/rnCr-xNNww_2s0amA9M5kng.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/fonts/rnCt-xNNww_2s0amA9M8onrmTA.woff2" crossorigin>
 <link rel="stylesheet" href="/style.css">
@@ -544,7 +547,7 @@
           and will stay free. If something I've made has been useful to you, a small
           donation goes a long way. No pressure, no paywalls.
         </p>
-        <p style="font-family:'IM Fell English',serif;font-style:italic;font-size:.88rem;color:var(--text-3);line-height:1.7;margin-bottom:1.2rem;opacity:.65">Freely you have received; freely give.</p>
+        <p style="font-family:var(--font-display);font-size:.88rem;color:var(--text-3);line-height:1.7;margin-bottom:1.2rem;opacity:.65">Freely you have received; freely give.</p>
         <a href="https://ko-fi.com/calstfrancis" target="_blank" rel="noopener" class="btn btn-kofi"><svg width="13" height="13" viewBox="-55 -55 110 110" aria-hidden="true" style="overflow:visible;flex-shrink:0"><use href="#sf"/></svg> Support on Ko-fi</a>
       </div>
     </div>
@@ -578,7 +581,7 @@
         <g transform="translate(36,82) translate(10,0) rotate(-18) scale(.5)"><use href="#lf-n"/></g>
       </svg>
     </div>
-    <p style="font-family:'IM Fell English',serif;font-style:italic;font-size:.8rem;color:var(--text-3);margin-top:.5rem;opacity:.5">freely given · freely received</p>
+    <p style="font-family:var(--font-display);font-size:.8rem;color:var(--text-3);margin-top:.5rem;opacity:.5">freely given · freely received</p>
   </div>
 </footer>
 

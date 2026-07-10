@@ -4,8 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Spasibo — Cal St Francis</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Spectral:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/fonts/fonts.css">
+<link rel="stylesheet" href="/tokens.css">
 
 <svg width="0" height="0" style="position:absolute;pointer-events:none" aria-hidden="true">
 <defs>
@@ -48,38 +48,15 @@
 </svg>
 
 <style>
-:root {
-  --bg:        #6a1710;
-  --bg-2:      #7c1e14;
-  --nav-bg:    rgba(28,6,4,.97);
-  --border:    #4a0e0b;
-  --border-hi: #8a2a1a;
-  --text:      #f2e4c4;
-  --text-2:    #d8c4a0;
-  --text-3:    #b89c72;
-  --coral:     #e06030;
-  --coral-hi:  #f07848;
-  --olive:     #7a8840;
-}
-[data-theme="light"] {
-  --bg:        #f0e4c8;
-  --bg-2:      #fdf6e8;
-  --nav-bg:    rgba(34,10,4,.96);
-  --border:    #c8b890;
-  --border-hi: #a89060;
-  --text:      #28120c;
-  --text-2:    #4a2e18;
-  --text-3:    #7a5a38;
-  --coral:     #b83818;
-  --coral-hi:  #d04825;
-  --olive:     #4a6018;
-}
+@view-transition { navigation: auto; }
+/* This page uses a lighter light-mode bg/text-3 than tokens.css's default. */
+[data-theme="light"] { --bg: #f0e4c8; --text-3: #7a5a38; }
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
 body{
   background:var(--bg);color:var(--text);
-  font-family:'Spectral',Georgia,serif;
+  font-family:var(--font-body),Georgia,serif;
   display:flex;flex-direction:column;
   -webkit-font-smoothing:antialiased;
   transition:background .25s,color .25s;
@@ -100,14 +77,15 @@ nav{
   height:52px;max-width:860px;margin:0 auto;padding:0 1.75rem;
 }
 .nav-brand{
-  font-family:'IM Fell English',serif;font-size:1.05rem;
+  font-family:var(--font-display);font-size:1.05rem;
   color:var(--coral);letter-spacing:.03em;
   display:flex;align-items:center;gap:.45rem;text-decoration:none;
+  view-transition-name:site-brand;
 }
 .nav-brand svg{width:20px;height:20px;overflow:visible;flex-shrink:0}
 .nav-links{display:flex;align-items:center;gap:1.6rem;list-style:none}
 .nav-links a{
-  font-family:'Spectral',serif;font-size:.78rem;font-weight:600;
+  font-family:var(--font-body);font-size:.78rem;font-weight:600;
   letter-spacing:.1em;text-transform:uppercase;color:var(--text-3);transition:color .15s;
 }
 .nav-links a:hover{color:var(--coral)}
@@ -117,7 +95,7 @@ nav{
 .nav-back:hover{border-color:var(--coral) !important}
 .theme-toggle{
   background:none;border:1px solid var(--border-hi);padding:.22rem .65rem;
-  font-family:'Spectral',serif;font-size:.72rem;font-weight:600;
+  font-family:var(--font-body);font-size:.72rem;font-weight:600;
   letter-spacing:.06em;color:var(--text-3);cursor:pointer;transition:all .15s;
   display:inline-flex;align-items:center;gap:5px;
 }
@@ -148,11 +126,11 @@ nav{
   padding:.3rem 1.75rem .5rem;
 }
 .game-bar-title{
-  font-family:'IM Fell English',serif;font-style:italic;
+  font-family:var(--font-display);
   font-size:.98rem;color:var(--coral);letter-spacing:.03em;
 }
 .game-bar-meta{
-  font-family:'Spectral',serif;font-size:.68rem;font-weight:600;
+  font-family:var(--font-body);font-size:.68rem;font-weight:600;
   letter-spacing:.12em;text-transform:uppercase;color:var(--text-3);
 }
 

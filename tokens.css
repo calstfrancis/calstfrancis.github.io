@@ -1,0 +1,75 @@
+/* Shared design tokens (colors, fonts) for all pages.
+   Single source of truth — edit here, not in per-page <style> blocks. */
+:root {
+  color-scheme: dark light;
+  --font-display: 'Gost Type B', serif;
+  --font-body:    'Spectral', serif;
+  --font-mono:    'Courier Prime', monospace;
+  --bg:        #6a1710;
+  --bg-2:      #7c1e14;
+  --bg-3:      #8e2218;
+  --nav-bg:    rgba(28,6,4,.97);
+  --border:    #4a0e0b;
+  --border-hi: #8a2a1a;
+  --text:      #f2e4c4;
+  --text-2:    #d8c4a0;
+  --text-3:    #b89c72;
+  --coral:     #e06030;
+  --coral-hi:  #f07848;
+  --cpale:     rgba(224,96,48,.12);
+  --olive:     #7a8840;
+  --olive-hi:  #96aa52;
+  --opale:     rgba(122,136,64,.15);
+  --black:     #100c08;
+  --ok:        #96aa52;
+
+  /* Game card text colors (dark mode defaults) */
+  --game-title: #f0e0a0;
+  --game-desc:  #a89060;
+  --game-ascii: #6a5a38;
+  --game-label: #6a5a38;
+  --game-link:  #c9a84c;
+  --game-link-hover: #e8c870;
+  --game-footer-border: #3a3020;
+
+  /* Flatpak specific */
+  --flatpak-green: #2d6a4f;
+  --flatpak-light: #40916c;
+
+  --teal:      #3a9a9a;
+  --teal-pale: rgba(58,154,154,.12);
+}
+
+[data-theme="light"] {
+  --bg:        #e8d5b0;
+  --bg-2:      #fdf6e8;
+  --bg-3:      #e4d4b0;
+  --nav-bg:    rgba(34,10,4,.96);
+  --border:    #c8b890;
+  --border-hi: #a89060;
+  --text:      #28120c;
+  --text-2:    #4a2e18;
+  --text-3:    #7a5a38;
+  --coral:     #b83818;
+  --coral-hi:  #d04825;
+  --cpale:     rgba(184,56,24,.1);
+  --olive:     #4a6018;
+  --olive-hi:  #5a7820;
+  --opale:     rgba(74,96,24,.12);
+  --black:     #faf4e4;
+  --ok:        #4a6018;
+
+  --game-title: #3a2c1c;
+  --game-desc:  #4a3a28;
+  --game-ascii: #5a4a30;
+  --game-label: #5a4a30;
+  --game-link:  #a05030;
+  --game-link-hover: #c06038;
+  --game-footer-border: #d0c0a0;
+
+  --flatpak-green: #1b4d3e;
+  --flatpak-light: #2d6a4f;
+  --text-3:    #5a3a18;
+  --teal:      #207878;
+  --teal-pale: rgba(32,120,120,.12);
+}

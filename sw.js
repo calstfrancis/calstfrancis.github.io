@@ -1,9 +1,9 @@
-const CACHE = 'calstfrancis-v2';
 const PRECACHE = [
   '/index.html',
   '/style.css',
+  '/tokens.css',
   '/fonts/fonts.css',
-  '/fonts/Ktk1ALSLW8zDe0rthJysWrnLsAzHEKOY.woff2',
+  '/fonts/gosttypeb.woff2',
   '/fonts/rnCr-xNNww_2s0amA9M5kng.woff2',
   '/fonts/rnCt-xNNww_2s0amA9M8onrmTA.woff2',
   '/defs.svg',
@@ -20,9 +20,28 @@ const PRECACHE = [
   '/404.html',
 ];
 
+// Cache name is derived from the precache list itself, so editing PRECACHE
+// (adding/removing/renaming an entry) automatically invalidates old caches —
+// no manual version bump to remember or forget.
+const hashPrecache = list => {
+  let h = 0;
+  const s = list.join('|');
+  for (let i = 0; i < s.length; i++) {
+    h = (Math.imul(31, h) + s.charCodeAt(i)) | 0;
+  }
+  return (h >>> 0).toString(36);
+};
+const CACHE = `calstfrancis-${hashPrecache(PRECACHE)}`;
+
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE).then(c => c.addAll(PRECACHE)).then(() => self.skipWaiting())
+      .catch(err => {
+        // addAll aborts on the first 404 — surface which URL broke instead of
+        // failing silently (this happened once with a stale font filename).
+        console.error('[sw] precache failed, a PRECACHE entry is likely broken:', err);
+        throw err;
+      })
   );
 });
 
