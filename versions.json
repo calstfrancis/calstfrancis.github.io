@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-10T06:29:32Z",
+  "updated": "2026-07-11T05:29:21Z",
   "repos": {
     "calstfrancis/rubric": {
       "downloads": 0,
@@ -14,10 +14,9 @@
       "tag_name": "v0.17.0"
     },
     "calstfrancis/skrizhal": {
-      "downloads": 0,
-      "html_url": "https://github.com/calstfrancis/skrizhal/releases/tag/v0.3.1",
-      "published_at": "2026-07-09T00:00:00Z",
-      "tag_name": "v0.3.1"
+      "message": "Not Found",
+      "documentation_url": "https://docs.github.com/rest/releases/releases#get-the-latest-release",
+      "status": "404"
     },
     "calstfrancis/kopilka": {
       "message": "Not Found",
