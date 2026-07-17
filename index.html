@@ -121,8 +121,8 @@
     <h1>Cal St Francis</h1>
     <p class="hero-subtitle">Candidate for Ordination, United Church of Canada</p>
     <p class="hero-desc">
-       I make little specialized tools for ministers, worship leaders, and academics, favour theology in the
-       traditions of <em>liberation and process</em>, and build weird little games as a hobby. 
+       I build contemplative software — specialized tools for ministers, worship leaders, and academics, and
+       narrative games rooted in liturgy, memory, and theology in the traditions of <em>liberation and process</em>.
        My desktop applications are now available via <strong>Flatpak</strong> — easy install on any Linux distribution.
     </p>
     <div class="hero-actions">
@@ -262,8 +262,10 @@
     </div>
     <div class="project-list" id="apps">
 
+      <div class="project-group-heading">Featured Software</div>
+
       <!-- Rubric - Flatpak integrated -->
-      <div class="project-card" data-category="linux" data-repo="calstfrancis/rubric">
+      <div class="project-card featured" data-category="linux" data-repo="calstfrancis/rubric">
         <svg class="project-card-flower" width="80" height="80" viewBox="-55 -55 110 110" aria-hidden="true"><use href="#sf"/></svg>
         <div class="project-body-wrap">
           <div class="project-initial">R</div>
@@ -275,18 +277,24 @@
               <span class="flatpak-badge">📦 Flatpak</span>
             </div>
             <p class="project-desc">
-              Worship planning system for United Church congregations. Service flows, RCL lectionary, hymn lookup, scripture fetching, and print‑ready bulletins via the bundled Typst typesetter. Git sync, undo history, and live PDF preview.
+              Rubric helps United Church congregations plan worship from first reading to finished bulletin.
+              RCL lectionary, hymn lookup, and scripture fetching feed straight into a print‑ready bulletin, typeset with the bundled Typst engine.
+              Git sync and undo history keep every service's history close at hand.
             </p>
             <div style="margin-top:0.6rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:center">
               <a href="/abouts/about-rubric.html" class="game-link" style="opacity:0.8;font-size:0.8rem;">Design Notes &amp; Reasoning →</a>
               <a href="https://github.com/calstfrancis/rubric" class="project-link">GitHub Page →</a>
+              <button class="screenshot-toggle" aria-expanded="false" aria-controls="rubric-screenshot">Screenshot ↓</button>
+            </div>
+            <div class="screenshot-panel" id="rubric-screenshot" hidden>
+              <img src="/rubric.png" alt="Rubric — Liturgy Planner screenshot" loading="lazy">
             </div>
           </div>
         </div>
       </div>
 
       <!-- Zerkalo - Flatpak integrated -->
-      <div class="project-card" data-category="linux" data-repo="calstfrancis/zerkalo">
+      <div class="project-card featured" data-category="linux" data-repo="calstfrancis/zerkalo">
         <svg class="project-card-flower" width="80" height="80" viewBox="-55 -55 110 110" aria-hidden="true"><use href="#sf"/></svg>
         <div class="project-body-wrap">
           <div class="project-initial">З</div>
@@ -312,6 +320,8 @@
           </div>
         </div>
       </div>
+
+      <div class="project-group-heading">Other Software</div>
 
       <!-- Skrizhal - Flatpak integrated, companion to Zerkalo -->
       <div class="project-card" data-category="linux" data-repo="calstfrancis/skrizhal">
@@ -373,14 +383,17 @@
               <span class="flatpak-badge">📦 Flatpak</span>
             </div>
             <p class="project-desc">
-              Generate ready-to-compile academic templates in LaTeX, Typst, or Word (.docx).
-              Supports SBL, Chicago, MLA, APA, ASA, Turabian, and Harvard citation styles.
-              Full book publishing layout — binding gutter, bleed and crop marks, recto chapter openings,
-              running headers, front matter, and colophon. Live compiled preview, journal template importer,
-              grammar check via LanguageTool, and saved template profiles.
+              Gost turns a manuscript into a ready-to-compile academic template in LaTeX, Typst, or Word —
+              citation style, book layout, and front matter handled for you, so writing can start immediately.
+              Supports SBL, Chicago, MLA, APA, ASA, Turabian, and Harvard, with live compiled preview and grammar
+              checking via LanguageTool built in.
             </p>
             <div style="margin-top:0.6rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:center">
               <a href="https://github.com/calstfrancis/Gost" class="project-link">GitHub Page →</a>
+              <button class="screenshot-toggle" aria-expanded="false" aria-controls="gost-screenshot">Screenshot ↓</button>
+            </div>
+            <div class="screenshot-panel" id="gost-screenshot" hidden>
+              <img src="/gost.png" alt="Gost — Academic Essay Templater screenshot" loading="lazy">
             </div>
           </div>
         </div>
@@ -403,6 +416,10 @@
             </p>
             <div style="margin-top:0.6rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:center">
               <a href="https://github.com/calstfrancis/kopilka" class="project-link">GitHub Page →</a>
+              <button class="screenshot-toggle" aria-expanded="false" aria-controls="kopilka-screenshot">Screenshot ↓</button>
+            </div>
+            <div class="screenshot-panel" id="kopilka-screenshot" hidden>
+              <img src="/kopilka.png" alt="Kopilka — Couples Budget Planner screenshot" loading="lazy">
             </div>
           </div>
         </div>
@@ -821,6 +838,14 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
     document.querySelectorAll('.project-card').forEach(card => {
       const show = f === 'all' || card.dataset.category === f;
       card.hidden = !show;
+    });
+    document.querySelectorAll('.project-group-heading').forEach(heading => {
+      let sib = heading.nextElementSibling, anyVisible = false;
+      while (sib && !sib.classList.contains('project-group-heading')) {
+        if (sib.classList.contains('project-card') && !sib.hidden) anyVisible = true;
+        sib = sib.nextElementSibling;
+      }
+      heading.hidden = !anyVisible;
     });
   });
 });
