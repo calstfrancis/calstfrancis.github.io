@@ -33,6 +33,12 @@
       "message": "Not Found",
       "documentation_url": "https://docs.github.com/rest/releases/releases#get-the-latest-release",
       "status": "404"
+    },
+    "calstfrancis/iskra": {
+      "downloads": 0,
+      "html_url": "https://github.com/calstfrancis/iskra/releases/tag/v0.3.0",
+      "published_at": "2026-07-19T19:30:56Z",
+      "tag_name": "v0.3.0"
     }
   }
 }
