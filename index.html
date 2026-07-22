@@ -132,13 +132,13 @@
           <a href="#flatpak-repo" class="btn btn-ghost">Install via Flatpak</a>
         </div>
       </div>
-      <!-- Hero product shot — app window frame around the Rubric screenshot -->
-      <div class="hero-shot" aria-hidden="false">
+      <!-- Hero product shot — app window frame around the Zerkalo screenshot -->
+      <div class="hero-shot">
         <figure class="app-window">
           <div class="app-window-bar"><span></span><span></span><span></span></div>
           <picture>
-            <source srcset="/rubric.webp" type="image/webp">
-            <img src="/rubric.png" width="1000" height="700" alt="Rubric, the liturgy planner, showing a service order beside its typeset bulletin preview." fetchpriority="high" decoding="async">
+            <source srcset="/zerkalo.webp" type="image/webp">
+            <img src="/zerkalo.png" width="1400" height="844" alt="Zerkalo, the Typst editor, showing a manuscript beside its live typeset preview." fetchpriority="high" decoding="async">
           </picture>
         </figure>
       </div>
@@ -162,7 +162,6 @@
 <!-- PROJECTS -->
 <section id="projects">
   <div class="container" style="position:relative">
-    <canvas id="sectionPorthole" aria-hidden="true"></canvas>
     <div class="section-eyebrow">Works</div>
     <div class="section-title-row">
       <h2 class="section-title">Projects &amp; Games</h2>
@@ -288,6 +287,36 @@
 
       <div class="project-group-heading is-featured">Featured Software</div>
 
+      <!-- Zerkalo - Flatpak integrated -->
+      <div class="project-card featured" data-category="linux" data-repo="calstfrancis/zerkalo">
+        <svg class="project-card-flower" width="80" height="80" viewBox="-55 -55 110 110" aria-hidden="true"><use href="#sf"/></svg>
+        <div class="project-body-wrap">
+          <div class="project-initial">З</div>
+          <div class="project-body">
+            <div class="project-meta">
+              <span class="project-name">Zerkalo/<span lang="ru">Зеркало</span> - Typst IDE</span>
+              <span class="project-type">Flatpak · Typst · Academic</span>
+              <span class="project-status-dev" data-repo="calstfrancis/zerkalo">Available via Flatpak</span>
+              <span class="flatpak-badge">📦 Flatpak</span>
+            </div>
+            <p class="project-desc">
+              Full academic Typst workplace. Templates for SBL, Chicago, APA, IEEE, Gost, etc... Live preview, document management, versioned backup,
+              spellcheck, export to PDF, DOCX, HTML.
+            </p>
+            <a class="project-shot" href="/zerkalo.png" data-shot="zerkalo" aria-label="Enlarge the Zerkalo screenshot">
+              <picture>
+                <source srcset="/zerkalo.webp" type="image/webp">
+                <img src="/zerkalo.png" width="1400" height="844" alt="Zerkalo — Typst IDE screenshot" loading="lazy" decoding="async">
+              </picture>
+            </a>
+            <div style="margin-top:0.6rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:center">
+              <a href="/abouts/about-zerkalo.html" class="game-link" style="opacity:0.8;font-size:0.8rem;">Design Notes &amp; Reasoning →</a>
+              <a href="https://github.com/calstfrancis/zerkalo" class="project-link">GitHub Page →</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Rubric - Flatpak integrated -->
       <div class="project-card featured" data-category="linux" data-repo="calstfrancis/rubric">
         <svg class="project-card-flower" width="80" height="80" viewBox="-55 -55 110 110" aria-hidden="true"><use href="#sf"/></svg>
@@ -314,36 +343,6 @@
             <div style="margin-top:0.6rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:center">
               <a href="/abouts/about-rubric.html" class="game-link" style="opacity:0.8;font-size:0.8rem;">Design Notes &amp; Reasoning →</a>
               <a href="https://github.com/calstfrancis/rubric" class="project-link">GitHub Page →</a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Zerkalo - Flatpak integrated -->
-      <div class="project-card featured" data-category="linux" data-repo="calstfrancis/zerkalo">
-        <svg class="project-card-flower" width="80" height="80" viewBox="-55 -55 110 110" aria-hidden="true"><use href="#sf"/></svg>
-        <div class="project-body-wrap">
-          <div class="project-initial">З</div>
-          <div class="project-body">
-            <div class="project-meta">
-              <span class="project-name">Zerkalo/<span lang="ru">Зеркало</span> - Typst IDE</span>
-              <span class="project-type">Flatpak · Typst · Academic</span>
-              <span class="project-status-dev" data-repo="calstfrancis/zerkalo">Available via Flatpak</span>
-              <span class="flatpak-badge">📦 Flatpak</span>
-            </div>
-            <p class="project-desc">
-              Full academic Typst workplace. Templates for SBL, Chicago, APA, IEEE, Gost, etc... Live preview, document management, versioned backup,
-              spellcheck, export to PDF, DOCX, HTML.
-            </p>
-            <a class="project-shot" href="/zerkalo.png" data-shot="zerkalo" aria-label="Enlarge the Zerkalo screenshot">
-              <picture>
-                <source srcset="/zerkalo.webp" type="image/webp">
-                <img src="/zerkalo.png" width="1400" height="844" alt="Zerkalo — Typst IDE screenshot" loading="lazy" decoding="async">
-              </picture>
-            </a>
-            <div style="margin-top:0.6rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:center">
-              <a href="/abouts/about-zerkalo.html" class="game-link" style="opacity:0.8;font-size:0.8rem;">Design Notes &amp; Reasoning →</a>
-              <a href="https://github.com/calstfrancis/zerkalo" class="project-link">GitHub Page →</a>
             </div>
           </div>
         </div>
@@ -672,99 +671,6 @@
 </dialog>
 
 <script>
-(function(){
-  const canvas = document.getElementById('sectionPorthole');
-  if (!canvas) return;
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const ctx = canvas.getContext('2d');
-  const dpr = window.devicePixelRatio || 1;
-  const SZ = 160;
-  canvas.width = SZ*dpr; canvas.height = SZ*dpr;
-  canvas.style.width = SZ+'px'; canvas.style.height = SZ+'px';
-  ctx.scale(dpr, dpr);
-  const cx = SZ/2, cy = SZ/2, r = SZ*0.42;
-  let T = 0;
-
-  // Moods: skyTop, skyBot, waterDeep, waterSurf, waveRGB, waveAlpha, rain, holdFrames
-  const MOODS = [
-    { st:[8,18,32],  sb:[12,26,40], wd:[4,14,28],  ws:[8,22,40],  wc:[45,90,130], wa:.35, rain:false, hold:900  },
-    { st:[14,16,22], sb:[18,22,28], wd:[4,14,28],  ws:[8,22,40],  wc:[45,90,130], wa:.42, rain:true,  hold:750  },
-    { st:[4,8,20],   sb:[6,14,28],  wd:[2,6,18],   ws:[4,12,24],  wc:[30,80,110], wa:.55, rain:false, hold:1100 },
-  ];
-  const TRANS = 200;
-  let mi = 0, mTick = 0;
-
-  function lv(a,b,t){return a+(b-a)*t;}
-  function lc(a,b,t){return[lv(a[0],b[0],t),lv(a[1],b[1],t),lv(a[2],b[2],t)];}
-  function rgba(c,a){return`rgba(${c[0]|0},${c[1]|0},${c[2]|0},${a})`;}
-
-  const rain = [];
-  for (let i=0;i<22;i++)
-    rain.push({x:cx+(Math.random()-.5)*r*1.7,y:cy+(Math.random()-.5)*r*1.7,len:5+Math.random()*8,spd:1.1+Math.random()*1.8});
-
-  function draw() {
-    T += 0.008; mTick++;
-    const inTrans = mTick > MOODS[mi].hold;
-    const mLerp = inTrans ? Math.min(1,(mTick-MOODS[mi].hold)/TRANS) : 0;
-    if (mTick >= MOODS[mi].hold+TRANS) { mi=(mi+1)%MOODS.length; mTick=0; }
-    const m0=MOODS[mi], m1=MOODS[(mi+1)%MOODS.length];
-    const st=lc(m0.st,m1.st,mLerp), sb=lc(m0.sb,m1.sb,mLerp);
-    const wd=lc(m0.wd,m1.wd,mLerp), ws=lc(m0.ws,m1.ws,mLerp);
-    const wc=lc(m0.wc,m1.wc,mLerp), wa=lv(m0.wa,m1.wa,mLerp);
-    const doRain = mLerp < .5 ? m0.rain : m1.rain;
-
-    ctx.clearRect(0,0,SZ,SZ);
-    ctx.strokeStyle='rgba(95,78,42,0.88)'; ctx.lineWidth=r*.22;
-    ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.stroke();
-    ctx.fillStyle='rgba(80,65,35,0.9)';
-    for(let i=0;i<8;i++){const a=(i/8)*Math.PI*2;ctx.beginPath();ctx.arc(cx+Math.cos(a)*(r+r*.06),cy+Math.sin(a)*(r+r*.06),r*.052,0,Math.PI*2);ctx.fill();}
-    ctx.save(); ctx.beginPath(); ctx.arc(cx,cy,r*.86,0,Math.PI*2); ctx.clip();
-    const horizY=cy+r*.08+Math.sin(T*.15)*r*.06;
-    const sg=ctx.createLinearGradient(cx,cy-r,cx,cy+r);
-    sg.addColorStop(0,rgba(st,1)); sg.addColorStop(.5,rgba(sb,1));
-    sg.addColorStop(.52,rgba(ws,1)); sg.addColorStop(1,rgba(wd,1));
-    ctx.fillStyle=sg; ctx.fillRect(cx-r,cy-r,r*2,r*2);
-    for(let i=0;i<8;i++){
-      const wy=horizY+r*.1+i*r*.09+Math.sin(T*.3+i*1.1)*r*.018;
-      const amp=r*.028*(1-i*.08), wop=wa*(1-i*.09);
-      ctx.strokeStyle=rgba(wc,wop); ctx.lineWidth=i<2?1.2:.8;
-      ctx.beginPath(); ctx.moveTo(cx-r*.88,wy);
-      for(let xi=-r*.88;xi<=r*.88;xi+=3){const la=amp*(1-Math.abs(xi)/(r*.88)*.3);ctx.lineTo(cx+xi,wy+Math.sin(T*(.18+i*.06)+xi*.038+i*1.1)*la);}
-      ctx.stroke();
-    }
-    if(doRain){
-      ctx.strokeStyle='rgba(120,160,200,0.32)'; ctx.lineWidth=.5;
-      for(const d of rain){d.y+=d.spd;if(d.y>cy+r){d.y=cy-r;d.x=cx+(Math.random()-.5)*r*1.7;}ctx.beginPath();ctx.moveTo(d.x,d.y);ctx.lineTo(d.x-1,d.y+d.len);ctx.stroke();}
-    } else {
-      const sx=cx+Math.sin(T*.07)*r*.75, sy=horizY+Math.cos(T*.05)*r*.04;
-      const swG=ctx.createRadialGradient(sx,sy,0,sx,sy,r*.55);
-      swG.addColorStop(0,'rgba(190,210,230,0.10)'); swG.addColorStop(1,'rgba(190,210,230,0)');
-      ctx.fillStyle=swG; ctx.fillRect(cx-r,cy-r,r*2,r*2);
-    }
-    ctx.restore();
-    ctx.strokeStyle='rgba(0,0,0,0.6)'; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(cx,cy,r*.86,0,Math.PI*2); ctx.stroke();
-    ctx.save(); ctx.beginPath(); ctx.arc(cx,cy,r*.86,0,Math.PI*2); ctx.clip();
-    const gl=ctx.createLinearGradient(cx-r*.4,cy-r*.7,cx+r*.1,cy-r*.2);
-    gl.addColorStop(0,'rgba(255,255,255,0.06)'); gl.addColorStop(1,'rgba(255,255,255,0)');
-    ctx.fillStyle=gl; ctx.fillRect(cx-r,cy-r,r*2,r*2); ctx.restore();
-    _raf = requestAnimationFrame(draw);
-  }
-  let _raf = null;
-  const obs = new IntersectionObserver(entries => {
-    if (entries[0].isIntersecting) {
-      cancelAnimationFrame(_raf);
-      _raf = requestAnimationFrame(draw);
-    } else {
-      cancelAnimationFrame(_raf);
-    }
-  }, { threshold: 0.01 });
-  obs.observe(canvas);
-  document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) { cancelAnimationFrame(_raf); _raf = requestAnimationFrame(draw); }
-    else cancelAnimationFrame(_raf);
-  });
-})();
-
 const _navSections = [...document.querySelectorAll('.nav-links a[href^="#"]')]
   .map(a => document.getElementById(a.getAttribute('href').slice(1)))
   .filter(Boolean)
@@ -837,59 +743,27 @@ themeBtn.addEventListener('click', () => {
   setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
 });
 
+// SPASIBO title drifts between its Latin and Cyrillic spellings — a slow
+// opacity crossfade, not the old strobe. Opacity only, so it can't judder.
 (function(){
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const card = document.querySelector('.game-feature.spasibo');
   const title = card && card.querySelector('.game-title');
   if (!card || !title) return;
-  const LAT = 'SPASIBO', CYR = 'СПАСИБО';
-  const CORRUPT = ['СПАСIBO', 'СPA̵СИБО', 'СПАСIBО'];
+  const LAT = 'SPASIBO', CYR = '\u0421\u041f\u0410\u0421\u0418\u0411\u041e';
+  let cyrillic = false;
 
-  function doFlicker(){
-    // force reflow so animation always restarts cleanly if class was already present
-    card.classList.remove('spasibo-flickering');
-    void card.offsetWidth;
-    card.classList.add('spasibo-flickering');
-    // fallback removal in case animationend doesn't fire
-    const removeFlicker = () => card.classList.remove('spasibo-flickering');
-    card.addEventListener('animationend', removeFlicker, {once:true});
-    setTimeout(removeFlicker, 900);
-
-    // 40% chance: just a visual flicker, no text change
-    if (Math.random() < 0.4) {
-      setTimeout(doFlicker, 22000 + Math.random() * 23000);
-      return;
-    }
-
-    // strobe starts 150ms in — mid-flicker, as if the brightness spike corrupted the signal
-    const strobeCount = 4 + Math.floor(Math.random() * 3);
-    let i = 0;
-    setTimeout(function strobeStep(){
-      if (i < strobeCount) {
-        title.textContent = (i % 2 === 0) ? CYR : LAT;
-        title.lang = (i % 2 === 0) ? 'ru' : '';
-        i++;
-        setTimeout(strobeStep, 80 + Math.random() * 40);
-      } else {
-        // one frame of corruption before settling
-        title.textContent = CORRUPT[Math.floor(Math.random() * CORRUPT.length)];
-        title.lang = 'ru';
-        setTimeout(() => {
-          title.textContent = CYR; // hard snap — signal stuck
-          title.lang = 'ru';
-          // dwell 3–10s, then hard cut back with no animation
-          setTimeout(() => {
-            title.textContent = LAT;
-            title.lang = '';
-            setTimeout(doFlicker, 22000 + Math.random() * 23000);
-          }, 3000 + Math.random() * 7000);
-        }, 80 + Math.random() * 60);
-      }
-    }, 150);
+  function drift(){
+    title.style.opacity = '0';
+    setTimeout(() => {
+      cyrillic = !cyrillic;
+      title.textContent = cyrillic ? CYR : LAT;
+      title.lang = cyrillic ? 'ru' : '';
+      title.style.opacity = '1';
+      setTimeout(drift, cyrillic ? 6000 + Math.random() * 5000 : 45000 + Math.random() * 25000);
+    }, 700);
   }
-
-  // first occurrence: 12–17s after load
-  setTimeout(doFlicker, 12000 + Math.random() * 5000);
+  setTimeout(drift, 20000 + Math.random() * 15000);
 })();
 
 // Screenshot toggles. The panel animates on grid-template-rows (0fr → 1fr),
@@ -1088,18 +962,6 @@ document.querySelectorAll('.copy-btn').forEach(btn => {
 document.querySelectorAll('.section-eyebrow').forEach(el => {
   el.insertAdjacentHTML('afterbegin', '<svg width="11" height="11" viewBox="-22 -22 44 44" aria-hidden="true" style="overflow:visible;vertical-align:middle;margin-right:.38em;flex-shrink:0;display:inline-block"><use href="#lf-v"/></svg>');
 });
-
-// Typewriter on hero eyebrow
-(function(){
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const el = document.querySelector('.hero-eyebrow');
-  if (!el) return;
-  const text = el.textContent;
-  el.textContent = '';
-  let i = 0;
-  function type(){ if(i<text.length){ el.textContent+=text[i++]; setTimeout(type,32+Math.random()*28); } }
-  setTimeout(type, 350);
-})();
 
 // Vine ink draw on scroll entry
 (function(){

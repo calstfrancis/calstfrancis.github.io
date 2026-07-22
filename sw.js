@@ -68,15 +68,23 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  // HTML pages: network-first, fall back to cache
-  if (e.request.headers.get('accept')?.includes('text/html')) {
+  // Stylesheets, scripts and versions.json: network-first, same as HTML.
+  // These used to be stale-while-revalidate, which meant the first load after a
+  // deploy rendered the new markup against the *previous* CSS — a deployed fix
+  // could look broken until a second reload. Correctness beats the few ms.
+  const isCode = /\.(css|js)$/.test(url.pathname) || url.pathname === '/versions.json';
+
+  if (isCode || e.request.headers.get('accept')?.includes('text/html')) {
     e.respondWith(
       fetch(e.request)
         .then(res => {
           if (res.ok) caches.open(CACHE).then(c => c.put(e.request, res.clone()));
           return res;
         })
-        .catch(() => caches.match(e.request).then(hit => hit || caches.match('/404.html')))
+        // Offline: fall back to the cached copy. Only an HTML request may fall
+        // back to /404.html — handing that to a <link rel=stylesheet> would
+        // serve markup as CSS.
+        .catch(() => caches.match(e.request).then(hit => hit || (isCode ? undefined : caches.match('/404.html'))))
     );
     return;
   }
