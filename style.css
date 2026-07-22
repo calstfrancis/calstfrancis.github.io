@@ -78,12 +78,13 @@ nav{
   font-family:var(--font-display);
   font-size:1.05rem;color:var(--coral);letter-spacing:.03em;
   display:flex;align-items:center;gap:.45rem;
+  white-space:nowrap;flex-shrink:0;
   view-transition-name: site-brand;
 }
 .nav-brand svg{width:20px;height:20px;overflow:visible;flex-shrink:0}
 .nav-brand svg{transition:transform .45s cubic-bezier(.22,1,.36,1),opacity .45s ease}
 .nav-brand:hover svg,.nav-brand:focus-within svg{transform:scale(1.12)}
-.nav-links{display:flex;align-items:center;gap:1.8rem;list-style:none}
+.nav-links{display:flex;align-items:center;gap:1.15rem;list-style:none}
 .nav-links a{
   font-family:var(--font-body);font-size:.84rem;font-weight:600;
   letter-spacing:.1em;text-transform:uppercase;color:var(--text-3);transition:color .15s;
@@ -510,13 +511,16 @@ footer a:hover{color:var(--coral)}
   .game-ascii{display:none}
   .game-header{flex-direction:column;gap:.9rem}
 }
-@media(max-width:680px){
+/* The nav collapses earlier than the rest of the layout: six links plus two
+   toggles stop fitting beside the wordmark well before the content does. */
+@media(max-width:900px){
   .nav-toggle{display:flex}
   .nav-links{
     display:none;position:fixed;top:52px;left:0;right:0;
     background:rgba(20,4,2,.99);border-bottom:2px solid var(--border);
     flex-direction:column;gap:0;padding:.5rem 0;z-index:99;
   }
+  .nav-links li{width:100%}
   [data-theme="light"] .nav-links{background:rgba(240,228,200,.99)}
   .nav-links.open{display:flex}
   .nav-links li a,.nav-links li button{
@@ -524,31 +528,28 @@ footer a:hover{color:var(--coral)}
     letter-spacing:.1em;width:100%;text-align:left;
   }
   .theme-toggle{border:none;padding:.85rem 1.75rem;width:100%;justify-content:flex-start}
+}
 
+@media(max-width:680px){
   .hero{padding:3rem 0 0}
   .hero-wm{display:none}
   .hero-actions{flex-direction:column;align-items:stretch}
   .btn{justify-content:center;padding:.75rem 1.2rem}
-
   section{padding:2.5rem 0}
   .container{padding:0 1.1rem}
-
   .game-body{padding:1.2rem 1.1rem 1.4rem}
   .game-ascii{display:none}
   .game-header{flex-direction:column;gap:.8rem}
   .game-footer{flex-direction:column;align-items:flex-start;gap:.7rem}
   .game-bota-top{display:none}
-
   .project-card-flower{display:none}
   .project-body-wrap{padding:1rem 1.1rem;gap:.9rem}
   .project-initial{font-size:2rem;width:2.2rem}
   .project-meta{gap:.4rem}
   .install-commands{flex-direction:column;align-items:flex-start}
-
   .about-body{grid-template-columns:1fr}
   .about-cell:first-child{grid-column:1}
   .about-cell{padding:1.1rem 1.1rem 1.1rem 1.3rem}
-
   .support-body{flex-direction:column;gap:.8rem;padding:1.4rem 1.2rem}
   .support-bota{width:50px}
 }
@@ -925,19 +926,15 @@ section.section-visible{animation:riseIn .6s cubic-bezier(.22,1,.36,1) both}
 .app-name-role::before{content:'❧';margin-right:.4rem;opacity:.7}
 
 /* ══ CAPABILITY FACTS ═══════════════════════════════════════════════════════
-   The local-first promise, stated on every card rather than left in prose. */
+   The local-first promise, stated on every card rather than left in prose.
+   One quiet line — as a row of pills it competed with the meta row above it. */
 .caps{
-  list-style:none;display:flex;flex-wrap:wrap;gap:.3rem .4rem;
-  margin:.1rem 0 .7rem;padding:0;min-width:0;
+  font-family:var(--font-body);font-size:.72rem;font-weight:600;
+  letter-spacing:.07em;color:var(--text-3);
+  margin:-.15rem 0 .75rem;opacity:.8;
+  display:flex;align-items:baseline;gap:.4rem;flex-wrap:wrap;min-width:0;
 }
-.caps li{
-  font-family:var(--font-body);font-size:.66rem;font-weight:600;
-  letter-spacing:.06em;text-transform:uppercase;
-  color:var(--text-3);border:1px solid var(--border-hi);
-  border-radius:var(--r-pill);padding:.1rem .6rem;
-  background:transparent;white-space:nowrap;
-}
-.caps li::before{content:'✓';color:var(--olive);margin-right:.35rem;opacity:.8}
+.caps::before{content:'✓';color:var(--olive);opacity:.9;flex-shrink:0}
 
 /* ══ DISCLOSED SCREENSHOTS ══════════════════════════════════════════════════
    <details> rather than a scripted panel, so it opens with JS off. */
