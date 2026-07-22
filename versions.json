@@ -1,5 +1,22 @@
 {
   "updated": "2026-07-22T05:36:52Z",
+  "manual": {
+    "severed-hours": {
+      "version": "1.23",
+      "status": "Fully Playable now"
+    },
+    "spasibo": {
+      "version": "1.7",
+      "status": "Testing"
+    },
+    "calstfrancis/SOBORNOST": {
+      "version": "3.3.1",
+      "status": "Stable"
+    },
+    "calstfrancis/mera": {
+      "status": "Awaiting AMO approval · Available on GitHub"
+    }
+  },
   "repos": {
     "calstfrancis/rubric": {
       "downloads": 0,

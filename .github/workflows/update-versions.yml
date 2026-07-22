@@ -23,7 +23,7 @@ jobs:
               2>/dev/null || echo 'null'
           }
           python3 - <<'PY'
-          import subprocess, json, datetime
+          import subprocess, json, datetime, os
 
           repos = [
             "calstfrancis/rubric",
@@ -33,15 +33,31 @@ jobs:
             "calstfrancis/kopilka-android",
             "calstfrancis/SOBORNOST",
             "calstfrancis/iskra",
+            "calstfrancis/Gost",
+            "calstfrancis/mera",
           ]
 
-          data = {"updated": datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"), "repos": {}}
+          # The "manual" block holds versions for things with no GitHub release
+          # (the games, SOBORNOST). It is hand-edited in versions.json — carry it
+          # through untouched instead of clobbering it on every run.
+          manual = {}
+          try:
+            with open("versions.json") as f:
+              manual = json.load(f).get("manual", {})
+          except Exception:
+            pass
+
+          data = {
+            "updated": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "manual": manual,
+            "repos": {},
+          }
           for repo in repos:
             result = subprocess.run(
               ["gh", "api", f"/repos/{repo}/releases/latest",
                "--jq", "{tag_name,published_at,html_url,downloads:([.assets[].download_count]|add//0)}"],
               capture_output=True, text=True,
-              env={**__import__("os").environ}
+              env={**os.environ}
             )
             try:
               data["repos"][repo] = json.loads(result.stdout)
@@ -49,7 +65,8 @@ jobs:
               data["repos"][repo] = None
 
           with open("versions.json", "w") as f:
-            json.dump(data, f, indent=2)
+            json.dump(data, f, indent=2, ensure_ascii=False)
+            f.write("\n")
           print("Written versions.json")
           PY
 

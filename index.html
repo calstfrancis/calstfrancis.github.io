@@ -117,17 +117,31 @@
     <svg class="hero-wm" width="340" height="340" viewBox="-55 -55 110 110" aria-hidden="true">
       <use href="#sf"/>
     </svg>
-    <div class="hero-eyebrow">Student Minister ❧ Developer</div>
-    <h1>Cal St Francis</h1>
-    <p class="hero-subtitle">Candidate for Ordination, United Church of Canada</p>
-    <p class="hero-desc">
-       I build contemplative software — specialized tools for ministers, worship leaders, and academics, and
-       narrative games rooted in liturgy, memory, and theology in the traditions of <em>liberation and process</em>.
-       My desktop applications are now available via <strong>Flatpak</strong> — easy install on any Linux distribution.
-    </p>
-    <div class="hero-actions">
-      <a href="#games" class="btn btn-coral">See My Work</a>
-      <a href="https://ko-fi.com/calstfrancis" target="_blank" rel="noopener" class="btn btn-kofi"><svg width="13" height="13" viewBox="-55 -55 110 110" aria-hidden="true" style="overflow:visible;flex-shrink:0"><use href="#sf"/></svg> Ko-fi</a>
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <div class="hero-eyebrow">Student Minister ❧ Developer</div>
+        <h1>Cal St Francis</h1>
+        <p class="hero-subtitle">Candidate for Ordination, United Church of Canada</p>
+        <p class="hero-desc">
+           I build contemplative software — specialized tools for ministers, worship leaders, and academics, and
+           narrative games rooted in liturgy, memory, and theology in the traditions of <em>liberation and process</em>.
+           My desktop applications are now available via <strong>Flatpak</strong> — easy install on any Linux distribution.
+        </p>
+        <div class="hero-actions">
+          <a href="#apps" class="btn btn-coral">See My Work</a>
+          <a href="#flatpak-repo" class="btn btn-ghost">Install via Flatpak</a>
+        </div>
+      </div>
+      <!-- Hero product shot — app window frame around the Rubric screenshot -->
+      <div class="hero-shot" aria-hidden="false">
+        <figure class="app-window">
+          <div class="app-window-bar"><span></span><span></span><span></span></div>
+          <picture>
+            <source srcset="/rubric.webp" type="image/webp">
+            <img src="/rubric.png" width="1000" height="700" alt="Rubric, the liturgy planner, showing a service order beside its typeset bulletin preview." fetchpriority="high" decoding="async">
+          </picture>
+        </figure>
+      </div>
     </div>
   </div>
   <svg class="hero-vine" viewBox="0 0 900 70" preserveAspectRatio="xMidYMid slice" aria-hidden="true" style="height:70px;display:block;margin-top:2.5rem;overflow:hidden">
@@ -159,14 +173,19 @@
     </p>
 
     <!-- Flatpak repo setup notice -->
-    <div style="margin:1rem 0 1.8rem;background:var(--opale);border:1px solid var(--border-hi);border-left:3px solid var(--olive);padding:0.9rem 1.3rem;border-radius:var(--r-md);">
-      <div style="display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;margin-bottom:0.5rem;">
-        <span style="font-family:'Spectral',serif;font-size:.68rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--olive);">Flatpak Repository</span>
-        <span style="font-size:0.85rem;color:var(--text-2);">Add once, then install all apps through your Software Center:</span>
+    <div class="flatpak-notice" id="flatpak-repo">
+      <div class="flatpak-notice-head">
+        <span class="flatpak-notice-label">Flatpak Repository</span>
+        <span class="flatpak-notice-hint">Add once, then install all apps through your Software Center:</span>
       </div>
       <div class="install-commands">
-        <code>flatpak remote-add --if-not-exists calstfrancis https://calstfrancis.github.io/flatpak/calstfrancis.flatpakrepo</code>
-        <a href="https://calstfrancis.github.io/flatpak/calstfrancis.flatpakrepo" class="btn btn-ghost" style="padding:0.2rem 0.8rem;font-size:0.7rem;">Download .flatpakrepo</a>
+        <code id="flatpakCmd">flatpak remote-add --if-not-exists calstfrancis https://calstfrancis.github.io/flatpak/calstfrancis.flatpakrepo</code>
+        <div class="install-actions">
+          <button type="button" class="btn btn-ghost btn-sm copy-btn" data-copy-target="flatpakCmd">
+            <span class="copy-btn-label">Copy command</span>
+          </button>
+          <a href="https://calstfrancis.github.io/flatpak/calstfrancis.flatpakrepo" class="btn btn-ghost btn-sm">Download .flatpakrepo</a>
+        </div>
       </div>
     </div>
 
@@ -207,7 +226,7 @@
           </div>
         </div>
         <div class="game-footer">
-          <span class="game-status"><span class="status-pip"></span> Fully Playable now — v1.23</span>
+          <span class="game-status" data-version-key="severed-hours"><span class="status-pip"></span><span class="game-status-text">Fully Playable now — v1.23</span></span>
           <div style="display: flex; gap: 1.5rem; align-items: center;">
             <a href="/abouts/about-severed-hours.html" class="game-link" style="opacity: 0.8; font-size: 0.8rem;">Design Notes &amp; Reasoning →</a>
             <a href="https://calstfrancis.itch.io/the-severed-hours" class="game-link">Descend →</a>
@@ -247,7 +266,7 @@
           </div>
         </div>
         <div class="game-footer">
-          <span class="game-status"><span class="status-pip"></span> Version 1.7 - Testing</span>
+          <span class="game-status" data-version-key="spasibo"><span class="status-pip"></span><span class="game-status-text">Version 1.7 — Testing</span></span>
           <div style="display: flex; gap: 1.5rem; align-items: center;">
             <a href="/abouts/about-spasibo.html" class="game-link" style="opacity: 0.8; font-size: 0.8rem;">Design Notes &amp; Reasoning →</a>
             <a href="spasibo.html" target="_blank" rel="noopener" class="game-link">Cross the Atlantic →</a>
@@ -286,13 +305,15 @@
               RCL lectionary, hymn lookup, and scripture fetching feed straight into a print‑ready bulletin, typeset with the bundled Typst engine.
               Git sync and undo history keep every service's history close at hand.
             </p>
+            <a class="project-shot" href="/rubric.png" data-shot="rubric" aria-label="Enlarge the Rubric screenshot">
+              <picture>
+                <source srcset="/rubric.webp" type="image/webp">
+                <img src="/rubric.png" width="1000" height="700" alt="Rubric — Liturgy Planner screenshot" loading="lazy" decoding="async">
+              </picture>
+            </a>
             <div style="margin-top:0.6rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:center">
               <a href="/abouts/about-rubric.html" class="game-link" style="opacity:0.8;font-size:0.8rem;">Design Notes &amp; Reasoning →</a>
               <a href="https://github.com/calstfrancis/rubric" class="project-link">GitHub Page →</a>
-              <button class="screenshot-toggle" aria-expanded="false" aria-controls="rubric-screenshot">Screenshot ↓</button>
-            </div>
-            <div class="screenshot-panel" id="rubric-screenshot" hidden>
-              <img src="/rubric.png" alt="Rubric — Liturgy Planner screenshot" loading="lazy">
             </div>
           </div>
         </div>
@@ -314,13 +335,15 @@
               Full academic Typst workplace. Templates for SBL, Chicago, APA, IEEE, Gost, etc... Live preview, document management, versioned backup,
               spellcheck, export to PDF, DOCX, HTML.
             </p>
+            <a class="project-shot" href="/zerkalo.png" data-shot="zerkalo" aria-label="Enlarge the Zerkalo screenshot">
+              <picture>
+                <source srcset="/zerkalo.webp" type="image/webp">
+                <img src="/zerkalo.png" width="1400" height="844" alt="Zerkalo — Typst IDE screenshot" loading="lazy" decoding="async">
+              </picture>
+            </a>
             <div style="margin-top:0.6rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:center">
               <a href="/abouts/about-zerkalo.html" class="game-link" style="opacity:0.8;font-size:0.8rem;">Design Notes &amp; Reasoning →</a>
               <a href="https://github.com/calstfrancis/zerkalo" class="project-link">GitHub Page →</a>
-              <button class="screenshot-toggle" aria-expanded="false" aria-controls="zerkalo-screenshot">Screenshot ↓</button>
-            </div>
-            <div class="screenshot-panel" id="zerkalo-screenshot" hidden>
-              <img src="/zerkalo.png" alt="Zerkalo — Typst IDE screenshot" loading="lazy">
             </div>
           </div>
         </div>
@@ -344,12 +367,14 @@
               references autocomplete as you type and build a bibliography automatically. RCL lectionary readings
               resolve from the planned date, and a printable, chrome-free Preaching View is built for the pulpit.
             </p>
+            <a class="project-shot" href="/iskra.png" data-shot="iskra" aria-label="Enlarge the Iskra screenshot">
+              <picture>
+                <source srcset="/iskra.webp" type="image/webp">
+                <img src="/iskra.png" width="1200" height="800" alt="Iskra — Sermon Planner screenshot" loading="lazy" decoding="async">
+              </picture>
+            </a>
             <div style="margin-top:0.6rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:center">
               <a href="https://github.com/calstfrancis/iskra" class="project-link">GitHub Page →</a>
-              <button class="screenshot-toggle" aria-expanded="false" aria-controls="iskra-screenshot">Screenshot ↓</button>
-            </div>
-            <div class="screenshot-panel" id="iskra-screenshot" hidden>
-              <img src="/iskra.png" alt="Iskra — Sermon Planner screenshot" loading="lazy">
             </div>
           </div>
         </div>
@@ -378,7 +403,7 @@
               <button class="screenshot-toggle" aria-expanded="false" aria-controls="skrizhal-screenshot">Screenshot ↓</button>
             </div>
             <div class="screenshot-panel" id="skrizhal-screenshot" hidden>
-              <img src="/skrizhal.png" alt="Skrizhal — CV element database screenshot" loading="lazy">
+              <picture><source srcset="/skrizhal.webp" type="image/webp"><img src="/skrizhal.png" width="1000" height="650" alt="Skrizhal — CV element database screenshot" loading="lazy" decoding="async"></picture>
             </div>
           </div>
         </div>
@@ -393,7 +418,7 @@
             <div class="project-meta">
               <span class="project-name"><span lang="ru">СОБОРНОСТЬ</span> / SOBORNOST — Game Engine</span>
               <span class="project-type">Narrative Engine · Open Source</span>
-              <span class="project-status-dev" data-repo="calstfrancis/SOBORNOST">Stable · v3.3.1</span>
+              <span class="project-status-dev" data-version-key="calstfrancis/SOBORNOST">Stable · v3.3.1</span>
             </div>
             <p class="project-desc">
               Browser‑native engine for contemplative, state‑reactive interactive fiction. Plain JS — no build step.
@@ -427,7 +452,7 @@
               <button class="screenshot-toggle" aria-expanded="false" aria-controls="gost-screenshot">Screenshot ↓</button>
             </div>
             <div class="screenshot-panel" id="gost-screenshot" hidden>
-              <img src="/gost.png" alt="Gost — Academic Essay Templater screenshot" loading="lazy">
+              <picture><source srcset="/gost.webp" type="image/webp"><img src="/gost.png" width="960" height="720" alt="Gost — Academic Essay Templater screenshot" loading="lazy" decoding="async"></picture>
             </div>
           </div>
         </div>
@@ -453,7 +478,7 @@
               <button class="screenshot-toggle" aria-expanded="false" aria-controls="kopilka-screenshot">Screenshot ↓</button>
             </div>
             <div class="screenshot-panel" id="kopilka-screenshot" hidden>
-              <img src="/kopilka.png" alt="Kopilka — Couples Budget Planner screenshot" loading="lazy">
+              <picture><source srcset="/kopilka.webp" type="image/webp"><img src="/kopilka.png" width="1200" height="800" alt="Kopilka — Couples Budget Planner screenshot" loading="lazy" decoding="async"></picture>
             </div>
           </div>
         </div>
@@ -490,7 +515,7 @@
             <div class="project-meta">
               <span class="project-name">Мера / Mera — Tab Capper</span>
               <span class="project-type">Firefox Extension · Browser</span>
-              <span class="project-status-dev" data-repo="calstfrancis/mera">Awaiting AMO approval · Available on GitHub</span>
+              <span class="project-status-dev" data-version-key="calstfrancis/mera">Awaiting AMO approval · Available on GitHub</span>
               <span class="flatpak-badge" style="background:#e84e0f18;color:#e84e0f;border-color:#e84e0f38">🦊 Firefox</span>
             </div>
             <p class="project-desc">
@@ -599,7 +624,7 @@
           donation goes a long way. No pressure, no paywalls.
         </p>
         <p style="font-family:var(--font-display);font-size:.88rem;color:var(--text-3);line-height:1.7;margin-bottom:1.2rem;opacity:.65">Freely you have received; freely give.</p>
-        <a href="https://ko-fi.com/calstfrancis" target="_blank" rel="noopener" class="btn btn-kofi"><svg width="13" height="13" viewBox="-55 -55 110 110" aria-hidden="true" style="overflow:visible;flex-shrink:0"><use href="#sf"/></svg> Support on Ko-fi</a>
+        <a href="https://ko-fi.com/calstfrancis" target="_blank" rel="noopener" class="btn btn-kofi btn-lg"><svg width="15" height="15" viewBox="-55 -55 110 110" aria-hidden="true" style="overflow:visible;flex-shrink:0"><use href="#sf"/></svg> Support on Ko-fi</a>
       </div>
     </div>
   </div>
@@ -639,6 +664,12 @@
 <button class="back-to-top" id="backToTop" aria-label="Back to top">
   <svg width="20" height="20" viewBox="-55 -55 110 110" aria-hidden="true" style="overflow:visible"><use href="#sf"/></svg>
 </button>
+
+<!-- Lightbox for the inline featured screenshots -->
+<dialog class="lightbox" id="lightbox" aria-label="Screenshot">
+  <button type="button" class="lightbox-close" aria-label="Close screenshot">✕</button>
+  <img alt="">
+</dialog>
 
 <script>
 (function(){
@@ -743,7 +774,11 @@ const _heroWm   = document.querySelector('.hero-wm');
 const _heroVine = document.querySelector('.hero-vine');
 const _parallaxOk = !window.matchMedia('(prefers-reduced-motion: reduce)').matches
   && !CSS.supports('animation-timeline', 'scroll()');
-window.addEventListener('scroll', () => {
+// Scroll work is rAF-throttled: this handler reads layout (getBoundingClientRect)
+// for scroll-spy, which is too expensive to run on every raw scroll event.
+let _scrollQueued = false;
+function _onScroll() {
+  _scrollQueued = false;
   const y = window.scrollY;
   const pct = y / (document.documentElement.scrollHeight - window.innerHeight);
   document.documentElement.style.setProperty('--scroll-progress', (pct||0).toFixed(4));
@@ -760,7 +795,13 @@ window.addEventListener('scroll', () => {
   }
   _navAs.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + cur));
   document.getElementById('backToTop').classList.toggle('visible', y > 400);
+}
+window.addEventListener('scroll', () => {
+  if (_scrollQueued) return;
+  _scrollQueued = true;
+  requestAnimationFrame(_onScroll);
 }, {passive:true});
+_onScroll();
 
 const _btt = document.getElementById('backToTop');
 if (_btt) _btt.addEventListener('click', () => window.scrollTo({top:0,behavior:'smooth'}));
@@ -851,7 +892,8 @@ themeBtn.addEventListener('click', () => {
   setTimeout(doFlicker, 12000 + Math.random() * 5000);
 })();
 
-// Screenshot toggles
+// Screenshot toggles. The panel animates on grid-template-rows (0fr → 1fr),
+// so a screenshot of any height opens fully — no max-height to outgrow.
 document.querySelectorAll('.screenshot-toggle').forEach(btn => {
   btn.addEventListener('click', () => {
     const panel = document.getElementById(btn.getAttribute('aria-controls'));
@@ -863,15 +905,75 @@ document.querySelectorAll('.screenshot-toggle').forEach(btn => {
   });
 });
 
-// Project filter tabs
-document.querySelectorAll('.filter-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    const f = btn.dataset.filter;
+// Copy-to-clipboard for the flatpak remote-add command
+document.querySelectorAll('.copy-btn').forEach(btn => {
+  const label = btn.querySelector('.copy-btn-label');
+  const original = label.textContent;
+  let revert;
+  btn.addEventListener('click', async () => {
+    const src = document.getElementById(btn.dataset.copyTarget);
+    if (!src) return;
+    try {
+      await navigator.clipboard.writeText(src.textContent.trim());
+      label.textContent = 'Copied ✓';
+    } catch {
+      // Clipboard API needs a secure context; fall back to selecting the text.
+      const sel = window.getSelection(), range = document.createRange();
+      range.selectNodeContents(src); sel.removeAllRanges(); sel.addRange(range);
+      label.textContent = 'Press Ctrl+C';
+    }
+    btn.classList.add('copied');
+    clearTimeout(revert);
+    revert = setTimeout(() => { label.textContent = original; btn.classList.remove('copied'); }, 2200);
+  });
+});
+
+// Lightbox for the inline featured screenshots
+(function () {
+  const shots = [...document.querySelectorAll('.project-shot')];
+  const box = document.getElementById('lightbox');
+  if (!shots.length || !box) return;
+  const boxImg = box.querySelector('img');
+  const closeBtn = box.querySelector('.lightbox-close');
+  let lastFocus = null;
+
+  const close = () => {
+    box.close();
+    boxImg.removeAttribute('src');
+  };
+  shots.forEach(shot => {
+    shot.addEventListener('click', e => {
+      if (e.metaKey || e.ctrlKey || e.shiftKey) return; // let "open in new tab" work
+      e.preventDefault();
+      const img = shot.querySelector('img');
+      lastFocus = shot;
+      boxImg.src = shot.getAttribute('href');
+      boxImg.alt = img ? img.alt : '';
+      box.showModal();
+      closeBtn.focus();
+    });
+  });
+  closeBtn.addEventListener('click', close);
+  box.addEventListener('click', e => { if (e.target === box) close(); });
+  box.addEventListener('close', () => { if (lastFocus) lastFocus.focus(); });
+})();
+
+// Project filter tabs. The active filter lives in the URL (?filter=linux) so it
+// survives a reload and can be linked to directly.
+(function () {
+  const btns = [...document.querySelectorAll('.filter-btn')];
+  if (!btns.length) return;
+  const known = new Set(btns.map(b => b.dataset.filter));
+
+  function applyFilter(f, updateUrl) {
+    if (!known.has(f)) f = 'all';
+    btns.forEach(b => {
+      const on = b.dataset.filter === f;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-pressed', String(on));
+    });
     document.querySelectorAll('.project-card').forEach(card => {
-      const show = f === 'all' || card.dataset.category === f;
-      card.hidden = !show;
+      card.hidden = !(f === 'all' || card.dataset.category === f);
     });
     document.querySelectorAll('.project-list .project-group-heading').forEach(heading => {
       let sib = heading.nextElementSibling, anyVisible = false;
@@ -881,8 +983,22 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
       }
       heading.hidden = !anyVisible;
     });
+    if (updateUrl) {
+      const url = new URL(location.href);
+      if (f === 'all') url.searchParams.delete('filter');
+      else url.searchParams.set('filter', f);
+      history.replaceState({ filter: f }, '', url);
+    }
+  }
+
+  btns.forEach(btn => btn.addEventListener('click', () => applyFilter(btn.dataset.filter, true)));
+  window.addEventListener('popstate', () => {
+    applyFilter(new URLSearchParams(location.search).get('filter') || 'all', false);
   });
-});
+
+  const initial = new URLSearchParams(location.search).get('filter');
+  if (initial) applyFilter(initial, false);
+})();
 
 // Section entrance animations via IntersectionObserver (fallback for non-scroll-timeline browsers)
 (function () {
@@ -897,23 +1013,38 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
   document.querySelectorAll('section').forEach(s => io.observe(s));
 })();
 
-// Live version + download count from versions.json (GitHub Actions cache), with API fallback
+// Every version number on this page comes from versions.json — the release-backed
+// ones from the nightly GitHub Actions cache, the rest from its hand-edited
+// "manual" block. Nothing is typed into the markup, so nothing can drift.
 (function () {
   const spans = [...document.querySelectorAll('.project-status-dev[data-repo]')];
-  if (!spans.length) return;
+  const manualEls = [...document.querySelectorAll('[data-version-key]')];
+  if (!spans.length && !manualEls.length) return;
 
   const dlBadge = document.getElementById('androidDownloads');
   const ANDROID_REPO = 'calstfrancis/kopilka-android';
 
   function applyData(repo, tag, downloads) {
     const ver = tag.replace(/^v/, '');
-    spans.filter(s => s.dataset.repo === repo).forEach(s => {
-      if (!s.textContent.trim().includes(ver)) s.textContent = `v${ver}`;
-    });
+    // The pill shows the version once it is known; the text sitting in the
+    // markup is only the "no data yet" fallback.
+    spans.filter(s => s.dataset.repo === repo).forEach(s => { s.textContent = `v${ver}`; });
     if (dlBadge && repo === ANDROID_REPO && downloads > 0) {
       dlBadge.textContent = `${downloads.toLocaleString()} downloads`;
       dlBadge.removeAttribute('hidden');
     }
+  }
+
+  function applyManual(json) {
+    const manual = (json && json.manual) || {};
+    manualEls.forEach(el => {
+      const entry = manual[el.dataset.versionKey];
+      if (!entry) return;
+      const text = [entry.status, entry.version && `v${entry.version}`].filter(Boolean).join(' · ');
+      if (!text) return;
+      const target = el.querySelector('.game-status-text') || el;
+      target.textContent = text;
+    });
   }
 
   function fetchFromAPI(repo) {
@@ -929,20 +1060,24 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
       });
   }
 
-  const STALE_MS = 4 * 60 * 60 * 1000; // 4 hours
+  // Staleness is a property of the cache file, not of when a release happened —
+  // an app that hasn't shipped in a year still has a perfectly current entry.
+  const STALE_MS = 36 * 60 * 60 * 1000; // the workflow runs nightly
   fetch('/versions.json', { cache: 'no-cache' })
     .then(r => r.ok ? r.json() : null)
     .catch(() => null)
     .then(json => {
+      applyManual(json);
+      const fresh = json && json.updated && (Date.now() - new Date(json.updated).getTime()) < STALE_MS;
       const repos = [...new Set(spans.map(s => s.dataset.repo))];
       repos.forEach(repo => {
         const entry = json && json.repos && json.repos[repo];
-        if (entry && entry.tag_name && entry.published_at) {
-          const age = Date.now() - new Date(entry.published_at).getTime();
-          if (age < STALE_MS) {
-            applyData(repo, entry.tag_name, entry.downloads || 0);
-            return;
-          }
+        if (fresh && entry) {
+          // A fresh entry without a tag means the repo genuinely has no release
+          // (Skrizhal, Kopilka) — believe it rather than re-asking the API on
+          // every page load for an answer that is always 404.
+          if (entry.tag_name) applyData(repo, entry.tag_name, entry.downloads || 0);
+          return;
         }
         fetchFromAPI(repo);
       });
@@ -1002,6 +1137,7 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js').catch(() => {});
 }
 </script>
+
 
 </body>
 </html>
