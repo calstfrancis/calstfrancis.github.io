@@ -314,6 +314,7 @@ nav::after{
   display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.1rem;
 }
 .filter-btn{
+  display:inline-block;
   font-family:var(--font-body);font-size:.76rem;font-weight:600;
   letter-spacing:.1em;text-transform:uppercase;
   background:transparent;border:1px solid var(--border-hi);
@@ -321,8 +322,41 @@ nav::after{
   border-radius:var(--r-pill);
 }
 .filter-btn:hover{border-color:var(--coral);color:var(--coral)}
-.filter-btn.active{background:var(--cpale);border-color:var(--coral);color:var(--coral)}
 .project-card[hidden]{display:none!important}
+
+/* ── CSS-ONLY PROJECT FILTERING ──
+   The radios are visually hidden but real and focusable: keyboard users get
+   arrow-key group navigation for free, and the whole thing works with
+   scripting disabled. */
+.filter-radio{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;margin:0}
+#filter-all:checked    ~ .project-filters label[for="filter-all"],
+#filter-linux:checked  ~ .project-filters label[for="filter-linux"],
+#filter-android:checked~ .project-filters label[for="filter-android"],
+#filter-engine:checked ~ .project-filters label[for="filter-engine"],
+#filter-browser:checked~ .project-filters label[for="filter-browser"]{
+  background:var(--cpale);border-color:var(--coral);color:var(--coral);
+}
+/* Focus ring has to come from the hidden input, since that is what is focused */
+#filter-all:focus-visible    ~ .project-filters label[for="filter-all"],
+#filter-linux:focus-visible  ~ .project-filters label[for="filter-linux"],
+#filter-android:focus-visible~ .project-filters label[for="filter-android"],
+#filter-engine:focus-visible ~ .project-filters label[for="filter-engine"],
+#filter-browser:focus-visible~ .project-filters label[for="filter-browser"]{
+  outline:2px solid var(--coral);outline-offset:3px;
+}
+#filter-linux:checked   ~ .project-list .project-card:not([data-category="linux"]),
+#filter-android:checked ~ .project-list .project-card:not([data-category="android"]),
+#filter-engine:checked  ~ .project-list .project-card:not([data-category="engine"]),
+#filter-browser:checked ~ .project-list .project-card:not([data-category="browser"]){display:none}
+/* A group with nothing left to show hides its heading too */
+@supports selector(:has(*)){
+  #filter-linux:checked   ~ .project-list .project-group:not(:has(.project-card[data-category="linux"])),
+  #filter-android:checked ~ .project-list .project-group:not(:has(.project-card[data-category="android"])),
+  #filter-engine:checked  ~ .project-list .project-group:not(:has(.project-card[data-category="engine"])),
+  #filter-browser:checked ~ .project-list .project-group:not(:has(.project-card[data-category="browser"])){display:none}
+}
+.project-group{display:flex;flex-direction:column;gap:.75rem}
+.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 
 .project-group-heading{
   font-family:var(--font-body);font-size:.74rem;font-weight:600;
@@ -347,7 +381,7 @@ nav::after{
   background:linear-gradient(to right,var(--coral),transparent);opacity:.5;
 }
 
-.project-list{display:flex;flex-direction:column;gap:.75rem}
+.project-list{display:flex;flex-direction:column;gap:.4rem}
 .project-card{
   border:1px solid var(--border-hi);border-left:3px solid var(--border-hi);background:rgba(0,0,0,.12);
   border-radius:var(--r-md);
@@ -658,8 +692,11 @@ section.section-visible{animation:riseIn .6s cubic-bezier(.22,1,.36,1) both}
 
 /* ── STAGGERED CARD ENTRANCE ── */
 @keyframes cardRise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+/* The .js guard matters: the staggered entrance starts the cards at opacity 0
+   and JS is what reveals them. Without the guard, a browser with scripting off
+   (or a script that failed to run) shows an empty project list forever. */
 @media(prefers-reduced-motion:no-preference){
-  .project-list .project-card{opacity:0}
+  html.js .project-list .project-card{opacity:0}
   .project-list.cards-visible .project-card{animation:cardRise .55s cubic-bezier(.22,1,.36,1) both}
   .project-list.cards-visible .project-card:nth-child(2){animation-delay:.08s}
   .project-list.cards-visible .project-card:nth-child(3){animation-delay:.16s}
@@ -858,3 +895,99 @@ section.section-visible{animation:riseIn .6s cubic-bezier(.22,1,.36,1) both}
 @media print{
   .project-shot,.lightbox,.hero-shot{display:none!important}
 }
+
+/* ══ APP NAME LOCKUP ════════════════════════════════════════════════════════
+   Every Slavic-named app reads the same way: the word in Cyrillic (tagged
+   lang="ru" so a screen reader switches voice rather than spelling it out in
+   English), the transliteration, what it means, and what it does. */
+.app-name{display:flex;align-items:baseline;gap:.5rem;flex-wrap:wrap;min-width:0}
+.app-name-cyr{
+  font-family:var(--font-display);color:var(--text);
+  letter-spacing:.01em;
+}
+.app-name-lat{
+  font-family:var(--font-body);font-size:.82em;font-weight:600;
+  color:var(--text-2);letter-spacing:.03em;
+}
+.app-name-lat::before{content:'/';color:var(--text-3);opacity:.5;margin-right:.5rem}
+.app-name:not(:has(.app-name-cyr)) .app-name-lat{
+  font-family:var(--font-display);font-size:1em;font-weight:400;color:var(--text);
+}
+.app-name:not(:has(.app-name-cyr)) .app-name-lat::before{content:none}
+.app-name-gloss{
+  font-family:var(--font-display);font-size:.74em;font-style:italic;
+  color:var(--text-3);opacity:.85;
+}
+.app-name-role{
+  font-family:var(--font-body);font-size:.6em;font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--olive);
+}
+.app-name-role::before{content:'❧';margin-right:.4rem;opacity:.7}
+
+/* ══ CAPABILITY FACTS ═══════════════════════════════════════════════════════
+   The local-first promise, stated on every card rather than left in prose. */
+.caps{
+  list-style:none;display:flex;flex-wrap:wrap;gap:.3rem .4rem;
+  margin:.1rem 0 .7rem;padding:0;min-width:0;
+}
+.caps li{
+  font-family:var(--font-body);font-size:.66rem;font-weight:600;
+  letter-spacing:.06em;text-transform:uppercase;
+  color:var(--text-3);border:1px solid var(--border-hi);
+  border-radius:var(--r-pill);padding:.1rem .6rem;
+  background:transparent;white-space:nowrap;
+}
+.caps li::before{content:'✓';color:var(--olive);margin-right:.35rem;opacity:.8}
+
+/* ══ DISCLOSED SCREENSHOTS ══════════════════════════════════════════════════
+   <details> rather than a scripted panel, so it opens with JS off. */
+.screenshot-details{margin:.2rem 0 .5rem}
+.screenshot-details summary{
+  display:inline-block;cursor:pointer;list-style:none;
+  font-family:var(--font-body);font-size:.84rem;font-weight:600;
+  letter-spacing:.04em;color:var(--text-3);transition:color .15s;
+}
+.screenshot-details summary::-webkit-details-marker{display:none}
+.screenshot-details summary::after{content:' ↓';transition:none}
+.screenshot-details[open] summary::after{content:' ↑'}
+.screenshot-details summary:hover,.screenshot-details[open] summary{color:var(--coral)}
+.screenshot-details[open] .project-shot{margin-top:.8rem}
+.project-shot.is-inline{max-width:340px}
+
+/* ══ QUIET MODE ═════════════════════════════════════════════════════════════
+   A persistent off switch for motion and ornament, independent of the OS
+   setting — nobody should have to change a system preference to read a page. */
+[data-motion="quiet"] *,
+[data-motion="quiet"] *::before,
+[data-motion="quiet"] *::after{
+  animation:none!important;transition:none!important;
+}
+[data-motion="quiet"] .hero-wm,
+[data-motion="quiet"] .project-card-flower,
+[data-motion="quiet"] .about-cell-flower,
+[data-motion="quiet"] .game-feature::before,
+[data-motion="quiet"] .game-feature::after{display:none}
+[data-motion="quiet"] .hero h1{
+  background:none;-webkit-text-fill-color:currentColor;color:var(--text);
+}
+[data-motion="quiet"] .app-window{transform:none}
+
+/* ══ LITURGICAL SEASON ══════════════════════════════════════════════════════
+   The ornament colour keeps the church year: the same calendar Rubric and
+   Iskra compute from. Coral stays the brand; the olive accent is what moves. */
+.season-line{
+  display:inline-flex;align-items:center;gap:.45rem;
+  font-family:var(--font-body);font-size:.72rem;font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--olive);
+  margin-top:.9rem;opacity:.85;
+}
+.season-dot{
+  width:8px;height:8px;border-radius:var(--r-pill);
+  background:var(--olive);flex-shrink:0;box-shadow:0 0 0 3px var(--opale);
+}
+.budget-line{
+  font-family:var(--font-body);font-size:.74rem;color:var(--text-3);
+  opacity:.55;margin-top:.6rem;line-height:1.9;
+}
+.budget-line a{color:var(--text-3);border-bottom:1px solid transparent}
+.budget-line a:hover{color:var(--coral);border-bottom-color:var(--coral)}

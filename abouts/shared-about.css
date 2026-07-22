@@ -166,3 +166,35 @@ h3 { font-size: 1.25rem }
 @media (max-width: 680px) {
   .article-header { padding-top: 2.5rem }
 }
+
+/* Index of design notes (abouts/index.html) */
+.notes-index { list-style: none; padding: 0; margin: 0 0 2.4rem }
+.notes-index li {
+  display: flex; flex-direction: column; gap: .2rem;
+  padding: .95rem 0; border-bottom: 1px solid var(--border);
+}
+.notes-index li:last-child { border-bottom: none }
+.notes-index a {
+  font-family: var(--font-display); font-size: 1.14rem;
+  color: var(--coral); text-decoration: none;
+}
+.notes-index a:hover { color: var(--coral-hi) }
+.notes-index span {
+  font-size: .92rem; color: var(--text-3); line-height: 1.7;
+}
+
+/* Commitment lists (accessibility.html) */
+.commitments { list-style: none; padding: 0; margin: 0 0 2rem }
+.commitments li {
+  position: relative; padding-left: 1.5rem; margin-bottom: .85rem;
+  font-size: .95rem; color: var(--text-2); line-height: 1.75;
+}
+.commitments li::before {
+  content: '❧'; position: absolute; left: 0; top: .2em;
+  color: var(--olive); font-size: .8rem; line-height: 1;
+}
+.commitments strong { color: var(--text-2); font-weight: 600 }
+.commitments code, .article-body code {
+  font-family: var(--font-mono); font-size: .86em;
+  background: var(--bg-3); padding: .1em .4em; border-radius: 6px;
+}

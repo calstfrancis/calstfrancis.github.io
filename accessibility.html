@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Accessibility &amp; Motion · Cal St Francis</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta name="description" content="What this site and these applications commit to on accessibility, motion, privacy, and page weight.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://calstfrancis.github.io/accessibility.html">
+<meta property="og:title" content="Accessibility &amp; Motion · Cal St Francis">
+<meta property="og:description" content="What this site and these applications commit to on accessibility, motion, privacy, and page weight.">
+<meta property="og:image" content="https://calstfrancis.github.io/og-default.svg">
+<link rel="canonical" href="https://calstfrancis.github.io/accessibility.html">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#6a1710" id="themeColorMeta">
+<link rel="stylesheet" href="/fonts/fonts.css">
+<link rel="stylesheet" href="/abouts/shared-about.css">
+<script src="/site.js" defer></script>
+</head>
+<body>
+
+<a href="#main-content" class="skip-link">Skip to content</a>
+
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="nav-brand" style="text-decoration:none">
+      <svg viewBox="-55 -55 110 110" aria-hidden="true"><use href="#sf"/></svg>
+      Cal St Francis
+    </a>
+    <button class="theme-toggle" id="themeToggle" aria-pressed="false"><span>🌙</span> Dark</button>
+  </div>
+</nav>
+
+<main class="container animate-text" id="main-content">
+  <header class="article-header">
+    <a href="/" class="back-link">← Return to Portfolio</a>
+    <div class="project-eyebrow">Commitments</div>
+    <h1>Accessibility &amp; Motion</h1>
+    <div class="project-subtitle">What this site will and will not do to you</div>
+  </header>
+
+  <article class="article-body">
+    <p>
+      Calling software contemplative is empty if the page announcing it flashes, pulses, and
+      moves under the reader. These are the specific commitments, so they can be checked
+      rather than taken on trust.
+    </p>
+
+    <h2>Motion</h2>
+    <ul class="commitments">
+      <li><strong>Nothing spins, flashes, strobes, or pulses.</strong> Everything that did — a rotating watermark, a flickering title, a pulsing button ring, a glowing heading — has been removed rather than slowed down.</li>
+      <li><strong>All remaining motion animates opacity or transform only</strong>, so it stays smooth instead of juddering when the machine is busy.</li>
+      <li><strong>Nothing moves faster than half a second</strong>, and the one decorative flourish — a slow sweep across the heading — happens once a minute.</li>
+      <li><strong><code>prefers-reduced-motion</code> is honoured everywhere</strong>, and it is the default for the quiet switch below.</li>
+      <li><strong>No parallax on scroll unless the browser can drive it natively</strong> off a scroll timeline, where it cannot fall behind the scroll position.</li>
+    </ul>
+
+    <h2>The quiet switch</h2>
+    <p>
+      In the site header there is a toggle marked <strong>Motion</strong>. Turning it to
+      <strong>Quiet</strong> stops every animation and transition on every page, hides the
+      decorative flourishes entirely, and remembers the choice on this device. It is
+      independent of your operating system, because no one should have to change a system
+      preference to read a page in peace.
+    </p>
+
+    <h2>Reading</h2>
+    <ul class="commitments">
+      <li><strong>Every colour pair is checked against its background</strong> in both the light and dark themes.</li>
+      <li><strong>Nothing conveys meaning by colour alone</strong> — category, status, and licence are all stated in words.</li>
+      <li><strong>Text reflows and never scrolls sideways</strong>, down to a 320px screen.</li>
+      <li><strong>Russian words carry <code>lang="ru"</code></strong>, so a screen reader pronounces them rather than spelling them out in English.</li>
+      <li><strong>Every control is reachable and visible from the keyboard</strong>, with a focus ring that is never removed without a replacement.</li>
+    </ul>
+
+    <h2>The page itself</h2>
+    <ul class="commitments">
+      <li><strong>No trackers, no analytics, no cookies, no consent banner.</strong> Nothing about your visit is recorded anywhere.</li>
+      <li><strong>No third-party subresources.</strong> Fonts, styles, scripts, and images are all served from this domain — no CDN is told that you were here.</li>
+      <li><strong>One exception, stated plainly:</strong> version numbers come from a nightly cache file on this domain, but if that file is stale or missing an entry the page asks GitHub's public releases API for the tag. No cookies and no identifier are sent, and it is the only request that ever leaves this domain.</li>
+      <li><strong>The page works with JavaScript disabled.</strong> Filtering the project list, opening a screenshot, and reading everything all work without it; scripting only adds URL memory and the lightbox.</li>
+      <li><strong>Images ship as WebP with a PNG fallback</strong>, sized so a phone never downloads a desktop-sized screenshot.</li>
+      <li><strong>A first visit costs about 300&nbsp;KB</strong> including fonts and the hero screenshot. <code>budget.sh</code> in the site repository measures it, so the number in the footer can be checked.</li>
+    </ul>
+
+    <div class="vine-divider" aria-hidden="true"><svg viewBox="0 0 900 40" preserveAspectRatio="xMidYMid meet" height="40"><path d="M-10,22 C80,8 160,34 220,18 C280,4 340,34 450,20 C560,6 620,34 680,18 C740,4 820,30 910,20" stroke="#5a6428" stroke-width="1.8" fill="none" stroke-linecap="round"/><g transform="translate(220,15) scale(.3)"><use href="#sf"/></g><g transform="translate(450,17) scale(.36)"><use href="#sf"/></g><g transform="translate(680,15) scale(.3)"><use href="#sf"/></g><g transform="translate(120,22) rotate(-22) scale(.38)"><use href="#lf-v"/></g><g transform="translate(335,24) rotate(16) scale(.36)"><use href="#lf-b"/></g><g transform="translate(560,20) rotate(-16) scale(.38)"><use href="#lf-v"/></g><g transform="translate(780,22) rotate(20) scale(.36)"><use href="#lf-b"/></g></svg></div>
+
+    <h2>If something here is wrong</h2>
+    <p>
+      If any of this fails for you — a contrast that does not hold up, a control you cannot
+      reach, motion that slipped through — write to
+      <a href="mailto:calstfrancis@disroot.org" class="game-link">calstfrancis@disroot.org</a>
+      and I will fix it. A commitment nobody can report against is just a slogan.
+    </p>
+  </article>
+</main>
+
+<script src="/abouts/shared-about.js"></script>
+</body>
+</html>

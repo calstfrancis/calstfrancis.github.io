@@ -2,6 +2,7 @@ const PRECACHE = [
   '/index.html',
   '/style.css',
   '/tokens.css',
+  '/site.js',
   '/fonts/fonts.css',
   '/fonts/4UacrEBBsBhlBjvfkQjt71kZfyBzPgNG9hU4-6qj.woff2',
   '/fonts/rnCr-xNNww_2s0amA9M5kng.woff2',
@@ -17,6 +18,8 @@ const PRECACHE = [
   '/abouts/about-spasibo.html',
   '/abouts/about-gost.html',
   '/abouts/about-severed-hours.html',
+  '/abouts/index.html',
+  '/accessibility.html',
   '/404.html',
 ];
 

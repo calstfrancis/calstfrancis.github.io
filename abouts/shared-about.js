@@ -15,6 +15,7 @@ if ('serviceWorker' in navigator) {
     { slug: 'about-severed-hours', title: 'The Severed Hours',  sub: 'Interactive Fiction' },
   ];
   const current = location.pathname.split('/').pop().replace('.html', '');
+  if (current === '' || current === 'index') return;
   const others = PROJECTS.filter(p => p.slug !== current);
   if (!others.length) return;
 
@@ -23,6 +24,8 @@ if ('serviceWorker' in navigator) {
   strip.style.cssText = 'border-top:1px dashed var(--border-hi);padding:2rem 0 1rem;margin-top:1rem';
   strip.innerHTML = `<p style="font-family:var(--font-body);font-size:.7rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--olive);margin-bottom:1rem">More Reflections</p>
 <div style="display:flex;flex-wrap:wrap;gap:.6rem">${others.map(p => `<a href="/abouts/${p.slug}.html" style="display:inline-flex;flex-direction:column;padding:.55rem .9rem;border:1px solid var(--border-hi);font-family:var(--font-display);text-decoration:none;transition:border-color .15s,color .15s" onmouseover="this.style.borderColor='var(--coral)'" onmouseout="this.style.borderColor='var(--border-hi)'"><span style="font-size:.88rem;color:var(--text)"${p.lang ? ` lang="${p.lang}"` : ''}>${p.title}</span><span style="font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text-3);font-family:var(--font-body);font-weight:600;margin-top:.15rem">${p.sub}</span></a>`).join('')}</div>`;
+
+  strip.innerHTML += '<p style="margin-top:1rem"><a href="/abouts/" style="font-family:var(--font-body);font-size:.78rem;font-weight:600;letter-spacing:.04em;color:var(--text-3)">All design notes, and what contemplative software means &rarr;</a></p>';
 
   const article = document.querySelector('.article-body') || document.querySelector('main');
   if (article) article.appendChild(strip);

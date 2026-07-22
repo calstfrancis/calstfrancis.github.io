@@ -22,7 +22,9 @@
 <link rel="preload" as="font" type="font/woff2" href="/fonts/4UacrEBBsBhlBjvfkQjt71kZfyBzPgNG9hU4-6qj.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/fonts/rnCr-xNNww_2s0amA9M5kng.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/fonts/rnCt-xNNww_2s0amA9M8onrmTA.woff2" crossorigin>
+<script>document.documentElement.classList.add('js')</script>
 <link rel="stylesheet" href="/style.css">
+<script src="/site.js" defer></script>
 
 <script type="application/ld+json">
 {
@@ -106,6 +108,7 @@
       <li><a href="#apps">Projects</a></li>
       <li><a href="#about">About</a></li>
       <li><a href="#support">Support</a></li>
+      <li><button class="theme-toggle" id="quietToggle" aria-pressed="false" title="Turn off motion and ornament"><span>❧</span> Motion</button></li>
       <li><button class="theme-toggle" id="themeToggle" aria-pressed="false"><span>🌙</span> Dark</button></li>
     </ul>
   </div>
@@ -276,16 +279,24 @@
 
     </div><!-- /.game-rail -->
 
-    <div class="project-filters" role="group" aria-label="Filter projects">
-      <button class="filter-btn active" data-filter="all">All</button>
-      <button class="filter-btn" data-filter="linux">Linux Apps</button>
-      <button class="filter-btn" data-filter="android">Android</button>
-      <button class="filter-btn" data-filter="engine">Engines</button>
-      <button class="filter-btn" data-filter="browser">Browser</button>
+    <!-- Filtering is CSS-only: the checked radio drives sibling selectors over
+         .project-list, so it works with scripting off. The script layer only
+         mirrors the choice into the URL. -->
+      <input class="filter-radio" type="radio" name="project-filter" id="filter-all" value="all" checked>
+      <input class="filter-radio" type="radio" name="project-filter" id="filter-linux" value="linux">
+      <input class="filter-radio" type="radio" name="project-filter" id="filter-android" value="android">
+      <input class="filter-radio" type="radio" name="project-filter" id="filter-engine" value="engine">
+      <input class="filter-radio" type="radio" name="project-filter" id="filter-browser" value="browser">
+    <div class="project-filters" role="group" aria-label="Filter projects by platform">
+      <label class="filter-btn" for="filter-all">All</label>
+      <label class="filter-btn" for="filter-linux">Linux Apps</label>
+      <label class="filter-btn" for="filter-android">Android</label>
+      <label class="filter-btn" for="filter-engine">Engines</label>
+      <label class="filter-btn" for="filter-browser">Browser</label>
     </div>
     <div class="project-list" id="apps">
-
-      <div class="project-group-heading is-featured">Featured Software</div>
+      <div class="project-group">
+        <div class="project-group-heading is-featured">Featured Software</div>
 
       <!-- Zerkalo - Flatpak integrated -->
       <div class="project-card featured" data-category="linux" data-repo="calstfrancis/zerkalo">
@@ -294,7 +305,7 @@
           <div class="project-initial">З</div>
           <div class="project-body">
             <div class="project-meta">
-              <span class="project-name">Zerkalo/<span lang="ru">Зеркало</span> - Typst IDE</span>
+              <span class="project-name app-name"><span class="app-name-cyr" lang="ru">Зеркало</span><span class="app-name-lat">Zerkalo</span><span class="app-name-gloss">“mirror”</span><span class="app-name-role">Typst IDE</span></span>
               <span class="project-type">Flatpak · Typst · Academic</span>
               <span class="project-status-dev" data-repo="calstfrancis/zerkalo">Available via Flatpak</span>
               <span class="flatpak-badge">📦 Flatpak</span>
@@ -303,6 +314,12 @@
               Full academic Typst workplace. Templates for SBL, Chicago, APA, IEEE, Gost, etc... Live preview, document management, versioned backup,
               spellcheck, export to PDF, DOCX, HTML.
             </p>
+            <ul class="caps" aria-label="Privacy and licence facts">
+              <li>No cloud</li>
+              <li>No accounts</li>
+              <li>Your files, your disk</li>
+              <li>MIT</li>
+            </ul>
             <a class="project-shot" href="/zerkalo.png" data-shot="zerkalo" aria-label="Enlarge the Zerkalo screenshot">
               <picture>
                 <source srcset="/zerkalo.webp" type="image/webp">
@@ -324,7 +341,7 @@
           <div class="project-initial">R</div>
           <div class="project-body">
             <div class="project-meta">
-              <span class="project-name">Rubric — Liturgy Planner</span>
+              <span class="project-name app-name"><span class="app-name-lat">Rubric</span><span class="app-name-gloss">“the red instruction”</span><span class="app-name-role">Liturgy Planner</span></span>
               <span class="project-type">Flatpak · Typst · UCC</span>
               <span class="project-status-dev" data-repo="calstfrancis/rubric">Available via Flatpak</span>
               <span class="flatpak-badge">📦 Flatpak</span>
@@ -334,6 +351,12 @@
               RCL lectionary, hymn lookup, and scripture fetching feed straight into a print‑ready bulletin, typeset with the bundled Typst engine.
               Git sync and undo history keep every service's history close at hand.
             </p>
+            <ul class="caps" aria-label="Privacy and licence facts">
+              <li>No cloud</li>
+              <li>No accounts</li>
+              <li>Your files, your disk</li>
+              <li>MIT</li>
+            </ul>
             <a class="project-shot" href="/rubric.png" data-shot="rubric" aria-label="Enlarge the Rubric screenshot">
               <picture>
                 <source srcset="/rubric.webp" type="image/webp">
@@ -355,7 +378,7 @@
           <div class="project-initial">И</div>
           <div class="project-body">
             <div class="project-meta">
-              <span class="project-name">Iskra/<span lang="ru">Искра</span> - Sermon Planner</span>
+              <span class="project-name app-name"><span class="app-name-cyr" lang="ru">Искра</span><span class="app-name-lat">Iskra</span><span class="app-name-gloss">“spark”</span><span class="app-name-role">Sermon Planner</span></span>
               <span class="project-type">Flatpak · Sermon Planning · Rubric Companion</span>
               <span class="project-status-dev" data-repo="calstfrancis/iskra">Available via Flatpak</span>
               <span class="flatpak-badge">📦 Flatpak</span>
@@ -366,6 +389,12 @@
               references autocomplete as you type and build a bibliography automatically. RCL lectionary readings
               resolve from the planned date, and a printable, chrome-free Preaching View is built for the pulpit.
             </p>
+            <ul class="caps" aria-label="Privacy and licence facts">
+              <li>No cloud</li>
+              <li>No accounts</li>
+              <li>Your files, your disk</li>
+              <li>MIT</li>
+            </ul>
             <a class="project-shot" href="/iskra.png" data-shot="iskra" aria-label="Enlarge the Iskra screenshot">
               <picture>
                 <source srcset="/iskra.webp" type="image/webp">
@@ -379,7 +408,9 @@
         </div>
       </div>
 
-      <div class="project-group-heading">Other Software</div>
+      </div>
+      <div class="project-group">
+        <div class="project-group-heading">Other Software</div>
 
       <!-- Skrizhal - Flatpak integrated, companion to Zerkalo -->
       <div class="project-card" data-category="linux" data-repo="calstfrancis/skrizhal">
@@ -388,7 +419,7 @@
           <div class="project-initial">С</div>
           <div class="project-body">
             <div class="project-meta">
-              <span class="project-name">Skrizhal/<span lang="ru">Скрижаль</span> - CV Element Database</span>
+              <span class="project-name app-name"><span class="app-name-cyr" lang="ru">Скрижаль</span><span class="app-name-lat">Skrizhal</span><span class="app-name-gloss">“tablet of the law”</span><span class="app-name-role">CV Element Database</span></span>
               <span class="project-type">Flatpak · CV Data · Zerkalo Companion</span>
               <span class="project-status-dev" data-repo="calstfrancis/skrizhal">Available via Flatpak</span>
               <span class="flatpak-badge">📦 Flatpak</span>
@@ -397,13 +428,24 @@
               YAML editor for CV elements — jobs, education, awards, publications, service — each keyed like a citation.
               Built as a companion to <a href="https://github.com/calstfrancis/zerkalo" class="game-link" style="font-size:inherit">Zerkalo</a>: a shared, GTK-free core crate lets Zerkalo's CV mode pull entries straight out of Skrizhal's database instead of retyping the same history into every new document.
             </p>
+            <ul class="caps" aria-label="Privacy and licence facts">
+              <li>No cloud</li>
+              <li>No accounts</li>
+              <li>Your files, your disk</li>
+              <li>MIT</li>
+            </ul>
             <div style="margin-top:0.6rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:center">
               <a href="https://github.com/calstfrancis/skrizhal" class="project-link">GitHub Page →</a>
-              <button class="screenshot-toggle" aria-expanded="false" aria-controls="skrizhal-screenshot">Screenshot ↓</button>
             </div>
-            <div class="screenshot-panel" id="skrizhal-screenshot" hidden>
-              <picture><source srcset="/skrizhal.webp" type="image/webp"><img src="/skrizhal.png" width="1000" height="650" alt="Skrizhal — CV element database screenshot" loading="lazy" decoding="async"></picture>
-            </div>
+            <details class="screenshot-details">
+              <summary>Screenshot</summary>
+              <a class="project-shot is-inline" href="/skrizhal.png" aria-label="Enlarge the Skrizhal screenshot">
+                <picture>
+                  <source srcset="/skrizhal.webp" type="image/webp">
+                  <img src="/skrizhal.png" width="1000" height="650" alt="Skrizhal — CV element database screenshot" loading="lazy" decoding="async">
+                </picture>
+              </a>
+            </details>
           </div>
         </div>
       </div>
@@ -415,7 +457,7 @@
           <div class="project-initial">C</div>
           <div class="project-body">
             <div class="project-meta">
-              <span class="project-name"><span lang="ru">СОБОРНОСТЬ</span> / SOBORNOST — Game Engine</span>
+              <span class="project-name app-name"><span class="app-name-cyr" lang="ru">Соборность</span><span class="app-name-lat">Sobornost</span><span class="app-name-gloss">“unity in freedom”</span><span class="app-name-role">Narrative Engine</span></span>
               <span class="project-type">Narrative Engine · Open Source</span>
               <span class="project-status-dev" data-version-key="calstfrancis/SOBORNOST">Stable · v3.3.1</span>
             </div>
@@ -423,6 +465,11 @@
               Browser‑native engine for contemplative, state‑reactive interactive fiction. Plain JS — no build step.
               Soundings, theosis, charisms, branching dialogue, rituals, magnetic deviation.
             </p>
+            <ul class="caps" aria-label="Privacy and licence facts">
+              <li>No build step</li>
+              <li>No dependencies</li>
+              <li>Runs from a file</li>
+            </ul>
             <a href="https://github.com/calstfrancis/SOBORNOST" target="_blank" rel="noopener" class="project-link">GitHub Page →</a>
           </div>
         </div>
@@ -435,7 +482,7 @@
           <div class="project-initial">Г</div>
           <div class="project-body">
             <div class="project-meta">
-              <span class="project-name"><span lang="ru">ГОСТ</span> / Gost — Academic Essay Templater</span>
+              <span class="project-name app-name"><span class="app-name-cyr" lang="ru">ГОСТ</span><span class="app-name-lat">Gost</span><span class="app-name-gloss">“the standard”</span><span class="app-name-role">Essay Templater</span></span>
               <span class="project-type">Flatpak · Typst · LaTeX · Word</span>
               <span class="project-status-dev" data-repo="calstfrancis/Gost">Available via Flatpak</span>
               <span class="flatpak-badge">📦 Flatpak</span>
@@ -446,13 +493,24 @@
               Supports SBL, Chicago, MLA, APA, ASA, Turabian, and Harvard, with live compiled preview and grammar
               checking via LanguageTool built in.
             </p>
+            <ul class="caps" aria-label="Privacy and licence facts">
+              <li>No cloud</li>
+              <li>No accounts</li>
+              <li>Your files, your disk</li>
+              <li>MIT</li>
+            </ul>
             <div style="margin-top:0.6rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:center">
               <a href="https://github.com/calstfrancis/Gost" class="project-link">GitHub Page →</a>
-              <button class="screenshot-toggle" aria-expanded="false" aria-controls="gost-screenshot">Screenshot ↓</button>
             </div>
-            <div class="screenshot-panel" id="gost-screenshot" hidden>
-              <picture><source srcset="/gost.webp" type="image/webp"><img src="/gost.png" width="960" height="720" alt="Gost — Academic Essay Templater screenshot" loading="lazy" decoding="async"></picture>
-            </div>
+            <details class="screenshot-details">
+              <summary>Screenshot</summary>
+              <a class="project-shot is-inline" href="/gost.png" aria-label="Enlarge the Gost screenshot">
+                <picture>
+                  <source srcset="/gost.webp" type="image/webp">
+                  <img src="/gost.png" width="960" height="720" alt="Gost — Academic Essay Templater screenshot" loading="lazy" decoding="async">
+                </picture>
+              </a>
+            </details>
           </div>
         </div>
       </div>
@@ -464,7 +522,7 @@
           <div class="project-initial">K</div>
           <div class="project-body">
             <div class="project-meta">
-              <span class="project-name">Kopilka — Piggy Bank</span>
+              <span class="project-name app-name"><span class="app-name-cyr" lang="ru">Копилка</span><span class="app-name-lat">Kopilka</span><span class="app-name-gloss">“money box”</span><span class="app-name-role">Couples Budget</span></span>
               <span class="project-type">Flatpak · Couples Budgeting Software</span>
               <span class="project-status-dev" data-repo="calstfrancis/kopilka">Available via Flatpak</span>
               <span class="flatpak-badge">📦 Flatpak</span>
@@ -472,13 +530,24 @@
             <p class="project-desc">
               Couples budget planner — track spending, income, debts, and savings goals together. Privacy-first: your data stays local or syncs via your own WebDAV server. No cloud, no accounts.
             </p>
+            <ul class="caps" aria-label="Privacy and licence facts">
+              <li>No cloud</li>
+              <li>No accounts</li>
+              <li>Sync only to your own server</li>
+              <li>MIT</li>
+            </ul>
             <div style="margin-top:0.6rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:center">
               <a href="https://github.com/calstfrancis/kopilka" class="project-link">GitHub Page →</a>
-              <button class="screenshot-toggle" aria-expanded="false" aria-controls="kopilka-screenshot">Screenshot ↓</button>
             </div>
-            <div class="screenshot-panel" id="kopilka-screenshot" hidden>
-              <picture><source srcset="/kopilka.webp" type="image/webp"><img src="/kopilka.png" width="1200" height="800" alt="Kopilka — Couples Budget Planner screenshot" loading="lazy" decoding="async"></picture>
-            </div>
+            <details class="screenshot-details">
+              <summary>Screenshot</summary>
+              <a class="project-shot is-inline" href="/kopilka.png" aria-label="Enlarge the Kopilka screenshot">
+                <picture>
+                  <source srcset="/kopilka.webp" type="image/webp">
+                  <img src="/kopilka.png" width="1200" height="800" alt="Kopilka — Couples Budget Planner screenshot" loading="lazy" decoding="async">
+                </picture>
+              </a>
+            </details>
           </div>
         </div>
       </div>
@@ -490,13 +559,18 @@
           <div class="project-initial" style="background:linear-gradient(135deg,#2a6a5a,#1a4a3a);color:#a0e0c8">К</div>
           <div class="project-body">
             <div class="project-meta">
-              <span class="project-name">Kopilka Android — Companion App</span>
+              <span class="project-name app-name"><span class="app-name-cyr" lang="ru">Копилка</span><span class="app-name-lat">Kopilka Android</span><span class="app-name-gloss">“money box”</span><span class="app-name-role">Companion App</span></span>
               <span class="project-type">Kotlin · Jetpack Compose · Android</span>
               <span class="project-status-dev" data-repo="calstfrancis/kopilka-android">v1.1.0 Released</span><span class="download-badge" id="androidDownloads" hidden></span>
             </div>
             <p class="project-desc">
               Android companion for Kopilka. Log spending on the go, track budgets per category, view savings goals and debts. Syncs with the desktop app via WebDAV. Biometric lock, home screen widgets, partner notifications.
             </p>
+            <ul class="caps" aria-label="Privacy and licence facts">
+              <li>No cloud</li>
+              <li>No accounts</li>
+              <li>Sync only to your own server</li>
+            </ul>
             <div style="margin-top:0.6rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:center">
               <a href="https://github.com/calstfrancis/kopilka-android/releases/latest" class="project-link">Latest Release →</a>
               <a href="https://github.com/calstfrancis/kopilka-android" class="project-link" style="opacity:.75">GitHub →</a>
@@ -512,7 +586,7 @@
           <div class="project-initial" style="background:linear-gradient(135deg,#2a3060,#1a1a40);color:#9898d8">М</div>
           <div class="project-body">
             <div class="project-meta">
-              <span class="project-name">Мера / Mera — Tab Capper</span>
+              <span class="project-name app-name"><span class="app-name-cyr" lang="ru">Мера</span><span class="app-name-lat">Mera</span><span class="app-name-gloss">“measure, moderation”</span><span class="app-name-role">Tab Capper</span></span>
               <span class="project-type">Firefox Extension · Browser</span>
               <span class="project-status-dev" data-version-key="calstfrancis/mera">Awaiting AMO approval · Available on GitHub</span>
               <span class="flatpak-badge" style="background:#e84e0f18;color:#e84e0f;border-color:#e84e0f38">🦊 Firefox</span>
@@ -522,13 +596,20 @@
               When you reach the limit, the browser tells you plainly — close one first.
               Pinned tabs are never counted. The rule is yours; Мера simply keeps it.
             </p>
+            <ul class="caps" aria-label="Privacy and licence facts">
+              <li>No telemetry</li>
+              <li>No permissions beyond tabs</li>
+              <li>Nothing leaves the browser</li>
+              <li>MIT</li>
+            </ul>
             <div style="margin-top:0.6rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:center">
               <a href="https://addons.mozilla.org/en-CA/firefox/addon/tab-capper/" target="_blank" rel="noopener" class="project-link">Firefox Add-ons →</a>
               <a href="https://github.com/calstfrancis/mera" target="_blank" rel="noopener" class="project-link" style="opacity:.75">GitHub →</a>
             </div>
           </div>
         </div>
-      </div>
+      </div>      </div>
+
     </div>
     <div class="vine-divider" aria-hidden="true"><svg viewBox="0 0 900 40" preserveAspectRatio="xMidYMid meet" height="40"><path d="M-10,22 C80,8 160,34 220,18 C280,4 340,34 450,20 C560,6 620,34 680,18 C740,4 820,30 910,20" stroke="#5a6428" stroke-width="1.8" fill="none" stroke-linecap="round"/><g transform="translate(220,15) scale(.3)"><use href="#sf"/></g><g transform="translate(450,17) scale(.36)"><use href="#sf"/></g><g transform="translate(680,15) scale(.3)"><use href="#sf"/></g><g transform="translate(120,22) rotate(-22) scale(.38)"><use href="#lf-v"/></g><g transform="translate(335,24) rotate(16) scale(.36)"><use href="#lf-b"/></g><g transform="translate(560,20) rotate(-16) scale(.38)"><use href="#lf-v"/></g><g transform="translate(780,22) rotate(20) scale(.36)"><use href="#lf-b"/></g></svg></div>
   </div>
@@ -647,6 +728,16 @@
       <a href="https://github.com/calstfrancis/flatpak" target="_blank" rel="noopener">Flatpak Repo</a>
     </p>
     <p style="margin-top:.4rem;opacity:.45">All linux and game content freely given.</p>
+    <p class="season-line" id="seasonLine" hidden>
+      <span class="season-dot" aria-hidden="true"></span>
+      <span class="season-name"></span> · <span class="season-year"></span>
+    </p>
+    <!-- Мера — measure. The same discipline the extension keeps, kept here. -->
+    <p class="budget-line">
+      No trackers · no cookies · no third-party subresources · 300&nbsp;KB first visit ·
+      <a href="/accessibility.html">accessibility &amp; motion</a> ·
+      <a href="/cal-st-francis.pdf">one-page PDF</a>, typeset with Typst
+    </p>
     <div style="margin-top:1.8rem;opacity:.22" aria-hidden="true">
       <svg width="72" height="92" viewBox="0 0 72 92" style="overflow:visible">
         <line x1="36" y1="92" x2="36" y2="42" stroke="#5a6428" stroke-width="2.5" stroke-linecap="round"/>
@@ -766,19 +857,6 @@ themeBtn.addEventListener('click', () => {
   setTimeout(drift, 20000 + Math.random() * 15000);
 })();
 
-// Screenshot toggles. The panel animates on grid-template-rows (0fr → 1fr),
-// so a screenshot of any height opens fully — no max-height to outgrow.
-document.querySelectorAll('.screenshot-toggle').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const panel = document.getElementById(btn.getAttribute('aria-controls'));
-    const open = btn.getAttribute('aria-expanded') === 'true';
-    btn.setAttribute('aria-expanded', String(!open));
-    panel.removeAttribute('hidden');
-    panel.classList.toggle('open', !open);
-    btn.textContent = open ? 'Screenshot ↓' : 'Screenshot ↑';
-  });
-});
-
 // Copy-to-clipboard for the flatpak remote-add command
 document.querySelectorAll('.copy-btn').forEach(btn => {
   const label = btn.querySelector('.copy-btn-label');
@@ -832,46 +910,28 @@ document.querySelectorAll('.copy-btn').forEach(btn => {
   box.addEventListener('close', () => { if (lastFocus) lastFocus.focus(); });
 })();
 
-// Project filter tabs. The active filter lives in the URL (?filter=linux) so it
-// survives a reload and can be linked to directly.
+// Filtering itself is CSS (see .filter-radios in style.css). This only keeps
+// the URL in step, so a filtered view can be linked to and survives a reload.
 (function () {
-  const btns = [...document.querySelectorAll('.filter-btn')];
-  if (!btns.length) return;
-  const known = new Set(btns.map(b => b.dataset.filter));
+  const radios = [...document.querySelectorAll('input.filter-radio[name="project-filter"]')];
+  if (!radios.length) return;
 
-  function applyFilter(f, updateUrl) {
-    if (!known.has(f)) f = 'all';
-    btns.forEach(b => {
-      const on = b.dataset.filter === f;
-      b.classList.toggle('active', on);
-      b.setAttribute('aria-pressed', String(on));
-    });
-    document.querySelectorAll('.project-card').forEach(card => {
-      card.hidden = !(f === 'all' || card.dataset.category === f);
-    });
-    document.querySelectorAll('.project-list .project-group-heading').forEach(heading => {
-      let sib = heading.nextElementSibling, anyVisible = false;
-      while (sib && !sib.classList.contains('project-group-heading')) {
-        if (sib.classList.contains('project-card') && !sib.hidden) anyVisible = true;
-        sib = sib.nextElementSibling;
-      }
-      heading.hidden = !anyVisible;
-    });
-    if (updateUrl) {
-      const url = new URL(location.href);
-      if (f === 'all') url.searchParams.delete('filter');
-      else url.searchParams.set('filter', f);
-      history.replaceState({ filter: f }, '', url);
-    }
-  }
+  const select = (value, updateUrl) => {
+    const radio = radios.find(r => r.value === value) || radios[0];
+    radio.checked = true;
+    if (!updateUrl) return;
+    const url = new URL(location.href);
+    if (radio.value === 'all') url.searchParams.delete('filter');
+    else url.searchParams.set('filter', radio.value);
+    history.replaceState({ filter: radio.value }, '', url);
+  };
 
-  btns.forEach(btn => btn.addEventListener('click', () => applyFilter(btn.dataset.filter, true)));
+  radios.forEach(r => r.addEventListener('change', () => select(r.value, true)));
   window.addEventListener('popstate', () => {
-    applyFilter(new URLSearchParams(location.search).get('filter') || 'all', false);
+    select(new URLSearchParams(location.search).get('filter') || 'all', false);
   });
-
   const initial = new URLSearchParams(location.search).get('filter');
-  if (initial) applyFilter(initial, false);
+  if (initial) select(initial, false);
 })();
 
 // Section entrance animations via IntersectionObserver (fallback for non-scroll-timeline browsers)

@@ -90,3 +90,25 @@
   --shadow-2: 0 4px 16px rgba(60,34,12,.13);
   --shadow-3: 0 10px 34px rgba(60,34,12,.18), 0 2px 8px rgba(60,34,12,.10);
 }
+
+/* ── LITURGICAL SEASON ──
+   The olive ornament accent follows the church year — the same calendar
+   Rubric and Iskra compute (Advent Sunday, Easter, Ash Wednesday, Pentecost).
+   Ordinary Time is the unmodified default, so no override is listed for it.
+   Each colour is picked to keep white text legible on it, because --olive is
+   also the flatpak badge's background. */
+[data-season="advent"]    { --olive:#5a4a92; --olive-hi:#7263ad; --opale:rgba(90,74,146,.15) }
+[data-season="christmas"] { --olive:#9a7418; --olive-hi:#b88c22; --opale:rgba(154,116,24,.15) }
+[data-season="epiphany"]  { --olive:#2f7d86; --olive-hi:#3c99a3; --opale:rgba(47,125,134,.15) }
+[data-season="lent"]      { --olive:#6b3a78; --olive-hi:#854a94; --opale:rgba(107,58,120,.15) }
+[data-season="holyweek"]  { --olive:#8a2b22; --olive-hi:#a5382c; --opale:rgba(138,43,34,.15) }
+[data-season="easter"]    { --olive:#9a7418; --olive-hi:#b88c22; --opale:rgba(154,116,24,.15) }
+[data-season="pentecost"] { --olive:#a32c1c; --olive-hi:#c03826; --opale:rgba(163,44,28,.15) }
+
+[data-theme="light"][data-season="advent"]    { --olive:#463878; --olive-hi:#584a90 }
+[data-theme="light"][data-season="christmas"] { --olive:#725210; --olive-hi:#8c661a }
+[data-theme="light"][data-season="epiphany"]  { --olive:#1f5f68; --olive-hi:#2a757f }
+[data-theme="light"][data-season="lent"]      { --olive:#522a5e; --olive-hi:#6a3a78 }
+[data-theme="light"][data-season="holyweek"]  { --olive:#6e1f18; --olive-hi:#8a2b22 }
+[data-theme="light"][data-season="easter"]    { --olive:#725210; --olive-hi:#8c661a }
+[data-theme="light"][data-season="pentecost"] { --olive:#821f12; --olive-hi:#a32c1c }
