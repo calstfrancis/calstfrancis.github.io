@@ -159,7 +159,7 @@
     </p>
 
     <!-- Flatpak repo setup notice -->
-    <div style="margin:1rem 0 1.8rem;background:var(--opale);border:1px solid var(--border-hi);border-left:3px solid var(--olive);padding:0.8rem 1.2rem;">
+    <div style="margin:1rem 0 1.8rem;background:var(--opale);border:1px solid var(--border-hi);border-left:3px solid var(--olive);padding:0.9rem 1.3rem;border-radius:var(--r-md);">
       <div style="display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;margin-bottom:0.5rem;">
         <span style="font-family:'Spectral',serif;font-size:.68rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--olive);">Flatpak Repository</span>
         <span style="font-size:0.85rem;color:var(--text-2);">Add once, then install all apps through your Software Center:</span>
@@ -170,8 +170,11 @@
       </div>
     </div>
 
+    <div class="game-rail" id="games">
+    <div class="project-group-heading is-featured" style="margin-top:.4rem">Games &amp; Interactive Fiction</div>
+
     <!-- Severed Hours game card -->
-    <div class="game-feature severed-hours" id="games">
+    <div class="game-feature severed-hours">
       <svg class="game-bota-top" viewBox="0 0 800 38" style="height:38px;display:block;overflow:hidden" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
         <rect width="800" height="38" fill="#0e0a04"/>
         <path d="M -5,22 C 60,8 130,30 200,18 C 270,6 340,28 400,18 C 460,8 530,30 600,18 C 670,6 740,28 805,18"
@@ -253,6 +256,8 @@
       </div>
     </div>
 
+    </div><!-- /.game-rail -->
+
     <div class="project-filters" role="group" aria-label="Filter projects">
       <button class="filter-btn active" data-filter="all">All</button>
       <button class="filter-btn" data-filter="linux">Linux Apps</button>
@@ -262,7 +267,7 @@
     </div>
     <div class="project-list" id="apps">
 
-      <div class="project-group-heading">Featured Software</div>
+      <div class="project-group-heading is-featured">Featured Software</div>
 
       <!-- Rubric - Flatpak integrated -->
       <div class="project-card featured" data-category="linux" data-repo="calstfrancis/rubric">
@@ -868,7 +873,7 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
       const show = f === 'all' || card.dataset.category === f;
       card.hidden = !show;
     });
-    document.querySelectorAll('.project-group-heading').forEach(heading => {
+    document.querySelectorAll('.project-list .project-group-heading').forEach(heading => {
       let sib = heading.nextElementSibling, anyVisible = false;
       while (sib && !sib.classList.contains('project-group-heading')) {
         if (sib.classList.contains('project-card') && !sib.hidden) anyVisible = true;

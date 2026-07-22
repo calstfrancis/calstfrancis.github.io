@@ -110,7 +110,8 @@ nav{
 .nav-links a:hover,.nav-links a.active{color:var(--coral)}
 .nav-links a:hover::after,.nav-links a.active::after{width:100%}
 .theme-toggle{
-  background:none;border:1px solid var(--border-hi);padding:.22rem .65rem;
+  background:none;border:1px solid var(--border-hi);padding:.22rem .7rem;
+  border-radius:var(--r-pill);
   font-family:var(--font-body);font-size:.72rem;font-weight:600;
   letter-spacing:.06em;color:var(--text-3);cursor:pointer;transition:all .15s;
   display:inline-flex;align-items:center;gap:5px;
@@ -119,6 +120,7 @@ nav{
 .nav-toggle{
   display:none;flex-direction:column;justify-content:center;gap:5px;
   width:36px;height:36px;background:none;border:1px solid var(--border-hi);
+  border-radius:var(--r-sm);
   cursor:pointer;padding:8px 7px;
 }
 .nav-toggle span{display:block;height:1px;background:var(--text-3);transition:all .2s}
@@ -150,7 +152,7 @@ nav{
 .hero-desc{
   font-size:.93rem;color:var(--text-2);line-height:2;
   max-width:480px;margin-bottom:1.8rem;
-  border-left:2px solid var(--border-hi);padding-left:1rem;
+  border-left:2px solid var(--border-hi);border-radius:var(--r-xs);padding-left:1rem;
 }
 .hero-desc em{font-style:italic;color:var(--text)}
 .hero-actions{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:0}
@@ -165,6 +167,7 @@ nav{
 .btn{
   display:inline-flex;align-items:center;gap:.4rem;
   padding:.52rem 1.15rem;
+  border-radius:var(--r-pill);
   font-family:var(--font-body);font-size:.84rem;font-weight:600;
   letter-spacing:.04em;cursor:pointer;transition:all .15s;
   border:1px solid transparent;text-decoration:none!important;
@@ -219,9 +222,32 @@ nav::after{
   max-width:580px;margin-top:.5rem;margin-bottom:1.8rem;
 }
 
+/* Games sit in their own raised rail, clearly apart from the app list below. */
+.game-rail{
+  margin:0 0 2.6rem;
+  padding:1.1rem 1.1rem .3rem;
+  border-radius:var(--r-xl);
+  background:rgba(0,0,0,.16);
+  border:1px solid var(--border-hi);
+  position:relative;
+}
+[data-theme="light"] .game-rail{background:rgba(255,255,255,.34);border-color:var(--border)}
+.game-rail::before{
+  content:'';position:absolute;left:1.1rem;right:1.1rem;top:0;height:2px;
+  border-radius:var(--r-pill);
+  background:linear-gradient(to right,transparent,var(--coral),transparent);
+  opacity:.55;
+}
+
 .game-feature{
-  border:2px solid var(--border);background:var(--black);
-  margin-bottom:1.2rem;position:relative;overflow:hidden;isolation:isolate;
+  border:1px solid var(--border);background:var(--black);
+  border-radius:var(--r-lg);
+  box-shadow:var(--shadow-3);
+  margin-bottom:1.1rem;position:relative;overflow:hidden;isolation:isolate;
+  transition:transform .28s ease,box-shadow .28s ease;
+}
+@media(prefers-reduced-motion:no-preference){
+  .game-feature:hover{transform:translateY(-4px);box-shadow:var(--shadow-3),0 0 0 1px var(--border-hi)}
 }
 .game-feature::before{
   content:'';position:absolute;inset:0;pointer-events:none;z-index:0;opacity:.055;
@@ -305,7 +331,8 @@ nav::after{
   font-family:var(--font-body);font-size:.7rem;font-weight:600;
   letter-spacing:.1em;text-transform:uppercase;
   background:transparent;border:1px solid var(--border-hi);
-  color:var(--text-3);padding:.22rem .7rem;cursor:pointer;transition:all .15s;
+  color:var(--text-3);padding:.22rem .8rem;cursor:pointer;transition:all .15s;
+  border-radius:var(--r-pill);
 }
 .filter-btn:hover{border-color:var(--coral);color:var(--coral)}
 .filter-btn.active{background:var(--cpale);border-color:var(--coral);color:var(--coral)}
@@ -314,23 +341,52 @@ nav::after{
 .project-group-heading{
   font-family:var(--font-body);font-size:.68rem;font-weight:600;
   letter-spacing:.18em;text-transform:uppercase;color:var(--olive);
-  margin:1.6rem 0 .6rem;
+  margin:2.2rem 0 .8rem;
+  display:flex;align-items:center;gap:.7rem;
+}
+.project-group-heading::after{
+  content:'';flex:1;height:1px;border-radius:var(--r-pill);
+  background:linear-gradient(to right,var(--border-hi),transparent);
 }
 .project-group-heading:first-child{margin-top:0}
+/* "Featured Software" reads louder than the plain group headings */
+.project-group-heading.is-featured{
+  color:var(--coral);font-size:.74rem;
+}
+.project-group-heading.is-featured::before{
+  content:'';width:8px;height:8px;border-radius:var(--r-pill);
+  background:var(--coral);flex-shrink:0;box-shadow:0 0 0 4px var(--cpale);
+}
+.project-group-heading.is-featured::after{
+  background:linear-gradient(to right,var(--coral),transparent);opacity:.5;
+}
 
 .project-list{display:flex;flex-direction:column;gap:.75rem}
 .project-card{
-  border:1px solid var(--border-hi);border-left:3px solid var(--olive);background:rgba(0,0,0,.18);
+  border:1px solid var(--border-hi);border-left:3px solid var(--olive);background:rgba(0,0,0,.12);
+  border-radius:var(--r-md);
   display:flex;align-items:flex-start;gap:1.25rem;
   transition:border-color .25s,background-color .25s,border-left-width .2s,transform .2s ease,box-shadow .2s ease;
   position:relative;overflow:hidden;
 }
-.project-card.featured{border-left-width:5px;border-left-color:var(--coral)}
+/* Featured cards are raised, roomier and warmer than the rest of the list. */
+.project-card.featured{
+  border-left-width:5px;border-left-color:var(--coral);
+  border-radius:var(--r-lg);
+  background:linear-gradient(135deg,var(--cpale),rgba(0,0,0,.16) 60%);
+  box-shadow:var(--shadow-2);
+  margin-bottom:.35rem;
+}
+.project-card.featured .project-body-wrap{padding:1.55rem 1.8rem}
 .project-card.featured .project-initial{font-size:3.2rem;width:3.5rem}
 .project-card.featured .project-name{font-size:1.24rem}
+.project-card.featured .project-card-flower{opacity:.2}
 [data-theme="light"] .project-card{background:var(--bg-2)}
+[data-theme="light"] .project-card.featured{background:linear-gradient(135deg,var(--cpale),var(--bg-2) 60%)}
 .project-card:hover{border-color:var(--coral);background:var(--cpale);box-shadow:0 6px 28px rgba(0,0,0,.3),inset 0 0 0 1px var(--coral);border-left-width:5px;transform:translateY(-3px)}
+.project-card.featured:hover{box-shadow:var(--shadow-3),inset 0 0 0 1px var(--coral)}
 [data-theme="light"] .project-card:hover{box-shadow:0 6px 28px rgba(0,0,0,.12),inset 0 0 0 1px var(--coral)}
+[data-theme="light"] .project-card.featured:hover{box-shadow:var(--shadow-3),inset 0 0 0 1px var(--coral)}
 .project-card-flower{
   position:absolute;right:-18px;top:50%;transform:translateY(-50%);
   opacity:.12;pointer-events:none;
@@ -346,10 +402,11 @@ nav::after{
 .project-name{font-family:var(--font-display);font-size:1.08rem;color:var(--text)}
 .project-type{
   font-family:var(--font-body);font-size:.64rem;font-weight:600;letter-spacing:.1em;
-  text-transform:uppercase;color:var(--olive);border:1px solid var(--olive);padding:.1rem .45rem;
+  text-transform:uppercase;color:var(--olive);border:1px solid var(--olive);padding:.1rem .55rem;
+  border-radius:var(--r-pill);
 }
 .flatpak-badge{
-  background:var(--olive);padding:0.1rem 0.5rem;border-radius:2px;
+  background:var(--olive);padding:0.1rem 0.6rem;border-radius:var(--r-pill);
   font-size:0.6rem;font-weight:600;letter-spacing:.05em;color:white;
   font-family:var(--font-body);text-transform:uppercase;
 }
@@ -358,14 +415,15 @@ nav::after{
 .project-link:hover{color:var(--coral-hi)}
 .project-status-dev{
   font-family:var(--font-body);font-size:.64rem;font-weight:600;letter-spacing:.08em;
-  text-transform:uppercase;color:var(--text-3);border:1px solid var(--border-hi);padding:.1rem .45rem;
+  text-transform:uppercase;color:var(--text-3);border:1px solid var(--border-hi);padding:.1rem .55rem;
+  border-radius:var(--r-pill);
 }
 .install-commands{
   margin-top:0.75rem;display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;
   min-width:0;width:100%;
 }
 .install-commands code{
-  background:var(--bg-3);padding:0.2rem 0.5rem;border-radius:6px;font-size:0.7rem;
+  background:var(--bg-3);padding:0.28rem 0.7rem;border-radius:var(--r-sm);font-size:0.7rem;
   font-family:var(--font-mono);color:var(--text-2);
   display:block;max-width:100%;overflow-x:auto;white-space:nowrap;
 }
@@ -377,6 +435,7 @@ nav::after{
 .about-cell{
   background:var(--bg-2);padding:1.4rem 1.5rem 1.4rem 1.6rem;
   border:1px solid var(--border-hi);border-left:3px solid var(--olive);
+  border-radius:var(--r-md);box-shadow:var(--shadow-1);
   transition:background .25s,border-color .2s;position:relative;overflow:hidden;
 }
 .about-cell:first-child{grid-column:1 / -1}
@@ -398,6 +457,7 @@ nav::after{
 
 .support-body{
   border:1px solid var(--border-hi);background:var(--bg-2);
+  border-radius:var(--r-lg);box-shadow:var(--shadow-2);
   padding:2rem 2.2rem;display:flex;align-items:flex-start;gap:1.8rem;
   transition:background-color .25s,border-color .25s;position:relative;overflow:hidden;
 }
@@ -502,6 +562,7 @@ section.section-visible{animation:riseIn .5s ease both}
 .screenshot-panel{
   margin-top:1rem;
   border:1px solid var(--border-hi);
+  border-radius:var(--r-md);
   overflow:hidden;
   max-height:0;
   transition:max-height .35s ease, opacity .3s ease;
@@ -511,7 +572,7 @@ section.section-visible{animation:riseIn .5s ease both}
 .screenshot-panel img{display:block;width:100%;height:auto}
 .skip-link{
   position:absolute;top:-100%;left:1rem;
-  padding:.4rem .9rem;background:var(--coral);color:#fff;
+  padding:.4rem .9rem;background:var(--coral);color:#fff;border-radius:var(--r-sm);
   font-size:.85rem;font-weight:600;letter-spacing:.05em;
   z-index:9999;transition:top .15s;
 }
@@ -550,7 +611,7 @@ section.section-visible{animation:riseIn .5s ease both}
   font-family:var(--font-body);font-size:.58rem;font-weight:600;
   letter-spacing:.12em;text-transform:uppercase;
   color:var(--olive);background:var(--bg);
-  border:1px solid var(--border-hi);padding:.1rem .4rem;
+  border:1px solid var(--border-hi);padding:.1rem .5rem;border-radius:var(--r-pill);
   opacity:0;transform:translateY(-5px);
   transition:opacity .22s ease,transform .22s ease;
   pointer-events:none;line-height:1.6;

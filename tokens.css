@@ -38,6 +38,19 @@
 
   --teal:      #3a9a9a;
   --teal-pale: rgba(58,154,154,.12);
+
+  /* Corner radii — one scale, used everywhere. Nothing should be a hard rectangle. */
+  --r-xs:   4px;
+  --r-sm:   7px;
+  --r-md:   11px;
+  --r-lg:   16px;
+  --r-xl:   22px;
+  --r-pill: 999px;
+
+  /* Elevation — used to set featured content above the plain list */
+  --shadow-1: 0 1px 2px rgba(0,0,0,.18);
+  --shadow-2: 0 4px 16px rgba(0,0,0,.28);
+  --shadow-3: 0 10px 34px rgba(0,0,0,.36), 0 2px 8px rgba(0,0,0,.22);
 }
 
 [data-theme="light"] {
@@ -72,4 +85,8 @@
   --text-3:    #5a3a18;
   --teal:      #207878;
   --teal-pale: rgba(32,120,120,.12);
+
+  --shadow-1: 0 1px 2px rgba(60,34,12,.10);
+  --shadow-2: 0 4px 16px rgba(60,34,12,.13);
+  --shadow-3: 0 10px 34px rgba(60,34,12,.18), 0 2px 8px rgba(60,34,12,.10);
 }
