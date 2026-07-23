@@ -803,16 +803,6 @@ section.section-visible{animation:riseIn .6s cubic-bezier(.22,1,.36,1) both}
 @media(prefers-reduced-motion:no-preference){
   .app-window:hover{transform:perspective(1400px) rotateY(0deg) translateY(-4px)}
 }
-.app-window-bar{
-  display:flex;align-items:center;gap:6px;
-  padding:.5rem .7rem;background:var(--bg-3);
-  border-bottom:1px solid var(--border-hi);
-}
-.app-window-bar span{
-  width:9px;height:9px;border-radius:var(--r-pill);
-  background:var(--border-hi);flex-shrink:0;
-}
-.app-window-bar span:first-child{background:var(--coral);opacity:.8}
 .app-window img{display:block;width:100%;max-width:100%;height:auto}
 
 /* ══ INLINE FEATURED SCREENSHOTS ════════════════════════════════════════════
