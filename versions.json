@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-22T05:36:52Z",
+  "updated": "2026-07-23T05:41:40Z",
   "manual": {
     "severed-hours": {
       "version": "1.23",
@@ -56,6 +56,18 @@
       "html_url": "https://github.com/calstfrancis/iskra/releases/tag/v0.3.0",
       "published_at": "2026-07-19T19:30:56Z",
       "tag_name": "v0.3.0"
+    },
+    "calstfrancis/Gost": {
+      "downloads": 1,
+      "html_url": "https://github.com/calstfrancis/Gost/releases/tag/v0.1.10",
+      "published_at": "2026-06-06T23:32:10Z",
+      "tag_name": "v0.1.10"
+    },
+    "calstfrancis/mera": {
+      "downloads": 0,
+      "html_url": "https://github.com/calstfrancis/mera/releases/tag/v1.0.3",
+      "published_at": "2026-07-01T13:18:41Z",
+      "tag_name": "v1.0.3"
     }
   }
 }
