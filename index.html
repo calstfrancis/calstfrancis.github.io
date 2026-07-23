@@ -140,9 +140,9 @@
       <div class="hero-shot">
         <figure class="app-window">
           <div class="app-window-bar"><span></span><span></span><span></span></div>
-          <picture>
+          <picture class="themed-shot">
             <source srcset="/zerkalo.webp" type="image/webp">
-            <img src="/zerkalo.png" width="1400" height="844" alt="Zerkalo, the Typst editor, showing a manuscript beside its live typeset preview." fetchpriority="high" decoding="async">
+            <img src="/zerkalo.png" width="1600" height="1000" alt="Zerkalo, the Typst editor, showing a manuscript beside its live typeset preview." fetchpriority="high" decoding="async">
           </picture>
         </figure>
       </div>
@@ -317,10 +317,10 @@
               spellcheck, export to PDF, DOCX, HTML.
             </p>
             <p class="caps">No cloud · No accounts · Your files, your disk · MIT</p>
-            <a class="project-shot" href="/zerkalo.png" data-shot="zerkalo" aria-label="Enlarge the Zerkalo screenshot">
-              <picture>
+            <a class="project-shot themed-shot" href="/zerkalo.png" data-shot="zerkalo" aria-label="Enlarge the Zerkalo screenshot">
+              <picture class="themed-shot">
                 <source srcset="/zerkalo.webp" type="image/webp">
-                <img src="/zerkalo.png" width="1400" height="844" alt="Zerkalo — Typst IDE screenshot" loading="lazy" decoding="async">
+                <img src="/zerkalo.png" width="1600" height="1000" alt="Zerkalo — Typst IDE screenshot" loading="lazy" decoding="async">
               </picture>
             </a>
             <div style="margin-top:0.6rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:center">
@@ -349,8 +349,8 @@
               Git sync and undo history keep every service's history close at hand.
             </p>
             <p class="caps">No cloud · No accounts · Your files, your disk · MIT</p>
-            <a class="project-shot" href="/rubric.png" data-shot="rubric" aria-label="Enlarge the Rubric screenshot">
-              <picture>
+            <a class="project-shot themed-shot" href="/rubric.png" data-shot="rubric" aria-label="Enlarge the Rubric screenshot">
+              <picture class="themed-shot">
                 <source srcset="/rubric.webp" type="image/webp">
                 <img src="/rubric.png" width="1000" height="700" alt="Rubric — Liturgy Planner screenshot" loading="lazy" decoding="async">
               </picture>
@@ -382,8 +382,8 @@
               resolve from the planned date, and a printable, chrome-free Preaching View is built for the pulpit.
             </p>
             <p class="caps">No cloud · No accounts · Your files, your disk · MIT</p>
-            <a class="project-shot" href="/iskra.png" data-shot="iskra" aria-label="Enlarge the Iskra screenshot">
-              <picture>
+            <a class="project-shot themed-shot" href="/iskra.png" data-shot="iskra" aria-label="Enlarge the Iskra screenshot">
+              <picture class="themed-shot">
                 <source srcset="/iskra.webp" type="image/webp">
                 <img src="/iskra.png" width="1200" height="800" alt="Iskra — Sermon Planner screenshot" loading="lazy" decoding="async">
               </picture>
@@ -421,8 +421,8 @@
             </div>
             <details class="screenshot-details">
               <summary>Screenshot</summary>
-              <a class="project-shot is-inline" href="/skrizhal.png" aria-label="Enlarge the Skrizhal screenshot">
-                <picture>
+              <a class="project-shot is-inline themed-shot" href="/skrizhal.png" aria-label="Enlarge the Skrizhal screenshot">
+                <picture class="themed-shot">
                   <source srcset="/skrizhal.webp" type="image/webp">
                   <img src="/skrizhal.png" width="1000" height="650" alt="Skrizhal — CV element database screenshot" loading="lazy" decoding="async">
                 </picture>
@@ -477,8 +477,8 @@
             </div>
             <details class="screenshot-details">
               <summary>Screenshot</summary>
-              <a class="project-shot is-inline" href="/gost.png" aria-label="Enlarge the Gost screenshot">
-                <picture>
+              <a class="project-shot is-inline themed-shot" href="/gost.png" aria-label="Enlarge the Gost screenshot">
+                <picture class="themed-shot">
                   <source srcset="/gost.webp" type="image/webp">
                   <img src="/gost.png" width="960" height="720" alt="Gost — Academic Essay Templater screenshot" loading="lazy" decoding="async">
                 </picture>
@@ -509,8 +509,8 @@
             </div>
             <details class="screenshot-details">
               <summary>Screenshot</summary>
-              <a class="project-shot is-inline" href="/kopilka.png" aria-label="Enlarge the Kopilka screenshot">
-                <picture>
+              <a class="project-shot is-inline themed-shot" href="/kopilka.png" aria-label="Enlarge the Kopilka screenshot">
+                <picture class="themed-shot">
                   <source srcset="/kopilka.webp" type="image/webp">
                   <img src="/kopilka.png" width="1200" height="800" alt="Kopilka — Couples Budget Planner screenshot" loading="lazy" decoding="async">
                 </picture>
@@ -779,6 +779,26 @@ links.querySelectorAll('a').forEach(a => {
   });
 });
 
+// Screenshots ship in light + dark variants ("/zerkalo.webp" + "/zerkalo-dark.webp").
+// The site's theme is a manual toggle (data-theme), not just prefers-color-scheme,
+// so a CSS <picture media> can't follow it — swap the sources in JS instead. The
+// light paths are snapshotted from the markup as authored; dark = "-dark" before
+// the extension.
+const applyShotTheme = (function () {
+  const toDark = p => p.replace(/(\.[a-z0-9]+)$/i, '-dark$1');
+  const snap = (sel, attr) =>
+    [...document.querySelectorAll(sel)].map(el => ({ el, attr, light: el.getAttribute(attr) }));
+  const items = [
+    ...snap('picture.themed-shot source', 'srcset'),
+    ...snap('picture.themed-shot img', 'src'),
+    ...snap('a.project-shot.themed-shot', 'href'),
+  ];
+  return theme => {
+    const dark = theme === 'dark';
+    items.forEach(o => o.el.setAttribute(o.attr, dark ? toDark(o.light) : o.light));
+  };
+})();
+
 const themeBtn = document.getElementById('themeToggle');
 const _themeColor = document.getElementById('themeColorMeta');
 const setTheme = t => {
@@ -787,6 +807,7 @@ const setTheme = t => {
   themeBtn.setAttribute('aria-pressed', t === 'dark' ? 'true' : 'false');
   themeBtn.innerHTML = t === 'dark' ? '<span>🌙</span> Dark' : '<span>☀️</span> Light';
   if (_themeColor) _themeColor.content = t === 'dark' ? '#6a1710' : '#e8d5b0';
+  applyShotTheme(t);
 };
 const saved = localStorage.getItem('theme');
 setTheme(saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
