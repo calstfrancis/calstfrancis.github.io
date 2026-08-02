@@ -59,7 +59,10 @@ body{
 a{color:var(--coral);text-decoration:none;transition:color .15s}
 a:hover{color:var(--coral-hi)}
 .container{max-width:860px;margin:0 auto;padding:0 1.75rem;min-width:0}
-html,body{overflow-x:hidden}
+/* clip, not hidden: overflow-x:hidden makes the root a scroll container, which
+   breaks the sticky nav (and its scroll-progress bar). clip contains the same
+   overflow without creating one. */
+html,body{overflow-x:clip}
 img{max-width:100%;height:auto}
 
 /* ── NAV ── */
@@ -949,6 +952,15 @@ section.section-visible{animation:riseIn .6s cubic-bezier(.22,1,.36,1) both}
 [data-motion="quiet"] *::after{
   animation:none!important;transition:none!important;
 }
+/* Killing the animations is not enough on its own: the entrance effects park
+   their elements at opacity:0 and rely on the animation to reveal them, and
+   quiet mode does not change what prefers-reduced-motion reports, so those
+   no-preference rules still apply. Without these resets, quiet mode blanks
+   every section (Chrome, via the view()-timeline rule) and the whole project
+   list (Firefox, via the cardRise rule). Mirrors the :reduce guards above. */
+[data-motion="quiet"] section,
+[data-motion="quiet"] .project-list .project-card{opacity:1!important}
+[data-motion="quiet"] .vine-draw-path{stroke-dashoffset:0!important}
 [data-motion="quiet"] .hero-wm,
 [data-motion="quiet"] .project-card-flower,
 [data-motion="quiet"] .about-cell-flower,
