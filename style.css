@@ -990,3 +990,190 @@ section.section-visible{animation:riseIn .6s cubic-bezier(.22,1,.36,1) both}
 }
 .budget-line a{color:var(--text-3);border-bottom:1px solid transparent}
 .budget-line a:hover{color:var(--coral);border-bottom-color:var(--coral)}
+
+/* ══ FOND ══════════════════════════════════════════════════════════════════
+   The third theme. tokens.css carries the palette; this carries the rest of
+   it, because Fond is not a recolour — it is a different set of decisions
+   about surfaces, edges and emphasis, and most of them are structural.
+
+   Four rules, taken from fond-style/style/fond.css and applied here:
+     · surfaces stack, and a hairline marks where two of them meet
+     · nothing is raised, tilted, gradient or drop-shadowed
+     · emphasis is weight and position, never a fill or an outline
+     · colour survives only as a mark — which is where the sunflowers go
+
+   Everything is scoped under [data-theme="fond"], so the warm light and dark
+   themes above are untouched. */
+
+/* ── Ornament ──
+   The vines, the watermark and the card flowers all go. Not because they are
+   bad — they carry the warm themes — but because Fond spends its one colour
+   on the section dot, and a page cannot have both.
+
+   !important is load-bearing here rather than lazy: .hero-vine and
+   .game-bota-top carry `display:block` in a style attribute in the markup, and
+   an inline declaration outranks any selector without it. */
+[data-theme="fond"] .hero-wm,
+[data-theme="fond"] .hero-vine,
+[data-theme="fond"] .vine-divider,
+[data-theme="fond"] .footer-vine,
+[data-theme="fond"] .game-bota-top,
+[data-theme="fond"] .game-vine,
+[data-theme="fond"] .project-card-flower { display:none !important }
+
+/* The sunflower keeps its geometry and takes the theme's red, so the mark
+   that was a 340px watermark becomes a 13px dot beside a section title. */
+[data-theme="fond"] #sf > g[fill] > path { fill:var(--coral) }
+[data-theme="fond"] #sf > circle { fill:var(--seed) }
+
+/* Sections are announced the Fond way: a dot, then a letterspaced small-caps
+   title, then its count — never a display-sized heading over an eyebrow. */
+[data-theme="fond"] .section-title-row { gap:.55rem;margin-bottom:.2rem }
+[data-theme="fond"] .section-title-row svg { width:13px;height:13px;order:-1 }
+[data-theme="fond"] .section-title {
+  font-family:var(--font-body);font-size:.78rem;font-weight:700;
+  letter-spacing:.09em;text-transform:uppercase;line-height:1.6;
+}
+[data-theme="fond"] .section-eyebrow,
+[data-theme="fond"] .hero-eyebrow {
+  font-size:.72rem;font-weight:700;letter-spacing:.09em;color:var(--text-3);
+}
+[data-theme="fond"] .section-intro { color:var(--text-2) }
+
+/* ── Surfaces ──
+   The page is the ground; cards are the plane above it; the bar is chrome.
+   .project-card hardcodes a black wash for the warm themes, which on a light
+   ground reads as dirt — it has to be named here rather than left to a token. */
+[data-theme="fond"] .project-card {
+  background:var(--bg-2);
+  border:1px solid var(--border-hi);
+  border-left:1px solid var(--border-hi);
+  border-radius:var(--r-md);
+}
+[data-theme="fond"] .project-card:hover,
+[data-theme="fond"] .project-card[data-category="android"]:hover {
+  background:var(--bg-2);
+  border-color:var(--border-hi);
+  border-left-width:1px;
+  transform:none;
+  box-shadow:none;
+}
+/* Hover is a wash across the row, as it is in every Fond list. It has to be
+   layered into the background rather than painted by ::after, because that
+   pseudo-element is already the floating category label. */
+[data-theme="fond"] .project-card:hover {
+  background:linear-gradient(var(--wash),var(--wash)),var(--bg-2);
+}
+[data-theme="fond"] .project-card.featured {
+  box-shadow:none;border-color:var(--border-hi);background:var(--bg-2);
+}
+/* The label itself keeps its job, minus the category colouring. */
+[data-theme="fond"] .project-card::after,
+[data-theme="fond"] .project-card[data-category="engine"]::after,
+[data-theme="fond"] .project-card[data-category="android"]::after {
+  background:var(--bg-2);border-color:var(--border-hi);color:var(--text-3);font-weight:400;
+}
+[data-theme="fond"] .project-card.featured:hover { box-shadow:none }
+
+/* A screenshot is a window, not an object on a shelf: no tilt, no lift. */
+[data-theme="fond"] .app-window {
+  transform:none;box-shadow:none;border-color:var(--border-hi);border-radius:var(--r-md);
+}
+[data-theme="fond"] .app-window:hover { transform:none;box-shadow:none }
+
+/* ── Chrome ──
+   The bar is the quietest thing on the page. The scroll indicator stays,
+   because it says something true, but at a hairline's weight. */
+[data-theme="fond"] nav { background:var(--nav-bg);border-bottom:1px solid var(--border) }
+[data-theme="fond"] nav::after { height:1px }
+[data-theme="fond"] .nav-links a { color:var(--text-2) }
+[data-theme="fond"] .nav-links a:hover,
+[data-theme="fond"] .nav-links a.active { color:var(--text) }
+[data-theme="fond"] .theme-toggle {
+  border-color:var(--border-hi);color:var(--text-2);font-weight:400;letter-spacing:.02em;
+}
+[data-theme="fond"] .theme-toggle:hover { border-color:var(--border-hi);color:var(--text);background:var(--cpale) }
+
+/* One bordered control, and one filled one for the single primary action. */
+[data-theme="fond"] .btn { font-weight:400;letter-spacing:.01em }
+[data-theme="fond"] .btn-coral { background:var(--coral);color:#fff;border-color:transparent }
+[data-theme="fond"] .btn-coral:hover { background:var(--coral-hi);color:#fff;border-color:transparent }
+[data-theme="fond"] .btn-ghost,
+[data-theme="fond"] .btn-kofi { background:transparent;color:var(--text-2);border-color:var(--border-hi) }
+[data-theme="fond"] .btn-ghost:hover,
+[data-theme="fond"] .btn-kofi:hover { background:var(--cpale);color:var(--text);border-color:var(--border-hi) }
+[data-theme="fond"] .btn-flatpak { background:transparent;color:var(--text-2);border-color:var(--border-hi) }
+[data-theme="fond"] .btn-flatpak:hover { background:var(--cpale);color:var(--text) }
+
+/* ── Emphasis ──
+   The drop cap and the outsized initial are both display gestures. Fond gets
+   its hierarchy from weight and position, so they stand down. */
+[data-theme="fond"] .project-desc::first-letter {
+  font-family:inherit;font-size:inherit;float:none;line-height:inherit;
+  margin:0;color:inherit;opacity:1;border-bottom:0;padding-bottom:0;
+}
+[data-theme="fond"] .project-initial { color:var(--text-3);opacity:.5;font-weight:400 }
+[data-theme="fond"] .project-desc { color:var(--text-2) }
+[data-theme="fond"] .hero-desc { border-left:1px solid var(--border-hi);color:var(--text-2);line-height:1.75 }
+[data-theme="fond"] .hero { border-bottom:1px solid var(--border);background:var(--bg-2) }
+[data-theme="fond"] .back-to-top { border-color:var(--border-hi);border-radius:var(--r-sm) }
+
+/* Type pills are labels, not badges: no fill, and the category reads in the
+   text rather than in a coloured box. */
+[data-theme="fond"] .project-type,
+[data-theme="fond"] .flatpak-badge {
+  background:transparent;border-color:var(--border-hi);color:var(--text-3);font-weight:400;
+}
+[data-theme="fond"] .project-card[data-category="linux"]   .project-type,
+[data-theme="fond"] .project-card[data-category="engine"]  .project-type,
+[data-theme="fond"] .project-card[data-category="android"] .project-type,
+[data-theme="fond"] .project-card[data-category="browser"] .project-type {
+  background:transparent;border-color:var(--border-hi);color:var(--text-3);
+}
+
+/* ── Texture and vignette ──
+   The warm themes lay a fractal-noise film over the page and a vignette over
+   the hero; both give the reds their depth. On Fond's neutrals they read as
+   dirt on the screen, so every layered effect is switched off rather than
+   retuned. */
+[data-theme="fond"] body { background-image:none;background-blend-mode:normal }
+[data-theme="fond"] .hero::before { display:none }
+[data-theme="fond"] .game-feature::before,
+[data-theme="fond"] .game-feature::after { display:none }
+[data-theme="fond"] .game-feature { border-color:var(--border-hi);box-shadow:none }
+[data-theme="fond"] .game-feature:hover { transform:none;box-shadow:none }
+[data-theme="fond"] .game-rail { background:var(--bg-2);border-color:var(--border-hi) }
+[data-theme="fond"] .game-rail::before { background:var(--border-hi) }
+/* A link underline is an underline, not a neon tube. */
+[data-theme="fond"] .nav-links a:hover::after,
+[data-theme="fond"] .nav-links a.active::after { box-shadow:none }
+
+/* Severed Hours and Spasibo paint their own grounds in both warm themes. Under
+   Fond they join the surface stack like everything else; the games keep their
+   identity in their art, not in the card behind it. */
+[data-theme="fond"] .game-feature.severed-hours,
+[data-theme="fond"] .game-feature.spasibo {
+  background:var(--bg-2);border-color:var(--border-hi);
+}
+[data-theme="fond"] .game-feature.severed-hours .game-title,
+[data-theme="fond"] .game-feature.spasibo .game-title,
+[data-theme="fond"] .game-feature.severed-hours .game-label,
+[data-theme="fond"] .game-feature.spasibo .game-label { color:var(--text) }
+[data-theme="fond"] .game-feature.severed-hours .game-desc,
+[data-theme="fond"] .game-feature.spasibo .game-desc { color:var(--text-2) }
+[data-theme="fond"] .game-feature.severed-hours .game-link,
+[data-theme="fond"] .game-feature.spasibo .game-link { color:var(--coral) }
+[data-theme="fond"] .game-feature.spasibo .game-ascii { color:var(--text-3) }
+[data-theme="fond"] .game-feature.spasibo .game-footer { border-top-color:var(--border) }
+
+/* The mobile nav drawer is a chrome surface, not a dark overlay. */
+@media(max-width:860px){
+  [data-theme="fond"] .nav-links { background:var(--nav-bg) }
+}
+
+/* The install notice is a card like any other. Its olive ground and coloured
+   left edge are how the warm themes mark it out; here it earns its place by
+   sitting on the card plane with the same hairline as everything else. */
+[data-theme="fond"] .flatpak-notice {
+  background:var(--bg-2);border:1px solid var(--border-hi);
+}

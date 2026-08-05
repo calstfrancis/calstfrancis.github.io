@@ -275,7 +275,21 @@ footer a:hover{color:var(--coral)}
 [data-theme="light"] body { background-blend-mode: multiply; }
 
 nav::after{content:'';position:absolute;bottom:0;left:0;height:2px;background:var(--coral);width:calc(var(--scroll-progress,0) * 100%);pointer-events:none;}
+
+/* ── FOND ──
+   Cards join the surface stack: one hairline all round instead of a black
+   wash and a coloured left edge, and no film over the page. */
+[data-theme="fond"] body{background-image:none;background-blend-mode:normal}
+[data-theme="fond"] .product-card,
+[data-theme="fond"] .fulfilment-note{
+  background:var(--bg-2);border:1px solid var(--border-hi);
+}
+[data-theme="fond"] .product-card:hover{
+  background:linear-gradient(var(--wash),var(--wash)),var(--bg-2);
+  border-color:var(--border-hi);transform:none;
+}
 </style>
+<script src="/site.js" defer></script>
 </head>
 <body>
 
@@ -381,18 +395,8 @@ window.addEventListener('scroll', () => {
   document.documentElement.style.setProperty('--scroll-progress', pct.toFixed(4));
 }, {passive:true});
 
-// ── THEME ───────────────────────────────────────────────────────────────────
-const themeBtn = document.getElementById('themeToggle');
-const setTheme = t => {
-  document.documentElement.setAttribute('data-theme', t);
-  localStorage.setItem('theme', t);
-  if (themeBtn) themeBtn.innerHTML = t === 'dark' ? '<span>🌙</span> Dark' : '<span>☀️</span> Light';
-};
-const saved = localStorage.getItem('theme');
-setTheme(saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
-themeBtn.addEventListener('click', () => {
-  setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-});
+// The theme toggle (light → dark → fond) lives in /site.js, so all three
+// states stay in step across every page.
 
 // ── NAV TOGGLE ──────────────────────────────────────────────────────────────
 const toggle = document.getElementById('navToggle');

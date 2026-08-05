@@ -198,3 +198,12 @@ h3 { font-size: 1.25rem }
   font-family: var(--font-mono); font-size: .86em;
   background: var(--bg-3); padding: .1em .4em; border-radius: 6px;
 }
+
+/* ── FOND ──
+   The two radial washes and the noise film give the warm themes their depth;
+   on Fond's neutrals they read as a smudge, so the ground goes flat. */
+[data-theme="fond"] body { background-image:none;background-blend-mode:normal }
+[data-theme="fond"] .vine-divider { display:none }
+[data-theme="fond"] .section-title-row svg { width:13px;height:13px;order:-1 }
+[data-theme="fond"] #sf > g[fill] > path { fill:var(--coral) }
+[data-theme="fond"] #sf > circle { fill:var(--seed) }

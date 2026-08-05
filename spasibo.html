@@ -157,7 +157,16 @@ nav{
   .game-bar-vine{height:30px}
   .game-bar-info{padding:.25rem 1.1rem .4rem}
 }
+
+/* ── FOND ──
+   The page-local surfaces the shared sheet cannot reach. Everything else
+   comes from the Fond tokens in /tokens.css. */
+[data-theme="fond"] .game-frame{background:var(--bg-2)}
+@media(max-width:640px){
+  [data-theme="fond"] .nav-links{background:var(--nav-bg)}
+}
 </style>
+<script src="/site.js" defer></script>
 </head>
 <body>
 
@@ -222,17 +231,8 @@ links.querySelectorAll('a').forEach(a => {
   });
 });
 
-const themeBtn = document.getElementById('themeToggle');
-const setTheme = t => {
-  document.documentElement.setAttribute('data-theme', t);
-  localStorage.setItem('theme', t);
-  themeBtn.innerHTML = t === 'dark' ? '<span>🌙</span> Dark' : '<span>☀️</span> Light';
-};
-const saved = localStorage.getItem('theme');
-setTheme(saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
-themeBtn.addEventListener('click', () => {
-  setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-});
+// The theme toggle (light → dark → fond) lives in /site.js, so all three
+// states stay in step across every page.
 </script>
 </body>
 </html>

@@ -91,6 +91,120 @@
   --shadow-3: 0 10px 34px rgba(60,34,12,.18), 0 2px 8px rgba(60,34,12,.10);
 }
 
+/* ── FOND ──
+   A third theme beside the warm light and dark ones, not a variant of either.
+   Fond is the interface language the desktop apps share (fond-style/fond.css)
+   and the Plasma theme built from it: four stacked surfaces, a hairline where
+   they meet, and nothing raised or gradient. Every grey here is libadwaita's
+   own value, so the site sits at the same tone as Zerkalo or Rubric open
+   beside it.
+
+   The one thing that carries over from the warm themes is the red — and it is
+   the only colour left. Sunflowers stop being watermarks and vines and become
+   the section dot, which is the whole idea: colour survives as a mark, not as
+   a ground.
+
+   Unlike the other two, Fond follows the operating system's light/dark
+   setting, exactly as the apps do (System is their honoured default). So the
+   toggle offers three palettes, and the third of them has two faces. */
+[data-theme="fond"] {
+  --bg:        #f3f3f5;   /* .fond-ground  — the recessed plane cards sit on */
+  --bg-2:      #ffffff;   /* .fond-view / .fond-card */
+  --bg-3:      #ebebed;   /* .fond-chrome / .fond-sidebar */
+  --nav-bg:    rgba(235,235,237,.97);
+  --border:    rgba(0,0,6,.09);   /* alpha(@borders, .6) — between rows */
+  --border-hi: rgba(0,0,6,.15);   /* @borders — around a card */
+  --text:      #323237;
+  --text-2:    #5a5a60;
+  --text-3:    #8a8a90;
+  --coral:     #b83818;
+  --coral-hi:  #d04825;
+  --cpale:     rgba(184,56,24,.09);
+  --olive:     #4a6018;
+  --olive-hi:  #5a7820;
+  --opale:     rgba(74,96,24,.1);
+  --black:     #ffffff;
+  --ok:        #4a6018;
+
+  --game-title: #323237;
+  --game-desc:  #5a5a60;
+  --game-ascii: #8a8a90;
+  --game-label: #8a8a90;
+  --game-link:  #b83818;
+  --game-link-hover: #d04825;
+  --game-footer-border: rgba(0,0,6,.09);
+
+  --flatpak-green: #1b4d3e;
+  --flatpak-light: #2d6a4f;
+  --teal:      #207878;
+  --teal-pale: rgba(32,120,120,.1);
+
+  /* One radius, the card's. Fond has a single corner, not a scale of six. */
+  --r-xs:   3px;
+  --r-sm:   6px;
+  --r-md:   10px;
+  --r-lg:   10px;
+  --r-xl:   12px;
+  --r-pill: 999px;
+
+  /* Nothing is raised. What reads as elevation elsewhere is a hairline here,
+     so the shadow tokens flatten rather than being edited out of every rule. */
+  --shadow-1: none;
+  --shadow-2: none;
+  --shadow-3: none;
+
+  /* A wash, for hover and selection. Laid over a surface rather than
+     replacing it, so one value serves cards, rows and search fields. */
+  --wash:      rgba(0,0,6,.045);
+
+  /* The sunflower's centre, which the SVG hardcodes in the warm themes. */
+  --seed:      #5a2c10;
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-theme="fond"] {
+    --bg:        #28282c;
+    --bg-2:      #343437;
+    --bg-3:      #2e2e32;
+    --nav-bg:    rgba(46,46,50,.97);
+    --border:    rgba(255,255,255,.09);
+    --border-hi: rgba(255,255,255,.15);
+    --text:      #ffffff;
+    --text-2:    #bcbcc0;
+    --text-3:    #8e8e94;
+    --coral:     #e06030;
+    --coral-hi:  #f07848;
+    --cpale:     rgba(224,96,48,.12);
+    --olive:     #7a8840;
+    --olive-hi:  #96aa52;
+    --opale:     rgba(122,136,64,.15);
+    --black:     #1d1d20;
+    --ok:        #96aa52;
+
+    --game-title: #ffffff;
+    --game-desc:  #bcbcc0;
+    --game-ascii: #8e8e94;
+    --game-label: #8e8e94;
+    --game-link:  #e06030;
+    --game-link-hover: #f07848;
+    --game-footer-border: rgba(255,255,255,.09);
+
+    --flatpak-green: #2d6a4f;
+    --flatpak-light: #40916c;
+    --teal:      #3a9a9a;
+    --teal-pale: rgba(58,154,154,.12);
+
+    --wash:      rgba(255,255,255,.055);
+    --seed:      #7a4420;
+  }
+}
+
+/* The season still applies under Fond. Its rules below sit later in this file
+   at equal specificity, so they tint --olive here as they do in the warm
+   themes; only the light-theme overrides are scoped away from it. Fond leaves
+   --olive less to colour than the warm themes do, so the season reads quieter
+   — worth revisiting if it ends up too quiet to notice. */
+
 /* ── LITURGICAL SEASON ──
    The olive ornament accent follows the church year — the same calendar
    Rubric and Iskra compute (Advent Sunday, Easter, Ash Wednesday, Pentecost).

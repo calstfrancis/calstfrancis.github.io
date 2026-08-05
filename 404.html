@@ -39,6 +39,7 @@
 }
 .notfound-links{display:flex;gap:.75rem;flex-wrap:wrap;justify-content:center}
 </style>
+<script src="/site.js" defer></script>
 </head>
 <body>
 
@@ -98,20 +99,8 @@
 </main>
 
 <script>
-const themeBtn = document.getElementById('themeToggle');
-const _themeColor = document.getElementById('themeColorMeta');
-const setTheme = t => {
-  document.documentElement.setAttribute('data-theme', t);
-  localStorage.setItem('theme', t);
-  themeBtn.setAttribute('aria-pressed', t === 'dark' ? 'true' : 'false');
-  themeBtn.innerHTML = t === 'dark' ? '<span>🌙</span> Dark' : '<span>☀️</span> Light';
-  if (_themeColor) _themeColor.content = t === 'dark' ? '#6a1710' : '#e8d5b0';
-};
-const saved = localStorage.getItem('theme');
-setTheme(saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
-themeBtn.addEventListener('click', () => {
-  setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-});
+// The theme toggle (light → dark → fond) lives in /site.js, so all three
+// states stay in step across every page.
 </script>
 <script>if("serviceWorker"in navigator)navigator.serviceWorker.register("/sw.js").catch(()=>{});</script>
 </body>

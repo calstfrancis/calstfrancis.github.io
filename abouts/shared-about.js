@@ -81,18 +81,5 @@ window.addEventListener('scroll', () => {
   document.documentElement.style.setProperty('--scroll-progress', pct.toFixed(4));
 }, { passive: true });
 
-// Theme toggle with aria-pressed + theme-color meta
-const themeBtn = document.getElementById('themeToggle');
-const _tc = document.getElementById('themeColorMeta');
-const setTheme = t => {
-  document.documentElement.setAttribute('data-theme', t);
-  localStorage.setItem('theme', t);
-  themeBtn.setAttribute('aria-pressed', t === 'dark' ? 'true' : 'false');
-  themeBtn.innerHTML = t === 'dark' ? '<span>🌙</span> Dark' : '<span>☀️</span> Light';
-  if (_tc) _tc.content = t === 'dark' ? '#6a1710' : '#e8d5b0';
-};
-const saved = localStorage.getItem('theme');
-setTheme(saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
-themeBtn.addEventListener('click', () => {
-  setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-});
+// The theme toggle (light → dark → fond) lives in /site.js, so all three
+// states stay in step across every page.

@@ -793,27 +793,18 @@ const applyShotTheme = (function () {
     ...snap('picture.themed-shot img', 'src'),
     ...snap('a.project-shot.themed-shot', 'href'),
   ];
-  return theme => {
-    const dark = theme === 'dark';
+  return scheme => {
+    const dark = scheme === 'dark';
     items.forEach(o => o.el.setAttribute(o.attr, dark ? toDark(o.light) : o.light));
   };
 })();
 
-const themeBtn = document.getElementById('themeToggle');
-const _themeColor = document.getElementById('themeColorMeta');
-const setTheme = t => {
-  document.documentElement.setAttribute('data-theme', t);
-  localStorage.setItem('theme', t);
-  themeBtn.setAttribute('aria-pressed', t === 'dark' ? 'true' : 'false');
-  themeBtn.innerHTML = t === 'dark' ? '<span>🌙</span> Dark' : '<span>☀️</span> Light';
-  if (_themeColor) _themeColor.content = t === 'dark' ? '#6a1710' : '#e8d5b0';
-  applyShotTheme(t);
-};
-const saved = localStorage.getItem('theme');
-setTheme(saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
-themeBtn.addEventListener('click', () => {
-  setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-});
+// The toggle itself lives in site.js, which cycles light → dark → fond and
+// announces the result. What matters to a screenshot is brightness rather than
+// palette, so this follows detail.scheme — under Fond that is the OS setting,
+// not the theme name. This listener is registered while the page parses, so it
+// is in place before site.js (deferred) sets the initial theme.
+document.documentElement.addEventListener('themechange', e => applyShotTheme(e.detail.scheme));
 
 // SPASIBO title drifts between its Latin and Cyrillic spellings — a slow
 // opacity crossfade, not the old strobe. Opacity only, so it can't judder.
