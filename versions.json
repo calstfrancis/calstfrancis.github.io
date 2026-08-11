@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-10T04:18:58Z",
+  "updated": "2026-08-11T04:08:12Z",
   "manual": {
     "severed-hours": {
       "version": "1.23",
@@ -25,10 +25,10 @@
       "tag_name": "v0.20.0"
     },
     "calstfrancis/zerkalo": {
-      "downloads": 2,
-      "html_url": "https://github.com/calstfrancis/zerkalo/releases/tag/v0.20.0",
-      "published_at": "2026-08-06T17:55:30Z",
-      "tag_name": "v0.20.0"
+      "downloads": 0,
+      "html_url": "https://github.com/calstfrancis/zerkalo/releases/tag/v0.21.0",
+      "published_at": "2026-08-10T22:41:15Z",
+      "tag_name": "v0.21.0"
     },
     "calstfrancis/skrizhal": {
       "message": "Not Found",
@@ -36,9 +36,10 @@
       "status": "404"
     },
     "calstfrancis/kopilka": {
-      "message": "Not Found",
-      "documentation_url": "https://docs.github.com/rest/releases/releases#get-the-latest-release",
-      "status": "404"
+      "downloads": 0,
+      "html_url": "https://github.com/calstfrancis/kopilka/releases/tag/v0.6.1",
+      "published_at": "2026-08-11T00:25:52Z",
+      "tag_name": "v0.6.1"
     },
     "calstfrancis/kopilka-android": {
       "downloads": 1,
