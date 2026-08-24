@@ -95,11 +95,15 @@
    A fourth, fixed palette (not OS-following, unlike Fond) — the site's warm
    light/dark pair keeps its structure, but the hues come from the "Fondwave"
    Plasma colour scheme (Fondwave.colors): ivory and indigo instead of
-   parchment and brick-red. Coral survives as the one colour Fondwave
-   shares with the warm themes; the scheme's own purple and gold take the
-   --olive/--ok slot the warm themes give to green, and its berry magenta
-   marks the two spots (game-link) that were already a third, distinct hue
-   rather than --coral or --olive.
+   parchment and brick-red. The scheme's own purple takes the --olive/--ok
+   slot the warm themes give to green, and its berry magenta marks the game-
+   link spot that was already a third, distinct hue rather than --coral or
+   --olive. --coral itself is the scheme's coral, darkened the same way the
+   light theme darkens the dark theme's brighter coral — Fondwave.colors
+   tunes coral/purple as light-on-dark accents (DecorationHover/Focus), which
+   read fine on a button but fail text contrast against this theme's own
+   light ground, so --coral, --olive and --text-2/--text-3 all sit a good
+   deal darker than the swatches in fondwave-palette.html.
 
    Unlike Fond, Fondwave doesn't swap in a different UI language — it renders
    through the same shadowed, vine-decorated structure as light/dark, just
@@ -111,20 +115,20 @@
   --bg:        #e8dac8;
   --bg-2:      #fffbf5;
   --bg-3:      #faf3e8;
-  --nav-bg:    rgba(60,47,92,.97);
+  --nav-bg:    rgba(28,21,48,.97);
   --border:    rgba(74,59,86,.14);
   --border-hi: rgba(74,59,86,.26);
   --text:      #4a3b56;
-  --text-2:    #8b7a94;
-  --text-3:    #a897b0;
-  --coral:     #e2604a;
-  --coral-hi:  #ec7a63;
-  --cpale:     rgba(226,96,74,.1);
-  --olive:     #e8b87e;
-  --olive-hi:  #d9a860;
-  --opale:     rgba(232,184,126,.15);
+  --text-2:    #6b5a7e;
+  --text-3:    #7d6789;
+  --coral:     #ba3825;
+  --coral-hi:  #d14a30;
+  --cpale:     rgba(186,56,37,.1);
+  --olive:     #5b4b8a;
+  --olive-hi:  #7263ad;
+  --opale:     rgba(91,75,138,.12);
   --black:     #fffbf5;
-  --ok:        #e8b87e;
+  --ok:        #5b4b8a;
 
   --game-title: #3c2f5c;
   --game-desc:  #5a4a6e;
