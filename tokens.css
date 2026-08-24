@@ -91,6 +91,59 @@
   --shadow-3: 0 10px 34px rgba(60,34,12,.18), 0 2px 8px rgba(60,34,12,.10);
 }
 
+/* ── FONDWAVE ──
+   A fourth, fixed palette (not OS-following, unlike Fond) — the site's warm
+   light/dark pair keeps its structure, but the hues come from the "Fondwave"
+   Plasma colour scheme (Fondwave.colors): ivory and indigo instead of
+   parchment and brick-red. Coral survives as the one colour Fondwave
+   shares with the warm themes; the scheme's own purple and gold take the
+   --olive/--ok slot the warm themes give to green, and its berry magenta
+   marks the two spots (game-link) that were already a third, distinct hue
+   rather than --coral or --olive.
+
+   Unlike Fond, Fondwave doesn't swap in a different UI language — it renders
+   through the same shadowed, vine-decorated structure as light/dark, just
+   recoloured. Because its ground is light like the light theme's, every
+   light-tuned structural rule in style.css/shared-about.css/shop.html/
+   game.html/spasibo.html is scoped with :is([data-theme="light"],
+   [data-theme="fondwave"]) rather than duplicated. */
+[data-theme="fondwave"] {
+  --bg:        #e8dac8;
+  --bg-2:      #fffbf5;
+  --bg-3:      #faf3e8;
+  --nav-bg:    rgba(60,47,92,.97);
+  --border:    rgba(74,59,86,.14);
+  --border-hi: rgba(74,59,86,.26);
+  --text:      #4a3b56;
+  --text-2:    #8b7a94;
+  --text-3:    #a897b0;
+  --coral:     #e2604a;
+  --coral-hi:  #ec7a63;
+  --cpale:     rgba(226,96,74,.1);
+  --olive:     #e8b87e;
+  --olive-hi:  #d9a860;
+  --opale:     rgba(232,184,126,.15);
+  --black:     #fffbf5;
+  --ok:        #e8b87e;
+
+  --game-title: #3c2f5c;
+  --game-desc:  #5a4a6e;
+  --game-ascii: #6b5a78;
+  --game-label: #6b5a78;
+  --game-link:  #b23a72;
+  --game-link-hover: #d0498a;
+  --game-footer-border: #d6c6dc;
+
+  --flatpak-green: #1b4d3e;
+  --flatpak-light: #2d6a4f;
+  --teal:      #207878;
+  --teal-pale: rgba(32,120,120,.12);
+
+  --shadow-1: 0 1px 2px rgba(60,47,92,.12);
+  --shadow-2: 0 4px 16px rgba(60,47,92,.16);
+  --shadow-3: 0 10px 34px rgba(60,47,92,.22), 0 2px 8px rgba(60,47,92,.12);
+}
+
 /* ── FOND ──
    A third theme beside the warm light and dark ones, not a variant of either.
    Fond is the interface language the desktop apps share (fond-style/fond.css)
@@ -219,10 +272,10 @@
 [data-season="easter"]    { --olive:#9a7418; --olive-hi:#b88c22; --opale:rgba(154,116,24,.15) }
 [data-season="pentecost"] { --olive:#a32c1c; --olive-hi:#c03826; --opale:rgba(163,44,28,.15) }
 
-[data-theme="light"][data-season="advent"]    { --olive:#463878; --olive-hi:#584a90 }
-[data-theme="light"][data-season="christmas"] { --olive:#725210; --olive-hi:#8c661a }
-[data-theme="light"][data-season="epiphany"]  { --olive:#1f5f68; --olive-hi:#2a757f }
-[data-theme="light"][data-season="lent"]      { --olive:#522a5e; --olive-hi:#6a3a78 }
-[data-theme="light"][data-season="holyweek"]  { --olive:#6e1f18; --olive-hi:#8a2b22 }
-[data-theme="light"][data-season="easter"]    { --olive:#725210; --olive-hi:#8c661a }
-[data-theme="light"][data-season="pentecost"] { --olive:#821f12; --olive-hi:#a32c1c }
+:is([data-theme="light"],[data-theme="fondwave"])[data-season="advent"]    { --olive:#463878; --olive-hi:#584a90 }
+:is([data-theme="light"],[data-theme="fondwave"])[data-season="christmas"] { --olive:#725210; --olive-hi:#8c661a }
+:is([data-theme="light"],[data-theme="fondwave"])[data-season="epiphany"]  { --olive:#1f5f68; --olive-hi:#2a757f }
+:is([data-theme="light"],[data-theme="fondwave"])[data-season="lent"]      { --olive:#522a5e; --olive-hi:#6a3a78 }
+:is([data-theme="light"],[data-theme="fondwave"])[data-season="holyweek"]  { --olive:#6e1f18; --olive-hi:#8a2b22 }
+:is([data-theme="light"],[data-theme="fondwave"])[data-season="easter"]    { --olive:#725210; --olive-hi:#8c661a }
+:is([data-theme="light"],[data-theme="fondwave"])[data-season="pentecost"] { --olive:#821f12; --olive-hi:#a32c1c }

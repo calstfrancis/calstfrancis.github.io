@@ -136,7 +136,7 @@ nav{
 
 /* ── IFRAME ── */
 .game-frame{flex:1;width:100%;border:none;display:block;background:#09080a}
-[data-theme="light"] .game-frame{background:#e9e8e7}
+:is([data-theme="light"],[data-theme="fondwave"]) .game-frame{background:#e9e8e7}
 
 /* ── RESPONSIVE ── */
 @media(max-width:640px){
@@ -147,6 +147,7 @@ nav{
     flex-direction:column;gap:0;padding:.5rem 0;z-index:99;
   }
   [data-theme="light"] .nav-links{background:rgba(240,228,200,.99)}
+  [data-theme="fondwave"] .nav-links{background:rgba(255,251,245,.99)}
   .nav-links.open{display:flex}
   .nav-links li a,.nav-links li button{
     display:block;padding:.85rem 1.75rem;font-size:.82rem;
