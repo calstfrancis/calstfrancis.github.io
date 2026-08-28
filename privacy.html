@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Privacy Policy · Cal St Francis</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta name="description" content="Privacy policy for Cal St Francis's desktop applications, including Zarya's use of Google Calendar and weather data.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://calstfrancis.github.io/privacy.html">
+<meta property="og:title" content="Privacy Policy · Cal St Francis">
+<meta property="og:description" content="Privacy policy for Cal St Francis's desktop applications, including Zarya's use of Google Calendar and weather data.">
+<meta property="og:image" content="https://calstfrancis.github.io/og-default.svg">
+<link rel="canonical" href="https://calstfrancis.github.io/privacy.html">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#6a1710" id="themeColorMeta">
+<link rel="stylesheet" href="/fonts/fonts.css">
+<link rel="stylesheet" href="/abouts/shared-about.css">
+<script src="/site.js" defer></script>
+</head>
+<body>
+
+<a href="#main-content" class="skip-link">Skip to content</a>
+
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="nav-brand" style="text-decoration:none">
+      <svg viewBox="-55 -55 110 110" aria-hidden="true"><use href="#sf"/></svg>
+      Cal St Francis
+    </a>
+    <button class="theme-toggle" id="themeToggle" aria-pressed="false"><span>🌙</span> Dark</button>
+  </div>
+</nav>
+
+<main class="container animate-text" id="main-content">
+  <header class="article-header">
+    <a href="/" class="back-link">← Return to Portfolio</a>
+    <div class="project-eyebrow">Commitments</div>
+    <h1>Privacy Policy</h1>
+    <div class="project-subtitle">What these applications collect, store, and send — and what they don't</div>
+  </header>
+
+  <article class="article-body">
+    <p>
+      This policy covers the desktop applications built and distributed from this site and
+      its linked repositories, including <strong>Zarya</strong>. These are personal,
+      independently-developed tools, not a company or a service with a backend — there is no
+      server collecting anything, because there is no server.
+    </p>
+
+    <h2>The general rule</h2>
+    <ul class="commitments">
+      <li><strong>No analytics, no telemetry, no crash reporting, no tracking of any kind.</strong> Nothing about how you use these apps is recorded anywhere, by anyone.</li>
+      <li><strong>No account with me is required or possible.</strong> I do not receive, see, or store your data — everything lives on your own machine.</li>
+      <li><strong>Data only moves between your machine and the third-party service an app is explicitly built to talk to</strong> (e.g. Google Calendar, Open-Meteo for weather), directly, using credentials only you hold.</li>
+    </ul>
+
+    <h2>Zarya specifically</h2>
+    <p>Zarya is a personal daily-dashboard app (system updates, weather, backup status, calendar). Here is exactly what each part does:</p>
+    <ul class="commitments">
+      <li><strong>Google Calendar:</strong> if you connect it, Zarya requests read-only access (<code>calendar.readonly</code>) to fetch today's events, directly from Google's API, using an OAuth token that lives only on your machine, in your system's secure keyring (KWallet/GNOME Keyring via libsecret). I never see this token, your calendar data, or anything else about your Google account — there is no server in the middle to see it. Disconnecting in Zarya's Preferences removes the token from your keyring; you can also revoke access entirely at <a href="https://myaccount.google.com/permissions" class="game-link">myaccount.google.com/permissions</a>.</li>
+      <li><strong>Weather:</strong> the city you enter is sent to Open-Meteo (a free, keyless weather API) to fetch a forecast. No account, identifier, or tracking cookie is involved — it's an anonymous HTTP request, same as any browser loading a page.</li>
+      <li><strong>System updates and backup status:</strong> these run entirely on your own machine (<code>zypper</code>, <code>flatpak</code>, <code>systemctl</code>) and never leave it.</li>
+      <li><strong>Everything Zarya stores</strong> — your city, unit preference, last-update result, OAuth token — stays in your local config, cache, and keyring directories. None of it is sent to me or to any third party I control.</li>
+    </ul>
+
+    <h2>If something here is wrong</h2>
+    <p>
+      If any of this is unclear, or you find a place where an app does something other than
+      what's described here, write to
+      <a href="mailto:calstfrancis@disroot.org" class="game-link">calstfrancis@disroot.org</a>
+      and I will fix either the app or this page.
+    </p>
+  </article>
+</main>
+
+<script src="/abouts/shared-about.js"></script>
+</body>
+</html>
