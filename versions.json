@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-07T09:23:47Z",
+  "updated": "2026-10-08T09:33:43Z",
   "manual": {
     "severed-hours": {
       "version": "1.23",
@@ -26,9 +26,9 @@
     },
     "calstfrancis/zerkalo": {
       "downloads": 0,
-      "html_url": "https://github.com/calstfrancis/zerkalo/releases/tag/v0.49.0",
-      "published_at": "2026-10-05T19:42:50Z",
-      "tag_name": "v0.49.0"
+      "html_url": "https://github.com/calstfrancis/zerkalo/releases/tag/v0.50.0",
+      "published_at": "2026-10-07T14:46:17Z",
+      "tag_name": "v0.50.0"
     },
     "calstfrancis/skrizhal": {
       "message": "Not Found",
